@@ -1,4 +1,4 @@
-namespace AutomaticRoadblock.AbstractionLayer
+namespace AutomaticRoadblocks.AbstractionLayer
 {
     /// <summary>
     /// Abstraction interface for displaying notifications to the player.

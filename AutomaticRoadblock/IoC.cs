@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
-namespace AutomaticRoadblock
+namespace AutomaticRoadblocks
 {
     /// <summary>
     /// Lightweight implementation of an IoC container for simplification of mod dependencies to not use a heavyweight DLL dependency.

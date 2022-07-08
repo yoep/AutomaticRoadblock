@@ -1,6 +1,6 @@
-using AutomaticRoadblock;
-using AutomaticRoadblock.AbstractionLayer;
-using AutomaticRoadblock.Settings;
+using AutomaticRoadblocks;
+using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Settings;
 using AutomaticRoadblockTests.Model;
 using Moq;
 using Xunit;

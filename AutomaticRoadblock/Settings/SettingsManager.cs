@@ -1,13 +1,13 @@
 using System;
 using System.Windows.Forms;
-using AutomaticRoadblock.AbstractionLayer;
+using AutomaticRoadblocks.AbstractionLayer;
 using Rage;
 
-namespace AutomaticRoadblock.Settings
+namespace AutomaticRoadblocks.Settings
 {
     public class SettingsManager : ISettingsManager
     {
-        private const string File = @"./Plugins/LSPDFR/AutomaticRoadblock.ini";
+        private const string File = @"./Plugins/LSPDFR/AutomaticRoadblocks.ini";
 
         private readonly ILogger _logger;
 
@@ -18,6 +18,9 @@ namespace AutomaticRoadblock.Settings
 
         /// <inheritdoc />
         public GeneralSettings GeneralSettings { get; private set; }
+
+        /// <inheritdoc />
+        public AutomaticRoadblocksSettings AutomaticRoadblocksSettings { get; private set; }
 
         /// <inheritdoc />
         public void Load()
@@ -37,6 +40,7 @@ namespace AutomaticRoadblock.Settings
                 var settingsFile = new InitializationFile(File);
                 
                 ReadGeneralSettings(settingsFile);
+                ReadAutomaticRoadblocksSettings(settingsFile);
                 _logger.Info("Settings have been loaded with success");
             }
             catch (Exception ex)
@@ -50,7 +54,15 @@ namespace AutomaticRoadblock.Settings
             GeneralSettings = new GeneralSettings
             {
                 OpenMenuKey = ValueToKey(file.ReadString("General", "OpenMenuKey", "X")),
-                OpenMenuModifierKey = ValueToKey(file.ReadString("General", "OpenMenuModifierKey", "Shift"))
+                OpenMenuModifierKey = ValueToKey(file.ReadString("General", "OpenMenuModifierKey", "ShiftKey"))
+            };
+        }
+        
+        private void ReadAutomaticRoadblocksSettings(InitializationFile file)
+        {
+            AutomaticRoadblocksSettings = new AutomaticRoadblocksSettings
+            {
+                EnableDuringPursuits = file.ReadBoolean("AutomaticRoadblocksSettings", "EnableDuringPursuits", true),
             };
         }
         

@@ -1,4 +1,4 @@
-using AutomaticRoadblock;
+using AutomaticRoadblocks;
 
 namespace AutomaticRoadblockTests.Model
 {

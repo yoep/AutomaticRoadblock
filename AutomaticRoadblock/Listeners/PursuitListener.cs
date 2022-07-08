@@ -1,7 +1,7 @@
-using AutomaticRoadblock.AbstractionLayer;
+using AutomaticRoadblocks.AbstractionLayer;
 using LSPD_First_Response.Mod.API;
 
-namespace AutomaticRoadblock.Listeners
+namespace AutomaticRoadblocks.Listeners
 {
     public class PursuitListener : IPursuitListener
     {

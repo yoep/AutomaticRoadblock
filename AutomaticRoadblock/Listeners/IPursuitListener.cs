@@ -1,4 +1,4 @@
-namespace AutomaticRoadblock.Listeners
+namespace AutomaticRoadblocks.Listeners
 {
     public interface IPursuitListener
     {

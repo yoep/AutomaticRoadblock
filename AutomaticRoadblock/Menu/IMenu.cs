@@ -1,6 +1,6 @@
 using System;
 
-namespace AutomaticRoadblock.Menu
+namespace AutomaticRoadblocks.Menu
 {
     public interface IMenu : IDisposable
     {

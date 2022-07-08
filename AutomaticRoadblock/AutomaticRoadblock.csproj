@@ -7,15 +7,14 @@
         <ProjectGuid>{A869776E-0E1D-4A25-A9B8-C5CE060BF760}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>AutomaticRoadblock</RootNamespace>
-        <AssemblyName>AutomaticRoadblock</AssemblyName>
+        <RootNamespace>AutomaticRoadblocks</RootNamespace>
+        <AssemblyName>AutomaticRoadblocks</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
       <DebugType>pdbonly</DebugType>
       <Optimize>true</Optimize>
-      <DefineConstants>TRACE</DefineConstants>
       <ErrorReport>prompt</ErrorReport>
       <WarningLevel>4</WarningLevel>
       <OutputPath>bin\x64\Release\</OutputPath>
@@ -45,6 +44,7 @@
         <Reference Include="System" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
+        <Reference Include="System.Drawing" />
         <Reference Include="System.Windows.Forms" />
         <Reference Include="System.Xml" />
     </ItemGroup>
@@ -57,6 +57,14 @@
         <Compile Include="AbstractionLayer\INotification.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblockPlugin.cs" />
+        <Compile Include="Debug\INearbyRoadsPreview.cs" />
+        <Compile Include="Debug\IRoadInfo.cs" />
+        <Compile Include="Debug\IRoadPreview.cs" />
+        <Compile Include="Debug\NearbyRoadsPreview.cs" />
+        <Compile Include="Debug\RoadInfo.cs" />
+        <Compile Include="Debug\RoadPreview.cs" />
+        <Compile Include="Instances\IPreviewSupport.cs" />
+        <Compile Include="Instances\Road.cs" />
         <Compile Include="IoC.cs" />
         <Compile Include="IoCException.cs" />
         <Compile Include="Listeners\IPursuitListener.cs" />
@@ -68,15 +76,20 @@
         <Compile Include="Menu\MenuImpl.cs" />
         <Compile Include="Menu\MenuType.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Roadblock\Menu\EnableDuringPursuitComponent.cs" />
+        <Compile Include="Settings\AutomaticRoadblocksSettings.cs" />
         <Compile Include="Settings\GeneralSettings.cs" />
         <Compile Include="Settings\ISettingsManager.cs" />
         <Compile Include="Settings\SettingsManager.cs" />
         <Compile Include="Utils\LspdfrUtils.cs" />
         <Compile Include="Utils\ModelUtils.cs" />
         <Compile Include="Utils\PreviewUtils.cs" />
+        <Compile Include="Utils\Road\RoadType.cs" />
+        <Compile Include="Utils\Road\RoadUtils.cs" />
+        <Compile Include="Utils\TimePeriod.cs" />
     </ItemGroup>
     <ItemGroup>
-      <Content Include="AutomaticRoadblock.ini">
+      <Content Include="AutomaticRoadblocks.ini">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>

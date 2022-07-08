@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Forms;
-using AutomaticRoadblock.AbstractionLayer;
-using AutomaticRoadblock.Settings;
+using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Settings;
 using Rage;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
 
-namespace AutomaticRoadblock.Menu
+namespace AutomaticRoadblocks.Menu
 {
     public class MenuImpl : IMenu
     {
@@ -78,7 +79,9 @@ namespace AutomaticRoadblock.Menu
             try
             {
                 _logger.Trace("Creating sub-menu's");
-                Menus.Add(MenuType.DEBUG, CreateMenu());
+                Menus.Add(MenuType.PURSUIT, CreateMenu());
+                Menus.Add(MenuType.MANUAL_PLACEMENT, CreateMenu());
+                AddDebugMenu();
 
                 _logger.Trace("Creating menu switcher");
                 CreateMenuSwitcher();
@@ -103,7 +106,7 @@ namespace AutomaticRoadblock.Menu
                 _notification.DisplayPluginNotification("an unexpected error occurred");
             }
         }
-        
+
         private void Process(object sender, GraphicsEventArgs e)
         {
             try
@@ -122,7 +125,7 @@ namespace AutomaticRoadblock.Menu
                 _notification.DisplayPluginNotification("an unexpected error occurred");
             }
         }
-        
+
         private void ItemSelectionHandler(UIMenu sender, UIMenuItem selectedItem, int index)
         {
             var menuComponent = MenuItems.FirstOrDefault(x => x.MenuItem == selectedItem);
@@ -148,7 +151,7 @@ namespace AutomaticRoadblock.Menu
                 _notification.DisplayPluginNotification("an unexpected error occurred while invoking the menu action");
             }
         }
-        
+
         private bool IsMenuKeyPressed()
         {
             var generalSettings = _settingsManager.GeneralSettings;
@@ -171,17 +174,25 @@ namespace AutomaticRoadblock.Menu
 
         private static UIMenu CreateMenu()
         {
-            var menu = new UIMenu("Automatic Roadblock", "~b~Dispatch roadblocks");
+            var menu = new UIMenu("Automatic Roadblocks", "~b~Dispatch roadblocks");
             MenuPool.Add(menu);
             return menu;
         }
 
         private void CreateMenuSwitcher()
         {
-            _menuSwitcher = new UIMenuSwitchMenusItem("Type", null,
+            _menuSwitcher = new UIMenuSwitchMenusItem("Mode", null,
+                new DisplayItem(Menus[MenuType.PURSUIT], "Pursuit"),
+                new DisplayItem(Menus[MenuType.MANUAL_PLACEMENT], "Manual Placement"),
                 new DisplayItem(Menus[MenuType.DEBUG], "Debug"));
         }
         
+        [Conditional("DEBUG")]
+        private static void AddDebugMenu()
+        {
+            Menus.Add(MenuType.DEBUG, CreateMenu());
+        }
+
         #endregion
     }
 }

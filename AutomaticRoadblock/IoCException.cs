@@ -1,6 +1,6 @@
 using System;
 
-namespace AutomaticRoadblock
+namespace AutomaticRoadblocks
 {
     public class IoCException : Exception
     {

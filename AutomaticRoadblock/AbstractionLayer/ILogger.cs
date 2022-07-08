@@ -1,6 +1,6 @@
 using System;
 
-namespace AutomaticRoadblock.AbstractionLayer
+namespace AutomaticRoadblocks.AbstractionLayer
 {
     public interface ILogger
     {

@@ -4,7 +4,7 @@ using LSPD_First_Response.Engine.Scripting;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
-namespace AutomaticRoadblock.Utils
+namespace AutomaticRoadblocks.Utils
 {
     public static class ModelUtils
     {

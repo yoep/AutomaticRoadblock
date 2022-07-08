@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using Rage;
 
-namespace AutomaticRoadblock.AbstractionLayer.Implementation
+namespace AutomaticRoadblocks.AbstractionLayer.Implementation
 {
     public class RageFiber : IGameFiber
     {

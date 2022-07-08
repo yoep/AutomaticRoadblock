@@ -1,4 +1,4 @@
-namespace AutomaticRoadblock.Settings
+namespace AutomaticRoadblocks.Settings
 {
     public interface ISettingsManager
     {
@@ -6,6 +6,11 @@ namespace AutomaticRoadblock.Settings
         /// Get the general settings for this plugin.
         /// </summary>
         GeneralSettings GeneralSettings { get; }
+        
+        /// <summary>
+        /// Get the automatic roadblocks settings for this plugin.
+        /// </summary>
+        AutomaticRoadblocksSettings AutomaticRoadblocksSettings { get; }
 
         /// <summary>
         /// Load the settings from the configuration file.

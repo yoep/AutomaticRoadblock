@@ -2,14 +2,16 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using AutomaticRoadblock.AbstractionLayer;
-using AutomaticRoadblock.AbstractionLayer.Implementation;
-using AutomaticRoadblock.Listeners;
-using AutomaticRoadblock.Menu;
-using AutomaticRoadblock.Settings;
+using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.AbstractionLayer.Implementation;
+using AutomaticRoadblocks.Debug;
+using AutomaticRoadblocks.Listeners;
+using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Roadblock.Menu;
+using AutomaticRoadblocks.Settings;
 using LSPD_First_Response.Mod.API;
 
-namespace AutomaticRoadblock
+namespace AutomaticRoadblocks
 {
     /// <inheritdoc />
     [SuppressMessage("ReSharper", "UnusedType.Global")]
@@ -24,6 +26,8 @@ namespace AutomaticRoadblock
         {
             InitializeDutyListener();
             InitializeSettings();
+            InitializeMenuComponents();
+            InitializeDebugComponents();
             InitializeMenu();
 
             AttachDebugger();
@@ -94,6 +98,12 @@ namespace AutomaticRoadblock
             logger.Debug($"Initialized a total of {menu.TotalItems} menu component(s)");
         }
 
+        private static void InitializeMenuComponents()
+        {
+            IoC.Instance
+                .RegisterSingleton<IMenuComponent>(typeof(EnableDuringPursuitComponent));
+        }
+
         private static void OnDutyStateChanged(bool onDuty)
         {
             var logger = IoC.Instance.GetInstance<ILogger>();
@@ -117,6 +127,18 @@ namespace AutomaticRoadblock
         private static void AttachDebugger()
         {
             Rage.Debug.AttachAndBreak();
+        }
+        
+        [Conditional("DEBUG")]
+        private static void InitializeDebugComponents()
+        {
+            var logger = IoC.Instance.GetInstance<ILogger>();
+
+            logger.Debug("Registering debug menu components");
+            IoC.Instance
+                .RegisterSingleton<IRoadInfo>(typeof(RoadInfo))
+                .Register<IRoadPreview>(typeof(RoadPreview))
+                .Register<INearbyRoadsPreview>(typeof(NearbyRoadsPreview));
         }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using RAGENativeUI.Elements;
 
-namespace AutomaticRoadblock.Menu
+namespace AutomaticRoadblocks.Menu
 {
     public class MenuException : Exception
     {

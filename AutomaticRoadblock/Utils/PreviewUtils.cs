@@ -1,7 +1,7 @@
 using Rage;
 using Rage.Native;
 
-namespace AutomaticRoadblock.Utils
+namespace AutomaticRoadblocks.Utils
 {
     public static class PreviewUtils
     {

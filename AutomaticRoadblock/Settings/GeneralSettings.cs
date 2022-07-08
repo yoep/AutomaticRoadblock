@@ -1,6 +1,6 @@
 using System.Windows.Forms;
 
-namespace AutomaticRoadblock.Settings
+namespace AutomaticRoadblocks.Settings
 {
     public class GeneralSettings
     {

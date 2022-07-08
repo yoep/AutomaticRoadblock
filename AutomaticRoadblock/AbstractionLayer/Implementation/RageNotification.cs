@@ -1,6 +1,6 @@
 using Rage;
 
-namespace AutomaticRoadblock.AbstractionLayer.Implementation
+namespace AutomaticRoadblocks.AbstractionLayer.Implementation
 {
     public class RageNotification : INotification
     {
