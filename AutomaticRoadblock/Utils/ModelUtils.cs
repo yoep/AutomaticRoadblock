@@ -8,43 +8,77 @@ namespace AutomaticRoadblocks.Utils
 {
     public static class ModelUtils
     {
+        private const string PoliceBikeModelName = "POLICEB";
         private static readonly Random Random = new Random();
 
         #region Constants
 
-        internal static readonly List<string> CityPedModels = new List<string>
+        public static class Weapons
         {
-            "s_m_y_cop_01",
-            "s_f_y_cop_01"
-        };
+            public const string Pistol = "weapon_pistol";
+            public const string StunGun = "weapon_stungun_mp";
+        }
 
-        internal static readonly List<string> CountyPedModels = new List<string>
+        public static class Peds
         {
-            "s_f_y_sheriff_01",
-            "s_m_y_sheriff_01"
-        };
+            public static readonly List<string> CopCityPedModels = new List<string>
+            {
+                "s_m_y_cop_01",
+                "s_f_y_cop_01"
+            };
 
-        internal static readonly List<string> StatePedModels = new List<string>
-        {
-            "s_m_y_hwaycop_01"
-        };
+            public static readonly List<string> CopCountyPedModels = new List<string>
+            {
+                "s_f_y_sheriff_01",
+                "s_m_y_sheriff_01"
+            };
+
+            public static readonly List<string> CopStatePedModels = new List<string>
+            {
+                "s_m_y_hwaycop_01"
+            };
+
+            public static readonly List<string> CopFbiPedModels = new List<string>
+            {
+                "ig_fbisuit_01",
+                "cs_fbisuit_01"
+            };
+
+            public static readonly List<string> CopSwatPedModels = new List<string>
+            {
+                "s_m_y_swat_01",
+            };
+        }
 
         internal static readonly List<string> CityVehicleModels = new List<string>
         {
             "POLICE",
             "POLICE2",
-            "POLICE3"
+            PoliceBikeModelName
         };
 
         internal static readonly List<string> CountyVehicleModels = new List<string>
         {
             "SHERIFF",
-            "SHERIFF2"
+            "SHERIFF2",
+            PoliceBikeModelName
         };
 
         internal static readonly List<string> StateVehicleModels = new List<string>
         {
-            "POLICE3"
+            "POLICE3",
+            PoliceBikeModelName
+        };
+
+        internal static readonly List<string> FbiVehicleModels = new List<string>
+        {
+            "FBI",
+            "FBI2"
+        };
+
+        internal static readonly List<string> SwatVehicleModels = new List<string>
+        {
+            "Riot"
         };
 
         #endregion
@@ -61,8 +95,8 @@ namespace AutomaticRoadblocks.Utils
             var zone = GetZone(position);
 
             return IsCountyZone(zone)
-                ? new Model(CityPedModels[Random.Next(CityPedModels.Count)])
-                : new Model(CountyPedModels[Random.Next(CountyPedModels.Count)]);
+                ? new Model(Peds.CopCountyPedModels[Random.Next(Peds.CopCountyPedModels.Count)])
+                : new Model(Peds.CopCityPedModels[Random.Next(Peds.CopCityPedModels.Count)]);
         }
 
         /// <summary>
@@ -75,8 +109,8 @@ namespace AutomaticRoadblocks.Utils
             var zone = GetZone(position);
 
             return IsCountyZone(zone)
-                ? new Model(CityVehicleModels[Random.Next(CityVehicleModels.Count)])
-                : new Model(CountyVehicleModels[Random.Next(CountyVehicleModels.Count)]);
+                ? new Model(CountyVehicleModels[Random.Next(CountyVehicleModels.Count)])
+                : new Model(CityVehicleModels[Random.Next(CityVehicleModels.Count)]);
         }
 
         /// <summary>
@@ -113,6 +147,17 @@ namespace AutomaticRoadblocks.Utils
         public static Model GetFireTruck()
         {
             return new Model("FIRETRUK");
+        }
+
+        /// <summary>
+        /// Verify if the given model is a bike.
+        /// </summary>
+        /// <param name="model">The model to verify.</param>
+        /// <returns>Returns true if the model is a bike, else false.</returns>
+        public static bool IsBike(Model model)
+        {
+            Assert.NotNull(model, "model cannot be null");
+            return model.Name.Equals(PoliceBikeModelName);
         }
 
         #endregion

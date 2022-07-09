@@ -7,7 +7,7 @@ namespace AutomaticRoadblocks.AbstractionLayer.Implementation
         /// <inheritdoc />
         public void DisplayPluginNotification(string message)
         {
-            Game.DisplayNotification("~b~" + AutomaticRoadblockPlugin.Name + " ~s~" + message.Trim());
+            Game.DisplayNotification("~b~" + AutomaticRoadblocksPlugin.Name + " ~s~" + message.Trim());
         }
 
         /// <inheritdoc />

@@ -47,7 +47,7 @@ namespace AutomaticRoadblocks.AbstractionLayer.Implementation
         {
             var stacktrace = exception?.StackTrace;
 
-            return $"{AutomaticRoadblockPlugin.Name}: [{level}] {message}\n{stacktrace}";
+            return $"{AutomaticRoadblocksPlugin.Name}: [{level}] {message}\n{stacktrace}";
         }
     }
 }

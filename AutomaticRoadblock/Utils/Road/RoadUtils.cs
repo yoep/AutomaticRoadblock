@@ -16,9 +16,9 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="position">Set the position to use as reference.</param>
         /// <param name="roadType">Set the road type.</param>
         /// <returns>Returns the position of the closest road.</returns>
-        public static Instances.Road GetClosestRoad(Vector3 position, RoadType roadType)
+        public static Road GetClosestRoad(Vector3 position, RoadType roadType)
         {
-            Instances.Road closestRoad = null;
+            Road closestRoad = null;
             var closestRoadDistance = 99999f;
 
             foreach (var road in GetNearbyRoads(position, roadType))
@@ -41,12 +41,12 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="road">Set the road to get the closest lane of.</param>
         /// <param name="closestToPoint">Set the point.</param>
         /// <returns>Returns the closest lane of the road in regards to the given point.</returns>
-        public static Instances.Road.Lane GetClosestLane(Instances.Road road, Vector3 closestToPoint)
+        public static Road.Lane GetClosestLane(Road road, Vector3 closestToPoint)
         {
             Assert.NotNull(road, "road cannot be null");
             Assert.NotNull(closestToPoint, "closestToPoint cannot be null");
             var distanceClosestLane = 9999f;
-            Instances.Road.Lane closestLane = null;
+            Road.Lane closestLane = null;
 
             foreach (var lane in road.Lanes)
             {
@@ -68,15 +68,15 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="position">Set the position to use as reference.</param>
         /// <param name="roadType">Set the road type.</param>
         /// <returns>Returns the position of the closest road.</returns>
-        public static IEnumerable<Instances.Road> GetNearbyRoads(Vector3 position, RoadType roadType)
+        public static IEnumerable<Road> GetNearbyRoads(Vector3 position, RoadType roadType)
         {
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(roadType, "roadType cannot be null");
 
             NativeFunction.Natives.GET_CLOSEST_ROAD(position.X, position.Y, position.Z, 1f, 1, out Vector3 road1, out Vector3 road2, out int numberOfLanes1,
-                out int numberOfLanes2, out float junctionIndication, (int) roadType);
+                out int numberOfLanes2, out float junctionIndication, (int)roadType);
 
-            return new List<Instances.Road>
+            return new List<Road>
             {
                 DiscoverRoad(road1, numberOfLanes1, numberOfLanes2, junctionIndication),
                 DiscoverRoad(road2, numberOfLanes1, numberOfLanes2, junctionIndication)
@@ -99,7 +99,7 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="road">The road to determine the lane side of.</param>
         /// <param name="lane">The lane on the road to verify.</param>
         /// <returns>Returns true if the given lane is the left lane of the road, else false.</returns>
-        public static bool IsLeftSideLane(Instances.Road road, Instances.Road.Lane lane)
+        public static bool IsLeftSideLane(Road road, Road.Lane lane)
         {
             var distanceRightSide = Vector3.Distance2D(road.RightSide, lane.Position);
             var distanceLeftSide = Vector3.Distance2D(road.LeftSide, lane.Position);
@@ -113,18 +113,42 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="road">The road to verify the lanes of.</param>
         /// <param name="lane">The lane to check for same direction.</param>
         /// <returns>Returns true if the road has multiple lanes going in the same direction as the given lane.</returns>
-        public static bool HasMultipleLanesInSameDirection(Instances.Road road, Instances.Road.Lane lane)
+        public static bool HasMultipleLanesInSameDirection(Road road, Road.Lane lane)
         {
+            Assert.NotNull(road, "road cannot be null");
             return road.Lanes
                 .Where(x => x != lane)
                 .Any(x => Math.Abs(lane.Heading - x.Heading) < 1f);
+        }
+
+        /// <summary>
+        /// Create a new speed zone.
+        /// </summary>
+        /// <param name="position">The position of the zone.</param>
+        /// <param name="radius">The radius of the zone.</param>
+        /// <param name="speed">The max speed within the zone.</param>
+        /// <returns>Returns the created zone ID.</returns>
+        public static int CreateSpeedZone(Vector3 position, float radius, float speed)
+        {
+            Assert.NotNull(position, "position cannot be null");
+            return NativeFunction.Natives._ADD_SPEED_ZONE_FOR_COORD<int>(position.X, position.Y, position.Z, radius, speed, false);
+        }
+
+        /// <summary>
+        /// Remove a speed zone.
+        /// </summary>
+        /// <param name="zoneId">The zone id to remove.</param>
+        public static void RemoveSpeedZone(int zoneId)
+        {
+            Assert.NotNull(zoneId, "zoneId cannot be null");
+            NativeFunction.Natives._REMOVE_SPEED_ZONE(zoneId);
         }
 
         #endregion
 
         #region Functions
 
-        private static Instances.Road DiscoverRoad(Vector3 roadPosition, int numberOfLanes1, int numberOfLanes2, float junctionIndication)
+        private static Road DiscoverRoad(Vector3 roadPosition, int numberOfLanes1, int numberOfLanes2, float junctionIndication)
         {
             var vehicleNode = GetVehicleNode(roadPosition);
             var rightSideHeading = vehicleNode.Heading;
@@ -143,17 +167,17 @@ namespace AutomaticRoadblocks.Utils.Road
                 .LeftSide(roadLeftSide)
                 .NumberOfLanes1(numberOfLanes1)
                 .NumberOfLanes2(numberOfLanes2)
-                .JunctionIndicator((int) junctionIndication)
+                .JunctionIndicator((int)junctionIndication)
                 .Lanes(DiscoverLanes(roadRightSide, roadLeftSide, roadPosition, rightSideHeading, numberOfLanes1, numberOfLanes2))
                 .Node(vehicleNode)
                 .Build();
         }
 
-        private static List<Instances.Road.Lane> DiscoverLanes(Vector3 roadRightSide, Vector3 roadLeftSide, Vector3 roadMiddle, float rightSideHeading,
+        private static List<Road.Lane> DiscoverLanes(Vector3 roadRightSide, Vector3 roadLeftSide, Vector3 roadMiddle, float rightSideHeading,
             int numberOfLanes1, int numberOfLanes2)
         {
             var singleDirection = IsSingleDirectionRoad(numberOfLanes1, numberOfLanes2);
-            var lanes = new List<Instances.Road.Lane>();
+            var lanes = new List<Road.Lane>();
 
             if (singleDirection)
             {
@@ -173,12 +197,12 @@ namespace AutomaticRoadblocks.Utils.Road
             return lanes;
         }
 
-        private static IEnumerable<Instances.Road.Lane> CreateLanes(Vector3 roadRightSide, float rightSideHeading, int numberOfLanes, float laneWidth,
+        private static IEnumerable<Road.Lane> CreateLanes(Vector3 roadRightSide, float rightSideHeading, int numberOfLanes, float laneWidth,
             bool isOpposite)
         {
             var lastRightPosition = roadRightSide;
             var moveDirection = MathHelper.ConvertHeadingToDirection(rightSideHeading + 90f);
-            var lanes = new List<Instances.Road.Lane>();
+            var lanes = new List<Road.Lane>();
 
             for (var index = 1; index <= numberOfLanes; index++)
             {
@@ -208,12 +232,12 @@ namespace AutomaticRoadblocks.Utils.Road
             return roadPosition + directionOfTheSideToFix * widthOtherSide;
         }
 
-        private static Instances.Road.VehicleNode GetVehicleNode(Vector3 position)
+        private static Road.VehicleNode GetVehicleNode(Vector3 position)
         {
-            NativeFunction.Natives.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(position.X, position.Y, position.Z, out Vector3 nodePosition, out float nodeHeading, 
+            NativeFunction.Natives.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(position.X, position.Y, position.Z, out Vector3 nodePosition, out float nodeHeading,
                 1, 3, 0);
 
-            return new Instances.Road.VehicleNode
+            return new Road.VehicleNode
             {
                 Position = nodePosition,
                 Heading = MathHelper.NormalizeHeading(nodeHeading)
@@ -245,7 +269,7 @@ namespace AutomaticRoadblocks.Utils.Road
             do
             {
                 lastPositionOnTheRoad = currentPosition;
-                currentPosition = currentPosition + direction * checkInterval;
+                currentPosition += direction * checkInterval;
                 isPointOnRoad = NativeFunction.Natives.IS_POINT_ON_ROAD<bool>(currentPosition.X, currentPosition.Y, currentPosition.Z);
             } while (isPointOnRoad);
 
@@ -284,14 +308,14 @@ namespace AutomaticRoadblocks.Utils.Road
 
     internal class RoadBuilder
     {
-        private readonly List<Instances.Road.Lane> _lanes = new List<Instances.Road.Lane>();
+        private readonly List<Road.Lane> _lanes = new List<Road.Lane>();
         private Vector3 _position;
         private Vector3 _rightSide;
         private Vector3 _leftSide;
         private int _numberOfLanes1;
         private int _numberOfLanes2;
         private int _junctionIndicator;
-        private Instances.Road.VehicleNode _node;
+        private Road.VehicleNode _node;
 
         private RoadBuilder()
         {
@@ -341,26 +365,26 @@ namespace AutomaticRoadblocks.Utils.Road
             return this;
         }
 
-        public RoadBuilder Lanes(List<Instances.Road.Lane> lanes)
+        public RoadBuilder Lanes(List<Road.Lane> lanes)
         {
             Assert.NotNull(lanes, "lanes cannot be null");
             _lanes.AddRange(lanes);
             return this;
         }
 
-        public RoadBuilder Node(Instances.Road.VehicleNode node)
+        public RoadBuilder Node(Road.VehicleNode node)
         {
             Assert.NotNull(node, "node cannot be null");
             _node = node;
             return this;
         }
 
-        public Instances.Road Build()
+        public Road Build()
         {
             Assert.NotNull(_position, "position has not been set");
             Assert.NotNull(_rightSide, "rightSide has not been set");
             Assert.NotNull(_leftSide, "leftSide has not been set");
-            return new Instances.Road(_position, _rightSide, _leftSide, _lanes.AsReadOnly(), _node, _numberOfLanes1, _numberOfLanes2, _junctionIndicator);
+            return new Road(_position, _rightSide, _leftSide, _lanes.AsReadOnly(), _node, _numberOfLanes1, _numberOfLanes2, _junctionIndicator);
         }
     }
 
@@ -423,9 +447,9 @@ namespace AutomaticRoadblocks.Utils.Road
             return this;
         }
 
-        public Instances.Road.Lane Build()
+        public Road.Lane Build()
         {
-            return new Instances.Road.Lane(_number, _heading, _rightSide, _leftSide, _nodePosition, _width);
+            return new Road.Lane(_number, _heading, _rightSide, _leftSide, _nodePosition, _width);
         }
     }
 }

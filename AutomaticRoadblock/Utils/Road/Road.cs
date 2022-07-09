@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using AutomaticRoadblocks.Preview;
 using Rage;
 
-namespace AutomaticRoadblocks.Instances
+namespace AutomaticRoadblocks.Utils.Road
 {
     public class Road : IPreviewSupport
     {

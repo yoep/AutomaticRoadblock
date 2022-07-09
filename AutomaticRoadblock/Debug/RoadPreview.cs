@@ -1,28 +1,28 @@
 using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug
 {
-    public class RoadPreview : IRoadPreview
+    public class RoadPreview : IMenuComponent
     {
         private readonly ILogger _logger;
-        private readonly IGameFiber _gameFiber;
+        private readonly IGame _game;
         private Road _road;
 
-        public RoadPreview(ILogger logger, IGameFiber gameFiber)
+        public RoadPreview(ILogger logger, IGame game)
         {
             _logger = logger;
-            _gameFiber = gameFiber;
+            _game = game;
         }
 
         #region IMenuComponent
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblockPlugin.RoadPreview);
+        public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.RoadPreview);
 
         /// <inheritdoc />
         public MenuType Type => MenuType.DEBUG;
@@ -45,29 +45,11 @@ namespace AutomaticRoadblocks.Debug
 
         #endregion
 
-        #region IRoadPreview
-
-        /// <inheritdoc />
-        public void ShowRoadPreview()
-        {
-            if (_road == null)
-                CreateRoadPreview();
-        }
-
-        /// <inheritdoc />
-        public void HideRoadPreview()
-        {
-            if (_road != null)
-                RemoveRoadPreview();
-        }
-
-        #endregion
-
         private void CreateRoadPreview()
         {
-            _gameFiber.NewSafeFiber(() =>
+            _game.NewSafeFiber(() =>
             {
-                MenuItem.Text = AutomaticRoadblockPlugin.RoadPreviewRemove;
+                MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreviewRemove;
                 _road = RoadUtils.GetClosestRoad(Game.LocalPlayer.Character.Position, RoadType.All);
                 _logger.Debug("Nearest road info: " + _road);
                 _road.CreatePreview();
@@ -76,9 +58,9 @@ namespace AutomaticRoadblocks.Debug
 
         private void RemoveRoadPreview()
         {
-            _gameFiber.NewSafeFiber(() =>
+            _game.NewSafeFiber(() =>
             {
-                MenuItem.Text = AutomaticRoadblockPlugin.RoadPreview;
+                MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreview;
                 _road.DeletePreview();
                 _road = null;
             }, "RoadPreview");

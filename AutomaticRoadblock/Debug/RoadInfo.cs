@@ -6,7 +6,7 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug
 {
-    public class RoadInfo : IRoadInfo
+    public class RoadInfo : IMenuComponent
     {
         private readonly ILogger _logger;
         private readonly INotification _notification;
@@ -18,7 +18,7 @@ namespace AutomaticRoadblocks.Debug
         }
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblockPlugin.RoadInfo);
+        public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.RoadInfo);
         
         /// <inheritdoc />
         public MenuType Type => MenuType.DEBUG;

@@ -40,6 +40,9 @@
           <HintPath>..\packages\Moq.4.18.1\lib\net462\Moq.dll</HintPath>
         </Reference>
         <Reference Include="mscorlib" />
+        <Reference Include="RagePluginHook">
+          <HintPath>..\Libs\RagePluginHookSDK.dll</HintPath>
+        </Reference>
         <Reference Include="System" />
         <Reference Include="System.Configuration" />
         <Reference Include="System.Core" />
@@ -65,10 +68,12 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="AbstractionLayer\Implementation\SystemLogger.cs" />
         <Compile Include="IoCTests.cs" />
         <Compile Include="Model\IPostConstructModel.cs" />
         <Compile Include="Model\PostConstructModel.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Pursuit\PursuitManagerTests.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
@@ -81,6 +86,9 @@
         <Project>{a869776e-0e1d-4a25-a9b8-c5ce060bf760}</Project>
         <Name>AutomaticRoadblock</Name>
       </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Roadblock.Menu" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

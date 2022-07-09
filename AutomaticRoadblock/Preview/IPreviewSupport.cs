@@ -1,4 +1,4 @@
-namespace AutomaticRoadblocks.Instances
+namespace AutomaticRoadblocks.Preview
 {
     /// <summary>
     /// Indicates that the instance can create a preview of itself in the game world.

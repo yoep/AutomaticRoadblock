@@ -4,16 +4,25 @@ using Rage;
 
 namespace AutomaticRoadblocks.AbstractionLayer.Implementation
 {
-    public class RageFiber : IGameFiber
+    public class Rage : IGame
     {
         private readonly INotification _notification;
         private readonly ILogger _logger;
 
-        public RageFiber(INotification notification, ILogger logger)
+        public Rage(INotification notification, ILogger logger)
         {
             _notification = notification;
             _logger = logger;
         }
+
+        /// <inheritdoc />
+        public uint GameTime => Game.GameTime;
+
+        /// <inheritdoc />
+        public Vector3 PlayerPosition => Game.LocalPlayer.Character.Position;
+
+        /// <inheritdoc />
+        public Vehicle PlayerVehicle => Game.LocalPlayer.LastVehicle;
 
         /// <inheritdoc />
         public void NewSafeFiber(Action action, string name)
