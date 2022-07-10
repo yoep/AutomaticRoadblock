@@ -131,7 +131,7 @@ namespace AutomaticRoadblocks.Utils.Road
         public static int CreateSpeedZone(Vector3 position, float radius, float speed)
         {
             Assert.NotNull(position, "position cannot be null");
-            return NativeFunction.Natives._ADD_SPEED_ZONE_FOR_COORD<int>(position.X, position.Y, position.Z, radius, speed, false);
+            return NativeFunction.Natives._ADD_SPEED_ZONE_FOR_COORD<uint>(0x2CE544C68FB812A0, position.X, position.Y, position.Z, radius, speed, false);
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace AutomaticRoadblocks.Utils.Road
             var roadRightSide = GetLastPointOnTheLane(roadPosition, rightSideHeading - 90f);
             var roadLeftSide = GetLastPointOnTheLane(roadPosition, rightSideHeading + 90f);
 
-            //Fix a side if it's the same as the middle of the road as GetLastPointOnTheLane probably failed to determine the last point
+            // Fix a side if it's the same as the middle of the road as GetLastPointOnTheLane probably failed to determine the last point
             if (roadRightSide == roadPosition)
                 roadRightSide = FixFailedLastPointCalculation(roadPosition, roadLeftSide, rightSideHeading - 90f);
             if (roadLeftSide == roadPosition)
@@ -246,7 +246,7 @@ namespace AutomaticRoadblocks.Utils.Road
 
         private static Vector3 GetLastPointOnTheLane(Vector3 position, float heading)
         {
-            var checkInterval = 5f;
+            var checkInterval = 2f;
             var lastPositionOnTheRoad = position;
 
             do

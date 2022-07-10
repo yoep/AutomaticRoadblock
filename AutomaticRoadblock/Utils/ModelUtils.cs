@@ -103,14 +103,17 @@ namespace AutomaticRoadblocks.Utils
         /// Get a local vehicle model for the given position.
         /// </summary>
         /// <param name="position">Set the position to get the local model for.</param>
+        /// <param name="includePoliceBike">Set if the police bike can also be returned as a vehicle model.</param>
         /// <returns>Returns the local vehicle model.</returns>
-        public static Model GetLocalPolice(Vector3 position)
+        public static Model GetLocalPolice(Vector3 position, bool includePoliceBike = true)
         {
             var zone = GetZone(position);
+            var list = IsCountyZone(zone) ? CountyVehicleModels : CityVehicleModels;
 
-            return IsCountyZone(zone)
-                ? new Model(CountyVehicleModels[Random.Next(CountyVehicleModels.Count)])
-                : new Model(CityVehicleModels[Random.Next(CityVehicleModels.Count)]);
+            if (!includePoliceBike)
+                list.Remove(PoliceBikeModelName);
+
+            return new Model(list[Random.Next(list.Count)]);
         }
 
         /// <summary>

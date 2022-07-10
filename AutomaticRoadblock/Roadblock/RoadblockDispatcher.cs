@@ -9,8 +9,8 @@ namespace AutomaticRoadblocks.Roadblock
 {
     public class RoadblockDispatcher : IRoadblockDispatcher
     {
-        private const float MinimumVehicleSpeed = 15f;
-        private const float MinimumRoadblockPlacementDistance = 60f;
+        private const float MinimumVehicleSpeed = 20f;
+        private const float MinimumRoadblockPlacementDistance = 100f;
 
         private readonly ILogger _logger;
         private readonly IGame _game;
@@ -86,12 +86,8 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public void Dispose()
         {
-            _logger.Trace("Disposing roadblocks");
-            foreach (var roadblock in _roadblocks)
-            {
-                roadblock.Dispose();
-            }
-
+            _logger.Trace($"Disposing {_roadblocks.Count} roadblock(s)");
+            _roadblocks.ForEach(x => x.Dispose());
             _roadblocks.Clear();
             _logger.Debug("Roadblocks have been disposed");
         }

@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Pursuit
         /// <summary>
         /// Retrieve the current pursuit level.
         /// </summary>
-        PursuitLevel PursuitLevel { get; }
+        PursuitLevel PursuitLevel { get; set; }
 
         /// <summary>
         /// Invoked when the pursuit state changes.

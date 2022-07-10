@@ -21,6 +21,7 @@ namespace AutomaticRoadblocks.Pursuit
 
         private uint _timePursuitStarted;
         private uint _timeLastDispatchedRoadblock;
+        private PursuitLevel _pursuitLevel = PursuitLevel.Level1;
 
         public PursuitManager(ILogger logger, IGame game, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher)
         {
@@ -28,7 +29,6 @@ namespace AutomaticRoadblocks.Pursuit
             _game = game;
             _settingsManager = settingsManager;
             _roadblockDispatcher = roadblockDispatcher;
-            PursuitLevel = PursuitLevel.Level1;
         }
 
         #region Properties
@@ -58,7 +58,15 @@ namespace AutomaticRoadblocks.Pursuit
         }
 
         /// <inheritdoc />
-        public PursuitLevel PursuitLevel { get; private set; }
+        public PursuitLevel PursuitLevel
+        {
+            get => _pursuitLevel;
+            set
+            {
+                _pursuitLevel = value;
+                _logger.Debug($"Pursuit level has changed to {value}");
+            }
+        }
 
         #endregion
 
@@ -94,8 +102,9 @@ namespace AutomaticRoadblocks.Pursuit
                 return null;
 
             return Functions.GetPursuitPeds(PursuitHandle)
+                .Where(x => !Functions.IsPedVisualLost(x))
                 .Select(x => x.CurrentVehicle)
-                .First(x => x != null);
+                .FirstOrDefault(x => x != null);
         }
 
         /// <inheritdoc />
@@ -109,9 +118,9 @@ namespace AutomaticRoadblocks.Pursuit
 
             var vehicle = GetSuspectVehicle();
 
-            // try to dispatch a new roadblock for the chased vehicle
+            // try to dispatch a new roadblock for a chased vehicle
             // if successful, store the dispatch time
-            if (!_roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle))
+            if (vehicle == null || !_roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle))
                 return false;
 
             _timeLastDispatchedRoadblock = _game.GameTime;
@@ -214,11 +223,15 @@ namespace AutomaticRoadblocks.Pursuit
 
         private bool IsDispatchingAllowed()
         {
+            if (!IsPursuitActive)
+                return false;
+
             var roadblocksSettings = _settingsManager.AutomaticRoadblocksSettings;
             var gameTime = _game.GameTime;
 
             return gameTime - _timePursuitStarted >= roadblocksSettings.DispatchAllowedAfter * 1000 &&
-                   gameTime - _timeLastDispatchedRoadblock >= roadblocksSettings.DispatchInterval * 1000;
+                   gameTime - _timeLastDispatchedRoadblock >= roadblocksSettings.DispatchInterval * 1000 &&
+                   Functions.GetPursuitPeds(PursuitHandle).Any(x => !Functions.IsPedVisualLost(x));
         }
 
         private static RoadblockLevel ToRoadblockLevel(PursuitLevel pursuitLevel)

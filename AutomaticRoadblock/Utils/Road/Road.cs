@@ -114,6 +114,7 @@ namespace AutomaticRoadblocks.Utils.Road
             {
                 lane.CreatePreview();
             }
+
             Node.CreatePreview();
         }
 
@@ -128,6 +129,7 @@ namespace AutomaticRoadblocks.Utils.Road
             {
                 lane.DeletePreview();
             }
+
             Node.DeletePreview();
         }
 
@@ -137,18 +139,19 @@ namespace AutomaticRoadblocks.Utils.Road
 
         public override string ToString()
         {
-            var message = Environment.NewLine + $"{nameof(Position)}: {Position}," +
-                          Environment.NewLine + $"{nameof(RightSide)}: {RightSide}," +
-                          Environment.NewLine + $"{nameof(LeftSide)}: {LeftSide}," +
-                          Environment.NewLine + $"{nameof(NumberOfLanes1)}: {NumberOfLanes1}," +
-                          Environment.NewLine + $"{nameof(NumberOfLanes2)}: {NumberOfLanes2}," +
-                          Environment.NewLine + $"{nameof(JunctionIndicator)}: {JunctionIndicator}," +
-                          Environment.NewLine + $"{nameof(IsAtJunction)}: {IsAtJunction}," +
-                          Environment.NewLine + $"{nameof(IsSingleDirection)}: {IsSingleDirection}," +
-                          Environment.NewLine + $"{nameof(Width)}: {Width}" +
-                          Environment.NewLine + $"{nameof(Node)}: {Node}" +
-                          Environment.NewLine + "--- Lanes ---" + Environment.NewLine;
-            return Lanes.Aggregate(message, (current, lane) => current + (Environment.NewLine + lane)) + Environment.NewLine + "---";
+            return $"\n{nameof(Position)}: {Position}," +
+                   $"\n{nameof(RightSide)}: {RightSide}," +
+                   $"\n{nameof(LeftSide)}: {LeftSide}," +
+                   $"\n{nameof(NumberOfLanes1)}: {NumberOfLanes1}," +
+                   $"\n{nameof(NumberOfLanes2)}: {NumberOfLanes2}," +
+                   $"\n{nameof(JunctionIndicator)}: {JunctionIndicator}," +
+                   $"\n{nameof(IsAtJunction)}: {IsAtJunction}," +
+                   $"\n{nameof(IsSingleDirection)}: {IsSingleDirection}," +
+                   $"\n{nameof(Width)}: {Width}" +
+                   $"\n{nameof(Node)}: {Node}" +
+                   "\n--- Lanes ---" +
+                   $"\n{string.Join("\n", Lanes)}" +
+                   "\n---";
         }
 
         #endregion
@@ -317,7 +320,8 @@ namespace AutomaticRoadblocks.Utils.Road
                 var direction = MathHelper.ConvertHeadingToDirection(Heading);
 
                 IsPreviewActive = true;
-                GameFiber.StartNew(() => {
+                GameFiber.StartNew(() =>
+                {
                     while (IsPreviewActive)
                     {
                         Rage.Debug.DrawArrow(FloatAboveGround(Position), direction, Rotator.Zero, 3f, Color.Gold);

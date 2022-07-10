@@ -142,10 +142,11 @@ namespace AutomaticRoadblocks
 
             logger.Debug("Registering debug menu components");
             IoC.Instance
-                .Register<IMenuComponent>(typeof(RoadInfo))
-                .Register<IMenuComponent>(typeof(RoadPreview))
-                .Register<IMenuComponent>(typeof(NearbyRoadsPreview))
-                .Register<IMenuComponent>(typeof(ZoneInfo))
+                .Register<IMenuComponent>(typeof(EndCalloutComponent))
+                .Register<IMenuComponent>(typeof(RoadInfoComponent))
+                .Register<IMenuComponent>(typeof(RoadPreviewComponent))
+                .Register<IMenuComponent>(typeof(NearbyRoadsPreviewComponent))
+                .Register<IMenuComponent>(typeof(ZoneInfoComponent))
                 .Register<IMenuComponent>(typeof(DispatchPreviewComponent))
                 .Register<IMenuComponent>(typeof(CleanRoadblocksComponent));
         }

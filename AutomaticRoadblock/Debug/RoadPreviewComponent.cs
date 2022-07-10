@@ -7,13 +7,13 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug
 {
-    public class RoadPreview : IMenuComponent
+    public class RoadPreviewComponent : IMenuComponent
     {
         private readonly ILogger _logger;
         private readonly IGame _game;
         private Road _road;
 
-        public RoadPreview(ILogger logger, IGame game)
+        public RoadPreviewComponent(ILogger logger, IGame game)
         {
             _logger = logger;
             _game = game;

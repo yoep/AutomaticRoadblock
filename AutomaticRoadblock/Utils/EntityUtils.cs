@@ -85,6 +85,21 @@ namespace AutomaticRoadblocks.Utils
             return ped;
         }
 
+        /// <summary>
+        /// Get the vector which is on the ground for the given coordinates.
+        /// </summary>
+        /// <param name="position">The position to get the ground level of.</param>
+        /// <returns>Returns the new vector which is on the ground.</returns>
+        public static Vector3 OnGround(Vector3 position)
+        {
+            var newPosition = new Vector3(position.X, position.Y, 0f);
+
+            NativeFunction.Natives.GET_GROUND_Z_FOR_3D_COORD<bool>(position.X, position.Y, position.Z + 15f, out float newHeight, 0);
+            newPosition.Z = newHeight;
+
+            return newPosition;
+        }
+
         private static void AddWeaponsToCopPed(Ped ped)
         {
             ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Pistol), -1, false);

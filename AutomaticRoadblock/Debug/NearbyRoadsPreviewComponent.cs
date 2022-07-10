@@ -8,7 +8,7 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug
 {
-    public class NearbyRoadsPreview : IMenuComponent
+    public class NearbyRoadsPreviewComponent : IMenuComponent
     {
         private readonly ILogger _logger;
         private readonly IGame _game;
@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Debug
 
         #region Constructors
 
-        public NearbyRoadsPreview(ILogger logger, IGame game)
+        public NearbyRoadsPreviewComponent(ILogger logger, IGame game)
         {
             _logger = logger;
             _game = game;

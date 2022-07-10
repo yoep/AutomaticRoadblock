@@ -38,7 +38,15 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
+            var scrollerMenuItem = (UIMenuListScrollerItem<int>)MenuItem;
             _pursuitManager.PursuitLevelChanged += PursuitLevelChanged;
+            scrollerMenuItem.IndexChanged += MenuItemChanged;
+        }
+
+        private void MenuItemChanged(UIMenuScrollerItem sender, int oldindex, int newindex)
+        {
+            var scrollerMenuItem = (UIMenuListScrollerItem<int>)MenuItem;
+            _pursuitManager.PursuitLevel = PursuitLevel.From(scrollerMenuItem.SelectedItem);
         }
 
         private void PursuitLevelChanged(PursuitLevel newPursuitLevel)

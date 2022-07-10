@@ -64,7 +64,7 @@ namespace AutomaticRoadblocks.Settings
             {
                 EnableDuringPursuits = file.ReadBoolean("Automatic Roadblocks", "EnableDuringPursuits", true),
                 DispatchAllowedAfter = file.ReadUInt32("Automatic Roadblocks", "DispatchAllowedAfter", 90),
-                DispatchInterval = file.ReadUInt32("Automatic Roadblocks", "DispatchAllowedAfter", 30),
+                DispatchInterval = file.ReadUInt32("Automatic Roadblocks", "DispatchAllowedAfter", 45),
                 SlowTraffic = file.ReadBoolean("Automatic Roadblocks", "SlowTraffic", true)
             };
         }

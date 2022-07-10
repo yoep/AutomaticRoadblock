@@ -6,13 +6,13 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug
 {
-    public class ZoneInfo : IMenuComponent
+    public class ZoneInfoComponent : IMenuComponent
     {
         private readonly ILogger _logger;
         private readonly INotification _notification;
         private readonly IGame _game;
 
-        public ZoneInfo(ILogger logger, INotification notification, IGame game)
+        public ZoneInfoComponent(ILogger logger, INotification notification, IGame game)
         {
             _logger = logger;
             _notification = notification;

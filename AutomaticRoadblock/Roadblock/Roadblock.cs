@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
@@ -17,7 +18,7 @@ namespace AutomaticRoadblocks.Roadblock
         private readonly ILogger _logger;
         private readonly Road _road;
         private readonly Vehicle _vehicle;
-        private readonly List<RoadblockSlot> _slots = new List<RoadblockSlot>();
+        private readonly List<IRoadblockSlot> _slots = new List<IRoadblockSlot>();
 
         private Blip _blip;
         private int _speedZoneId;
@@ -136,21 +137,31 @@ namespace AutomaticRoadblocks.Roadblock
         public override string ToString()
         {
             return $"{nameof(Level)}: {Level}\n" +
-                   $"{nameof(_slots)}: {_slots}\n" +
-                   $"{nameof(State)}: {State}" +
+                   $"{nameof(State)}: {State}\n" +
+                   $"{nameof(_slots)}: [{_slots.Count}]{string.Join(",", _slots)}\n" +
                    $"{nameof(_road)}: {_road}";
         }
 
         private void Init(bool limitSpeed)
         {
-            var lanesToBlock = _road.Lanes
-                .Where(x => Math.Abs(x.Heading - _vehicle.Heading) < LaneHeadingTolerance)
-                .ToList();
-            _logger.Debug($"Roadblock will block {lanesToBlock.Count} lanes");
+            var lanesToBlock = _road.Lanes;
+            var heading = _road.Lanes
+                .Select(x => x.Heading)
+                .First(x => Math.Abs(x - _vehicle.Heading) < LaneHeadingTolerance);
 
+            // if we're currently at level one, we'll only block the lane of the pursuit
+            // at other levels, we'll block the full road
+            if (Level == RoadblockLevel.Level1)
+            {
+                lanesToBlock = _road.Lanes
+                    .Where(x => Math.Abs(x.Heading - _vehicle.Heading) < LaneHeadingTolerance)
+                    .ToList();
+            }
+
+            _logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
             foreach (var lane in lanesToBlock)
             {
-                _slots.Add(new RoadblockSlot(lane.Position, lane.Heading));
+                _slots.Add(SlotFactory.Create(Level, lane.Position, heading));
             }
 
             if (limitSpeed)
@@ -168,7 +179,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
             catch (Exception ex)
             {
-                _logger.Error("Failed to create roadblock speed zone", ex);
+                _logger.Error($"Failed to create roadblock speed zone, {ex.Message}", ex);
             }
         }
 
@@ -216,7 +227,7 @@ namespace AutomaticRoadblocks.Roadblock
         private void ReleaseEntitiesToLspdfr()
         {
             DeleteBlip();
-            
+
             foreach (var slot in _slots)
             {
                 slot.ReleaseToLspdfr();

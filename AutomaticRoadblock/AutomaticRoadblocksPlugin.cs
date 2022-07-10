@@ -9,9 +9,8 @@ namespace AutomaticRoadblocks
         public const string RoadPreviewRemove = "Remove road preview " + DebugIndicatorText;
         public const string NearbyRoadsPreview = "Nearby roads preview " + DebugIndicatorText;
         public const string NearbyRoadsPreviewRemove = "Remove nearby roads preview " + DebugIndicatorText;
-        public const string RoadBlockPreview = "Roadblock preview " + DebugIndicatorText;
-        public const string RoadBlockPreviewRemove = "Remove roadblock preview " + DebugIndicatorText;
         public const string ZoneInfo = "Zone info " + DebugIndicatorText;
+        public const string EndCallout = "End current callout " + DebugIndicatorText;
 
         public const string EnableDuringPursuit = "Enabled";
         public const string EnableDuringPursuitDescription = "Enable automatic roadblock dispatching during pursuit";
