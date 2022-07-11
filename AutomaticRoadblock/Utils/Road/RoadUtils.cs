@@ -131,7 +131,7 @@ namespace AutomaticRoadblocks.Utils.Road
         public static int CreateSpeedZone(Vector3 position, float radius, float speed)
         {
             Assert.NotNull(position, "position cannot be null");
-            return NativeFunction.Natives._ADD_SPEED_ZONE_FOR_COORD<uint>(0x2CE544C68FB812A0, position.X, position.Y, position.Z, radius, speed, false);
+            return NativeFunction.CallByHash<int>(0x2CE544C68FB812A0, position.X, position.Y, position.Z, radius, speed, false);
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace AutomaticRoadblocks.Utils.Road
         public static void RemoveSpeedZone(int zoneId)
         {
             Assert.NotNull(zoneId, "zoneId cannot be null");
-            NativeFunction.Natives._REMOVE_SPEED_ZONE(zoneId);
+            NativeFunction.CallByHash<int>(0x2CE544C68FB812A0, zoneId);
         }
 
         #endregion

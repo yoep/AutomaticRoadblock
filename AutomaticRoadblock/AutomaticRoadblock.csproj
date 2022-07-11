@@ -64,6 +64,10 @@
         <Compile Include="Debug\RoadInfoComponent.cs" />
         <Compile Include="Debug\RoadPreviewComponent.cs" />
         <Compile Include="Debug\ZoneInfoComponent.cs" />
+        <Compile Include="Instance\ARInstance.cs" />
+        <Compile Include="Instance\ARPed.cs" />
+        <Compile Include="Instance\ARScenery.cs" />
+        <Compile Include="Instance\ARVehicle.cs" />
         <Compile Include="Instance\InstanceSlot.cs" />
         <Compile Include="Instance\InstanceType.cs" />
         <Compile Include="IoC.cs" />
@@ -97,6 +101,9 @@
         <Compile Include="Roadblock\Slot\IRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\RoadblockSlotLevel1.cs" />
         <Compile Include="Roadblock\Slot\RoadblockSlotLevel2.cs" />
+        <Compile Include="Roadblock\Slot\RoadblockSlotLevel3.cs" />
+        <Compile Include="Roadblock\Slot\RoadblockSlotLevel4.cs" />
+        <Compile Include="Roadblock\Slot\RoadblockSlotLevel5.cs" />
         <Compile Include="Roadblock\Slot\SlotFactory.cs" />
         <Compile Include="Scenery\AbstractPlaceableSceneryItem.cs" />
         <Compile Include="Scenery\Barrier.cs" />

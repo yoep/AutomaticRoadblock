@@ -57,6 +57,12 @@ namespace AutomaticRoadblocks.Utils
             return new Object(model, Vector3.Zero);
         }
 
+        public static Object CreateFlareVertical()
+        {
+            var model = new Model("prop_flare_01");
+            return new Object(model, Vector3.Zero);
+        }
+
         #endregion
 
         #region Street items
@@ -162,14 +168,21 @@ namespace AutomaticRoadblocks.Utils
             return new Object(new Model("prop_ld_health_pack"), position);
         }
 
+        public static Object CreateFlareHorizontal(Vector3 position, float heading)
+        {
+            var instance = new Object(new Model("prop_flare_01b"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
+        }
+
         #endregion
 
         #region Methods
 
-        public static bool PlaceCorrectlyOnGround(Object instance)
+        public static void PlaceCorrectlyOnGround(Object instance)
         {
             Assert.NotNull(instance, "instance cannot be null");
-            return NativeFunction.Natives.PLACE_OBJECT_ON_GROUND_PROPERLY<bool>(instance);
+            NativeFunction.Natives.PLACE_OBJECT_ON_GROUND_PROPERLY<bool>(instance);
         }
 
         public static void SetVisibility(Object instance, bool isVisible)

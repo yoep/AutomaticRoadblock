@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.Roadblock
         private const float BypassTolerance = 20f;
         private const float SpeedLimit = 5f;
 
-        private readonly ILogger _logger;
+        private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
         private readonly Road _road;
         private readonly Vehicle _vehicle;
         private readonly List<IRoadblockSlot> _slots = new List<IRoadblockSlot>();
@@ -29,7 +29,6 @@ namespace AutomaticRoadblocks.Roadblock
             Assert.NotNull(level, "level cannot be null");
             Assert.NotNull(road, "road cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
-            _logger = IoC.Instance.GetInstance<ILogger>();
             _road = road;
             _vehicle = vehicle;
             Level = level;
@@ -147,16 +146,21 @@ namespace AutomaticRoadblocks.Roadblock
             var lanesToBlock = _road.Lanes;
             var heading = _road.Lanes
                 .Select(x => x.Heading)
-                .First(x => Math.Abs(x - _vehicle.Heading) < LaneHeadingTolerance);
+                .Where(x => Math.Abs(x - _vehicle.Heading) < LaneHeadingTolerance)
+                .DefaultIfEmpty(_road.Lanes[0].Heading)
+                .First();
 
             // if we're currently at level one, we'll only block the lane of the pursuit
             // at other levels, we'll block the full road
             if (Level == RoadblockLevel.Level1)
             {
-                lanesToBlock = _road.Lanes
+                lanesToBlock = lanesToBlock
                     .Where(x => Math.Abs(x.Heading - _vehicle.Heading) < LaneHeadingTolerance)
                     .ToList();
             }
+
+            // filter any lanes which are to close to each other
+            lanesToBlock = FilterLanesWhichAreTooCloseToEachOther(lanesToBlock);
 
             _logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
             foreach (var lane in lanesToBlock)
@@ -264,6 +268,26 @@ namespace AutomaticRoadblocks.Roadblock
         {
             State = state;
             RoadblockStateChanged?.Invoke(state);
+        }
+
+        private static IReadOnlyList<Road.Lane> FilterLanesWhichAreTooCloseToEachOther(IReadOnlyList<Road.Lane> lanesToBlock)
+        {
+            Road.Lane lastLane = null;
+
+            lanesToBlock = lanesToBlock
+                .Where(x =>
+                {
+                    var result = true;
+
+                    if (lastLane != null)
+                        result = x.Position.DistanceTo(lastLane.Position) >= 5f;
+
+                    lastLane = x;
+                    return result;
+                })
+                .ToList();
+
+            return lanesToBlock;
         }
     }
 }

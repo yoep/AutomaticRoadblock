@@ -56,19 +56,14 @@ namespace AutomaticRoadblocks.Pursuit
         /// <summary>
         /// Dispatch a roadblock for the current pursuit.
         /// </summary>
+        /// <param name="force">Force the roadblock, this will disable the conditions checking.</param>
         /// <returns>Returns true if a roadblock will be dispatched, else false.</returns>
-        bool DispatchNow();
+        bool DispatchNow(bool force = false);
 
         /// <summary>
         /// Dispatch a preview of a possible roadblock.
         /// This preview doesn't require an active pursuit, but required that the player has at least a vehicle to determine the roadblock location.
         /// </summary>
         void DispatchPreview();
-
-        /// <summary>
-        /// Update the current pursuit level.
-        /// </summary>
-        /// <param name="level">The new pursuit level.</param>
-        void UpdatePursuitLevel(PursuitLevel level);
     }
 }

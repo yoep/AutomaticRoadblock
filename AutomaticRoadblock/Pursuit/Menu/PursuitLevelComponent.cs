@@ -31,7 +31,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         {
             var scrollerMenuItem = (UIMenuListScrollerItem<int>)MenuItem;
 
-            _pursuitManager.UpdatePursuitLevel(PursuitLevel.From(scrollerMenuItem.SelectedItem));
+            _pursuitManager.PursuitLevel = PursuitLevel.From(scrollerMenuItem.SelectedItem);
         }
 
         [IoC.PostConstruct]

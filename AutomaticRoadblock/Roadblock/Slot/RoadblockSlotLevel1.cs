@@ -1,3 +1,4 @@
+using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
 using Rage;
@@ -11,6 +12,21 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             Init();
         }
 
+        public override void Spawn()
+        {
+            base.Spawn();
+            CopInstances
+                .Select(x => x.GameInstance)
+                .ToList()
+                .ForEach(x => x.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Any));
+        }
+
+        /// <inheritdoc />
+        protected override Model GetVehicleModel()
+        {
+            return ModelUtils.GetLocalPoliceVehicle(Position, true, false);
+        }
+
         private void Init()
         {
             InitializeVehicleSlot();
@@ -18,35 +34,34 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             InitializeCones();
         }
 
-        private void InitializeVehicleSlot()
-        {
-            Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Heading + 90,
-                (position, heading) => new Vehicle(ModelUtils.GetLocalPolice(position, false), position, heading)
-                {
-                    NeedsCollision = true
-                }));
-        }
-
         private void InitializePedSlots()
         {
-            for (var i = 0; i < 2; i++)
-            {
-                Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f,
-                    (position, heading) => EntityUtils.CreateLocalCop(Position)));
-            }
+            var isBike = ModelUtils.IsBike(VehicleModel);
+            Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, heading) =>
+                isBike
+                    ? AssignCopWeapons(new ARPed(ModelUtils.GetPoliceBikeCop(), Position))
+                    : AssignCopWeapons(new ARPed(ModelUtils.GetLocalCop(Position), Position))));
         }
 
         private void InitializeCones()
         {
-            var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 5f;
+            var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
             var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2.5f;
 
             for (var i = 0; i < 5; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.Cone, startPosition, Heading,
-                    (position, heading) => PropUtils.CreateSmallConeWithStripes(position)));
+                    (position, heading) => new ARScenery(PropUtils.CreateSmallConeWithStripes(position))));
                 startPosition += MathHelper.ConvertHeadingToDirection(Heading - 90) * 1.5f;
             }
+        }
+
+        private static ARPed AssignCopWeapons(ARPed ped)
+        {
+            ped.GivePrimaryWeapon(ModelUtils.Weapons.Pistol);
+            ped.GiveWeapon(ModelUtils.Weapons.Nightstick);
+            ped.GiveWeapon(ModelUtils.Weapons.StunGun);
+            return ped;
         }
     }
 }

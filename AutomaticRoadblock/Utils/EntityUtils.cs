@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Rage;
 using Rage.Native;
@@ -71,7 +72,24 @@ namespace AutomaticRoadblocks.Utils
             }
         }
 
-        public static Ped CreateLocalCop(Vector3 position)
+        public static Ped CreateFbiCop(Vector3 position)
+        {
+            Assert.NotNull(position, "position cannot be null");
+            var ped = new Ped(ModelUtils.GetPoliceFbiCop(), position, 3f)
+            {
+                IsPersistent = true,
+                BlockPermanentEvents = true,
+                KeepTasks = true
+            };
+
+            AddWeaponsToCopPed(ped, new []
+            {
+                ModelUtils.Weapons.HeavyRifle,
+            });
+            return ped;
+        }
+
+        public static Ped CreateSwatCop(Vector3 position)
         {
             Assert.NotNull(position, "position cannot be null");
             var ped = new Ped(ModelUtils.GetLocalCop(position), position, 3f)
@@ -81,7 +99,11 @@ namespace AutomaticRoadblocks.Utils
                 KeepTasks = true
             };
 
-            AddWeaponsToCopPed(ped);
+            AddWeaponsToCopPed(ped, new []
+            {
+                ModelUtils.Weapons.HeavyRifle,
+                ModelUtils.Weapons.Shotgun,
+            });
             return ped;
         }
 
@@ -100,10 +122,18 @@ namespace AutomaticRoadblocks.Utils
             return newPosition;
         }
 
-        private static void AddWeaponsToCopPed(Ped ped)
+        private static void AddWeaponsToCopPed(Ped ped, IEnumerable<string> weapons)
         {
-            ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Pistol), -1, false);
-            ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.StunGun), -1, false);
+            foreach (var weapon in weapons)
+            {
+                var asset = new WeaponAsset(weapon);
+                
+                ped.Inventory.GiveNewWeapon(asset, -1, false);
+                ped.Inventory.AddComponentToWeapon(asset, ModelUtils.Weapons.Attachments.PistolFlashlight);
+                ped.Inventory.AddComponentToWeapon(asset, ModelUtils.Weapons.Attachments.RifleFlashlight);
+            }
+
+            ped.Inventory.GiveFlashlight();
             NativeFunction.Natives.SET_PED_CAN_SWITCH_WEAPON(ped, true);
         }
     }

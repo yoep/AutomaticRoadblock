@@ -7,9 +7,9 @@ namespace AutomaticRoadblocks.Instance
 {
     public class InstanceSlot : IDisposable, IPreviewSupport
     {
-        private readonly Func<Vector3, float, Entity> _factory;
+        private readonly Func<Vector3, float, ARInstance<Entity>> _factory;
 
-        public InstanceSlot(EntityType type, Vector3 position, float heading, Func<Vector3, float, Entity> factory)
+        public InstanceSlot(EntityType type, Vector3 position, float heading, Func<Vector3, float, ARInstance<Entity>> factory)
         {
             Assert.NotNull(type, "type cannot be null");
             Assert.NotNull(position, "position cannot be null");
@@ -38,7 +38,7 @@ namespace AutomaticRoadblocks.Instance
         /// <summary>
         /// Get the instance if it's spawned.
         /// </summary>
-        public Entity Instance { get; private set; }
+        public ARInstance<Entity> Instance { get; private set; }
 
         /// <summary>
         /// Spawn the entity if it's not already spawned.
@@ -61,7 +61,7 @@ namespace AutomaticRoadblocks.Instance
         {
             IsPreviewActive = true;
             Spawn();
-            PreviewUtils.TransformToPreview(Instance);
+            PreviewUtils.TransformToPreview(Instance.GameInstance);
         }
 
         /// <inheritdoc />
@@ -78,11 +78,11 @@ namespace AutomaticRoadblocks.Instance
         /// <inheritdoc />
         public void Dispose()
         {
-            if (Instance != null)
-            {
-                EntityUtils.Remove(Instance);
-                Instance = null;
-            }
+            if (Instance == null)
+                return;
+            
+            Instance.Dispose();
+            Instance = null;
         }
 
         #endregion

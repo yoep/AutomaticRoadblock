@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Roadblock;
 
 namespace AutomaticRoadblocks.Api
@@ -11,5 +12,10 @@ namespace AutomaticRoadblocks.Api
         /// Get the roadblock dispatcher.
         /// </summary>
         public static IRoadblockDispatcher RoadblockDispatcher => IoC.Instance.GetInstance<IRoadblockDispatcher>();
+
+        /// <summary>
+        /// Get the automatic roadblock pursuit manager. 
+        /// </summary>
+        public static IPursuitManager PursuitManager => IoC.Instance.GetInstance<IPursuitManager>();
     }
 }

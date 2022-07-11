@@ -21,6 +21,7 @@ namespace AutomaticRoadblocks.Pursuit
 
         private uint _timePursuitStarted;
         private uint _timeLastDispatchedRoadblock;
+        private uint _timeLastLevelChanged;
         private PursuitLevel _pursuitLevel = PursuitLevel.Level1;
 
         public PursuitManager(ILogger logger, IGame game, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher)
@@ -64,6 +65,7 @@ namespace AutomaticRoadblocks.Pursuit
             set
             {
                 _pursuitLevel = value;
+                _timeLastLevelChanged = _game.GameTime;
                 _logger.Debug($"Pursuit level has changed to {value}");
             }
         }
@@ -108,7 +110,7 @@ namespace AutomaticRoadblocks.Pursuit
         }
 
         /// <inheritdoc />
-        public bool DispatchNow()
+        public bool DispatchNow(bool force = false)
         {
             if (!IsPursuitActive)
             {
@@ -120,7 +122,7 @@ namespace AutomaticRoadblocks.Pursuit
 
             // try to dispatch a new roadblock for a chased vehicle
             // if successful, store the dispatch time
-            if (vehicle == null || !_roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle))
+            if (vehicle == null || !_roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, force))
                 return false;
 
             _timeLastDispatchedRoadblock = _game.GameTime;
@@ -142,18 +144,28 @@ namespace AutomaticRoadblocks.Pursuit
             _roadblockDispatcher.DispatchPreview(ToRoadblockLevel(PursuitLevel), vehicle);
         }
 
-        /// <inheritdoc />
-        public void UpdatePursuitLevel(PursuitLevel level)
+        #endregion
+
+        #region Functions
+
+        private void UpdatePursuitLevel(PursuitLevel level)
         {
             Assert.NotNull(level, "level cannot be null");
-            _logger.Debug($"Updating pursuit level to {PursuitLevel.Level3}");
+            _logger.Debug($"Updating pursuit level to {level}");
             PursuitLevel = level;
             PursuitLevelChanged?.Invoke(level);
         }
 
-        #endregion
+        private void IncreasePursuitLevel()
+        {
+            var newLevel = PursuitLevel.Level + 1;
 
-        #region Functions
+            // check that the max level hasn't already been reached
+            if (newLevel > PursuitLevel.Level5.Level)
+                return;
+
+            PursuitLevel = PursuitLevel.From(newLevel);
+        }
 
         private void PursuitStarted(LHandle pursuitHandle)
         {
@@ -183,6 +195,7 @@ namespace AutomaticRoadblocks.Pursuit
                     _game.FiberYield();
 
                     VerifyPursuitLethalForce();
+                    DoLevelIncreaseTick();
                     DoDispatchTick();
                 }
             }, "PursuitManager.PursuitMonitor");
@@ -196,12 +209,20 @@ namespace AutomaticRoadblocks.Pursuit
             var firstLethalLevel = PursuitLevel.Levels
                 .First(x => x.LethalAllowed);
 
-            // make that the current level is at least a lethal level
+            // make sure that the current level is at least a lethal level
             // if not, update the current level to the first lethal level
             if (PursuitLevel.Level < firstLethalLevel.Level)
             {
                 UpdatePursuitLevel(firstLethalLevel);
             }
+        }
+
+        private void DoLevelIncreaseTick()
+        {
+            var gameTime = _game.GameTime;
+
+            if (gameTime - _timeLastLevelChanged > 2 * 60 * 1000 && _random.Next(11) <= 2)
+                IncreasePursuitLevel();
         }
 
         private void DoDispatchTick()

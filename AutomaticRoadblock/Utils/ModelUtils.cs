@@ -9,6 +9,9 @@ namespace AutomaticRoadblocks.Utils
     public static class ModelUtils
     {
         private const string PoliceBikeModelName = "POLICEB";
+        private const string PoliceTransporterModelName = "POLICET";
+        private const string PoliceBikeCopModelName = "s_m_y_hwaycop_01";
+
         private static readonly Random Random = new Random();
 
         #region Constants
@@ -17,6 +20,15 @@ namespace AutomaticRoadblocks.Utils
         {
             public const string Pistol = "weapon_pistol";
             public const string StunGun = "weapon_stungun_mp";
+            public const string Shotgun = "weapon_pumpshotgun";
+            public const string HeavyRifle = "weapon_heavyrifle";
+            public const string Nightstick = "weapon_nightstick";
+
+            public static class Attachments
+            {
+                public const string PistolFlashlight = "COMPONENT_AT_PI_FLSH";
+                public const string RifleFlashlight = "COMPONENT_AT_AR_FLSH";
+            }
         }
 
         public static class Peds
@@ -31,11 +43,6 @@ namespace AutomaticRoadblocks.Utils
             {
                 "s_f_y_sheriff_01",
                 "s_m_y_sheriff_01"
-            };
-
-            public static readonly List<string> CopStatePedModels = new List<string>
-            {
-                "s_m_y_hwaycop_01"
             };
 
             public static readonly List<string> CopFbiPedModels = new List<string>
@@ -54,20 +61,23 @@ namespace AutomaticRoadblocks.Utils
         {
             "POLICE",
             "POLICE2",
-            PoliceBikeModelName
+            PoliceBikeModelName,
+            PoliceTransporterModelName
         };
 
         internal static readonly List<string> CountyVehicleModels = new List<string>
         {
             "SHERIFF",
             "SHERIFF2",
-            PoliceBikeModelName
+            PoliceBikeModelName,
+            PoliceTransporterModelName
         };
 
         internal static readonly List<string> StateVehicleModels = new List<string>
         {
             "POLICE3",
-            PoliceBikeModelName
+            PoliceBikeModelName,
+            PoliceTransporterModelName
         };
 
         internal static readonly List<string> FbiVehicleModels = new List<string>
@@ -99,21 +109,75 @@ namespace AutomaticRoadblocks.Utils
                 : new Model(Peds.CopCityPedModels[Random.Next(Peds.CopCityPedModels.Count)]);
         }
 
+        public static Model GetPoliceFbiCop()
+        {
+            return new Model(Peds.CopFbiPedModels[Random.Next(Peds.CopFbiPedModels.Count)]);
+        }
+
+        public static Model GetPoliceSwatCop()
+        {
+            return new Model(Peds.CopSwatPedModels[Random.Next(Peds.CopSwatPedModels.Count)]);
+        }
+
+        public static Model GetPoliceBikeCop()
+        {
+            return new Model(PoliceBikeCopModelName);
+        }
+
         /// <summary>
         /// Get a local vehicle model for the given position.
         /// </summary>
         /// <param name="position">Set the position to get the local model for.</param>
         /// <param name="includePoliceBike">Set if the police bike can also be returned as a vehicle model.</param>
-        /// <returns>Returns the local vehicle model.</returns>
-        public static Model GetLocalPolice(Vector3 position, bool includePoliceBike = true)
+        /// <param name="includePoliceTransporter">Set if the police transporter can also be returned as vehicle model.</param>
+        /// <returns>Returns the local police vehicle model.</returns>
+        public static Model GetLocalPoliceVehicle(Vector3 position, bool includePoliceBike = true, bool includePoliceTransporter = true)
         {
             var zone = GetZone(position);
             var list = IsCountyZone(zone) ? CountyVehicleModels : CityVehicleModels;
 
             if (!includePoliceBike)
                 list.Remove(PoliceBikeModelName);
+            if (!includePoliceTransporter)
+                list.Remove(PoliceTransporterModelName);
 
             return new Model(list[Random.Next(list.Count)]);
+        }
+
+        /// <summary>
+        /// Get a state police vehicle.
+        /// </summary>
+        /// <param name="includePoliceBike">Set if the police bike can also be returned as a vehicle model.</param>
+        /// <param name="includePoliceTransporter">Set if the police transporter can also be returned as vehicle model.</param>
+        /// <returns>Returns a state police vehicle.</returns>
+        public static Model GetStatePoliceVehicle(bool includePoliceBike = true, bool includePoliceTransporter = true)
+        {
+            var list = StateVehicleModels;
+
+            if (!includePoliceBike)
+                list.Remove(PoliceBikeModelName);
+            if (!includePoliceTransporter)
+                list.Remove(PoliceTransporterModelName);
+
+            return new Model(list[Random.Next(list.Count)]);
+        }
+
+        /// <summary>
+        /// Get an FBI police vehicle model. 
+        /// </summary>
+        /// <returns>Returns an FBI police vehicle model.</returns>
+        public static Model GetFbiPoliceVehicle()
+        {
+            return new Model(FbiVehicleModels[Random.Next(FbiVehicleModels.Count)]);
+        }
+
+        /// <summary>
+        /// Get an swat police vehicle model. 
+        /// </summary>
+        /// <returns>Returns an swat police vehicle model.</returns>
+        public static Model GetSwatPoliceVehicle()
+        {
+            return new Model(SwatVehicleModels[Random.Next(SwatVehicleModels.Count)]);
         }
 
         /// <summary>

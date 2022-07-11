@@ -6,9 +6,9 @@ using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
-    public class RoadblockSlotLevel2 : AbstractRoadblockSlot
+    public class RoadblockSlotLevel4 : AbstractRoadblockSlot
     {
-        internal RoadblockSlotLevel2(Vector3 position, float heading) : base(position, heading)
+        internal RoadblockSlotLevel4(Vector3 position, float heading) : base(position, heading)
         {
             Init();
         }
@@ -23,18 +23,18 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                     x.EquipPrimaryWeapon();
                     if (IsTargetVehiclePresent)
                     {
-                        x.GameInstance.Tasks.TakeCoverFrom(TargetVehicle.Driver, -1, false);
+                        x.GameInstance.Tasks.TakeCoverFrom(TargetVehicle.Driver, -1, true);
                     }
                     else
                     {
-                        x.GameInstance.Tasks.TakeCoverAt(Vehicle.Position, IoC.Instance.GetInstance<IGame>().PlayerPosition, -1, false);
+                        x.GameInstance.Tasks.TakeCoverAt(Vehicle.Position, IoC.Instance.GetInstance<IGame>().PlayerPosition, -1, true);
                     }
                 });
         }
 
         protected override Model GetVehicleModel()
         {
-            return ModelUtils.GetLocalPoliceVehicle(Position, true, false);
+            return ModelUtils.GetFbiPoliceVehicle();
         }
 
         private void Init()
@@ -46,14 +46,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private void InitializePedSlots()
         {
-            var isBike = ModelUtils.IsBike(VehicleModel);
-            var totalOccupants = isBike ? 1 : 2;
             var pedSpawnPosition = GetPositionBehindVehicle();
-
-            for (var i = 0; i < totalOccupants; i++)
+            
+            for (var i = 0; i < 2; i++)
             {
-                Instances.Add(new InstanceSlot(EntityType.CopPed, pedSpawnPosition, Heading - 180,
-                    (position, heading) => AssignCopWeapons(new ARPed(ModelUtils.GetLocalCop(Position), position, heading))));
+                Instances.Add(new InstanceSlot(EntityType.CopPed, pedSpawnPosition, 0f,
+                    (position, heading) => AssignCopWeapons(new ARPed(ModelUtils.GetPoliceFbiCop(), position, heading))));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }
@@ -73,8 +71,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private static ARPed AssignCopWeapons(ARPed ped)
         {
-            ped.GivePrimaryWeapon(ModelUtils.Weapons.Pistol);
-            ped.GiveWeapon(ModelUtils.Weapons.Nightstick);
+            ped.GivePrimaryWeapon(ModelUtils.Weapons.HeavyRifle);
             ped.GiveWeapon(ModelUtils.Weapons.StunGun);
             ped.GiveWeapon(ModelUtils.Weapons.Shotgun);
             return ped;
