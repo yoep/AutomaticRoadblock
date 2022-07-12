@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using LSPD_First_Response.Engine.Scripting;
@@ -17,7 +18,7 @@ namespace AutomaticRoadblocks.Debug
             _game = game;
         }
 
-        public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.ZoneInfo);
+        public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.ZoneInfo);
         public MenuType Type => MenuType.DEBUG;
         public bool IsAutoClosed => false;
 

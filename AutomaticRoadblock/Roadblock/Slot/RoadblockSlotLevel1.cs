@@ -1,15 +1,16 @@
 using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
+using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public class RoadblockSlotLevel1 : AbstractRoadblockSlot
     {
-        internal RoadblockSlotLevel1(Vector3 position, float heading, Vehicle targetVehicle) : base(position, heading, targetVehicle)
+        internal RoadblockSlotLevel1(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
+            : base(lane, heading, targetVehicle, shouldAddLights)
         {
-            Init();
         }
 
         public override void Spawn()
@@ -27,31 +28,37 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             return ModelUtils.GetLocalPoliceVehicle(Position, true, false);
         }
 
-        private void Init()
-        {
-            InitializeVehicleSlot();
-            InitializePedSlots();
-            InitializeCones();
-        }
-
-        private void InitializePedSlots()
+        protected override void InitializeCopPeds()
         {
             var isBike = ModelUtils.IsBike(VehicleModel);
-            Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, heading) =>
+            Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (_, _) =>
                 isBike
                     ? AssignCopWeapons(new ARPed(ModelUtils.GetPoliceBikeCop(), Position))
                     : AssignCopWeapons(new ARPed(ModelUtils.GetLocalCop(Position), Position))));
         }
 
-        private void InitializeCones()
+        protected override void InitializeScenery()
         {
             var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
             var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2.5f;
 
             for (var i = 0; i < 5; i++)
             {
-                Instances.Add(new InstanceSlot(EntityType.Cone, startPosition, Heading,
+                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
                     (position, heading) => new ARScenery(PropUtils.CreateSmallConeWithStripes(position))));
+                startPosition += MathHelper.ConvertHeadingToDirection(Heading - 90) * 1.5f;
+            }
+        }
+
+        protected override void InitializeLights()
+        {
+            var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 2f;
+            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2.5f;
+
+            for (var i = 0; i < 5; i++)
+            {
+                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
+                    (position, heading) => new ARScenery(PropUtils.CreateFlareHorizontal(position, Heading + 90))));
                 startPosition += MathHelper.ConvertHeadingToDirection(Heading - 90) * 1.5f;
             }
         }

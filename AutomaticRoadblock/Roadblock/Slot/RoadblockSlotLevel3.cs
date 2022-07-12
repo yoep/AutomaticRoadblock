@@ -2,15 +2,16 @@ using System;
 using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
+using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public class RoadblockSlotLevel3 : AbstractRoadblockSlot
     {
-        internal RoadblockSlotLevel3(Vector3 position, float heading, Vehicle targetVehicle) : base(position, heading, targetVehicle)
+        internal RoadblockSlotLevel3(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
+            : base(lane, heading, targetVehicle, shouldAddLights)
         {
-            Init();
         }
 
         public override void Spawn()
@@ -31,14 +32,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             return ModelUtils.GetStatePoliceVehicle(false);
         }
 
-        private void Init()
-        {
-            InitializeVehicleSlot();
-            InitializePedSlots();
-            InitializeBarriers();
-        }
-
-        private void InitializePedSlots()
+        protected override void InitializeCopPeds()
         {
             var pedSpawnPosition = GetPositionBehindVehicle();
 
@@ -50,17 +44,21 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             }
         }
 
-        private void InitializeBarriers()
+        protected override void InitializeScenery()
         {
             var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
             var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2f;
 
             for (var i = 0; i < 2; i++)
             {
-                Instances.Add(new InstanceSlot(EntityType.Barrier, startPosition, Heading,
+                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
                     (position, heading) => new ARScenery(PropUtils.CreatePoliceDoNotCrossBarrier(position, heading))));
                 startPosition += MathHelper.ConvertHeadingToDirection(Heading - 90) * 3f;
             }
+        }
+
+        protected override void InitializeLights()
+        {
         }
 
         private static ARPed AssignCopWeapons(ARPed ped)

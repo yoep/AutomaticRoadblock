@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
@@ -49,6 +50,7 @@ namespace AutomaticRoadblocks.Debug
 
         #endregion
 
+        [Conditional("DEBUG")]
         private void CreateRoadPreview()
         {
             _game.NewSafeFiber(() =>
@@ -64,6 +66,7 @@ namespace AutomaticRoadblocks.Debug
             }, "RoadPreview");
         }
 
+        [Conditional("DEBUG")]
         private void RemoveRoadPreview()
         {
             _game.NewSafeFiber(() =>

@@ -1,16 +1,18 @@
 using System.Collections.Generic;
+using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
-namespace AutomaticRoadblocks.Roadblock
+namespace AutomaticRoadblocks.Roadblock.Dispatcher
 {
     public class RoadblockDispatcher : IRoadblockDispatcher
     {
         private const float MinimumVehicleSpeed = 20f;
         private const float MinimumRoadblockPlacementDistance = 125f;
+        private const int AutoCleanRoadblockAfterSeconds = 60;
 
         private readonly ILogger _logger;
         private readonly IGame _game;
@@ -23,7 +25,28 @@ namespace AutomaticRoadblocks.Roadblock
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
+
+            StartCleaner();
         }
+
+        #region Properties
+
+        /// <inheritdoc />
+        public IEnumerable<IRoadblock> Roadblocks => _roadblocks;
+
+        #endregion
+
+        #region Events
+
+        /// <inheritdoc />
+        public event RoadblockEvents.RoadblockStateChanged RoadblockStateChanged;
+
+        /// <inheritdoc />
+        public event RoadblockEvents.RoadblockCopKilled RoadblockCopKilled;
+
+        #endregion
+
+        #region IRoadblockDispatcher
 
         /// <inheritdoc />
         public bool Dispatch(RoadblockLevel level, Vehicle vehicle, bool force)
@@ -34,23 +57,7 @@ namespace AutomaticRoadblocks.Roadblock
             _logger.Trace($"Starting roadblock dispatching with force state {force}");
             if (force || IsRoadblockDispatchingAllowed(vehicle))
             {
-                _logger.Debug("Dispatching new roadblock");
-                _game.NewSafeFiber(() =>
-                    {
-                        var road = DetermineRoadblockLocation(vehicle);
-                        _logger.Trace($"Dispatching roadblock on {road}");
-
-                        _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
-                        LspdfrUtils.PlayScannerAudioUsingPosition("WE_HAVE OFFICER_IN_NEED_OF_ASSISTANCE IN_OR_ON_POSITION", road.Position);
-
-                        var roadblock = new Roadblock(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic);
-                        _logger.Info($"Dispatching new roadblock\n{roadblock}");
-                        _roadblocks.Add(roadblock);
-
-                        roadblock.RoadblockStateChanged += RoadblockStateChanged;
-                        roadblock.Spawn();
-                    },
-                    "RoadblockDispatcher.Dispatch");
+                DoDispose(level, vehicle);
                 return true;
             }
 
@@ -71,13 +78,16 @@ namespace AutomaticRoadblocks.Roadblock
                 _logger.Trace($"Dispatching roadblock on {road}");
 
                 _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
-                var roadblock = new Roadblock(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic);
+                var roadblock = RoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
+                    ShouldAddLightsToRoadblock());
                 _logger.Info($"Dispatching new roadblock\n{roadblock}");
                 _roadblocks.Add(roadblock);
 
                 roadblock.CreatePreview();
             }, "RoadblockDispatcher.DispatchPreview");
         }
+
+        #endregion
 
         #region IDisposable
 
@@ -92,9 +102,42 @@ namespace AutomaticRoadblocks.Roadblock
 
         #endregion
 
+        #region Functions
+
         private bool IsRoadblockDispatchingAllowed(Vehicle vehicle)
         {
             return vehicle.Speed >= MinimumVehicleSpeed;
+        }
+
+        private bool ShouldAddLightsToRoadblock()
+        {
+            return _settingsManager.AutomaticRoadblocksSettings.EnableLights &&
+                   GameUtils.TimePeriod is TimePeriod.Evening or TimePeriod.Night;
+        }
+
+        private void DoDispose(RoadblockLevel level, Vehicle vehicle)
+        {
+            _logger.Debug("Dispatching new roadblock");
+            _game.NewSafeFiber(() =>
+                {
+                    var road = DetermineRoadblockLocation(vehicle);
+                    _logger.Trace($"Dispatching roadblock on {road}");
+
+                    _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
+                    LspdfrUtils.PlayScannerAudioUsingPosition("WE_HAVE OFFICER_IN_NEED_OF_ASSISTANCE IN_OR_ON_POSITION", road.Position);
+
+                    var roadblock = RoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
+                        ShouldAddLightsToRoadblock());
+                    _logger.Info($"Dispatching new roadblock\n{roadblock}");
+                    _roadblocks.Add(roadblock);
+
+                    // subscribe to the roadblock events
+                    roadblock.RoadblockStateChanged += InternalRoadblockStateChanged;
+                    roadblock.RoadblockCopKilled += InternalRoadblockCopKilled;
+
+                    roadblock.Spawn();
+                },
+                "RoadblockDispatcher.Dispatch");
         }
 
         private Road DetermineRoadblockLocation(Vehicle vehicle)
@@ -117,11 +160,11 @@ namespace AutomaticRoadblocks.Roadblock
             return distance;
         }
 
-        private void RoadblockStateChanged(IRoadblock roadblock, RoadblockState newState)
+        private void InternalRoadblockStateChanged(IRoadblock roadblock, RoadblockState newState)
         {
+            _logger.Debug($"Roadblock state changed to {newState}");
             _game.NewSafeFiber(() =>
             {
-                _logger.Debug($"Roadblock state changed to {newState}");
                 switch (newState)
                 {
                     case RoadblockState.Hit:
@@ -137,6 +180,28 @@ namespace AutomaticRoadblocks.Roadblock
                         break;
                 }
             }, "RoadblockDispatcher.RoadblockStateChanged");
+            RoadblockStateChanged?.Invoke(roadblock, newState);
         }
+
+        private void InternalRoadblockCopKilled(IRoadblock roadblock)
+        {
+            _logger.Debug($"A roadblock cop has been killed");
+            RoadblockCopKilled?.Invoke(roadblock);
+        }
+
+        private void StartCleaner()
+        {
+            _game.NewSafeFiber(() =>
+            {
+                GameFiber.Wait(10 * 1000);
+                _roadblocks
+                    .Where(x => x.State is not RoadblockState.Active or RoadblockState.Preparing)
+                    .Where(x => _game.GameTime - x.LastStateChange >= AutoCleanRoadblockAfterSeconds * 1000)
+                    .ToList()
+                    .ForEach(x => x.Dispose());
+            }, "RoadblockDispatcher.StartCleaner");
+        }
+
+        #endregion
     }
 }

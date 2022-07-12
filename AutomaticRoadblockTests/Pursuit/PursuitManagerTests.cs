@@ -2,6 +2,7 @@ using AutomaticRoadblocks;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Roadblock;
+using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblockTests.AbstractionLayer.Implementation;
 using Moq;

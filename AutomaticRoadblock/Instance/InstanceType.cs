@@ -2,8 +2,7 @@ namespace AutomaticRoadblocks.Instance
 {
     public enum EntityType
     {
-        Cone,
-        Barrier,
+        Scenery,
         CopPed,
         CopVehicle
     }

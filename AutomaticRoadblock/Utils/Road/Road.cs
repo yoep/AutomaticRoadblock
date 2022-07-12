@@ -222,6 +222,11 @@ namespace AutomaticRoadblocks.Utils.Road
             /// Get the width of the lane.
             /// </summary>
             public float Width { get; }
+            
+            /// <summary>
+            /// Get the lane type.
+            /// </summary>
+            public LaneType Type { get; }
 
             #endregion
 
@@ -274,6 +279,7 @@ namespace AutomaticRoadblocks.Utils.Road
                        $"{nameof(LeftSide)}: {LeftSide}," + Environment.NewLine +
                        $"{nameof(NodePosition)}: {NodePosition}," + Environment.NewLine +
                        $"{nameof(Width)}: {Width}," + Environment.NewLine +
+                       $"{nameof(Type)}: {Type}," + Environment.NewLine +
                        $"{nameof(IsPreviewActive)}: {IsPreviewActive}" + Environment.NewLine;
             }
 
@@ -288,6 +294,13 @@ namespace AutomaticRoadblocks.Utils.Road
             private static Vector3 FloatAboveGround(Vector3 position)
             {
                 return position + Vector3.WorldUp * 0.25f;
+            }
+
+            public enum LaneType
+            {
+                LeftLane,
+                MiddleLane,
+                RightLane
             }
         }
 

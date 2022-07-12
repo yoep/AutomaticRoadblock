@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Roadblock;
+using AutomaticRoadblocks.Roadblock.Dispatcher;
 
 namespace AutomaticRoadblocks.Api
 {

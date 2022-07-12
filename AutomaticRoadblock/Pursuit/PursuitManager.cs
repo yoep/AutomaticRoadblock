@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Roadblock;
+using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Settings;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -11,17 +12,15 @@ namespace AutomaticRoadblocks.Pursuit
 {
     public class PursuitManager : IPursuitManager
     {
-        private const double NonLethalDispatchFactor = 0.15;
-        private const double LethalDispatchFactor = 0.25;
-
         private readonly ILogger _logger;
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly IRoadblockDispatcher _roadblockDispatcher;
-        private readonly Random _random = new Random();
+        private readonly Random _random = new();
 
         private uint _timePursuitStarted;
         private uint _timeLastDispatchedRoadblock;
+        private uint _timeLastRoadblockActive;
         private uint _timeLastLevelChanged;
         private PursuitLevel _pursuitLevel = PursuitLevel.Level1;
 
@@ -161,13 +160,15 @@ namespace AutomaticRoadblocks.Pursuit
             if (newLevel > PursuitLevel.Level5.Level)
                 return;
 
-            PursuitLevel = PursuitLevel.From(newLevel);
+            UpdatePursuitLevel(PursuitLevel.From(newLevel));
         }
 
         private void PursuitStarted(LHandle pursuitHandle)
         {
             _logger.Trace("Pursuit has been started");
             _timePursuitStarted = _game.GameTime;
+            _roadblockDispatcher.RoadblockCopKilled += RoadblockCopKilled;
+            _roadblockDispatcher.RoadblockStateChanged += RoadblockStateChanged;
             PursuitHandle = pursuitHandle;
             UpdatePursuitLevel(PursuitLevel.Level1);
 
@@ -179,6 +180,7 @@ namespace AutomaticRoadblocks.Pursuit
         private void PursuitEnded(LHandle handle)
         {
             PursuitHandle = null;
+            _roadblockDispatcher.RoadblockCopKilled -= RoadblockCopKilled;
 
             PursuitStateChanged?.Invoke(false);
         }
@@ -192,7 +194,7 @@ namespace AutomaticRoadblocks.Pursuit
                     VerifyPursuitLethalForce();
                     DoLevelIncreaseTick();
                     DoDispatchTick();
-                    
+
                     _game.FiberYield();
                 }
             }, "PursuitManager.PursuitMonitor");
@@ -204,7 +206,7 @@ namespace AutomaticRoadblocks.Pursuit
                 return;
 
             var firstLethalLevel = PursuitLevel.Levels
-                .First(x => x.LethalAllowed);
+                .First(x => x.IsLethalForceAllowed);
 
             // make sure that the current level is at least a lethal level
             // if not, update the current level to the first lethal level
@@ -217,15 +219,17 @@ namespace AutomaticRoadblocks.Pursuit
         private void DoLevelIncreaseTick()
         {
             var gameTime = _game.GameTime;
+            var increaseLevelThreshold = 100 - PursuitLevel.AutomaticLevelIncreaseFactor * 100;
 
-            if (gameTime - _timeLastLevelChanged > 2 * 60 * 1000 && _random.Next(11) <= 2)
+            if (gameTime - _timeLastLevelChanged > _settingsManager.AutomaticRoadblocksSettings.TimeBetweenAutoLevelIncrements * 1000 &&
+                _random.Next(101) >= increaseLevelThreshold)
                 IncreasePursuitLevel();
         }
 
         private bool DoDispatch(Vehicle vehicle, bool force)
         {
             var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, force);
-            
+
             if (dispatched)
                 _timeLastDispatchedRoadblock = _game.GameTime;
 
@@ -252,10 +256,7 @@ namespace AutomaticRoadblocks.Pursuit
             if (!IsPursuitActive)
                 return false;
 
-            var possibility = Functions.IsPursuitLethalForceForced(PursuitHandle) ? LethalDispatchFactor : NonLethalDispatchFactor;
-            var dispatchThreshold = 100 - possibility * 100;
-
-            return _random.Next(0, 101) >= dispatchThreshold;
+            return _random.Next(0, 101) >= 100 - PursuitLevel.DispatchFactor * 100;
         }
 
         private bool IsDispatchingAllowed()
@@ -268,7 +269,22 @@ namespace AutomaticRoadblocks.Pursuit
 
             return gameTime - _timePursuitStarted >= roadblocksSettings.DispatchAllowedAfter * 1000 &&
                    gameTime - _timeLastDispatchedRoadblock >= roadblocksSettings.DispatchInterval * 1000 &&
+                   gameTime - _timeLastRoadblockActive >= roadblocksSettings.DispatchInterval * 1000 &&
                    Functions.GetPursuitPeds(PursuitHandle).Any(x => !Functions.IsPedVisualLost(x));
+        }
+
+        private void RoadblockStateChanged(IRoadblock roadblock, RoadblockState newState)
+        {
+            if (newState == RoadblockState.Active)
+                _timeLastRoadblockActive = _game.GameTime;
+        }
+
+        private void RoadblockCopKilled(IRoadblock roadblock)
+        {
+            // if a cop is killed from the roadblock
+            // increase the level 2
+            if (PursuitLevel.Level < 2)
+                UpdatePursuitLevel(PursuitLevel.Level2);
         }
 
         [Conditional("DEBUG")]

@@ -4,6 +4,7 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
+using AutomaticRoadblocks.Utils.Road;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -14,27 +15,39 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected readonly List<InstanceSlot> Instances = new();
 
-        protected AbstractRoadblockSlot(Vector3 position, float heading, Vehicle targetVehicle)
+        private bool _monitoring;
+
+        protected AbstractRoadblockSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
-            Assert.NotNull(position, "position cannot be null");
+            Assert.NotNull(lane, "lane cannot be null");
             Assert.NotNull(heading, "heading cannot be null");
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
-            Position = position;
+            Lane = lane;
             Heading = heading;
             TargetVehicle = targetVehicle;
             VehicleModel = GetVehicleModel();
+
+            Init(shouldAddLights);
         }
 
         #region Properties
 
         /// <inheritdoc />
-        public Vector3 Position { get; }
+        public Vector3 Position => Lane.Position;
 
         /// <inheritdoc />
         public float Heading { get; }
 
         /// <inheritdoc />
         public Vehicle Vehicle => VehicleInstance?.GameInstance;
+
+        /// <inheritdoc />
+        public event RoadblockEvents.RoadblockSlotEvents.RoadblockCopKilled RoadblockCopKilled;
+
+        /// <summary>
+        /// Get the lane of this slot.
+        /// </summary>
+        protected Road.Lane Lane { get; }
 
         /// <summary>
         /// Get the police vehicle model which is used for the slot.
@@ -108,6 +121,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public void Dispose()
         {
+            _monitoring = false;
             Instances.ForEach(x => x.Dispose());
         }
 
@@ -139,6 +153,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                     Functions.SetPedAsCop(x);
                     Functions.SetCopAsBusy(x, true);
                 });
+
+            Monitor();
         }
 
         /// <inheritdoc />
@@ -164,11 +180,25 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                     Functions.SetPedAsCop(x);
                     Functions.SetCopAsBusy(x, false);
                 });
+
+            // remove all cop instances so that we don't remove them by accident
+            // these instances are now in control of LSPDFR
+            Instances.RemoveAll(x => x.Type is EntityType.CopPed or EntityType.CopVehicle);
         }
 
         #endregion
 
         #region Functions
+
+        private void Init(bool shouldAddLights)
+        {
+            InitializeVehicleSlot();
+            InitializeCopPeds();
+            InitializeScenery();
+
+            if (shouldAddLights)
+                InitializeLights();
+        }
 
         protected void InitializeVehicleSlot()
         {
@@ -188,10 +218,49 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         /// <summary>
+        /// Initialize the cop ped slots.
+        /// </summary>
+        protected abstract void InitializeCopPeds();
+
+        /// <summary>
+        /// Initialize the prop slots of the slot.
+        /// </summary>
+        protected abstract void InitializeScenery();
+
+        /// <summary>
+        /// Initialize the light slots.
+        /// </summary>
+        protected abstract void InitializeLights();
+
+        /// <summary>
         /// Get the vehicle model of the slot.
         /// </summary>
         /// <returns>Returns the vehicle model that should be used for this slot.</returns>
         protected abstract Model GetVehicleModel();
+
+        private void Monitor()
+        {
+            var game = IoC.Instance.GetInstance<IGame>();
+            _monitoring = true;
+
+            game.NewSafeFiber(() =>
+            {
+                while (_monitoring)
+                {
+                    var hasACopBeenKilled = Instances
+                        .Where(x => x.Type == EntityType.CopPed)
+                        .Select(x => (ARPed)x.Instance)
+                        .Where(x => x.GameInstance.IsDead)
+                        .Where(x => x.GameInstance.HasBeenDamagedByAnyVehicle)
+                        .Any(x => x.GameInstance.HasBeenDamagedBy(TargetVehicle));
+
+                    if (hasACopBeenKilled)
+                        RoadblockCopKilled?.Invoke(this);
+
+                    game.FiberYield();
+                }
+            }, "AbstractRoadblockSlot.Monitor");
+        }
 
         #endregion
     }

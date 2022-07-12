@@ -308,7 +308,7 @@ namespace AutomaticRoadblocks.Utils.Road
 
     internal class RoadBuilder
     {
-        private readonly List<Road.Lane> _lanes = new List<Road.Lane>();
+        private readonly List<Road.Lane> _lanes = new();
         private Vector3 _position;
         private Vector3 _rightSide;
         private Vector3 _leftSide;

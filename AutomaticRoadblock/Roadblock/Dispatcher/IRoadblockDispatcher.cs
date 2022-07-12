@@ -1,13 +1,29 @@
 using System;
+using System.Collections.Generic;
 using Rage;
 
-namespace AutomaticRoadblocks.Roadblock
+namespace AutomaticRoadblocks.Roadblock.Dispatcher
 {
     /// <summary>
     /// The roadblock dispatcher is responsible for determining & dispatching roadblocks.
     /// </summary>
     public interface IRoadblockDispatcher : IDisposable
     {
+        /// <summary>
+        /// Invoked when a roadblock cop is killed.
+        /// </summary>
+        event RoadblockEvents.RoadblockCopKilled RoadblockCopKilled;
+
+        /// <summary>
+        /// Invoked when a roadblock state has changed.
+        /// </summary>
+        event RoadblockEvents.RoadblockStateChanged RoadblockStateChanged;
+        
+        /// <summary>
+        /// Get the roadblocks which have been dispatched.
+        /// </summary>
+        IEnumerable<IRoadblock> Roadblocks { get; }
+
         /// <summary>
         /// Dispatch a new roadblock for the current pursuit.
         /// Forcing the roadblock will disable all condition checks for a roadblock to spawn.

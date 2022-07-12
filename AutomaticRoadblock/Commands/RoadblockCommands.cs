@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Roadblock;
+using AutomaticRoadblocks.Roadblock.Dispatcher;
 using Rage.Attributes;
 
 namespace AutomaticRoadblocks.Commands

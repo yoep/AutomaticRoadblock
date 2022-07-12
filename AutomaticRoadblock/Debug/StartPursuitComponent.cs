@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
@@ -42,6 +43,7 @@ namespace AutomaticRoadblocks.Debug
             }
         }
 
+        [Conditional("DEBUG")]
         private void StartPursuit()
         {
             _game.NewSafeFiber(() =>
@@ -53,8 +55,13 @@ namespace AutomaticRoadblocks.Debug
                 var ped = new Ped(road.Position);
                 var vehicle = new Vehicle(new Model("Buffalo3"), lane.Position, lane.Heading);
 
-                ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Pistol), -1, true);
+                var weaponDescriptor = ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Pistol), -1, true);
+                ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.HeavyRifle), -1, false);
+                ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Shotgun), -1, false);
+                ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Smg), -1, false);
+                ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.MicroSmg), -1, false);
                 ped.WarpIntoVehicle(vehicle, (int)VehicleSeat.Driver);
+                ped.Inventory.EquippedWeapon = weaponDescriptor;
 
                 Functions.AddPedToPursuit(_currentPursuit, ped);
                 Functions.SetPursuitIsActiveForPlayer(_currentPursuit, true);
@@ -62,6 +69,7 @@ namespace AutomaticRoadblocks.Debug
             }, "StartPursuitComponent.StartPursuit");
         }
 
+        [Conditional("DEBUG")]
         private void EndPursuit()
         {
             Functions.ForceEndPursuit(_currentPursuit);

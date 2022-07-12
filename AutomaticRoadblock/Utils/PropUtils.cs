@@ -104,22 +104,44 @@ namespace AutomaticRoadblocks.Utils
 
         public static Object CreateBarrier(Vector3 position, float heading = 0f)
         {
-            return new Object(new Model("prop_ld_barrier_01"), position, heading);
+            var instance = new Object(new Model("prop_ld_barrier_01"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
+        }
+
+        public static Object CreateBarrierWorkWithLight(Vector3 position, float heading = 0f)
+        {
+            var instance = new Object(new Model("prop_barrier_work02a"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
+        }
+
+        public static Object CreateBarrierWorkWithLightAlternative(Vector3 position, float heading = 0f)
+        {
+            var instance = new Object(new Model("prop_barrier_work01b"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
         }
 
         public static Object CreateWorkerBarrierArrowRight(Vector3 position)
         {
-            return new Object(new Model("prop_mp_arrow_barrier_01"), position);
+            var instance = new Object(new Model("prop_mp_arrow_barrier_01"), position);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
         }
 
         public static Object RedirectTrafficArrowLeft(Vector3 position, float heading)
         {
-            return new Object(new Model("prop_trafficdiv_01"), position, heading);
+            var instance = new Object(new Model("prop_trafficdiv_01"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
         }
 
         public static Object RedirectTrafficArrowBoth(Vector3 position, float heading)
         {
-            return new Object(new Model("prop_trafficdiv_02"), position, heading);
+            var instance = new Object(new Model("prop_trafficdiv_02"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
         }
 
         public static Object StoppedVehiclesSign(Vector3 position, float heading)
@@ -138,22 +160,30 @@ namespace AutomaticRoadblocks.Utils
 
         public static Object CreateGeneratorWithLights(Vector3 position, float heading = 0f)
         {
-            return new Object(new Model("prop_generator_03b"), position, heading);
+            var instance = new Object(new Model("prop_generator_03b"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
         }
 
         public static Object CreateFloodLight(Vector3 position, float heading = 0f)
         {
-            return new Object(new Model("prop_worklight_03a"), position, heading);
+            var instance = new Object(new Model("prop_worklight_03a"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
         }
 
         public static Object CreateFloodLights(Vector3 position, float heading = 0f)
         {
-            return new Object(new Model("prop_worklight_03b"), position, heading);
+            var instance = new Object(new Model("prop_worklight_03b"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
         }
 
         public static Object CreateGroundFloodLight(Vector3 position, float heading = 0f)
         {
-            return new Object(new Model("prop_worklight_02a"), position, heading);
+            var instance = new Object(new Model("prop_worklight_02a"), position, heading);
+            PlaceCorrectlyOnGround(instance);
+            return instance;
         }
 
         public static Object CreateRedGroundLight(Vector3 position)

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
 {
-    public class Roadblock : IRoadblock
+    public abstract class AbstractRoadblock : IRoadblock
     {
         private const float LaneHeadingTolerance = 40f;
         private const float BypassTolerance = 20f;
@@ -17,58 +18,77 @@ namespace AutomaticRoadblocks.Roadblock
         private const int BlipFlashDuration = 3000;
 
         private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
-        private readonly Road _road;
+        private readonly IGame _game = IoC.Instance.GetInstance<IGame>();
         private readonly Vehicle _vehicle;
-        private readonly List<IRoadblockSlot> _slots = new List<IRoadblockSlot>();
 
         private Blip _blip;
         private int _speedZoneId;
         private float _lastKnownDistanceToRoadblock = 9999f;
 
-        internal Roadblock(RoadblockLevel level, Road road, Vehicle vehicle, bool limitSpeed)
+        internal AbstractRoadblock(Road road, Vehicle vehicle, bool limitSpeed, bool addLights)
         {
-            Assert.NotNull(level, "level cannot be null");
             Assert.NotNull(road, "road cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
-            _road = road;
+            Road = road;
             _vehicle = vehicle;
-            Level = level;
 
-            Init(limitSpeed);
+            Init(limitSpeed, addLights);
         }
 
         #region Properties
 
+        /// <inheritdoc />
+        public uint LastStateChange { get; private set; }
+
         /// <summary>
         /// Get the level of the roadblock.
         /// </summary>
-        public RoadblockLevel Level { get; }
+        public abstract RoadblockLevel Level { get; }
 
-        /// <summary>
-        /// Get the state of the roadblock.
-        /// </summary>
+        /// <inheritdoc />
         public RoadblockState State { get; private set; } = RoadblockState.Preparing;
 
         /// <summary>
         /// Get the central position of the roadblock.
         /// </summary>
-        public Vector3 Postion => _road.Position;
+        public Vector3 Postion => Road.Position;
+
+        /// <summary>
+        /// Get the heading of the roadblock.
+        /// </summary>
+        public float Heading { get; private set; }
+
+        /// <summary>
+        /// Get the road of this roadblock.
+        /// </summary>
+        protected Road Road { get; }
+
+        /// <summary>
+        /// Get the generated slots for this roadblock.
+        /// </summary>
+        protected List<IRoadblockSlot> Slots { get; } = new();
+
+        /// <summary>
+        /// Get the scenery slots for this roadblock.
+        /// </summary>
+        protected List<InstanceSlot> Instances { get; } = new();
 
         #endregion
 
         #region Events
 
-        /// <summary>
-        /// Invoked when the roadblock state changes.
-        /// </summary>
+        /// <inheritdoc />
         public event RoadblockEvents.RoadblockStateChanged RoadblockStateChanged;
+
+        /// <inheritdoc />
+        public event RoadblockEvents.RoadblockCopKilled RoadblockCopKilled;
 
         #endregion
 
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive => _slots
+        public bool IsPreviewActive => Instances
             .Select(x => x.IsPreviewActive)
             .FirstOrDefault();
 
@@ -76,20 +96,24 @@ namespace AutomaticRoadblocks.Roadblock
         public void CreatePreview()
         {
             CreateBlip();
-            foreach (var roadblockSlot in _slots)
+            foreach (var roadblockSlot in Slots)
             {
                 roadblockSlot.CreatePreview();
             }
+
+            Instances.ForEach(x => x.CreatePreview());
         }
 
         /// <inheritdoc />
         public void DeletePreview()
         {
             DeleteBlip();
-            foreach (var roadblockSlot in _slots)
+            foreach (var roadblockSlot in Slots)
             {
                 roadblockSlot.DeletePreview();
             }
+
+            Instances.ForEach(x => x.DeletePreview());
         }
 
         #endregion
@@ -106,12 +130,15 @@ namespace AutomaticRoadblocks.Roadblock
 
             DeleteBlip();
             DeleteSpeedZone();
-            _slots.ForEach(x => x.Dispose());
+            Slots.ForEach(x => x.Dispose());
+            Instances.ForEach(x => x.Dispose());
 
             UpdateState(RoadblockState.Disposed);
         }
 
         #endregion
+
+        #region Methods
 
         /// <summary>
         /// Spawn the roadblock in the world.
@@ -123,10 +150,8 @@ namespace AutomaticRoadblocks.Roadblock
                 _logger.Trace("Spawning roadblock");
                 UpdateState(RoadblockState.Active);
 
-                foreach (var slot in _slots)
-                {
-                    slot.Spawn();
-                }
+                Slots.ForEach(x => x.Spawn());
+                Instances.ForEach(x => x.Spawn());
 
                 CreateBlip();
                 Monitor();
@@ -143,17 +168,51 @@ namespace AutomaticRoadblocks.Roadblock
         {
             return $"{nameof(Level)}: {Level}\n" +
                    $"{nameof(State)}: {State}\n" +
-                   $"{nameof(_slots)}: [{_slots.Count}]{string.Join(",", _slots)}\n" +
-                   $"{nameof(_road)}: {_road}";
+                   $"{nameof(Slots)}: [{Slots.Count}]{string.Join(",", Slots)}\n" +
+                   $"{nameof(Road)}: {Road}";
         }
 
-        private void Init(bool limitSpeed)
+        #endregion
+
+        #region Functions
+
+        /// <summary>
+        /// Initialize the scenery slots of this roadblock.
+        /// </summary>
+        protected abstract void InitializeScenery();
+
+        /// <summary>
+        /// Initialize the light slots of this roadblock.
+        /// </summary>
+        protected abstract void InitializeLights();
+
+        /// <summary>
+        /// Create a slot for this roadblock for the given lane.
+        /// </summary>
+        /// <param name="lane">The lane for the slot to block.</param>
+        /// <param name="heading">The heading of the block.</param>
+        /// <param name="targetVehicle">The target vehicle.</param>
+        /// <param name="shouldAddLights">Set if light scenery should be added.</param>
+        /// <returns>Returns the created slot for the roadblock.</returns>
+        protected abstract IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights);
+
+        private void Init(bool limitSpeed, bool shouldAddLights)
         {
-            var lanesToBlock = _road.Lanes;
-            var heading = _road.Lanes
+            InitializeRoadblockSlots(shouldAddLights);
+            InitializeScenery();
+            InitializeSpeedLimit(limitSpeed);
+
+            if (shouldAddLights)
+                InitializeLights();
+        }
+
+        private void InitializeRoadblockSlots(bool addLights)
+        {
+            var lanesToBlock = Road.Lanes;
+            Heading = Road.Lanes
                 .Select(x => x.Heading)
                 .Where(x => Math.Abs(x - _vehicle.Heading) < LaneHeadingTolerance)
-                .DefaultIfEmpty(_road.Lanes[0].Heading)
+                .DefaultIfEmpty(Road.Lanes[0].Heading)
                 .First();
 
             // if we're currently at level one, we'll only block the lane of the pursuit
@@ -171,14 +230,19 @@ namespace AutomaticRoadblocks.Roadblock
             _logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
             foreach (var lane in lanesToBlock)
             {
-                _slots.Add(SlotFactory.Create(Level, lane.Position, heading, _vehicle));
+                var roadblockSlot = CreateSlot(lane, Heading, _vehicle, addLights);
+                roadblockSlot.RoadblockCopKilled += RoadblockSlotCopKilled;
+                Slots.Add(roadblockSlot);
             }
+        }
 
-            if (limitSpeed)
-            {
-                _logger.Trace("Creating speed zone at roadblock");
-                CreateSpeedZoneLimit();
-            }
+        private void InitializeSpeedLimit(bool limitSpeed)
+        {
+            if (!limitSpeed)
+                return;
+
+            _logger.Trace("Creating speed zone at roadblock");
+            CreateSpeedZoneLimit();
         }
 
         private void CreateSpeedZoneLimit()
@@ -224,15 +288,13 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void Monitor()
         {
-            var game = IoC.Instance.GetInstance<IGame>();
-
-            game.NewSafeFiber(() =>
+            _game.NewSafeFiber(() =>
             {
                 while (State == RoadblockState.Active)
                 {
                     VerifyIfRoadblockIsBypassed();
                     VerifyIfRoadblockIsHit();
-                    game.FiberYield();
+                    _game.FiberYield();
                 }
             }, "Roadblock.Monitor");
         }
@@ -240,7 +302,7 @@ namespace AutomaticRoadblocks.Roadblock
         private void ReleaseEntitiesToLspdfr()
         {
             _logger.Debug("Releasing cop peds to LSPDFR");
-            foreach (var slot in _slots)
+            foreach (var slot in Slots)
             {
                 slot.ReleaseToLspdfr();
             }
@@ -275,7 +337,7 @@ namespace AutomaticRoadblocks.Roadblock
                 return;
 
             _logger.Trace("Collision has been detected for target vehicle");
-            if (_slots.Any(slot => slot.Vehicle.HasBeenDamagedBy(_vehicle)))
+            if (Slots.Any(slot => slot.Vehicle.HasBeenDamagedBy(_vehicle)))
             {
                 _logger.Debug("Determined that the collision must have been against a roadblock slot");
                 BlipFlashNewState(Color.Green);
@@ -291,6 +353,10 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void UpdateState(RoadblockState state)
         {
+            if (State == state)
+                return;
+
+            LastStateChange = _game.GameTime;
             State = state;
             RoadblockStateChanged?.Invoke(this, state);
         }
@@ -301,12 +367,17 @@ namespace AutomaticRoadblocks.Roadblock
             _blip.Flash(500, BlipFlashDuration);
         }
 
-        private static IReadOnlyList<Road.Lane> FilterLanesWhichAreTooCloseToEachOther(IReadOnlyList<Road.Lane> lanesToBlock)
+        private void RoadblockSlotCopKilled(IRoadblockSlot roadblockSlot)
+        {
+            RoadblockCopKilled?.Invoke(this);
+        }
+
+        private IReadOnlyList<Road.Lane> FilterLanesWhichAreTooCloseToEachOther(IReadOnlyList<Road.Lane> lanesToBlock)
         {
             Road.Lane lastLane = null;
-
-            lanesToBlock = lanesToBlock
-                .Where(x =>
+            
+            _logger.Trace("Filtering lanes which are too close to each-other");
+            var filteredLanesToBlock = lanesToBlock.Where(x =>
                 {
                     var result = true;
 
@@ -318,7 +389,13 @@ namespace AutomaticRoadblocks.Roadblock
                 })
                 .ToList();
 
-            return lanesToBlock;
+            if (filteredLanesToBlock.Count != 0)
+                return filteredLanesToBlock;
+
+            _logger.Warn("Lanes too close filter has filtered out all lanes, resetting to original list");
+            return lanesToBlock.ToList();
         }
+
+        #endregion
     }
 }

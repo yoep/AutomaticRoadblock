@@ -4,11 +4,11 @@ namespace AutomaticRoadblocks.Pursuit
 {
     public class PursuitLevel
     {
-        public static readonly PursuitLevel Level1 = new PursuitLevel(1, false);
-        public static readonly PursuitLevel Level2 = new PursuitLevel(2, false);
-        public static readonly PursuitLevel Level3 = new PursuitLevel(3, true);
-        public static readonly PursuitLevel Level4 = new PursuitLevel(4, true);
-        public static readonly PursuitLevel Level5 = new PursuitLevel(5, true);
+        public static readonly PursuitLevel Level1 = new(1, 0.1, 0.20, false);
+        public static readonly PursuitLevel Level2 = new(2, 0.15, 0.15, false);
+        public static readonly PursuitLevel Level3 = new(3, 0.2, 0.10, true);
+        public static readonly PursuitLevel Level4 = new(4, 0.3, 0.05, true);
+        public static readonly PursuitLevel Level5 = new(5, 0.35, 0.0, true);
 
         public static readonly PursuitLevel[] Levels =
         {
@@ -19,10 +19,12 @@ namespace AutomaticRoadblocks.Pursuit
             Level5
         };
 
-        private PursuitLevel(int level, bool lethalAllowed)
+        private PursuitLevel(int level, double dispatchFactor, double automaticLevelIncreaseFactor, bool isLethalForceAllowed)
         {
             Level = level;
-            LethalAllowed = lethalAllowed;
+            DispatchFactor = dispatchFactor;
+            AutomaticLevelIncreaseFactor = automaticLevelIncreaseFactor;
+            IsLethalForceAllowed = isLethalForceAllowed;
         }
 
         /// <summary>
@@ -31,9 +33,19 @@ namespace AutomaticRoadblocks.Pursuit
         public int Level { get; }
 
         /// <summary>
+        /// Get the factor at which a roadblock can be dispatched for the pursuit level.
+        /// </summary>
+        public double DispatchFactor { get; }
+
+        /// <summary>
+        /// Get the factor at which the pursuit level can be increased automatically to the next level.
+        /// </summary>
+        public double AutomaticLevelIncreaseFactor { get; }
+
+        /// <summary>
         /// Verify if firing weapons is allowed.
         /// </summary>
-        public bool LethalAllowed { get; }
+        public bool IsLethalForceAllowed { get; }
 
         public override string ToString()
         {

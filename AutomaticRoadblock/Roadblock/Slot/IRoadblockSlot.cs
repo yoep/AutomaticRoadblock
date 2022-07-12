@@ -23,6 +23,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         Vehicle Vehicle { get; }
 
         /// <summary>
+        /// Invoked when a cop from this slot has been killed.
+        /// </summary>
+        event RoadblockEvents.RoadblockSlotEvents.RoadblockCopKilled RoadblockCopKilled;
+
+        /// <summary>
         /// Spawn the slot entities into the world.
         /// </summary>
         void Spawn();

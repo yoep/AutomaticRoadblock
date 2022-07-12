@@ -38,7 +38,7 @@ namespace AutomaticRoadblocks.Settings
             try
             {
                 var settingsFile = new InitializationFile(File);
-                
+
                 ReadGeneralSettings(settingsFile);
                 ReadAutomaticRoadblocksSettings(settingsFile);
                 _logger.Info("Settings have been loaded with success");
@@ -48,7 +48,7 @@ namespace AutomaticRoadblocks.Settings
                 _logger.Error("An error occurred while loading the settings", ex);
             }
         }
-        
+
         private void ReadGeneralSettings(InitializationFile file)
         {
             GeneralSettings = new GeneralSettings
@@ -57,18 +57,20 @@ namespace AutomaticRoadblocks.Settings
                 OpenMenuModifierKey = ValueToKey(file.ReadString("General", "OpenMenuModifierKey", "ShiftKey"))
             };
         }
-        
+
         private void ReadAutomaticRoadblocksSettings(InitializationFile file)
         {
             AutomaticRoadblocksSettings = new AutomaticRoadblocksSettings
             {
                 EnableDuringPursuits = file.ReadBoolean("Automatic Roadblocks", "EnableDuringPursuits", true),
+                EnableLights = file.ReadBoolean("Automatic Roadblocks", "EnableLights", true),
                 DispatchAllowedAfter = file.ReadUInt32("Automatic Roadblocks", "DispatchAllowedAfter", 90),
                 DispatchInterval = file.ReadUInt32("Automatic Roadblocks", "DispatchAllowedAfter", 45),
+                TimeBetweenAutoLevelIncrements = file.ReadUInt32("Automatic Roadblocks", "TimeBetweenAutoLevelIncrements", 90),
                 SlowTraffic = file.ReadBoolean("Automatic Roadblocks", "SlowTraffic", true)
             };
         }
-        
+
         private Keys ValueToKey(string value)
         {
             if (!Enum.TryParse(value, true, out Keys key))

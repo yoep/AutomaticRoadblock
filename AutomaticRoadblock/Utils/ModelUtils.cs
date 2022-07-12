@@ -23,6 +23,8 @@ namespace AutomaticRoadblocks.Utils
             public const string Shotgun = "weapon_pumpshotgun";
             public const string HeavyRifle = "weapon_heavyrifle";
             public const string Nightstick = "weapon_nightstick";
+            public const string MicroSmg = "weapon_microsmg";
+            public const string Smg = "weapon_smg";
 
             public static class Attachments
             {
