@@ -6,9 +6,10 @@ namespace AutomaticRoadblocks
 
         public const string RoadInfo = "Road info" + DebugIndicatorText;
         public const string RoadPreview = "Road preview" + DebugIndicatorText;
-        public const string RoadPreviewRemove = "Remove road preview" + DebugIndicatorText;
-        public const string NearbyRoadsPreview = "Nearby roads preview" + DebugIndicatorText;
-        public const string NearbyRoadsPreviewRemove = "Remove nearby roads preview" + DebugIndicatorText;
+        public const string RoadPreviewDescription = "Create a visual of the road information";
+        public const string RoadPreviewClosest = "Closest road";
+        public const string RoadPreviewNearby = "Nearby roads";
+        public const string RoadPreviewRemove = "Remove preview" + DebugIndicatorText;
         public const string ZoneInfo = "Zone info " + DebugIndicatorText;
         public const string EndCallout = "End current callout " + DebugIndicatorText;
 

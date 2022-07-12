@@ -1,16 +1,19 @@
+using System.Collections.Generic;
+using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
+using RAGENativeUI;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug
 {
-    public class RoadPreviewComponent : IMenuComponent<UIMenuItem>
+    public class RoadPreviewComponent : IMenuComponent<UIMenuListItem>
     {
         private readonly ILogger _logger;
         private readonly IGame _game;
-        private Road _road;
+        private List<Road> _roads;
 
         public RoadPreviewComponent(ILogger logger, IGame game)
         {
@@ -21,7 +24,9 @@ namespace AutomaticRoadblocks.Debug
         #region IMenuComponent
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.RoadPreview);
+        public UIMenuListItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.RoadPreview, AutomaticRoadblocksPlugin.RoadPreviewDescription,
+            new DisplayItem(RoadPreviewType.Closest, AutomaticRoadblocksPlugin.RoadPreviewClosest),
+            new DisplayItem(RoadPreviewType.Nearby, AutomaticRoadblocksPlugin.RoadPreviewNearby));
 
         /// <inheritdoc />
         public MenuType Type => MenuType.DEBUG;
@@ -32,7 +37,7 @@ namespace AutomaticRoadblocks.Debug
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            if (_road == null)
+            if (_roads == null)
             {
                 CreateRoadPreview();
             }
@@ -49,9 +54,13 @@ namespace AutomaticRoadblocks.Debug
             _game.NewSafeFiber(() =>
             {
                 MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreviewRemove;
-                _road = RoadUtils.GetClosestRoad(Game.LocalPlayer.Character.Position, RoadType.All);
-                _logger.Debug("Nearest road info: " + _road);
-                _road.CreatePreview();
+                var type = (RoadPreviewType)MenuItem.SelectedValue;
+                _roads = type == RoadPreviewType.Closest
+                    ? new List<Road> { RoadUtils.GetClosestRoad(Game.LocalPlayer.Character.Position, RoadType.All) }
+                    : RoadUtils.GetNearbyRoads(Game.LocalPlayer.Character.Position, RoadType.All).ToList();
+
+                _logger.Debug("Nearest road info: " + string.Join("---\n", _roads));
+                _roads.ForEach(x => x.CreatePreview());
             }, "RoadPreview");
         }
 
@@ -60,9 +69,15 @@ namespace AutomaticRoadblocks.Debug
             _game.NewSafeFiber(() =>
             {
                 MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreview;
-                _road.DeletePreview();
-                _road = null;
+                _roads.ForEach(x => x.DeletePreview());
+                _roads = null;
             }, "RoadPreview");
+        }
+
+        public enum RoadPreviewType
+        {
+            Closest,
+            Nearby
         }
     }
 }

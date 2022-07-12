@@ -262,7 +262,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
             else if (Math.Abs(currentDistance - _lastKnownDistanceToRoadblock) > BypassTolerance)
             {
-                BlipFlashNewState(Color.Red);
+                BlipFlashNewState(Color.LightGray);
                 UpdateState(RoadblockState.Bypassed);
                 ReleaseEntitiesToLspdfr();
                 _logger.Info("Roadblock has been bypassed");
@@ -298,7 +298,7 @@ namespace AutomaticRoadblocks.Roadblock
         private void BlipFlashNewState(Color color)
         {
             _blip.Color = color;
-            _blip.Flash(1000, BlipFlashDuration);
+            _blip.Flash(500, BlipFlashDuration);
         }
 
         private static IReadOnlyList<Road.Lane> FilterLanesWhichAreTooCloseToEachOther(IReadOnlyList<Road.Lane> lanesToBlock)

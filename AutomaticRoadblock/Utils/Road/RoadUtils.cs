@@ -79,7 +79,7 @@ namespace AutomaticRoadblocks.Utils.Road
             return new List<Road>
             {
                 DiscoverRoad(road1, numberOfLanes1, numberOfLanes2, junctionIndication),
-                DiscoverRoad(road2, numberOfLanes1, numberOfLanes2, junctionIndication)
+                DiscoverRoad(road2, numberOfLanes2, numberOfLanes1, junctionIndication)
             };
         }
 

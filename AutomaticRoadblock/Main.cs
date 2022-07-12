@@ -146,7 +146,6 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EndCalloutComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadPreviewComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(NearbyRoadsPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ZoneInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent));

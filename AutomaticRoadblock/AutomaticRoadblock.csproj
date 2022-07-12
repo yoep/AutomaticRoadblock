@@ -59,7 +59,6 @@
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
         <Compile Include="Commands\RoadblockCommands.cs" />
         <Compile Include="Debug\EndCalloutComponent.cs" />
-        <Compile Include="Debug\NearbyRoadsPreviewComponent.cs" />
         <Compile Include="Debug\RoadInfoComponent.cs" />
         <Compile Include="Debug\RoadPreviewComponent.cs" />
         <Compile Include="Debug\StartPursuitComponent.cs" />
