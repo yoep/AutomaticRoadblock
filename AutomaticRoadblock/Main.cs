@@ -12,6 +12,7 @@ using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
 using LSPD_First_Response.Mod.API;
+using RAGENativeUI.Elements;
 
 // Source code: https://github.com/yoep/AutomaticRoadblock
 namespace AutomaticRoadblocks
@@ -39,7 +40,7 @@ namespace AutomaticRoadblocks
         public override void Finally()
         {
             var logger = IoC.Instance.GetInstance<ILogger>();
-            var notification = IoC.Instance.GetInstance<INotification>();
+            var game = IoC.Instance.GetInstance<IGame>();
             var disposables = IoC.Instance.GetInstances<IDisposable>();
 
             try
@@ -50,19 +51,18 @@ namespace AutomaticRoadblocks
                     instance.Dispose();
                 }
 
-                notification.DisplayPluginNotification("~g~has been unloaded");
+                game.DisplayPluginNotification("~g~has been unloaded");
             }
             catch (Exception ex)
             {
                 logger.Error("An error occurred while unloading the plugin", ex);
-                notification.DisplayPluginNotification("~r~failed to correctly unload the plugin, see logs for more info");
+                game.DisplayPluginNotification("~r~failed to correctly unload the plugin, see logs for more info");
             }
         }
 
         private static void InitializeIoC()
         {
             IoC.Instance
-                .Register<INotification>(typeof(RageNotification))
                 .Register<IGame>(typeof(AbstractionLayer.Implementation.Rage))
                 .Register<ILogger>(typeof(RageLogger))
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
@@ -91,7 +91,7 @@ namespace AutomaticRoadblocks
         {
             var logger = IoC.Instance.GetInstance<ILogger>();
             var menu = IoC.Instance.GetInstance<IMenu>();
-            var menuComponents = IoC.Instance.GetInstances<IMenuComponent>();
+            var menuComponents = IoC.Instance.GetInstances<IMenuComponent<UIMenuItem>>();
 
             logger.Trace("Initializing menu components");
             foreach (var menuComponent in menuComponents)
@@ -105,9 +105,9 @@ namespace AutomaticRoadblocks
         private static void InitializeMenuComponents()
         {
             IoC.Instance
-                .Register<IMenuComponent>(typeof(EnableDuringPursuitComponent))
-                .Register<IMenuComponent>(typeof(PursuitLevelComponent))
-                .Register<IMenuComponent>(typeof(DispatchNowComponent));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableDuringPursuitComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent));
         }
 
         private static void OnDutyStateChanged(bool onDuty)
@@ -120,8 +120,8 @@ namespace AutomaticRoadblocks
             {
                 pursuitListener.StartListener();
 
-                var notification = IoC.Instance.GetInstance<INotification>();
-                notification.DisplayPluginNotification($"{Assembly.GetExecutingAssembly().GetName().Version}, developed by ~b~yoep~s~, has been loaded");
+                var game = IoC.Instance.GetInstance<IGame>();
+                game.DisplayPluginNotification($"{Assembly.GetExecutingAssembly().GetName().Version}, developed by ~b~yoep~s~, has been loaded");
             }
             else
             {
@@ -142,13 +142,14 @@ namespace AutomaticRoadblocks
 
             logger.Debug("Registering debug menu components");
             IoC.Instance
-                .Register<IMenuComponent>(typeof(EndCalloutComponent))
-                .Register<IMenuComponent>(typeof(RoadInfoComponent))
-                .Register<IMenuComponent>(typeof(RoadPreviewComponent))
-                .Register<IMenuComponent>(typeof(NearbyRoadsPreviewComponent))
-                .Register<IMenuComponent>(typeof(ZoneInfoComponent))
-                .Register<IMenuComponent>(typeof(DispatchPreviewComponent))
-                .Register<IMenuComponent>(typeof(CleanRoadblocksComponent));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(StartPursuitComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EndCalloutComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RoadInfoComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RoadPreviewComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(NearbyRoadsPreviewComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ZoneInfoComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent));
         }
     }
 }

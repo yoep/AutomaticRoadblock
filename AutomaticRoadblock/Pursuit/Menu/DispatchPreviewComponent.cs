@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using AutomaticRoadblocks.Menu;
+using RAGENativeUI;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
 {
-    public class DispatchPreviewComponent : IMenuComponent
+    public class DispatchPreviewComponent : IMenuComponent<UIMenuListItem>
     {
         private readonly IPursuitManager _pursuitManager;
 
@@ -13,7 +15,12 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         }
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.DispatchPreview);
+        public UIMenuListItem MenuItem { get; } = new UIMenuListItem(AutomaticRoadblocksPlugin.DispatchPreview,
+            AutomaticRoadblocksPlugin.DispatchPreviewDescription, new List<IDisplayItem>
+            {
+                new DisplayItem(DispatchPreviewType.Preview, AutomaticRoadblocksPlugin.DispatchPreviewPreviewType),
+                new DisplayItem(DispatchPreviewType.Spawn, AutomaticRoadblocksPlugin.DispatchPreviewSpawnType)
+            });
 
         /// <inheritdoc />
         public MenuType Type => MenuType.PURSUIT;
@@ -24,7 +31,24 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _pursuitManager.DispatchPreview();
+            var selectedValue = MenuItem.SelectedItem.Value;
+            if (selectedValue.GetType() != typeof(DispatchPreviewType))
+                return;
+
+            if ((DispatchPreviewType)selectedValue == DispatchPreviewType.Preview)
+            {
+                _pursuitManager.DispatchPreview();
+            }
+            else
+            {
+                _pursuitManager.DispatchNow(true);
+            }
+        }
+
+        private enum DispatchPreviewType
+        {
+            Preview,
+            Spawn
         }
     }
 }

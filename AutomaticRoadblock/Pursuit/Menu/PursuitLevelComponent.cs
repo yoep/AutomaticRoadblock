@@ -5,7 +5,7 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
 {
-    public class PursuitLevelComponent : IMenuComponent
+    public class PursuitLevelComponent : IMenuComponent<UIMenuListScrollerItem<int>>
     {
         private readonly IPursuitManager _pursuitManager;
 
@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         }
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } =
+        public UIMenuListScrollerItem<int> MenuItem { get; } =
             new UIMenuListScrollerItem<int>(AutomaticRoadblocksPlugin.PursuitLevel, AutomaticRoadblocksPlugin.PursuitLevelDescription, PursuitLevel.Levels
                 .Select(x => x.Level)
                 .ToList());
@@ -29,30 +29,25 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            var scrollerMenuItem = (UIMenuListScrollerItem<int>)MenuItem;
-
-            _pursuitManager.PursuitLevel = PursuitLevel.From(scrollerMenuItem.SelectedItem);
+            _pursuitManager.PursuitLevel = PursuitLevel.From(MenuItem.SelectedItem);
         }
 
         [IoC.PostConstruct]
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            var scrollerMenuItem = (UIMenuListScrollerItem<int>)MenuItem;
             _pursuitManager.PursuitLevelChanged += PursuitLevelChanged;
-            scrollerMenuItem.IndexChanged += MenuItemChanged;
+            MenuItem.IndexChanged += MenuItemChanged;
         }
 
         private void MenuItemChanged(UIMenuScrollerItem sender, int oldindex, int newindex)
         {
-            var scrollerMenuItem = (UIMenuListScrollerItem<int>)MenuItem;
-            _pursuitManager.PursuitLevel = PursuitLevel.From(scrollerMenuItem.SelectedItem);
+            _pursuitManager.PursuitLevel = PursuitLevel.From(MenuItem.SelectedItem);
         }
 
         private void PursuitLevelChanged(PursuitLevel newPursuitLevel)
         {
-            var scrollerMenuItem = (UIMenuListScrollerItem<int>)MenuItem;
-            scrollerMenuItem.SelectedItem = newPursuitLevel.Level;
+            MenuItem.SelectedItem = newPursuitLevel.Level;
         }
     }
 }

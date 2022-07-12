@@ -48,7 +48,7 @@ namespace AutomaticRoadblocks.Instance
             if (Instance != null)
                 return;
 
-            Instance = _factory.Invoke(EntityUtils.OnGround(Position), Heading);
+            Instance = _factory.Invoke(GameUtils.GetOnTheGroundVector(Position), Heading);
         }
 
         #region IPreviewSupport

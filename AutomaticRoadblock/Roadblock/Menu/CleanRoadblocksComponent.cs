@@ -3,7 +3,7 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Roadblock.Menu
 {
-    public class CleanRoadblocksComponent : IMenuComponent
+    public class CleanRoadblocksComponent : IMenuComponent<UIMenuItem>
     {
         private readonly IRoadblockDispatcher _roadblockDispatcher;
 

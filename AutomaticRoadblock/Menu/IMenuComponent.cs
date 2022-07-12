@@ -2,12 +2,12 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Menu
 {
-    public interface IMenuComponent
+    public interface IMenuComponent<out TMenuType> where TMenuType : UIMenuItem
     {
         /// <summary>
         /// Get the menu item to register at nativeUI.
         /// </summary>
-        UIMenuItem MenuItem { get; }
+        TMenuType MenuItem { get; }
         
         /// <summary>
         /// Get the type of the menu item.

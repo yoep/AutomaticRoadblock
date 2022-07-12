@@ -26,7 +26,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Spawn the slot entities into the world.
         /// </summary>
         void Spawn();
-        
+
         /// <summary>
         /// Release the AI entities to LSPDFR.
         /// This allows the cops to join the pursuit.

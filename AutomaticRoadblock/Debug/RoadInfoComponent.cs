@@ -6,15 +6,15 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug
 {
-    public class RoadInfoComponent : IMenuComponent
+    public class RoadInfoComponent : IMenuComponent<UIMenuItem>
     {
         private readonly ILogger _logger;
-        private readonly INotification _notification;
+        private readonly IGame _game;
 
-        public RoadInfoComponent(ILogger logger, INotification notification)
+        public RoadInfoComponent(ILogger logger, IGame game)
         {
             _logger = logger;
-            _notification = notification;
+            _game = game;
         }
 
         /// <inheritdoc />
@@ -31,7 +31,7 @@ namespace AutomaticRoadblocks.Debug
         {
             var road = RoadUtils.GetClosestRoad(Game.LocalPlayer.Character.Position, RoadType.All);
             _logger.Info("Nearest road info: " + road);
-            _notification.DisplayPluginNotification("see console or log file for info about the closest road");
+            _game.DisplayPluginNotification("see console or log file for info about the closest road");
         }
     }
 }

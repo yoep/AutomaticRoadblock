@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Rage;
 using Rage.Native;
@@ -30,6 +29,39 @@ namespace AutomaticRoadblocks.Utils
         {
             Assert.NotNull(attachment, "attachment cannot be null");
             NativeFunction.Natives.DETACH_ENTITY(attachment, false, false);
+        }
+
+        /// <summary>
+        /// Set if the given ped entity can cower while in cover.
+        /// </summary>
+        /// <param name="ped">The ped to set the cower state.</param>
+        /// <param name="canCower">Set the cower state.</param>
+        public static void CanCowerInCover(Ped ped, bool canCower)
+        {
+            Assert.NotNull(ped, "ped cannot be null");
+            NativeFunction.Natives.SET_PED_CAN_COWER_IN_COVER(ped, canCower);
+        }
+
+        /// <summary>
+        /// Set if the given ped entity can peek while in cover.
+        /// </summary>
+        /// <param name="ped">The ped to set the cower state.</param>
+        /// <param name="canPeek">Set the cower state.</param>
+        public static void CanPeekInCover(Ped ped, bool canPeek)
+        {
+            Assert.NotNull(ped, "ped cannot be null");
+            NativeFunction.Natives.SET_PED_CAN_PEEK_IN_COVER(ped, canPeek);
+        }
+
+        /// <summary>
+        /// Load the cover for the given ped.
+        /// </summary>
+        /// <param name="ped">The ped to set the cower state.</param>
+        /// <param name="loadCoverState">Set if the cover data should be loaded for the ped.</param>
+        public static void LoadCover(Ped ped, bool loadCoverState)
+        {
+            Assert.NotNull(ped, "ped cannot be null");
+            NativeFunction.Natives.SET_PED_TO_LOAD_COVER(ped, loadCoverState);
         }
 
         /// <summary>
@@ -70,71 +102,6 @@ namespace AutomaticRoadblocks.Utils
             {
                 Remove(entity);
             }
-        }
-
-        public static Ped CreateFbiCop(Vector3 position)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            var ped = new Ped(ModelUtils.GetPoliceFbiCop(), position, 3f)
-            {
-                IsPersistent = true,
-                BlockPermanentEvents = true,
-                KeepTasks = true
-            };
-
-            AddWeaponsToCopPed(ped, new []
-            {
-                ModelUtils.Weapons.HeavyRifle,
-            });
-            return ped;
-        }
-
-        public static Ped CreateSwatCop(Vector3 position)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            var ped = new Ped(ModelUtils.GetLocalCop(position), position, 3f)
-            {
-                IsPersistent = true,
-                BlockPermanentEvents = true,
-                KeepTasks = true
-            };
-
-            AddWeaponsToCopPed(ped, new []
-            {
-                ModelUtils.Weapons.HeavyRifle,
-                ModelUtils.Weapons.Shotgun,
-            });
-            return ped;
-        }
-
-        /// <summary>
-        /// Get the vector which is on the ground for the given coordinates.
-        /// </summary>
-        /// <param name="position">The position to get the ground level of.</param>
-        /// <returns>Returns the new vector which is on the ground.</returns>
-        public static Vector3 OnGround(Vector3 position)
-        {
-            var newPosition = new Vector3(position.X, position.Y, 0f);
-
-            NativeFunction.Natives.GET_GROUND_Z_FOR_3D_COORD<bool>(position.X, position.Y, position.Z + 15f, out float newHeight, 0);
-            newPosition.Z = newHeight;
-
-            return newPosition;
-        }
-
-        private static void AddWeaponsToCopPed(Ped ped, IEnumerable<string> weapons)
-        {
-            foreach (var weapon in weapons)
-            {
-                var asset = new WeaponAsset(weapon);
-                
-                ped.Inventory.GiveNewWeapon(asset, -1, false);
-                ped.Inventory.AddComponentToWeapon(asset, ModelUtils.Weapons.Attachments.PistolFlashlight);
-                ped.Inventory.AddComponentToWeapon(asset, ModelUtils.Weapons.Attachments.RifleFlashlight);
-            }
-
-            ped.Inventory.GiveFlashlight();
-            NativeFunction.Natives.SET_PED_CAN_SWITCH_WEAPON(ped, true);
         }
     }
 }

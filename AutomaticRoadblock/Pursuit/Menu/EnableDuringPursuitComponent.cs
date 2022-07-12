@@ -4,7 +4,7 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
 {
-    public class EnableDuringPursuitComponent : IMenuComponent
+    public class EnableDuringPursuitComponent : IMenuComponent<UIMenuCheckboxItem>
     {
         private readonly IPursuitManager _pursuitManager;
 
@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         }
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; }
+        public UIMenuCheckboxItem MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.PURSUIT;
@@ -30,7 +30,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _pursuitManager.EnableAutomaticDispatching = ((UIMenuCheckboxItem)MenuItem).Checked;
+            _pursuitManager.EnableAutomaticDispatching = MenuItem.Checked;
         }
     }
 }

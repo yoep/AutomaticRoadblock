@@ -11,6 +11,7 @@
         <AssemblyName>AutomaticRoadblocks</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
+        <LangVersion>9</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
       <DebugType>pdbonly</DebugType>
@@ -53,8 +54,6 @@
         <Compile Include="AbstractionLayer\ILogger.cs" />
         <Compile Include="AbstractionLayer\Implementation\Rage.cs" />
         <Compile Include="AbstractionLayer\Implementation\RageLogger.cs" />
-        <Compile Include="AbstractionLayer\Implementation\RageNotification.cs" />
-        <Compile Include="AbstractionLayer\INotification.cs" />
         <Compile Include="Api\AutomaticRoadblocksApi.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
@@ -63,6 +62,7 @@
         <Compile Include="Debug\NearbyRoadsPreviewComponent.cs" />
         <Compile Include="Debug\RoadInfoComponent.cs" />
         <Compile Include="Debug\RoadPreviewComponent.cs" />
+        <Compile Include="Debug\StartPursuitComponent.cs" />
         <Compile Include="Debug\ZoneInfoComponent.cs" />
         <Compile Include="Instance\ARInstance.cs" />
         <Compile Include="Instance\ARPed.cs" />
@@ -115,6 +115,7 @@
         <Compile Include="Settings\ISettingsManager.cs" />
         <Compile Include="Settings\SettingsManager.cs" />
         <Compile Include="Utils\EntityUtils.cs" />
+        <Compile Include="Utils\GameUtils.cs" />
         <Compile Include="Utils\LspdfrUtils.cs" />
         <Compile Include="Utils\ModelUtils.cs" />
         <Compile Include="Utils\PreviewUtils.cs" />

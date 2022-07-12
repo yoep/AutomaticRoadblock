@@ -16,7 +16,7 @@ namespace AutomaticRoadblockTests.Pursuit
         {
             IoC.Instance
                 .Register<ILogger>(typeof(SystemLogger))
-                .RegisterInstance<IGame>(Mock.Of<IGame>())
+                .Register<IGame>(typeof(TestGame))
                 .RegisterInstance<ISettingsManager>(Mock.Of<ISettingsManager>())
                 .RegisterInstance<IRoadblockDispatcher>(Mock.Of<IRoadblockDispatcher>())
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager));

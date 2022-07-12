@@ -21,6 +21,14 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Indicates that an error occurred when processing the roadblock.
         /// </summary>
-        Error
+        Error,
+        /// <summary>
+        /// Indicates that the roadblock is disposing and entities will be removed.
+        /// </summary>
+        Disposing,
+        /// <summary>
+        /// Indicates that the roadblock is disposed and entities have been removed.
+        /// </summary>
+        Disposed
     }
 }

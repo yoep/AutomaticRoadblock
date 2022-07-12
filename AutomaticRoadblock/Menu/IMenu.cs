@@ -1,4 +1,5 @@
 using System;
+using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Menu
 {
@@ -23,6 +24,6 @@ namespace AutomaticRoadblocks.Menu
         /// Register the given component in the menu.
         /// </summary>
         /// <param name="component">Set the component to register.</param>
-        void RegisterComponent(IMenuComponent component);
+        void RegisterComponent(IMenuComponent<UIMenuItem> component);
     }
 }

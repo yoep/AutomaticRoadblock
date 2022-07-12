@@ -1,5 +1,5 @@
+using System;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
 using Rage;
@@ -8,7 +8,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public class RoadblockSlotLevel3 : AbstractRoadblockSlot
     {
-        internal RoadblockSlotLevel3(Vector3 position, float heading) : base(position, heading)
+        internal RoadblockSlotLevel3(Vector3 position, float heading, Vehicle targetVehicle) : base(position, heading, targetVehicle)
         {
             Init();
         }
@@ -21,14 +21,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 .ForEach(x =>
                 {
                     x.EquipPrimaryWeapon();
-                    if (IsTargetVehiclePresent)
-                    {
-                        x.GameInstance.Tasks.TakeCoverFrom(TargetVehicle.Driver, -1, true);
-                    }
-                    else
-                    {
-                        x.GameInstance.Tasks.TakeCoverAt(Vehicle.Position, IoC.Instance.GetInstance<IGame>().PlayerPosition, -1, true);
-                    }
+                    Logger.Trace("Taking cover from target vehicle driver");
+                    x.GameInstance.Tasks.TakeCoverFrom(TargetVehicle.Driver, -1, true);
                 });
         }
 
@@ -47,7 +41,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         private void InitializePedSlots()
         {
             var pedSpawnPosition = GetPositionBehindVehicle();
-            
+
             for (var i = 0; i < 2; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.CopPed, pedSpawnPosition, 0f,
@@ -71,10 +65,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private static ARPed AssignCopWeapons(ARPed ped)
         {
-            ped.GivePrimaryWeapon(ModelUtils.Weapons.Shotgun);
+            var primaryWeapon = new Random().Next(2) == 1 ? ModelUtils.Weapons.Shotgun : ModelUtils.Weapons.Pistol;
+
+            ped.GivePrimaryWeapon(primaryWeapon);
+            ped.GiveWeapon(ModelUtils.Weapons.Pistol);
+            ped.GiveWeapon(ModelUtils.Weapons.Shotgun);
             ped.GiveWeapon(ModelUtils.Weapons.Nightstick);
             ped.GiveWeapon(ModelUtils.Weapons.StunGun);
-            ped.GiveWeapon(ModelUtils.Weapons.Pistol);
             return ped;
         }
     }

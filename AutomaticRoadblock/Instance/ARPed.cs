@@ -17,7 +17,6 @@ namespace AutomaticRoadblocks.Instance
             GameInstance = new Ped(model, position, heading)
             {
                 IsPersistent = true,
-                BlockPermanentEvents = true,
                 KeepTasks = true
             };
         }
@@ -74,6 +73,15 @@ namespace AutomaticRoadblocks.Instance
             GameInstance.Inventory.EquippedWeapon = PrimaryWeapon;
         }
 
+        /// <summary>
+        /// Let the ped cover behind the closest object.
+        /// </summary>
+        public void Cover()
+        {
+            EntityUtils.CanPeekInCover(GameInstance, true);
+            EntityUtils.LoadCover(GameInstance, true);
+        }
+        
         #endregion
 
         #region Functions

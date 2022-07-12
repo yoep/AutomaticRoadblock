@@ -5,6 +5,8 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Invoked when the roadblock state changes.
         /// </summary>
-        public delegate void RoadblockStateChanged(RoadblockState newState);
+        /// <param name="roadblock">The roadblock of which the state changed.</param>
+        /// <param name="newState">The new state of the roadblock.</param>
+        public delegate void RoadblockStateChanged(IRoadblock roadblock, RoadblockState newState);
     }
 }

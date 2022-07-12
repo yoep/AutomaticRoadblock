@@ -14,6 +14,7 @@ namespace AutomaticRoadblocks.Roadblock
         private const float LaneHeadingTolerance = 40f;
         private const float BypassTolerance = 20f;
         private const float SpeedLimit = 5f;
+        private const int BlipFlashDuration = 3000;
 
         private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
         private readonly Road _road;
@@ -98,11 +99,16 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public void Dispose()
         {
+            UpdateState(RoadblockState.Disposing);
+
             if (IsPreviewActive)
                 DeletePreview();
 
+            DeleteBlip();
             DeleteSpeedZone();
             _slots.ForEach(x => x.Dispose());
+
+            UpdateState(RoadblockState.Disposed);
         }
 
         #endregion
@@ -165,7 +171,7 @@ namespace AutomaticRoadblocks.Roadblock
             _logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
             foreach (var lane in lanesToBlock)
             {
-                _slots.Add(SlotFactory.Create(Level, lane.Position, heading));
+                _slots.Add(SlotFactory.Create(Level, lane.Position, heading, _vehicle));
             }
 
             if (limitSpeed)
@@ -203,14 +209,17 @@ namespace AutomaticRoadblocks.Roadblock
                 IsRouteEnabled = false,
                 IsFriendly = true,
                 Scale = 1f,
-                Color = Color.Green
+                Color = Color.LightBlue
             };
         }
 
         private void DeleteBlip()
         {
-            if (_blip != null)
-                _blip.Delete();
+            if (_blip == null)
+                return;
+
+            _blip.Delete();
+            _blip = null;
         }
 
         private void Monitor()
@@ -221,21 +230,26 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 while (State == RoadblockState.Active)
                 {
-                    game.FiberYield();
                     VerifyIfRoadblockIsBypassed();
                     VerifyIfRoadblockIsHit();
+                    game.FiberYield();
                 }
             }, "Roadblock.Monitor");
         }
 
         private void ReleaseEntitiesToLspdfr()
         {
-            DeleteBlip();
-
+            _logger.Debug("Releasing cop peds to LSPDFR");
             foreach (var slot in _slots)
             {
                 slot.ReleaseToLspdfr();
             }
+
+            IoC.Instance.GetInstance<IGame>().NewSafeFiber(() =>
+            {
+                GameFiber.Wait(BlipFlashDuration);
+                DeleteBlip();
+            }, "Roadblock.ReleaseEntitiesToLspdfr");
         }
 
         private void VerifyIfRoadblockIsBypassed()
@@ -248,6 +262,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
             else if (Math.Abs(currentDistance - _lastKnownDistanceToRoadblock) > BypassTolerance)
             {
+                BlipFlashNewState(Color.Red);
                 UpdateState(RoadblockState.Bypassed);
                 ReleaseEntitiesToLspdfr();
                 _logger.Info("Roadblock has been bypassed");
@@ -256,18 +271,34 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void VerifyIfRoadblockIsHit()
         {
-            if (_slots.Any(slot => _vehicle.IsTouching(slot.Vehicle)))
+            if (!_vehicle.HasBeenDamagedByAnyVehicle)
+                return;
+
+            _logger.Trace("Collision has been detected for target vehicle");
+            if (_slots.Any(slot => slot.Vehicle.HasBeenDamagedBy(_vehicle)))
             {
+                _logger.Debug("Determined that the collision must have been against a roadblock slot");
+                BlipFlashNewState(Color.Green);
                 UpdateState(RoadblockState.Hit);
                 ReleaseEntitiesToLspdfr();
                 _logger.Info("Roadblock has been hit by the suspect");
+            }
+            else
+            {
+                _logger.Debug("Determined that the collision was not the roadblock");
             }
         }
 
         private void UpdateState(RoadblockState state)
         {
             State = state;
-            RoadblockStateChanged?.Invoke(state);
+            RoadblockStateChanged?.Invoke(this, state);
+        }
+
+        private void BlipFlashNewState(Color color)
+        {
+            _blip.Color = color;
+            _blip.Flash(1000, BlipFlashDuration);
         }
 
         private static IReadOnlyList<Road.Lane> FilterLanesWhichAreTooCloseToEachOther(IReadOnlyList<Road.Lane> lanesToBlock)

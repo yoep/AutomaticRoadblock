@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Utils;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -10,12 +11,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public abstract class AbstractRoadblockSlot : IRoadblockSlot
     {
-        protected readonly List<InstanceSlot> Instances = new List<InstanceSlot>();
+        protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+        protected readonly List<InstanceSlot> Instances = new();
 
-        protected AbstractRoadblockSlot(Vector3 position, float heading, Vehicle targetVehicle = null)
+        protected AbstractRoadblockSlot(Vector3 position, float heading, Vehicle targetVehicle)
         {
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(heading, "heading cannot be null");
+            Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             Position = position;
             Heading = heading;
             TargetVehicle = targetVehicle;
@@ -31,11 +34,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public float Heading { get; }
 
         /// <inheritdoc />
-        public Vehicle Vehicle => Instances
-            .Where(x => x.Type == EntityType.CopVehicle)
-            .Select(x => x.Instance)
-            .Select(x => (Vehicle)x.GameInstance)
-            .FirstOrDefault();
+        public Vehicle Vehicle => VehicleInstance?.GameInstance;
 
         /// <summary>
         /// Get the police vehicle model which is used for the slot.
@@ -43,16 +42,18 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected Model VehicleModel { get; }
 
         /// <summary>
-        /// Verify if a target vehicle is known for the slot.
-        /// </summary>
-        protected bool IsTargetVehiclePresent => TargetVehicle != null;
-
-        /// <summary>
         /// Get the target vehicle of the slot.
-        /// When the roadblock is manually placed, it will be null.
-        /// This can be checked with <see cref="IsTargetVehiclePresent"/>.
         /// </summary>
         protected Vehicle TargetVehicle { get; }
+
+        /// <summary>
+        /// Get the AR vehicle instance of this slot.
+        /// </summary>
+        protected ARVehicle VehicleInstance => Instances
+            .Where(x => x.Type == EntityType.CopVehicle)
+            .Select(x => x.Instance)
+            .Select(x => (ARVehicle)x)
+            .FirstOrDefault();
 
         /// <summary>
         /// Get the cop ped instance(s) of this slot.
@@ -74,7 +75,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         /// <inheritdoc />
         public bool IsPreviewActive => Instances.First().IsPreviewActive;
-
 
         /// <inheritdoc />
         public void CreatePreview()
@@ -130,6 +130,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 DeletePreview();
 
             Instances.ForEach(x => x.Spawn());
+            Vehicle.IsSirenOn = true;
             CopInstances
                 .Select(x => x.GameInstance)
                 .ToList()
@@ -143,10 +144,26 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public void ReleaseToLspdfr()
         {
-            Instances
+            var copPeds = Instances
                 .Where(x => x.Type == EntityType.CopPed)
+                .ToList();
+
+            Logger.Trace($"Releasing a total of {copPeds.Count} to LSPDFR");
+            copPeds
+                .Select(x => x.Instance)
+                .Select(x => x.GameInstance)
+                .Select(x => (Ped)x)
                 .ToList()
-                .ForEach(x => Functions.SetCopAsBusy((Ped)x.Instance.GameInstance, false));
+                .ForEach(x =>
+                {
+                    // make sure the ped is the vehicle or at least entering it
+                    if (!x.IsInVehicle(Vehicle, true))
+                        x.Tasks.EnterVehicle(Vehicle, (int)VehicleSeat.Any);
+
+                    x.Dismiss();
+                    Functions.SetPedAsCop(x);
+                    Functions.SetCopAsBusy(x, false);
+                });
         }
 
         #endregion
@@ -157,7 +174,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
             Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Heading + 90,
-                (position, heading) => new ARVehicle(VehicleModel, position, heading)));
+                (position, heading) =>
+                {
+                    var vehicle = new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundVector(position), heading);
+
+                    return vehicle;
+                }));
         }
 
         protected Vector3 GetPositionBehindVehicle()

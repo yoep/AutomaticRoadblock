@@ -1,13 +1,12 @@
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
-using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug
 {
-    public class RoadPreviewComponent : IMenuComponent
+    public class RoadPreviewComponent : IMenuComponent<UIMenuItem>
     {
         private readonly ILogger _logger;
         private readonly IGame _game;

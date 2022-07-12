@@ -22,7 +22,7 @@ namespace AutomaticRoadblockTests
             var ioC = IoC.Instance;
             ioC
                 .UnregisterAll()
-                .RegisterInstance<INotification>(Mock.Of<INotification>())
+                .RegisterInstance<IGame>(Mock.Of<IGame>())
                 .RegisterInstance<ILogger>(Mock.Of<ILogger>())
                 .Register<ISettingsManager>(typeof(SettingsManager));
             var expectedResult = ioC.GetInstance<ISettingsManager>();
@@ -38,7 +38,6 @@ namespace AutomaticRoadblockTests
             var ioC = IoC.Instance;
             ioC
                 .UnregisterAll()
-                .RegisterInstance<INotification>(Mock.Of<INotification>())
                 .RegisterInstance<ILogger>(Mock.Of<ILogger>())
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager));
             var expectedResult = ioC.GetInstance<ISettingsManager>();

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Roadblock;
@@ -114,19 +115,14 @@ namespace AutomaticRoadblocks.Pursuit
         {
             if (!IsPursuitActive)
             {
-                _logger.Warn("Unable to dispatch roadblock, no active pursuit ongoing");
-                return false;
+                return DispatchForNonActivePursuit(force);
             }
 
             var vehicle = GetSuspectVehicle();
 
             // try to dispatch a new roadblock for a chased vehicle
             // if successful, store the dispatch time
-            if (vehicle == null || !_roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, force))
-                return false;
-
-            _timeLastDispatchedRoadblock = _game.GameTime;
-            return true;
+            return vehicle != null && DoDispatch(vehicle, force);
         }
 
         /// <inheritdoc />
@@ -154,6 +150,7 @@ namespace AutomaticRoadblocks.Pursuit
             _logger.Debug($"Updating pursuit level to {level}");
             PursuitLevel = level;
             PursuitLevelChanged?.Invoke(level);
+            NotifyPursuitLevelIncreased();
         }
 
         private void IncreasePursuitLevel()
@@ -192,11 +189,11 @@ namespace AutomaticRoadblocks.Pursuit
             {
                 while (IsPursuitActive)
                 {
-                    _game.FiberYield();
-
                     VerifyPursuitLethalForce();
                     DoLevelIncreaseTick();
                     DoDispatchTick();
+                    
+                    _game.FiberYield();
                 }
             }, "PursuitManager.PursuitMonitor");
         }
@@ -225,10 +222,29 @@ namespace AutomaticRoadblocks.Pursuit
                 IncreasePursuitLevel();
         }
 
+        private bool DoDispatch(Vehicle vehicle, bool force)
+        {
+            var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, force);
+            
+            if (dispatched)
+                _timeLastDispatchedRoadblock = _game.GameTime;
+
+            return dispatched;
+        }
+
         private void DoDispatchTick()
         {
             if (IsDispatchingAllowed() && ShouldDispatchRoadblock())
                 DispatchNow();
+        }
+
+        private bool DispatchForNonActivePursuit(bool force)
+        {
+            if (force)
+                return DoDispatch(_game.PlayerVehicle, true);
+
+            _logger.Warn("Unable to dispatch roadblock, no active pursuit ongoing");
+            return false;
         }
 
         private bool ShouldDispatchRoadblock()
@@ -253,6 +269,12 @@ namespace AutomaticRoadblocks.Pursuit
             return gameTime - _timePursuitStarted >= roadblocksSettings.DispatchAllowedAfter * 1000 &&
                    gameTime - _timeLastDispatchedRoadblock >= roadblocksSettings.DispatchInterval * 1000 &&
                    Functions.GetPursuitPeds(PursuitHandle).Any(x => !Functions.IsPedVisualLost(x));
+        }
+
+        [Conditional("DEBUG")]
+        private void NotifyPursuitLevelIncreased()
+        {
+            _game.DisplayNotification($"Pursuit level has changed to ~g~{PursuitLevel.Level}");
         }
 
         private static RoadblockLevel ToRoadblockLevel(PursuitLevel pursuitLevel)

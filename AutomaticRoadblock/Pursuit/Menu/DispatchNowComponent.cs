@@ -4,7 +4,7 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
 {
-    public class DispatchNowComponent : IMenuComponent
+    public class DispatchNowComponent : IMenuComponent<UIMenuItem>
     {
         private readonly IPursuitManager _pursuitManager;
 

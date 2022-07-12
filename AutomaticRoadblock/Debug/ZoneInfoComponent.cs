@@ -6,27 +6,26 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug
 {
-    public class ZoneInfoComponent : IMenuComponent
+    public class ZoneInfoComponent : IMenuComponent<UIMenuItem>
     {
         private readonly ILogger _logger;
-        private readonly INotification _notification;
         private readonly IGame _game;
 
-        public ZoneInfoComponent(ILogger logger, INotification notification, IGame game)
+        public ZoneInfoComponent(ILogger logger,IGame game)
         {
             _logger = logger;
-            _notification = notification;
             _game = game;
         }
 
         public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.ZoneInfo);
         public MenuType Type => MenuType.DEBUG;
         public bool IsAutoClosed => false;
+
         public void OnMenuActivation(IMenu sender)
         {
             var zone = Functions.GetZoneAtPosition(_game.PlayerPosition);
             _logger.Info($"Zone info: {FormatZone(zone)}");
-            _notification.DisplayPluginNotification($"Zone:\n{FormatZone(zone)}");
+            _game.DisplayPluginNotification($"Zone:\n{FormatZone(zone)}");
         }
 
         private static string FormatZone(WorldZone zone)

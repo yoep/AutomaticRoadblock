@@ -10,20 +10,18 @@ namespace AutomaticRoadblocks.Roadblock
     public class RoadblockDispatcher : IRoadblockDispatcher
     {
         private const float MinimumVehicleSpeed = 20f;
-        private const float MinimumRoadblockPlacementDistance = 100f;
+        private const float MinimumRoadblockPlacementDistance = 125f;
 
         private readonly ILogger _logger;
         private readonly IGame _game;
-        private readonly INotification _notification;
         private readonly ISettingsManager _settingsManager;
 
-        private readonly List<IRoadblock> _roadblocks = new List<IRoadblock>();
+        private readonly List<IRoadblock> _roadblocks = new();
 
-        public RoadblockDispatcher(ILogger logger, IGame game, INotification notification, ISettingsManager settingsManager)
+        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager)
         {
             _logger = logger;
             _game = game;
-            _notification = notification;
             _settingsManager = settingsManager;
         }
 
@@ -42,7 +40,7 @@ namespace AutomaticRoadblocks.Roadblock
                         var road = DetermineRoadblockLocation(vehicle);
                         _logger.Trace($"Dispatching roadblock on {road}");
 
-                        _notification.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
+                        _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
                         LspdfrUtils.PlayScannerAudioUsingPosition("WE_HAVE OFFICER_IN_NEED_OF_ASSISTANCE IN_OR_ON_POSITION", road.Position);
 
                         var roadblock = new Roadblock(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic);
@@ -71,8 +69,8 @@ namespace AutomaticRoadblocks.Roadblock
                 _logger.Debug("Dispatching new roadblock preview");
                 var road = DetermineRoadblockLocation(vehicle);
                 _logger.Trace($"Dispatching roadblock on {road}");
-                
-                _notification.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
+
+                _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
                 var roadblock = new Roadblock(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic);
                 _logger.Info($"Dispatching new roadblock\n{roadblock}");
                 _roadblocks.Add(roadblock);
@@ -111,7 +109,7 @@ namespace AutomaticRoadblocks.Roadblock
         private float DetermineRoadblockDistance(Vehicle vehicle)
         {
             var vehicleSpeed = vehicle.Speed;
-            var distance = vehicleSpeed * 2f;
+            var distance = vehicleSpeed * 2.5f;
 
             if (distance < MinimumRoadblockPlacementDistance)
                 distance = MinimumRoadblockPlacementDistance;
@@ -119,18 +117,26 @@ namespace AutomaticRoadblocks.Roadblock
             return distance;
         }
 
-        private void RoadblockStateChanged(RoadblockState newState)
+        private void RoadblockStateChanged(IRoadblock roadblock, RoadblockState newState)
         {
-            _logger.Debug($"Roadblock state changed to {newState}");
-            switch (newState)
+            _game.NewSafeFiber(() =>
             {
-                case RoadblockState.Hit:
-                    _notification.DisplayNotification("~g~Roadblock has been hit");
-                    break;
-                case RoadblockState.Bypassed:
-                    _notification.DisplayNotification("~r~Roadblock has been bypassed");
-                    break;
-            }
+                _logger.Debug($"Roadblock state changed to {newState}");
+                switch (newState)
+                {
+                    case RoadblockState.Hit:
+                        _game.DisplayNotification("~g~Roadblock has been hit");
+                        LspdfrUtils.PlayScannerAudio("REPORT_SUSPECT_CRASHED_VEHICLE");
+                        break;
+                    case RoadblockState.Bypassed:
+                        _game.DisplayNotification("~r~Roadblock has been bypassed");
+                        break;
+                    case RoadblockState.Disposed:
+                        _logger.Trace($"Removing roadblock {roadblock} from dispatcher");
+                        _roadblocks.Remove(roadblock);
+                        break;
+                }
+            }, "RoadblockDispatcher.RoadblockStateChanged");
         }
     }
 }

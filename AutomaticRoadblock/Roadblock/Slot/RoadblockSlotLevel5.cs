@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
 using Rage;
@@ -9,7 +8,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public class RoadblockSlotLevel5 : AbstractRoadblockSlot
     {
-        internal RoadblockSlotLevel5(Vector3 position, float heading) : base(position, heading)
+        internal RoadblockSlotLevel5(Vector3 position, float heading, Vehicle targetVehicle) : base(position, heading, targetVehicle)
         {
             Init();
         }
@@ -22,14 +21,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 .ForEach(x =>
                 {
                     x.EquipPrimaryWeapon();
-                    if (IsTargetVehiclePresent)
-                    {
-                        x.GameInstance.Tasks.TakeCoverFrom(TargetVehicle.Driver, -1, true);
-                    }
-                    else
-                    {
-                        x.GameInstance.Tasks.TakeCoverAt(Vehicle.Position, IoC.Instance.GetInstance<IGame>().PlayerPosition, -1, true);
-                    }
+                    Logger.Trace("Taking cover from target vehicle driver");
+                    x.GameInstance.Tasks.TakeCoverFrom(TargetVehicle.Driver, -1, true);
                 });
         }
 
@@ -49,7 +42,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             var pedSpawnPosition = GetPositionBehindVehicle();
             var totalOccupants = new Random().Next(3) + 2;
-            
+
             for (var i = 0; i < totalOccupants; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.CopPed, pedSpawnPosition, 0f,

@@ -1,5 +1,4 @@
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
 using Rage;
@@ -8,7 +7,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public class RoadblockSlotLevel2 : AbstractRoadblockSlot
     {
-        internal RoadblockSlotLevel2(Vector3 position, float heading) : base(position, heading)
+        internal RoadblockSlotLevel2(Vector3 position, float heading, Vehicle targetVehicle) : base(position, heading, targetVehicle)
         {
             Init();
         }
@@ -21,14 +20,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 .ForEach(x =>
                 {
                     x.EquipPrimaryWeapon();
-                    if (IsTargetVehiclePresent)
-                    {
-                        x.GameInstance.Tasks.TakeCoverFrom(TargetVehicle.Driver, -1, false);
-                    }
-                    else
-                    {
-                        x.GameInstance.Tasks.TakeCoverAt(Vehicle.Position, IoC.Instance.GetInstance<IGame>().PlayerPosition, -1, false);
-                    }
+                    Logger.Trace("Taking cover from target vehicle driver");
+                    x.Cover();
+                    x.GameInstance.Tasks.TakeCoverAt(Vehicle.Position + MathHelper.ConvertHeadingToDirection(Heading) * 2f, TargetVehicle.Position, -1, false);
                 });
         }
 

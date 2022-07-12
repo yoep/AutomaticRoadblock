@@ -15,6 +15,11 @@ namespace AutomaticRoadblocks.AbstractionLayer
         /// Get the player's current position.
         /// </summary>
         Vector3 PlayerPosition { get; }
+        
+        /// <summary>
+        /// Get the heading of the player character.
+        /// </summary>
+        float PlayerHeading { get; }
 
         /// <summary>
         /// Get the player's last vehicle.
@@ -33,5 +38,17 @@ namespace AutomaticRoadblocks.AbstractionLayer
         /// Execute GameFiber.Yield in rage
         /// </summary>
         void FiberYield();
+
+        /// <summary>
+        /// Display a notification with the name of the plugin at the start.
+        /// </summary>
+        /// <param name="message">Set the message to show in the notification.</param>
+        void DisplayPluginNotification(string message);
+
+        /// <summary>
+        /// Display a notification.
+        /// </summary>
+        /// <param name="message">Set the message to display in a notification.</param>
+        void DisplayNotification(string message);
     }
 }

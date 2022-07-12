@@ -7,7 +7,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public class RoadblockSlotLevel1 : AbstractRoadblockSlot
     {
-        internal RoadblockSlotLevel1(Vector3 position, float heading) : base(position, heading)
+        internal RoadblockSlotLevel1(Vector3 position, float heading, Vehicle targetVehicle) : base(position, heading, targetVehicle)
         {
             Init();
         }
@@ -18,7 +18,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             CopInstances
                 .Select(x => x.GameInstance)
                 .ToList()
-                .ForEach(x => x.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Any));
+                .ForEach(x => x.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Driver));
         }
 
         /// <inheritdoc />

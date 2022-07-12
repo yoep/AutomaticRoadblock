@@ -15,19 +15,19 @@ namespace AutomaticRoadblocks.Menu
     public class MenuImpl : IMenu
     {
         private readonly ILogger _logger;
-        private readonly INotification _notification;
+        private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
-        
+
         private static readonly MenuPool MenuPool = new MenuPool();
         private static readonly IDictionary<MenuType, UIMenu> Menus = new Dictionary<MenuType, UIMenu>();
-        private static readonly List<IMenuComponent> MenuItems = new List<IMenuComponent>();
-        
+        private static readonly List<IMenuComponent<UIMenuItem>> MenuItems = new List<IMenuComponent<UIMenuItem>>();
+
         private UIMenuSwitchMenusItem _menuSwitcher;
 
-        public MenuImpl(ILogger logger, INotification notification, ISettingsManager settingsManager)
+        public MenuImpl(ILogger logger, IGame game, ISettingsManager settingsManager)
         {
             _logger = logger;
-            _notification = notification;
+            _game = game;
             _settingsManager = settingsManager;
         }
 
@@ -45,8 +45,8 @@ namespace AutomaticRoadblocks.Menu
         #endregion
 
         #region IMenu
-        
-        public void RegisterComponent(IMenuComponent component)
+
+        public void RegisterComponent(IMenuComponent<UIMenuItem> component)
         {
             Assert.NotNull(component, "component cannot be null");
             var uiMenu = Menus[component.Type];
@@ -60,22 +60,22 @@ namespace AutomaticRoadblocks.Menu
         #endregion
 
         #region IDisposable
-        
+
         public void Dispose()
         {
             Game.FrameRender -= Process;
         }
-        
+
         #endregion
-        
+
         #region Functions
-        
+
         [IoC.PostConstruct]
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
             _logger.Trace("Initializing menu");
-            
+
             try
             {
                 _logger.Trace("Creating sub-menu's");
@@ -103,7 +103,7 @@ namespace AutomaticRoadblocks.Menu
             catch (Exception ex)
             {
                 _logger.Error($"An unexpected error occurred while initializing the menu with error {ex.Message}", ex);
-                _notification.DisplayPluginNotification("an unexpected error occurred");
+                _game.DisplayPluginNotification("an unexpected error occurred");
             }
         }
 
@@ -122,7 +122,7 @@ namespace AutomaticRoadblocks.Menu
             catch (Exception ex)
             {
                 _logger.Error($"An unexpected error occurred while processing the menu with error {ex.Message}", ex);
-                _notification.DisplayPluginNotification("an unexpected error occurred");
+                _game.DisplayPluginNotification("an unexpected error occurred");
             }
         }
 
@@ -143,12 +143,12 @@ namespace AutomaticRoadblocks.Menu
             catch (MenuException ex)
             {
                 _logger.Error(ex.Message, ex);
-                _notification.DisplayPluginNotification("could not invoke menu item, see log files for more info");
+                _game.DisplayPluginNotification("could not invoke menu item, see log files for more info");
             }
             catch (Exception ex)
             {
                 _logger.Error($"An unexpected error occurred while activating the menu item {ex.Message}", ex);
-                _notification.DisplayPluginNotification("an unexpected error occurred while invoking the menu action");
+                _game.DisplayPluginNotification("an unexpected error occurred while invoking the menu action");
             }
         }
 
@@ -186,7 +186,7 @@ namespace AutomaticRoadblocks.Menu
                 new DisplayItem(Menus[MenuType.MANUAL_PLACEMENT], "Manual Placement"),
                 new DisplayItem(Menus[MenuType.DEBUG], "Debug"));
         }
-        
+
         [Conditional("DEBUG")]
         private static void AddDebugMenu()
         {
