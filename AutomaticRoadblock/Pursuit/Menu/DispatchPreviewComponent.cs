@@ -15,11 +15,11 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         }
 
         /// <inheritdoc />
-        public UIMenuListItem MenuItem { get; } = new UIMenuListItem(AutomaticRoadblocksPlugin.DispatchPreview,
+        public UIMenuListItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.DispatchPreview,
             AutomaticRoadblocksPlugin.DispatchPreviewDescription, new List<IDisplayItem>
             {
-                new DisplayItem(DispatchPreviewType.Preview, AutomaticRoadblocksPlugin.DispatchPreviewPreviewType),
-                new DisplayItem(DispatchPreviewType.Spawn, AutomaticRoadblocksPlugin.DispatchPreviewSpawnType)
+                new DisplayItem(DispatchPreviewType.Calculate, AutomaticRoadblocksPlugin.DispatchPreviewCalculateType),
+                new DisplayItem(DispatchPreviewType.CurrentLocation, AutomaticRoadblocksPlugin.DispatchPreviewCurrentLocationType)
             });
 
         /// <inheritdoc />
@@ -35,20 +35,13 @@ namespace AutomaticRoadblocks.Pursuit.Menu
             if (selectedValue.GetType() != typeof(DispatchPreviewType))
                 return;
 
-            if ((DispatchPreviewType)selectedValue == DispatchPreviewType.Preview)
-            {
-                _pursuitManager.DispatchPreview();
-            }
-            else
-            {
-                _pursuitManager.DispatchNow(true);
-            }
+            _pursuitManager.DispatchPreview((DispatchPreviewType)selectedValue == DispatchPreviewType.CurrentLocation);
         }
 
         private enum DispatchPreviewType
         {
-            Preview,
-            Spawn
+            Calculate,
+            CurrentLocation
         }
     }
 }

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
@@ -8,7 +11,7 @@ namespace AutomaticRoadblocks.Roadblock
 {
     public class RoadblockLevel1 : AbstractRoadblock
     {
-        public RoadblockLevel1(Road road, Vehicle vehicle, bool limitSpeed, bool addLights) 
+        public RoadblockLevel1(Road road, Vehicle vehicle, bool limitSpeed, bool addLights)
             : base(road, vehicle, limitSpeed, addLights)
         {
         }
@@ -25,16 +28,26 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         protected override void InitializeScenery()
         {
-            var position = Postion + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 3f;
+            var position = Postion + MathHelper.ConvertHeadingToDirection(MathHelper.NormalizeHeading(Road.Node.Heading - 180)) * 3f;
 
             Instances.Add(new InstanceSlot(EntityType.Scenery, position, 0f,
                 (conePosition, _) => new ARScenery(PropUtils.CreateBigConeWithStripes(conePosition))));
         }
-        
+
         /// <inheritdoc />
         protected override void InitializeLights()
         {
             // no-op
+        }
+
+        /// <inheritdoc />
+        protected override IReadOnlyList<Road.Lane> LanesToBlock()
+        {
+            var lanesToBlock = base.LanesToBlock();
+
+            return lanesToBlock
+                .Where(x => Math.Abs(x.Heading - Vehicle.Heading) < LaneHeadingTolerance)
+                .ToList();
         }
 
         /// <inheritdoc />

@@ -8,7 +8,6 @@ using AutomaticRoadblocks.Debug;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Pursuit.Menu;
-using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
@@ -148,6 +147,7 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ZoneInfoComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchSpawnComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent));
         }

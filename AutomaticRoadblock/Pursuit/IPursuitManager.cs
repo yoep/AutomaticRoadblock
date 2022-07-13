@@ -64,6 +64,6 @@ namespace AutomaticRoadblocks.Pursuit
         /// Dispatch a preview of a possible roadblock.
         /// This preview doesn't require an active pursuit, but required that the player has at least a vehicle to determine the roadblock location.
         /// </summary>
-        void DispatchPreview();
+        void DispatchPreview(bool currentLocation);
     }
 }

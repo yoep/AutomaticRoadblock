@@ -39,6 +39,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// </summary>
         /// <param name="level">The level of the roadblock. This determines the look/units/props of the roadblock.</param>
         /// <param name="vehicle">The vehicle for which a roadblock preview should be dispatched.</param>
-        void DispatchPreview(RoadblockLevel level, Vehicle vehicle);
+        /// <param name="atCurrentLocation">Set if the preview should be dispatched at the current vehicle location.</param>
+        void DispatchPreview(RoadblockLevel level, Vehicle vehicle, bool atCurrentLocation = false);
     }
 }

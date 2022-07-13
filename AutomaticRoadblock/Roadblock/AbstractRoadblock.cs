@@ -12,14 +12,13 @@ namespace AutomaticRoadblocks.Roadblock
 {
     public abstract class AbstractRoadblock : IRoadblock
     {
-        private const float LaneHeadingTolerance = 40f;
-        private const float BypassTolerance = 20f;
-        private const float SpeedLimit = 5f;
-        private const int BlipFlashDuration = 3000;
+        protected const float LaneHeadingTolerance = 40f;
+        protected const float BypassTolerance = 20f;
+        protected const float SpeedLimit = 5f;
+        protected const int BlipFlashDuration = 3000;
 
-        private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
-        private readonly IGame _game = IoC.Instance.GetInstance<IGame>();
-        private readonly Vehicle _vehicle;
+        protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+        protected readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         private Blip _blip;
         private int _speedZoneId;
@@ -30,7 +29,7 @@ namespace AutomaticRoadblocks.Roadblock
             Assert.NotNull(road, "road cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
             Road = road;
-            _vehicle = vehicle;
+            Vehicle = vehicle;
 
             Init(limitSpeed, addLights);
         }
@@ -62,6 +61,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// Get the road of this roadblock.
         /// </summary>
         protected Road Road { get; }
+
+        /// <summary>
+        /// Get the target vehicle of this roadblock.
+        /// </summary>
+        protected Vehicle Vehicle { get; }
 
         /// <summary>
         /// Get the generated slots for this roadblock.
@@ -101,6 +105,7 @@ namespace AutomaticRoadblocks.Roadblock
                 roadblockSlot.CreatePreview();
             }
 
+            Road.CreatePreview();
             Instances.ForEach(x => x.CreatePreview());
         }
 
@@ -113,6 +118,7 @@ namespace AutomaticRoadblocks.Roadblock
                 roadblockSlot.DeletePreview();
             }
 
+            Road.DeletePreview();
             Instances.ForEach(x => x.DeletePreview());
         }
 
@@ -147,7 +153,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             try
             {
-                _logger.Trace("Spawning roadblock");
+                Logger.Trace("Spawning roadblock");
                 UpdateState(RoadblockState.Active);
 
                 Slots.ForEach(x => x.Spawn());
@@ -158,7 +164,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
             catch (Exception ex)
             {
-                _logger.Error("Failed to spawn roadblock", ex);
+                Logger.Error("Failed to spawn roadblock", ex);
                 UpdateState(RoadblockState.Error);
             }
         }
@@ -196,6 +202,16 @@ namespace AutomaticRoadblocks.Roadblock
         /// <returns>Returns the created slot for the roadblock.</returns>
         protected abstract IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights);
 
+        /// <summary>
+        /// Retrieve the lanes of the road which should be blocked.
+        /// </summary>
+        /// <returns>Returns the lanes to block.</returns>
+        protected virtual IReadOnlyList<Road.Lane> LanesToBlock()
+        {
+            // filter any lanes which are to close to each other
+            return FilterLanesWhichAreTooCloseToEachOther(Road.Lanes);
+        }
+
         private void Init(bool limitSpeed, bool shouldAddLights)
         {
             InitializeRoadblockSlots(shouldAddLights);
@@ -208,29 +224,17 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void InitializeRoadblockSlots(bool addLights)
         {
-            var lanesToBlock = Road.Lanes;
             Heading = Road.Lanes
                 .Select(x => x.Heading)
-                .Where(x => Math.Abs(x - _vehicle.Heading) < LaneHeadingTolerance)
+                .Where(x => Math.Abs(x - Vehicle.Heading) < LaneHeadingTolerance)
                 .DefaultIfEmpty(Road.Lanes[0].Heading)
                 .First();
+            var lanesToBlock = LanesToBlock();
 
-            // if we're currently at level one, we'll only block the lane of the pursuit
-            // at other levels, we'll block the full road
-            if (Level == RoadblockLevel.Level1)
-            {
-                lanesToBlock = lanesToBlock
-                    .Where(x => Math.Abs(x.Heading - _vehicle.Heading) < LaneHeadingTolerance)
-                    .ToList();
-            }
-
-            // filter any lanes which are to close to each other
-            lanesToBlock = FilterLanesWhichAreTooCloseToEachOther(lanesToBlock);
-
-            _logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
+            Logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
             foreach (var lane in lanesToBlock)
             {
-                var roadblockSlot = CreateSlot(lane, Heading, _vehicle, addLights);
+                var roadblockSlot = CreateSlot(lane, Heading, Vehicle, addLights);
                 roadblockSlot.RoadblockCopKilled += RoadblockSlotCopKilled;
                 Slots.Add(roadblockSlot);
             }
@@ -241,7 +245,7 @@ namespace AutomaticRoadblocks.Roadblock
             if (!limitSpeed)
                 return;
 
-            _logger.Trace("Creating speed zone at roadblock");
+            Logger.Trace("Creating speed zone at roadblock");
             CreateSpeedZoneLimit();
         }
 
@@ -253,7 +257,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
             catch (Exception ex)
             {
-                _logger.Error($"Failed to create roadblock speed zone, {ex.Message}", ex);
+                Logger.Error($"Failed to create roadblock speed zone, {ex.Message}", ex);
             }
         }
 
@@ -288,20 +292,20 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void Monitor()
         {
-            _game.NewSafeFiber(() =>
+            Game.NewSafeFiber(() =>
             {
                 while (State == RoadblockState.Active)
                 {
                     VerifyIfRoadblockIsBypassed();
                     VerifyIfRoadblockIsHit();
-                    _game.FiberYield();
+                    Game.FiberYield();
                 }
             }, "Roadblock.Monitor");
         }
 
         private void ReleaseEntitiesToLspdfr()
         {
-            _logger.Debug("Releasing cop peds to LSPDFR");
+            Logger.Debug("Releasing cop peds to LSPDFR");
             foreach (var slot in Slots)
             {
                 slot.ReleaseToLspdfr();
@@ -316,7 +320,7 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void VerifyIfRoadblockIsBypassed()
         {
-            var currentDistance = _vehicle.DistanceTo(Postion);
+            var currentDistance = Vehicle.DistanceTo(Postion);
 
             if (currentDistance < _lastKnownDistanceToRoadblock)
             {
@@ -327,27 +331,27 @@ namespace AutomaticRoadblocks.Roadblock
                 BlipFlashNewState(Color.LightGray);
                 UpdateState(RoadblockState.Bypassed);
                 ReleaseEntitiesToLspdfr();
-                _logger.Info("Roadblock has been bypassed");
+                Logger.Info("Roadblock has been bypassed");
             }
         }
 
         private void VerifyIfRoadblockIsHit()
         {
-            if (!_vehicle.HasBeenDamagedByAnyVehicle)
+            if (!Vehicle.HasBeenDamagedByAnyVehicle)
                 return;
 
-            _logger.Trace("Collision has been detected for target vehicle");
-            if (Slots.Any(slot => slot.Vehicle.HasBeenDamagedBy(_vehicle)))
+            Logger.Trace("Collision has been detected for target vehicle");
+            if (Slots.Any(slot => slot.Vehicle.HasBeenDamagedBy(Vehicle)))
             {
-                _logger.Debug("Determined that the collision must have been against a roadblock slot");
+                Logger.Debug("Determined that the collision must have been against a roadblock slot");
                 BlipFlashNewState(Color.Green);
                 UpdateState(RoadblockState.Hit);
                 ReleaseEntitiesToLspdfr();
-                _logger.Info("Roadblock has been hit by the suspect");
+                Logger.Info("Roadblock has been hit by the suspect");
             }
             else
             {
-                _logger.Debug("Determined that the collision was not the roadblock");
+                Logger.Debug("Determined that the collision was not the roadblock");
             }
         }
 
@@ -356,7 +360,7 @@ namespace AutomaticRoadblocks.Roadblock
             if (State == state)
                 return;
 
-            LastStateChange = _game.GameTime;
+            LastStateChange = Game.GameTime;
             State = state;
             RoadblockStateChanged?.Invoke(this, state);
         }
@@ -375,8 +379,8 @@ namespace AutomaticRoadblocks.Roadblock
         private IReadOnlyList<Road.Lane> FilterLanesWhichAreTooCloseToEachOther(IReadOnlyList<Road.Lane> lanesToBlock)
         {
             Road.Lane lastLane = null;
-            
-            _logger.Trace("Filtering lanes which are too close to each-other");
+
+            Logger.Trace("Filtering lanes which are too close to each-other");
             var filteredLanesToBlock = lanesToBlock.Where(x =>
                 {
                     var result = true;
@@ -392,7 +396,7 @@ namespace AutomaticRoadblocks.Roadblock
             if (filteredLanesToBlock.Count != 0)
                 return filteredLanesToBlock;
 
-            _logger.Warn("Lanes too close filter has filtered out all lanes, resetting to original list");
+            Logger.Warn("Lanes too close filter has filtered out all lanes, resetting to original list");
             return lanesToBlock.ToList();
         }
 

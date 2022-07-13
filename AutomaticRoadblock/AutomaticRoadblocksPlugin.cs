@@ -18,9 +18,11 @@ namespace AutomaticRoadblocks
         public const string DispatchNow = "Dispatch now";
         public const string DispatchNowDescription = "Dispatch a roadblock now for the current pursuit";
         public const string DispatchPreview = "Dispatch preview" + DebugIndicatorText;
-        public const string DispatchPreviewDescription = "Preview or spawn a roadblock as it would during a pursuit";
-        public const string DispatchPreviewPreviewType = "Preview";
-        public const string DispatchPreviewSpawnType = "Spawn";
+        public const string DispatchPreviewDescription = "Preview a roadblock with the position calculated or at the current location of the player";
+        public const string DispatchPreviewCalculateType = "Calculate";
+        public const string DispatchPreviewCurrentLocationType = "Current";
+        public const string DispatchSpawn = "Dispatch spawn" + DebugIndicatorText;
+        public const string DispatchSpawnDescription = "Dispatch a roadblock";
         public const string PursuitLevel = "Level";
         public const string PursuitLevelDescription = "The pursuit level which determines the roadblock type";
         public const string CleanAllRoadblocks = "Clean all roadblocks" + DebugIndicatorText;

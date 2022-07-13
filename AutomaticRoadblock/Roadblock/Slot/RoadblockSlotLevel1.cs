@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
@@ -41,8 +42,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
             var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2.5f;
+            var totalCones = (int) Math.Ceiling(Lane.Width / 1.5f);
 
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < totalCones; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
                     (position, heading) => new ARScenery(PropUtils.CreateSmallConeWithStripes(position))));

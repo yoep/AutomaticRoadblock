@@ -259,38 +259,25 @@ namespace AutomaticRoadblocks.Utils.Road
 
         private static Vector3 GetLastPointOnTheLane(Vector3 position, float heading)
         {
-            var checkInterval = 2f;
+            var checkInterval = 1f;
+            var direction = MathHelper.ConvertHeadingToDirection(heading);
             var lastPositionOnTheRoad = position;
 
             do
             {
-                var lastPointResult = DetermineLastPointOnLane(lastPositionOnTheRoad, heading, checkInterval);
-                lastPositionOnTheRoad = lastPointResult.LastPointOnRoad;
-                checkInterval /= 2;
-            } while (checkInterval > 0.1f);
+                var pointToCheck = lastPositionOnTheRoad + direction * checkInterval;
+                if (NativeFunction.Natives.IS_POINT_ON_ROAD<bool>(pointToCheck.X, pointToCheck.Y, pointToCheck.Z))
+                {
+                    checkInterval *= 2f;
+                    lastPositionOnTheRoad = pointToCheck;
+                }
+                else
+                {
+                    checkInterval /= 1.5f;
+                }
+            } while (checkInterval >= 0.25f);
 
             return lastPositionOnTheRoad;
-        }
-
-        private static LastPointResult DetermineLastPointOnLane(Vector3 position, float heading, float checkInterval)
-        {
-            var currentPosition = position;
-            var direction = MathHelper.ConvertHeadingToDirection(heading);
-            bool isPointOnRoad;
-            Vector3 lastPositionOnTheRoad;
-
-            do
-            {
-                lastPositionOnTheRoad = currentPosition;
-                currentPosition += direction * checkInterval;
-                isPointOnRoad = NativeFunction.Natives.IS_POINT_ON_ROAD<bool>(currentPosition.X, currentPosition.Y, currentPosition.Z);
-            } while (isPointOnRoad);
-
-            return new LastPointResult
-            {
-                LastCheckedPoint = currentPosition,
-                LastPointOnRoad = lastPositionOnTheRoad
-            };
         }
 
         private static float GetWidth(Vector3 point1, Vector3 point2)
@@ -304,19 +291,6 @@ namespace AutomaticRoadblocks.Utils.Road
         }
 
         #endregion
-    }
-
-    internal class LastPointResult
-    {
-        /// <summary>
-        /// The last point that was checked and was not on the road anymore.
-        /// </summary>
-        public Vector3 LastCheckedPoint { get; set; }
-
-        /// <summary>
-        /// The last point that was check and was still on the road.
-        /// </summary>
-        public Vector3 LastPointOnRoad { get; set; }
     }
 
     internal class RoadBuilder

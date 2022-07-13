@@ -66,7 +66,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         }
 
         /// <inheritdoc />
-        public void DispatchPreview(RoadblockLevel level, Vehicle vehicle)
+        public void DispatchPreview(RoadblockLevel level, Vehicle vehicle, bool atCurrentLocation)
         {
             Assert.NotNull(level, "level cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
@@ -74,7 +74,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             _game.NewSafeFiber(() =>
             {
                 _logger.Debug("Dispatching new roadblock preview");
-                var road = DetermineRoadblockLocation(vehicle);
+                var road = DetermineRoadblockLocation(vehicle, atCurrentLocation);
                 _logger.Trace($"Dispatching roadblock on {road}");
 
                 _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
@@ -146,11 +146,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 "RoadblockDispatcher.Dispatch");
         }
 
-        private Road DetermineRoadblockLocation(Vehicle vehicle)
+        private Road DetermineRoadblockLocation(Vehicle vehicle, bool atCurrentLocation = false)
         {
             _logger.Trace("Determining roadblock location");
             var direction = MathHelper.ConvertHeadingToDirection(vehicle.Heading);
-            var roadblockDistance = DetermineRoadblockDistance(vehicle);
+            var roadblockDistance = atCurrentLocation ? 2.5f : DetermineRoadblockDistance(vehicle);
 
             return RoadUtils.GetClosestRoad(vehicle.Position + direction * roadblockDistance, RoadType.All);
         }

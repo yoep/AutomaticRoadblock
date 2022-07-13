@@ -18,6 +18,7 @@ namespace AutomaticRoadblocks.Pursuit
         private readonly IRoadblockDispatcher _roadblockDispatcher;
         private readonly Random _random = new();
 
+        private int _totalCopsKilled;
         private uint _timePursuitStarted;
         private uint _timeLastDispatchedRoadblock;
         private uint _timeLastRoadblockActive;
@@ -125,7 +126,7 @@ namespace AutomaticRoadblocks.Pursuit
         }
 
         /// <inheritdoc />
-        public void DispatchPreview()
+        public void DispatchPreview(bool currentLocation)
         {
             var vehicle = GetSuspectVehicle() ?? _game.PlayerVehicle;
 
@@ -136,7 +137,7 @@ namespace AutomaticRoadblocks.Pursuit
             }
 
             _logger.Trace("Creating pursuit roadblock preview");
-            _roadblockDispatcher.DispatchPreview(ToRoadblockLevel(PursuitLevel), vehicle);
+            _roadblockDispatcher.DispatchPreview(ToRoadblockLevel(PursuitLevel), vehicle, currentLocation);
         }
 
         #endregion
@@ -166,6 +167,7 @@ namespace AutomaticRoadblocks.Pursuit
         private void PursuitStarted(LHandle pursuitHandle)
         {
             _logger.Trace("Pursuit has been started");
+            _totalCopsKilled = 0;
             _timePursuitStarted = _game.GameTime;
             _roadblockDispatcher.RoadblockCopKilled += RoadblockCopKilled;
             _roadblockDispatcher.RoadblockStateChanged += RoadblockStateChanged;
@@ -191,13 +193,22 @@ namespace AutomaticRoadblocks.Pursuit
             {
                 while (IsPursuitActive)
                 {
-                    VerifyPursuitLethalForce();
+                    DoAutoLevelIncrementTick();
                     DoLevelIncreaseTick();
                     DoDispatchTick();
 
                     _game.FiberYield();
                 }
             }, "PursuitManager.PursuitMonitor");
+        }
+
+        private void DoAutoLevelIncrementTick()
+        {
+            if (!_settingsManager.AutomaticRoadblocksSettings.EnableAutoLevelIncrements)
+                return;
+
+            VerifyPursuitLethalForce();
+            VerifyShotsFired();
         }
 
         private void VerifyPursuitLethalForce()
@@ -213,6 +224,27 @@ namespace AutomaticRoadblocks.Pursuit
             if (PursuitLevel.Level < firstLethalLevel.Level)
             {
                 UpdatePursuitLevel(firstLethalLevel);
+            }
+        }
+
+        private void VerifyShotsFired()
+        {
+            if (Functions.GetPursuitPeds(PursuitHandle).Any(x => x.IsShooting || x.IsAiming) && PursuitLevel.Level < 2)
+            {
+                _logger.Debug("Suspect is shooting/aiming, increasing level");
+                UpdatePursuitLevel(PursuitLevel.Level2);
+            }
+
+            switch (PursuitLevel.Level)
+            {
+                case < 2 when _totalCopsKilled > 0:
+                    _logger.Debug("Suspect has killed a roadblock cop, increasing level");
+                    UpdatePursuitLevel(PursuitLevel.Level2);
+                    break;
+                case < 3 when _totalCopsKilled >= 3:
+                    _logger.Debug("Suspect has killed multiple roadblock cops, increasing level");
+                    UpdatePursuitLevel(PursuitLevel.Level3);
+                    break;
             }
         }
 
@@ -281,10 +313,7 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void RoadblockCopKilled(IRoadblock roadblock)
         {
-            // if a cop is killed from the roadblock
-            // increase the level 2
-            if (PursuitLevel.Level < 2)
-                UpdatePursuitLevel(PursuitLevel.Level2);
+            _totalCopsKilled++;
         }
 
         [Conditional("DEBUG")]

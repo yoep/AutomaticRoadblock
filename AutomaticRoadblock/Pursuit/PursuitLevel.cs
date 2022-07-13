@@ -6,8 +6,8 @@ namespace AutomaticRoadblocks.Pursuit
     {
         public static readonly PursuitLevel Level1 = new(1, 0.1, 0.20, false);
         public static readonly PursuitLevel Level2 = new(2, 0.15, 0.15, false);
-        public static readonly PursuitLevel Level3 = new(3, 0.2, 0.10, true);
-        public static readonly PursuitLevel Level4 = new(4, 0.3, 0.05, true);
+        public static readonly PursuitLevel Level3 = new(3, 0.2, 0.05, true);
+        public static readonly PursuitLevel Level4 = new(4, 0.3, 0.025, true);
         public static readonly PursuitLevel Level5 = new(5, 0.35, 0.0, true);
 
         public static readonly PursuitLevel[] Levels =

@@ -8,6 +8,11 @@ namespace AutomaticRoadblocks.Settings
         public bool EnableDuringPursuits { get; internal set; }
         
         /// <summary>
+        /// Verify if the pursuit level can be automatically increased by the plugin
+        /// </summary>
+        public bool EnableAutoLevelIncrements { get; internal set; }
+        
+        /// <summary>
         /// Verify if lights should be used within the roadblocks during nighttime
         /// </summary>
         public bool EnableLights { get; internal set; }
