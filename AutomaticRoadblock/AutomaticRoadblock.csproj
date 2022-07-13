@@ -127,6 +127,7 @@
         <Compile Include="Utils\Road\Road.cs" />
         <Compile Include="Utils\Road\RoadType.cs" />
         <Compile Include="Utils\Road\RoadUtils.cs" />
+        <Compile Include="Utils\Road\VehicleNodeType.cs" />
         <Compile Include="Utils\TimePeriod.cs" />
         <Compile Include="Utils\VehicleSeat.cs" />
     </ItemGroup>

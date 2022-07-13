@@ -20,13 +20,13 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         private readonly List<IRoadblock> _roadblocks = new();
 
+        private bool _cleanerRunning;
+
         public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
-
-            StartCleaner();
         }
 
         #region Properties
@@ -95,6 +95,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         public void Dispose()
         {
             _logger.Trace($"Disposing {_roadblocks.Count} roadblock(s)");
+            _cleanerRunning = false;
             _roadblocks.ForEach(x => x.Dispose());
             _roadblocks.Clear();
             _logger.Debug("Roadblocks have been disposed");
@@ -118,6 +119,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private void DoDispose(RoadblockLevel level, Vehicle vehicle)
         {
             _logger.Debug("Dispatching new roadblock");
+
+            // start the cleaner if it's not yet running
+            if (!_cleanerRunning)
+                StartCleaner();
+
             _game.NewSafeFiber(() =>
                 {
                     var road = DetermineRoadblockLocation(vehicle);
@@ -191,14 +197,19 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         private void StartCleaner()
         {
+            _logger.Trace("Starting the roadblock dispatcher cleaner");
+            _cleanerRunning = true;
             _game.NewSafeFiber(() =>
             {
-                GameFiber.Wait(10 * 1000);
-                _roadblocks
-                    .Where(x => x.State is not RoadblockState.Active or RoadblockState.Preparing)
-                    .Where(x => _game.GameTime - x.LastStateChange >= AutoCleanRoadblockAfterSeconds * 1000)
-                    .ToList()
-                    .ForEach(x => x.Dispose());
+                while (_cleanerRunning)
+                {
+                    _roadblocks
+                        .Where(x => x.State is not RoadblockState.Active or RoadblockState.Preparing)
+                        .Where(x => _game.GameTime - x.LastStateChange >= AutoCleanRoadblockAfterSeconds * 1000)
+                        .ToList()
+                        .ForEach(x => x.Dispose());
+                    GameFiber.Wait(15 * 1000);
+                }
             }, "RoadblockDispatcher.StartCleaner");
         }
 

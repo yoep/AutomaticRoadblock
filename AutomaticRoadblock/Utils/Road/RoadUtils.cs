@@ -209,6 +209,8 @@ namespace AutomaticRoadblocks.Utils.Road
                 var laneLeftPosition = lastRightPosition + moveDirection * laneWidth;
                 var vehicleNode = GetVehicleNode(lastRightPosition);
                 var heading = isOpposite ? OppositeHeading(rightSideHeading) : rightSideHeading;
+                var type = DetermineLaneType(index, numberOfLanes);
+
                 lanes.Add(LaneBuilder.Builder()
                     .Number(index)
                     .Heading(heading)
@@ -216,11 +218,22 @@ namespace AutomaticRoadblocks.Utils.Road
                     .LeftSide(isOpposite ? lastRightPosition : laneLeftPosition)
                     .NodePosition(vehicleNode.Position)
                     .Width(laneWidth)
+                    .Type(type)
                     .Build());
                 lastRightPosition = laneLeftPosition;
             }
 
             return lanes;
+        }
+
+        private static Road.Lane.LaneType DetermineLaneType(int index, int numberOfLanes)
+        {
+            if (index == numberOfLanes)
+            {
+                return Road.Lane.LaneType.RightLane;
+            }
+
+            return index == 1 ? Road.Lane.LaneType.LeftLane : Road.Lane.LaneType.MiddleLane;
         }
 
         // This fix is a simple workaround if the last point detection failed with the native function of GTA
@@ -396,6 +409,7 @@ namespace AutomaticRoadblocks.Utils.Road
         private Vector3 _leftSide;
         private Vector3 _nodePosition;
         private float _width;
+        private Road.Lane.LaneType _type;
 
         private LaneBuilder()
         {
@@ -447,9 +461,16 @@ namespace AutomaticRoadblocks.Utils.Road
             return this;
         }
 
+        public LaneBuilder Type(Road.Lane.LaneType type)
+        {
+            Assert.NotNull(type, "type cannot be null");
+            _type = type;
+            return this;
+        }
+
         public Road.Lane Build()
         {
-            return new Road.Lane(_number, _heading, _rightSide, _leftSide, _nodePosition, _width);
+            return new Road.Lane(_number, _heading, _rightSide, _leftSide, _nodePosition, _width, _type);
         }
     }
 }

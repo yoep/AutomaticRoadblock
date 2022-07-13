@@ -200,16 +200,25 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 InitializeLights();
         }
 
-        protected void InitializeVehicleSlot()
+        protected virtual void InitializeVehicleSlot()
         {
             Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
-            Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Heading + 90,
-                (position, heading) =>
-                {
-                    var vehicle = new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundVector(position), heading);
+            var initialPosition = Position;
+            
+            // move the vehicle a little bit to the border of the road
+            // this should prevent clipping
+            switch (Lane.Type)
+            {
+                case Road.Lane.LaneType.RightLane:
+                    initialPosition += MathHelper.ConvertHeadingToDirection(Lane.Heading + 90) * 1.5f;
+                    break;
+                case Road.Lane.LaneType.LeftLane:
+                    initialPosition += MathHelper.ConvertHeadingToDirection(Lane.Heading - 90) * 1.5f;
+                    break;
+            }
 
-                    return vehicle;
-                }));
+            Instances.Add(new InstanceSlot(EntityType.CopVehicle, initialPosition, Heading + 90,
+                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundVector(position), heading)));
         }
 
         protected Vector3 GetPositionBehindVehicle()

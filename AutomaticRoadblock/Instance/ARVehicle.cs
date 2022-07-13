@@ -14,11 +14,9 @@ namespace AutomaticRoadblocks.Instance
         {
             Assert.NotNull(model, "model cannot be null");
             Assert.NotNull(position, "position cannot be null");
-            GameInstance = new Vehicle(model, position, heading)
-            {
-                NeedsCollision = true,
-                IsRecordingCollisions = true
-            };
+            GameInstance = EntityUtils.CreateVehicle(model, position, heading);
+            GameInstance.NeedsCollision = true;
+            GameInstance.IsRecordingCollisions = true;
         }
 
         /// <inheritdoc />

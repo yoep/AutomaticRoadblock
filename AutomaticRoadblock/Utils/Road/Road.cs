@@ -169,11 +169,11 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <summary>
         /// Defines the lane information within the road.
         /// </summary>
-        public class Lane : IPreviewSupport
+        public record Lane : IPreviewSupport
         {
             #region Constructors
 
-            public Lane(int number, float heading, Vector3 rightSide, Vector3 leftSide, Vector3 nodePosition, float width)
+            public Lane(int number, float heading, Vector3 rightSide, Vector3 leftSide, Vector3 nodePosition, float width, LaneType type)
             {
                 Number = number;
                 Heading = heading;
@@ -181,6 +181,7 @@ namespace AutomaticRoadblocks.Utils.Road
                 LeftSide = leftSide;
                 NodePosition = nodePosition;
                 Width = width;
+                Type = type;
                 Position = CalculatePosition();
             }
 

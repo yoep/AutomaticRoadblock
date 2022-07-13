@@ -53,7 +53,7 @@ namespace AutomaticRoadblocks.Debug
                 var road = RoadUtils.GetClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, RoadType.All);
                 var lane = road.Lanes.First();
                 var ped = new Ped(road.Position);
-                var vehicle = new Vehicle(new Model("Buffalo3"), lane.Position, lane.Heading);
+                var vehicle = EntityUtils.CreateVehicle(new Model("Buffalo3"), lane.Position, lane.Heading);
 
                 var weaponDescriptor = ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Pistol), -1, true);
                 ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.HeavyRifle), -1, false);

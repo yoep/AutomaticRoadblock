@@ -7,6 +7,22 @@ namespace AutomaticRoadblocks.Utils
     public static class EntityUtils
     {
         /// <summary>
+        /// Create a vehicle which is placed on the ground correctly.
+        /// </summary>
+        /// <param name="model">The model of the vehicle.</param>
+        /// <param name="position">The position of the vehicle.</param>
+        /// <param name="heading">The heading of the vehicle.</param>
+        /// <returns>Returns the created vehicle.</returns>
+        public static Vehicle CreateVehicle(Model model, Vector3 position, float heading)
+        {
+            Assert.NotNull(model, "model cannot be null");
+            Assert.NotNull(position, "position cannot be null");
+            var vehicle = new Vehicle(model, position, heading);
+            NativeFunction.Natives.SET_VEHICLE_ON_GROUND_PROPERLY(vehicle);
+            return vehicle;
+        }
+        
+        /// <summary>
         /// Attach the given attachment to the given entity.
         /// </summary>
         /// <param name="attachment">Set the attachment entity.</param>
