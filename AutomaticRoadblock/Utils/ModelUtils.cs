@@ -15,8 +15,6 @@ namespace AutomaticRoadblocks.Utils
 
         private static readonly Random Random = new();
 
-        #region Constants
-
         public static class Weapons
         {
             public const string Pistol = "weapon_pistol";
@@ -58,6 +56,35 @@ namespace AutomaticRoadblocks.Utils
             {
                 "s_m_y_swat_01",
             };
+            
+            /// <summary>
+            /// Get a local ped model for the given position.
+            /// </summary>
+            /// <param name="position">Set the position to get the local model for.</param>
+            /// <returns>Returns the local ped model.</returns>
+            public static Model GetLocalCop(Vector3 position)
+            {
+                var zone = GetZone(position);
+
+                return IsCountyZone(zone)
+                    ? new Model(Peds.CopCountyPedModels[Random.Next(Peds.CopCountyPedModels.Count)])
+                    : new Model(Peds.CopCityPedModels[Random.Next(Peds.CopCityPedModels.Count)]);
+            }
+            
+            public static Model GetPoliceFbiCop()
+            {
+                return new Model(Peds.CopFbiPedModels[Random.Next(Peds.CopFbiPedModels.Count)]);
+            }
+
+            public static Model GetPoliceSwatCop()
+            {
+                return new Model(Peds.CopSwatPedModels[Random.Next(Peds.CopSwatPedModels.Count)]);
+            }
+
+            public static Model GetPoliceBikeCop()
+            {
+                return new Model(PoliceBikeCopModelName);
+            }
         }
 
         public static class Vehicles
@@ -95,97 +122,64 @@ namespace AutomaticRoadblocks.Utils
             {
                 "Riot"
             };
+
+            /// <summary>
+            /// Get a local vehicle model for the given position.
+            /// </summary>
+            /// <param name="position">Set the position to get the local model for.</param>
+            /// <param name="includePoliceBike">Set if the police bike can also be returned as a vehicle model.</param>
+            /// <param name="includePoliceTransporter">Set if the police transporter can also be returned as vehicle model.</param>
+            /// <returns>Returns the local police vehicle model.</returns>
+            public static Model GetLocalPoliceVehicle(Vector3 position, bool includePoliceBike = true, bool includePoliceTransporter = true)
+            {
+                var zone = GetZone(position);
+                var list = IsCountyZone(zone) ? Vehicles.CountyVehicleModels.ToList() : Vehicles.CityVehicleModels.ToList();
+
+                if (!includePoliceBike)
+                    list.Remove(PoliceBikeModelName);
+                if (!includePoliceTransporter)
+                    list.Remove(PoliceTransporterModelName);
+
+                return new Model(list[Random.Next(list.Count)]);
+            }
+            
+            /// <summary>
+            /// Get a state police vehicle.
+            /// </summary>
+            /// <param name="includePoliceBike">Set if the police bike can also be returned as a vehicle model.</param>
+            /// <param name="includePoliceTransporter">Set if the police transporter can also be returned as vehicle model.</param>
+            /// <returns>Returns a state police vehicle.</returns>
+            public static Model GetStatePoliceVehicle(bool includePoliceBike = true, bool includePoliceTransporter = true)
+            {
+                var list = Vehicles.StateVehicleModels.ToList();
+
+                if (!includePoliceBike)
+                    list.Remove(PoliceBikeModelName);
+                if (!includePoliceTransporter)
+                    list.Remove(PoliceTransporterModelName);
+
+                return new Model(list[Random.Next(list.Count)]);
+            }
+
+            /// <summary>
+            /// Get an FBI police vehicle model. 
+            /// </summary>
+            /// <returns>Returns an FBI police vehicle model.</returns>
+            public static Model GetFbiPoliceVehicle()
+            {
+                return new Model(Vehicles.FbiVehicleModels[Random.Next(Vehicles.FbiVehicleModels.Count)]);
+            }
+
+            /// <summary>
+            /// Get an swat police vehicle model. 
+            /// </summary>
+            /// <returns>Returns an swat police vehicle model.</returns>
+            public static Model GetSwatPoliceVehicle()
+            {
+                return new Model(Vehicles.SwatVehicleModels[Random.Next(Vehicles.SwatVehicleModels.Count)]);
+            }
         }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Get a local ped model for the given position.
-        /// </summary>
-        /// <param name="position">Set the position to get the local model for.</param>
-        /// <returns>Returns the local ped model.</returns>
-        public static Model GetLocalCop(Vector3 position)
-        {
-            var zone = GetZone(position);
-
-            return IsCountyZone(zone)
-                ? new Model(Peds.CopCountyPedModels[Random.Next(Peds.CopCountyPedModels.Count)])
-                : new Model(Peds.CopCityPedModels[Random.Next(Peds.CopCityPedModels.Count)]);
-        }
-
-        public static Model GetPoliceFbiCop()
-        {
-            return new Model(Peds.CopFbiPedModels[Random.Next(Peds.CopFbiPedModels.Count)]);
-        }
-
-        public static Model GetPoliceSwatCop()
-        {
-            return new Model(Peds.CopSwatPedModels[Random.Next(Peds.CopSwatPedModels.Count)]);
-        }
-
-        public static Model GetPoliceBikeCop()
-        {
-            return new Model(PoliceBikeCopModelName);
-        }
-
-        /// <summary>
-        /// Get a local vehicle model for the given position.
-        /// </summary>
-        /// <param name="position">Set the position to get the local model for.</param>
-        /// <param name="includePoliceBike">Set if the police bike can also be returned as a vehicle model.</param>
-        /// <param name="includePoliceTransporter">Set if the police transporter can also be returned as vehicle model.</param>
-        /// <returns>Returns the local police vehicle model.</returns>
-        public static Model GetLocalPoliceVehicle(Vector3 position, bool includePoliceBike = true, bool includePoliceTransporter = true)
-        {
-            var zone = GetZone(position);
-            var list = IsCountyZone(zone) ? Vehicles.CountyVehicleModels.ToList() : Vehicles.CityVehicleModels.ToList();
-
-            if (!includePoliceBike)
-                list.Remove(PoliceBikeModelName);
-            if (!includePoliceTransporter)
-                list.Remove(PoliceTransporterModelName);
-
-            return new Model(list[Random.Next(list.Count)]);
-        }
-
-        /// <summary>
-        /// Get a state police vehicle.
-        /// </summary>
-        /// <param name="includePoliceBike">Set if the police bike can also be returned as a vehicle model.</param>
-        /// <param name="includePoliceTransporter">Set if the police transporter can also be returned as vehicle model.</param>
-        /// <returns>Returns a state police vehicle.</returns>
-        public static Model GetStatePoliceVehicle(bool includePoliceBike = true, bool includePoliceTransporter = true)
-        {
-            var list = Vehicles.StateVehicleModels.ToList();
-
-            if (!includePoliceBike)
-                list.Remove(PoliceBikeModelName);
-            if (!includePoliceTransporter)
-                list.Remove(PoliceTransporterModelName);
-
-            return new Model(list[Random.Next(list.Count)]);
-        }
-
-        /// <summary>
-        /// Get an FBI police vehicle model. 
-        /// </summary>
-        /// <returns>Returns an FBI police vehicle model.</returns>
-        public static Model GetFbiPoliceVehicle()
-        {
-            return new Model(Vehicles.FbiVehicleModels[Random.Next(Vehicles.FbiVehicleModels.Count)]);
-        }
-
-        /// <summary>
-        /// Get an swat police vehicle model. 
-        /// </summary>
-        /// <returns>Returns an swat police vehicle model.</returns>
-        public static Model GetSwatPoliceVehicle()
-        {
-            return new Model(Vehicles.SwatVehicleModels[Random.Next(Vehicles.SwatVehicleModels.Count)]);
-        }
-
+        
         /// <summary>
         /// Get the medic model.
         /// </summary>
@@ -232,8 +226,6 @@ namespace AutomaticRoadblocks.Utils
             Assert.NotNull(model, "model cannot be null");
             return model.Name.Equals(PoliceBikeModelName);
         }
-
-        #endregion
 
         private static bool IsCountyZone(WorldZone zone)
         {

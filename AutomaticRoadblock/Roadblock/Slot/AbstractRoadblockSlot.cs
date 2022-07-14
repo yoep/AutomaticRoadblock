@@ -238,18 +238,18 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
             if (ModelUtils.IsBike(model))
             {
-                return ModelUtils.GetPoliceBikeCop();
+                return ModelUtils.Peds.GetPoliceBikeCop();
             }
 
             if (ModelUtils.Vehicles.CityVehicleModels.Contains(model) || ModelUtils.Vehicles.CountyVehicleModels.Contains(model) ||
                 ModelUtils.Vehicles.StateVehicleModels.Contains(model))
             {
-                return ModelUtils.GetLocalCop(Position);
+                return ModelUtils.Peds.GetLocalCop(Position);
             }
 
             return ModelUtils.Vehicles.FbiVehicleModels.Contains(model)
-                ? ModelUtils.GetFbiPoliceVehicle()
-                : ModelUtils.GetSwatPoliceVehicle();
+                ? ModelUtils.Peds.GetPoliceFbiCop()
+                : ModelUtils.Peds.GetPoliceSwatCop();
         }
 
         /// <summary>

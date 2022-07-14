@@ -26,7 +26,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         protected override Model GetVehicleModel()
         {
-            return ModelUtils.GetLocalPoliceVehicle(Position, true, false);
+            return ModelUtils.Vehicles.GetLocalPoliceVehicle(Position, true, false);
         }
 
         protected override void InitializeCopPeds()

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
@@ -29,7 +28,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override Model GetVehicleModel()
         {
-            return Random.Next(3) == 0 ? ModelUtils.GetStatePoliceVehicle() : ModelUtils.GetFbiPoliceVehicle();
+            return Random.Next(3) == 0 ? ModelUtils.Vehicles.GetStatePoliceVehicle() : ModelUtils.Vehicles.GetFbiPoliceVehicle();
         }
 
         protected override void InitializeCopPeds()
