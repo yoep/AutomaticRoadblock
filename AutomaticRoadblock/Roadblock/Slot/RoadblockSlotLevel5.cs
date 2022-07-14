@@ -29,13 +29,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override Model GetVehicleModel()
         {
-            return new Random().Next(3) == 0 ? ModelUtils.GetFbiPoliceVehicle() : ModelUtils.GetSwatPoliceVehicle();
+            return Random.Next(3) == 0 ? ModelUtils.GetFbiPoliceVehicle() : ModelUtils.GetSwatPoliceVehicle();
         }
 
         protected override void InitializeCopPeds()
         {
             var pedSpawnPosition = GetPositionBehindVehicle();
-            var totalOccupants = new Random().Next(3) + 2;
+            var totalOccupants = Random.Next(3) + 2;
 
             for (var i = 0; i < totalOccupants; i++)
             {

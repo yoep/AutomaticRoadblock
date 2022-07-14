@@ -62,13 +62,15 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected override void InitializeLights()
         {
             var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 2f;
-            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2.5f;
+            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 3f;
+            var direction = MathHelper.ConvertHeadingToDirection(Heading - 90);
+            var totalFlares = (int) Lane.Width;
 
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < totalFlares; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
-                    (position, heading) => new ARScenery(PropUtils.CreateFlareHorizontal(position, Heading + 90))));
-                startPosition += MathHelper.ConvertHeadingToDirection(Heading - 90) * 1.5f;
+                    (position, heading) => new ARScenery(PropUtils.CreateFlare(position, heading + Random.Next(91)))));
+                startPosition += direction * 1f;
             }
         }
 

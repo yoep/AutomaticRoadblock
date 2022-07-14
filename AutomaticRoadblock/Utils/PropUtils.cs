@@ -180,9 +180,12 @@ namespace AutomaticRoadblocks.Utils
             return new Object(new Model("prop_ld_health_pack"), position);
         }
 
-        public static Object CreateFlareHorizontal(Vector3 position, float heading)
+        public static Object CreateFlare(Vector3 position, float heading)
         {
-            var instance = new Object(new Model("prop_flare_01b"), position, heading);
+            var instance = new Weapon(new WeaponAsset("weapon_flare"), position, -1)
+            {
+                Heading = heading
+            };
             return PlaceCorrectlyOnGround(instance);
         }
 

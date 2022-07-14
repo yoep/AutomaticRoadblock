@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override Model GetVehicleModel()
         {
-            return new Random().Next(3) == 0 ? ModelUtils.GetLocalPoliceVehicle(Position, false) : ModelUtils.GetStatePoliceVehicle(false);
+            return Random.Next(3) == 0 ? ModelUtils.GetLocalPoliceVehicle(Position, false) : ModelUtils.GetStatePoliceVehicle(false);
         }
 
         protected override void InitializeCopPeds()
@@ -61,9 +61,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
         }
 
-        private static ARPed AssignCopWeapons(ARPed ped)
+        private ARPed AssignCopWeapons(ARPed ped)
         {
-            var primaryWeapon = new Random().Next(2) == 1 ? ModelUtils.Weapons.Shotgun : ModelUtils.Weapons.Pistol;
+            var primaryWeapon = Random.Next(2) == 1 ? ModelUtils.Weapons.Shotgun : ModelUtils.Weapons.Pistol;
 
             ped.GivePrimaryWeapon(primaryWeapon);
             ped.GiveWeapon(ModelUtils.Weapons.Pistol);

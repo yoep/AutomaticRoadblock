@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
     {
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected readonly List<InstanceSlot> Instances = new();
+        protected readonly Random Random = new();
 
         private bool _monitoring;
 

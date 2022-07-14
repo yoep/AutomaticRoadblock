@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override Model GetVehicleModel()
         {
-            return new Random().Next(3) == 0 ? ModelUtils.GetStatePoliceVehicle() : ModelUtils.GetFbiPoliceVehicle();
+            return Random.Next(3) == 0 ? ModelUtils.GetStatePoliceVehicle() : ModelUtils.GetFbiPoliceVehicle();
         }
 
         protected override void InitializeCopPeds()

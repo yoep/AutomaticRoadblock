@@ -19,6 +19,7 @@ namespace AutomaticRoadblocks.Pursuit
         private readonly Random _random = new();
 
         private int _totalCopsKilled;
+        private int _totalRoadblocksDeployed;
         private uint _timePursuitStarted;
         private uint _timeLastDispatchedRoadblock;
         private uint _timeLastRoadblockActive;
@@ -168,6 +169,7 @@ namespace AutomaticRoadblocks.Pursuit
         {
             _logger.Trace("Pursuit has been started");
             _totalCopsKilled = 0;
+            _totalRoadblocksDeployed = 0;
             _timePursuitStarted = _game.GameTime;
             _roadblockDispatcher.RoadblockCopKilled += RoadblockCopKilled;
             _roadblockDispatcher.RoadblockStateChanged += RoadblockStateChanged;
@@ -250,10 +252,11 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void DoLevelIncreaseTick()
         {
-            var gameTime = _game.GameTime;
+            
             var increaseLevelThreshold = 100 - PursuitLevel.AutomaticLevelIncreaseFactor * 100;
 
-            if (gameTime - _timeLastLevelChanged > _settingsManager.AutomaticRoadblocksSettings.TimeBetweenAutoLevelIncrements * 1000 &&
+            if (HasAtLeastOneRoadblockDeployed() &&
+                HasEnoughTimePassedBetweenLastLevelIncrease() &&
                 _random.Next(101) >= increaseLevelThreshold)
                 IncreasePursuitLevel();
         }
@@ -263,7 +266,10 @@ namespace AutomaticRoadblocks.Pursuit
             var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, force);
 
             if (dispatched)
+            {
                 _timeLastDispatchedRoadblock = _game.GameTime;
+                _totalRoadblocksDeployed++;
+            }
 
             return dispatched;
         }
@@ -314,6 +320,18 @@ namespace AutomaticRoadblocks.Pursuit
         private void RoadblockCopKilled(IRoadblock roadblock)
         {
             _totalCopsKilled++;
+        }
+
+        private bool HasAtLeastOneRoadblockDeployed()
+        {
+            return _totalRoadblocksDeployed > 0;
+        }
+
+        private bool HasEnoughTimePassedBetweenLastLevelIncrease()
+        {
+            var gameTime = _game.GameTime;
+            
+            return gameTime - _timeLastLevelChanged > _settingsManager.AutomaticRoadblocksSettings.TimeBetweenAutoLevelIncrements * 1000;
         }
 
         [Conditional("DEBUG")]
