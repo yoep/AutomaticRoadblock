@@ -31,18 +31,15 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override void InitializeCopPeds()
         {
-            var isBike = ModelUtils.IsBike(VehicleModel);
-            Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (_, _) =>
-                isBike
-                    ? AssignCopWeapons(new ARPed(ModelUtils.GetPoliceBikeCop(), Position))
-                    : AssignCopWeapons(new ARPed(ModelUtils.GetLocalCop(Position), Position))));
+            Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, _) =>
+                AssignCopWeapons(new ARPed(GetPedModelForVehicle(), position))));
         }
 
         protected override void InitializeScenery()
         {
             var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
             var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2.5f;
-            var totalCones = (int) Math.Ceiling(Lane.Width / 1.5f);
+            var totalCones = (int)Math.Ceiling(Lane.Width / 1.5f);
 
             for (var i = 0; i < totalCones; i++)
             {

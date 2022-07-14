@@ -204,7 +204,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
             var initialPosition = Position;
-            
+
             // move the vehicle a little bit to the border of the road
             // this should prevent clipping
             switch (Lane.Type)
@@ -224,6 +224,30 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected Vector3 GetPositionBehindVehicle()
         {
             return Position + MathHelper.ConvertHeadingToDirection(Heading) * 3f;
+        }
+
+        /// <summary>
+        /// Get a police cop ped model for the current vehicle model.
+        /// </summary>
+        /// <returns>Returns a cop ped model.</returns>
+        protected Model GetPedModelForVehicle()
+        {
+            var model = VehicleModel.Name;
+
+            if (ModelUtils.IsBike(model))
+            {
+                return ModelUtils.GetPoliceBikeCop();
+            }
+
+            if (ModelUtils.Vehicles.CityVehicleModels.Contains(model) || ModelUtils.Vehicles.CountyVehicleModels.Contains(model) ||
+                ModelUtils.Vehicles.StateVehicleModels.Contains(model))
+            {
+                return ModelUtils.GetLocalCop(Position);
+            }
+
+            return ModelUtils.Vehicles.FbiVehicleModels.Contains(model)
+                ? ModelUtils.GetFbiPoliceVehicle()
+                : ModelUtils.GetSwatPoliceVehicle();
         }
 
         /// <summary>

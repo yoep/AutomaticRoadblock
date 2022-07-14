@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using LSPD_First_Response.Engine.Scripting;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -12,7 +13,7 @@ namespace AutomaticRoadblocks.Utils
         private const string PoliceTransporterModelName = "POLICET";
         private const string PoliceBikeCopModelName = "s_m_y_hwaycop_01";
 
-        private static readonly Random Random = new Random();
+        private static readonly Random Random = new();
 
         #region Constants
 
@@ -35,63 +36,66 @@ namespace AutomaticRoadblocks.Utils
 
         public static class Peds
         {
-            public static readonly List<string> CopCityPedModels = new List<string>
+            public static readonly IReadOnlyList<string> CopCityPedModels = new List<string>
             {
                 "s_m_y_cop_01",
                 "s_f_y_cop_01"
             };
 
-            public static readonly List<string> CopCountyPedModels = new List<string>
+            public static readonly IReadOnlyList<string> CopCountyPedModels = new List<string>
             {
                 "s_f_y_sheriff_01",
                 "s_m_y_sheriff_01"
             };
 
-            public static readonly List<string> CopFbiPedModels = new List<string>
+            public static readonly IReadOnlyList<string> CopFbiPedModels = new List<string>
             {
                 "ig_fbisuit_01",
                 "cs_fbisuit_01"
             };
 
-            public static readonly List<string> CopSwatPedModels = new List<string>
+            public static readonly IReadOnlyList<string> CopSwatPedModels = new List<string>
             {
                 "s_m_y_swat_01",
             };
         }
 
-        internal static readonly List<string> CityVehicleModels = new List<string>
+        public static class Vehicles
         {
-            "POLICE",
-            "POLICE2",
-            PoliceBikeModelName,
-            PoliceTransporterModelName
-        };
+            public static readonly IReadOnlyList<string> CityVehicleModels = new List<string>
+            {
+                "POLICE",
+                "POLICE2",
+                PoliceBikeModelName,
+                PoliceTransporterModelName
+            };
 
-        internal static readonly List<string> CountyVehicleModels = new List<string>
-        {
-            "SHERIFF",
-            "SHERIFF2",
-            PoliceBikeModelName,
-            PoliceTransporterModelName
-        };
+            public static readonly IReadOnlyList<string> CountyVehicleModels = new List<string>
+            {
+                "SHERIFF",
+                "SHERIFF2",
+                PoliceBikeModelName,
+                PoliceTransporterModelName
+            };
 
-        internal static readonly List<string> StateVehicleModels = new List<string>
-        {
-            "POLICE3",
-            PoliceBikeModelName,
-            PoliceTransporterModelName
-        };
+            public static readonly IReadOnlyList<string> StateVehicleModels = new List<string>
+            {
+                "POLICE3",
+                PoliceBikeModelName,
+                PoliceTransporterModelName
+            };
 
-        internal static readonly List<string> FbiVehicleModels = new List<string>
-        {
-            "FBI",
-            "FBI2"
-        };
+            public static readonly IReadOnlyList<string> FbiVehicleModels = new List<string>
+            {
+                "FBI",
+                "FBI2"
+            };
 
-        internal static readonly List<string> SwatVehicleModels = new List<string>
-        {
-            "Riot"
-        };
+            public static readonly IReadOnlyList<string> SwatVehicleModels = new List<string>
+            {
+                "Riot"
+            };
+        }
 
         #endregion
 
@@ -136,7 +140,7 @@ namespace AutomaticRoadblocks.Utils
         public static Model GetLocalPoliceVehicle(Vector3 position, bool includePoliceBike = true, bool includePoliceTransporter = true)
         {
             var zone = GetZone(position);
-            var list = IsCountyZone(zone) ? CountyVehicleModels : CityVehicleModels;
+            var list = IsCountyZone(zone) ? Vehicles.CountyVehicleModels.ToList() : Vehicles.CityVehicleModels.ToList();
 
             if (!includePoliceBike)
                 list.Remove(PoliceBikeModelName);
@@ -154,7 +158,7 @@ namespace AutomaticRoadblocks.Utils
         /// <returns>Returns a state police vehicle.</returns>
         public static Model GetStatePoliceVehicle(bool includePoliceBike = true, bool includePoliceTransporter = true)
         {
-            var list = StateVehicleModels;
+            var list = Vehicles.StateVehicleModels.ToList();
 
             if (!includePoliceBike)
                 list.Remove(PoliceBikeModelName);
@@ -170,7 +174,7 @@ namespace AutomaticRoadblocks.Utils
         /// <returns>Returns an FBI police vehicle model.</returns>
         public static Model GetFbiPoliceVehicle()
         {
-            return new Model(FbiVehicleModels[Random.Next(FbiVehicleModels.Count)]);
+            return new Model(Vehicles.FbiVehicleModels[Random.Next(Vehicles.FbiVehicleModels.Count)]);
         }
 
         /// <summary>
@@ -179,7 +183,7 @@ namespace AutomaticRoadblocks.Utils
         /// <returns>Returns an swat police vehicle model.</returns>
         public static Model GetSwatPoliceVehicle()
         {
-            return new Model(SwatVehicleModels[Random.Next(SwatVehicleModels.Count)]);
+            return new Model(Vehicles.SwatVehicleModels[Random.Next(Vehicles.SwatVehicleModels.Count)]);
         }
 
         /// <summary>

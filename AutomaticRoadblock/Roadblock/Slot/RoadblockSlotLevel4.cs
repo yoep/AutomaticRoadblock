@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
@@ -28,7 +29,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override Model GetVehicleModel()
         {
-            return ModelUtils.GetFbiPoliceVehicle();
+            return new Random().Next(3) == 0 ? ModelUtils.GetStatePoliceVehicle() : ModelUtils.GetFbiPoliceVehicle();
         }
 
         protected override void InitializeCopPeds()
@@ -38,7 +39,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             for (var i = 0; i < 2; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.CopPed, pedSpawnPosition, 0f,
-                    (position, heading) => AssignCopWeapons(new ARPed(ModelUtils.GetPoliceFbiCop(), position, heading))));
+                    (position, heading) => AssignCopWeapons(new ARPed(GetPedModelForVehicle(), position, heading))));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }

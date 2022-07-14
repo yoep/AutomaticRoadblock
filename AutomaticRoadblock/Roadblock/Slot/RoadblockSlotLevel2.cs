@@ -41,7 +41,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             for (var i = 0; i < totalOccupants; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.CopPed, pedSpawnPosition, Heading - 180,
-                    (position, heading) => AssignCopWeapons(new ARPed(ModelUtils.GetLocalCop(Position), position, heading))));
+                    (position, heading) => AssignCopWeapons(new ARPed(GetPedModelForVehicle(), position, heading))));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }
