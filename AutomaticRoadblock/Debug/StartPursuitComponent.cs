@@ -19,6 +19,7 @@ namespace AutomaticRoadblocks.Debug
         public StartPursuitComponent(IGame game)
         {
             _game = game;
+            Events.OnPursuitEnded += OnPursuitEnded;
         }
 
         /// <inheritdoc />
@@ -50,7 +51,7 @@ namespace AutomaticRoadblocks.Debug
             {
                 _currentPursuit = Functions.CreatePursuit();
 
-                var road = RoadUtils.GetClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, RoadType.All);
+                var road = RoadUtils.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, RoadType.All);
                 var lane = road.Lanes.First();
                 var ped = new Ped(road.Position);
                 var vehicle = EntityUtils.CreateVehicle(new Model("Buffalo3"), lane.Position, lane.Heading);
@@ -69,11 +70,17 @@ namespace AutomaticRoadblocks.Debug
             }, "StartPursuitComponent.StartPursuit");
         }
 
+        private void OnPursuitEnded(LHandle handle)
+        {
+            MenuItem.Text = AutomaticRoadblocksPlugin.StartPursuit;
+            _currentPursuit = null;
+        }
+
         [Conditional("DEBUG")]
         private void EndPursuit()
         {
-            Functions.ForceEndPursuit(_currentPursuit);
-            MenuItem.Text = AutomaticRoadblocksPlugin.StartPursuit;
+            if (Functions.IsPursuitStillRunning(_currentPursuit))
+                Functions.ForceEndPursuit(_currentPursuit);
         }
     }
 }

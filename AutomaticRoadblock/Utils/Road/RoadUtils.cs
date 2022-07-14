@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutomaticRoadblocks.AbstractionLayer;
 using Rage;
 using Rage.Native;
 
@@ -16,12 +17,12 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="position">Set the position to use as reference.</param>
         /// <param name="roadType">Set the road type.</param>
         /// <returns>Returns the position of the closest road.</returns>
-        public static Road GetClosestRoad(Vector3 position, RoadType roadType)
+        public static Road FindClosestRoad(Vector3 position, RoadType roadType)
         {
             Road closestRoad = null;
             var closestRoadDistance = 99999f;
 
-            foreach (var road in GetNearbyRoads(position, roadType))
+            foreach (var road in FindNearbyRoads(position, roadType))
             {
                 var roadDistanceToPosition = Vector3.Distance2D(road.Position, position);
 
@@ -36,30 +37,34 @@ namespace AutomaticRoadblocks.Utils.Road
         }
 
         /// <summary>
-        /// Get the lane closest to the given point.
+        /// Find a road by traversing the current road position towards the heading.
         /// </summary>
-        /// <param name="road">Set the road to get the closest lane of.</param>
-        /// <param name="closestToPoint">Set the point.</param>
-        /// <returns>Returns the closest lane of the road in regards to the given point.</returns>
-        public static Road.Lane GetClosestLane(Road road, Vector3 closestToPoint)
+        /// <param name="position">The position to start from.</param>
+        /// <param name="heading">The heading to traverse the road from.</param>
+        /// <param name="distance">The distance to traverse.</param>
+        /// <param name="roadType">The road types to follow.</param>
+        /// <returns>Returns the found round traversed from the start position.</returns>
+        public static Road FindRoadTraversing(Vector3 position, float heading, float distance, RoadType roadType)
         {
-            Assert.NotNull(road, "road cannot be null");
-            Assert.NotNull(closestToPoint, "closestToPoint cannot be null");
-            var distanceClosestLane = 9999f;
-            Road.Lane closestLane = null;
+            FindVehicleNodesWhileTraversing(position, heading, distance, roadType, out var lastFoundNode);
+            return DiscoverRoad(lastFoundNode);
+        }
 
-            foreach (var lane in road.Lanes)
-            {
-                var laneDistance = Vector3.Distance2D(lane.RightSide, closestToPoint);
+        /// <summary>
+        /// Find roads while traversing the given distance from the current location.
+        /// </summary>
+        /// <param name="position">The position to start from.</param>
+        /// <param name="heading">The heading to traverse the road from.</param>
+        /// <param name="distance">The distance to traverse.</param>
+        /// <param name="roadType">The road types to follow.</param>
+        /// <returns>Returns the roads found while traversing the distance.</returns>
+        public static ICollection<Road> FindRoadsTraversing(Vector3 position, float heading, float distance, RoadType roadType)
+        {
+            var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, out _);
 
-                if (laneDistance > distanceClosestLane)
-                    continue;
-
-                closestLane = lane;
-                distanceClosestLane = laneDistance;
-            }
-
-            return closestLane;
+            return nodeInfos
+                .Select(DiscoverRoad)
+                .ToList();
         }
 
         /// <summary>
@@ -68,18 +73,17 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="position">Set the position to use as reference.</param>
         /// <param name="roadType">Set the road type.</param>
         /// <returns>Returns the position of the closest road.</returns>
-        public static IEnumerable<Road> GetNearbyRoads(Vector3 position, RoadType roadType)
+        public static IEnumerable<Road> FindNearbyRoads(Vector3 position, RoadType roadType)
         {
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(roadType, "roadType cannot be null");
 
-            NativeFunction.Natives.GET_CLOSEST_ROAD(position.X, position.Y, position.Z, 1f, 1, out Vector3 road1, out Vector3 road2, out int numberOfLanes1,
-                out int numberOfLanes2, out float junctionIndication, (int)roadType);
+            FindVehicleNodes(position, roadType, out NodeInfo node1, out NodeInfo node2);
 
             return new List<Road>
             {
-                DiscoverRoad(road1, numberOfLanes1, numberOfLanes2, junctionIndication),
-                DiscoverRoad(road2, numberOfLanes2, numberOfLanes1, junctionIndication)
+                DiscoverRoad(node1),
+                DiscoverRoad(node2)
             };
         }
 
@@ -144,32 +148,111 @@ namespace AutomaticRoadblocks.Utils.Road
             NativeFunction.CallByHash<int>(0x2CE544C68FB812A0, zoneId);
         }
 
+        /// <summary>
+        /// Verify if the given point is on a road.
+        /// </summary>
+        /// <param name="position">The point position to check.</param>
+        /// <returns>Returns true if the position is on a road, else false.</returns>
+        public static bool IsPointOnRoad(Vector3 position)
+        {
+            return NativeFunction.Natives.IS_POINT_ON_ROAD<bool>(position.X, position.Y, position.Z);
+        }
+
         #endregion
 
         #region Functions
 
-        private static Road DiscoverRoad(Vector3 roadPosition, int numberOfLanes1, int numberOfLanes2, float junctionIndication)
+        private static NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, RoadType roadType)
         {
-            var vehicleNode = GetVehicleNode(roadPosition);
-            var rightSideHeading = vehicleNode.Heading;
-            var roadRightSide = GetLastPointOnTheLane(roadPosition, rightSideHeading - 90f);
-            var roadLeftSide = GetLastPointOnTheLane(roadPosition, rightSideHeading + 90f);
+            var logger = IoC.Instance.GetInstance<ILogger>();
+            logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading}");
+            FindVehicleNodes(position, roadType, out var node1, out var node2);
+            logger.Trace($"Found vehicle node 1 at {node1.Position} with heading {node1.Heading}");
+            logger.Trace($"Found vehicle node 2 at {node2.Position} with heading {node2.Heading}");
+
+            var nodeMatchingClosestToHeading = Math.Abs(node1.Heading - heading) % 360 < Math.Abs(node2.Heading - heading) % 360 ? node1 : node2;
+            logger.Debug($"Using node {nodeMatchingClosestToHeading} as closest matching");
+
+            if (Math.Abs(nodeMatchingClosestToHeading.Heading - heading) % 360 > 45)
+            {
+                logger.Warn(
+                    $"Closest matching node {nodeMatchingClosestToHeading} is exceeding the heading tolerance, using the original heading of {heading} instead");
+                nodeMatchingClosestToHeading = new NodeInfo(nodeMatchingClosestToHeading.Position, heading, nodeMatchingClosestToHeading.NumberOfLanes1,
+                    nodeMatchingClosestToHeading.NumberOfLanes2, nodeMatchingClosestToHeading.AtJunction);
+            }
+
+            return nodeMatchingClosestToHeading;
+        }
+
+        private static List<NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, RoadType roadType,
+            out NodeInfo lastFoundNode)
+        {
+            var distanceTraversed = 0f;
+            var distanceToMove = 5f;
+            var nodeInfos = new List<NodeInfo>();
+
+            lastFoundNode = new NodeInfo(position, heading, -1, -1, -1f);
+
+            while (distanceTraversed < distance)
+            {
+                var findNodeAt = lastFoundNode.Position + MathHelper.ConvertHeadingToDirection(lastFoundNode.Heading) * distanceToMove;
+                var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNode.Heading, roadType);
+
+                if (nodeTowardsHeading.Position == lastFoundNode.Position)
+                {
+                    distanceToMove *= 1.5f;
+                }
+                else
+                {
+                    nodeInfos.Add(nodeTowardsHeading);
+                    distanceToMove = 5f;
+                    distanceTraversed += lastFoundNode.Position.DistanceTo(nodeTowardsHeading.Position);
+                    lastFoundNode = nodeTowardsHeading;
+                }
+            }
+
+            return nodeInfos;
+        }
+
+        private static void FindVehicleNodes(Vector3 position, RoadType roadType, out NodeInfo node1, out NodeInfo node2)
+        {
+            Assert.NotNull(position, "position cannot be null");
+            Assert.NotNull(roadType, "roadType cannot be null");
+            NativeFunction.Natives.GET_CLOSEST_ROAD(position.X, position.Y, position.Z, 1f, 1, out Vector3 roadPosition1, out Vector3 roadPosition2,
+                out int numberOfLanes1, out int numberOfLanes2, out float junctionIndication, (int)roadType);
+
+            var vehicleNode1 = FindVehicleNode(roadPosition1, VehicleNodeType.AllRoadNoJunctions);
+            var vehicleNode2 = FindVehicleNode(roadPosition2, VehicleNodeType.AllRoadNoJunctions);
+
+            node1 = new NodeInfo(vehicleNode1.Position, vehicleNode1.Heading, numberOfLanes1, numberOfLanes2, junctionIndication);
+            node2 = new NodeInfo(vehicleNode2.Position, vehicleNode2.Heading, numberOfLanes2, numberOfLanes1, junctionIndication);
+        }
+
+        private static Road DiscoverRoad(NodeInfo nodeInfo)
+        {
+            var rightSideHeading = nodeInfo.Heading;
+            var roadRightSide = GetLastPointOnTheLane(nodeInfo.Position, rightSideHeading - 90f);
+            var roadLeftSide = GetLastPointOnTheLane(nodeInfo.Position, rightSideHeading + 90f);
 
             // Fix a side if it's the same as the middle of the road as GetLastPointOnTheLane probably failed to determine the last point
-            if (roadRightSide == roadPosition)
-                roadRightSide = FixFailedLastPointCalculation(roadPosition, roadLeftSide, rightSideHeading - 90f);
-            if (roadLeftSide == roadPosition)
-                roadLeftSide = FixFailedLastPointCalculation(roadPosition, roadRightSide, rightSideHeading + 90f);
+            if (roadRightSide == nodeInfo.Position)
+                roadRightSide = FixFailedLastPointCalculation(nodeInfo.Position, roadLeftSide, rightSideHeading - 90f);
+            if (roadLeftSide == nodeInfo.Position)
+                roadLeftSide = FixFailedLastPointCalculation(nodeInfo.Position, roadRightSide, rightSideHeading + 90f);
 
             return RoadBuilder.Builder()
-                .Position(roadPosition)
+                .Position(nodeInfo.Position)
                 .RightSide(roadRightSide)
                 .LeftSide(roadLeftSide)
-                .NumberOfLanes1(numberOfLanes1)
-                .NumberOfLanes2(numberOfLanes2)
-                .JunctionIndicator((int)junctionIndication)
-                .Lanes(DiscoverLanes(roadRightSide, roadLeftSide, roadPosition, rightSideHeading, numberOfLanes1, numberOfLanes2))
-                .Node(vehicleNode)
+                .NumberOfLanes1(nodeInfo.NumberOfLanes1)
+                .NumberOfLanes2(nodeInfo.NumberOfLanes2)
+                .JunctionIndicator((int)nodeInfo.AtJunction)
+                .Lanes(DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, rightSideHeading, nodeInfo.NumberOfLanes1, nodeInfo.NumberOfLanes2))
+                .Node(new Road.VehicleNode
+                {
+                    Position = nodeInfo.Position,
+                    Heading = nodeInfo.Heading
+                })
                 .Build();
         }
 
@@ -207,7 +290,7 @@ namespace AutomaticRoadblocks.Utils.Road
             for (var index = 1; index <= numberOfLanes; index++)
             {
                 var laneLeftPosition = lastRightPosition + moveDirection * laneWidth;
-                var vehicleNode = GetVehicleNode(lastRightPosition);
+                var vehicleNode = FindVehicleNode(lastRightPosition, VehicleNodeType.AllNodes);
                 var heading = isOpposite ? OppositeHeading(rightSideHeading) : rightSideHeading;
                 var type = DetermineLaneType(index, numberOfLanes);
 
@@ -237,7 +320,9 @@ namespace AutomaticRoadblocks.Utils.Road
         }
 
         // This fix is a simple workaround if the last point detection failed with the native function of GTA
+
         // It will assume that both sides have the same width and mirror the width to the other side to determine the point
+
         private static Vector3 FixFailedLastPointCalculation(Vector3 roadPosition, Vector3 otherSidePosition, float heading)
         {
             var widthOtherSide = Vector3.Distance2D(roadPosition, otherSidePosition);
@@ -245,16 +330,14 @@ namespace AutomaticRoadblocks.Utils.Road
             return roadPosition + directionOfTheSideToFix * widthOtherSide;
         }
 
-        private static Road.VehicleNode GetVehicleNode(Vector3 position)
+        private static NodeInfo FindVehicleNode(Vector3 position, VehicleNodeType type)
         {
+            Assert.NotNull(position, "position cannot be null");
+            Assert.NotNull(type, "type cannot be null");
             NativeFunction.Natives.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(position.X, position.Y, position.Z, out Vector3 nodePosition, out float nodeHeading,
-                1, 3, 0);
+                (int)type, 3, 0);
 
-            return new Road.VehicleNode
-            {
-                Position = nodePosition,
-                Heading = MathHelper.NormalizeHeading(nodeHeading)
-            };
+            return new NodeInfo(nodePosition, MathHelper.NormalizeHeading(nodeHeading));
         }
 
         private static Vector3 GetLastPointOnTheLane(Vector3 position, float heading)
@@ -266,7 +349,7 @@ namespace AutomaticRoadblocks.Utils.Road
             do
             {
                 var pointToCheck = lastPositionOnTheRoad + direction * checkInterval;
-                if (NativeFunction.Natives.IS_POINT_ON_ROAD<bool>(pointToCheck.X, pointToCheck.Y, pointToCheck.Z))
+                if (IsPointOnRoad(pointToCheck))
                 {
                     checkInterval *= 2f;
                     lastPositionOnTheRoad = pointToCheck;
@@ -445,6 +528,39 @@ namespace AutomaticRoadblocks.Utils.Road
         public Road.Lane Build()
         {
             return new Road.Lane(_number, _heading, _rightSide, _leftSide, _nodePosition, _width, _type);
+        }
+    }
+
+    internal class NodeInfo
+    {
+        public NodeInfo(Vector3 position, float heading)
+        {
+            Position = position;
+            Heading = heading;
+        }
+
+        public NodeInfo(Vector3 position, float heading, int numberOfLanes1, int numberOfLanes2, float atJunction)
+        {
+            Position = position;
+            Heading = heading;
+            NumberOfLanes1 = numberOfLanes1;
+            NumberOfLanes2 = numberOfLanes2;
+            AtJunction = atJunction;
+        }
+
+        public Vector3 Position { get; }
+
+        public float Heading { get; }
+
+        public int NumberOfLanes1 { get; }
+
+        public int NumberOfLanes2 { get; }
+
+        public float AtJunction { get; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}";
         }
     }
 }

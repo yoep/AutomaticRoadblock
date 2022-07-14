@@ -11,9 +11,9 @@ namespace AutomaticRoadblocks.Utils.Road
         /// </summary>
         AllNodes = 1,
         /// <summary>
-        /// Underwater
+        /// Water nodes only
         /// </summary>
-        Underwater = 3,
+        Water = 3,
         /// <summary>
         /// Main roads, no junction nodes (you get no nodes at a junction)
         /// </summary>

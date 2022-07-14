@@ -30,9 +30,10 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// </summary>
         /// <param name="level">The level of the roadblock. This determines the look/units/props of the roadblock.</param>
         /// <param name="vehicle">The vehicle for which a roadblock should be dispatched.</param>
+        /// <param name="userRequested">Set if the roadblock is requested by the user.</param>
         /// <param name="force">Set if a roadblock should be forced and no conditions should be checked.</param>
         /// <returns>Return true if a roadblock will be dispatched, else false.</returns>
-        bool Dispatch(RoadblockLevel level, Vehicle vehicle, bool force = false);
+        bool Dispatch(RoadblockLevel level, Vehicle vehicle, bool userRequested, bool force = false);
 
         /// <summary>
         /// Dispatch a new roadblock preview for the given vehicle.

@@ -56,9 +56,10 @@ namespace AutomaticRoadblocks.Pursuit
         /// <summary>
         /// Dispatch a roadblock for the current pursuit.
         /// </summary>
+        /// <param name="userRequested">Indicates if the roadblock is requested on behalve of the user.</param>
         /// <param name="force">Force the roadblock, this will disable the conditions checking.</param>
         /// <returns>Returns true if a roadblock will be dispatched, else false.</returns>
-        bool DispatchNow(bool force = false);
+        bool DispatchNow(bool userRequested = false, bool force = false);
 
         /// <summary>
         /// Dispatch a preview of a possible roadblock.

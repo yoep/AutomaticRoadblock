@@ -11,7 +11,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
     public class RoadblockDispatcher : IRoadblockDispatcher
     {
         private const float MinimumVehicleSpeed = 20f;
-        private const float MinimumRoadblockPlacementDistance = 125f;
+        private const float MinimumRoadblockPlacementDistance = 175f;
         private const int AutoCleanRoadblockAfterSeconds = 60;
 
         private readonly ILogger _logger;
@@ -19,6 +19,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private readonly ISettingsManager _settingsManager;
 
         private readonly List<IRoadblock> _roadblocks = new();
+        private readonly List<Road> _foundRoads = new();
 
         private bool _cleanerRunning;
 
@@ -49,13 +50,13 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         #region IRoadblockDispatcher
 
         /// <inheritdoc />
-        public bool Dispatch(RoadblockLevel level, Vehicle vehicle, bool force)
+        public bool Dispatch(RoadblockLevel level, Vehicle vehicle, bool userRequested, bool force)
         {
             Assert.NotNull(level, "level cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
 
             _logger.Trace($"Starting roadblock dispatching with force state {force}");
-            if (force || IsRoadblockDispatchingAllowed(vehicle))
+            if (force || userRequested || IsRoadblockDispatchingAllowed(vehicle))
             {
                 DoDispose(level, vehicle);
                 return true;
@@ -74,16 +75,19 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             _game.NewSafeFiber(() =>
             {
                 _logger.Debug("Dispatching new roadblock preview");
-                var road = DetermineRoadblockLocation(vehicle, atCurrentLocation);
+                var roads = DetermineRoadblockLocationPreview(vehicle, atCurrentLocation);
+                var road = roads.Last();
                 _logger.Trace($"Dispatching roadblock on {road}");
 
                 _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
                 var roadblock = RoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
                     ShouldAddLightsToRoadblock());
-                _logger.Info($"Dispatching new roadblock\n{roadblock}");
+               
                 _roadblocks.Add(roadblock);
+                _foundRoads.AddRange(roads);
 
                 roadblock.CreatePreview();
+                _foundRoads.ForEach(x => x.CreatePreview());
             }, "RoadblockDispatcher.DispatchPreview");
         }
 
@@ -98,6 +102,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             _cleanerRunning = false;
             _roadblocks.ForEach(x => x.Dispose());
             _roadblocks.Clear();
+            _foundRoads.ForEach(x => x.DeletePreview());
+            _foundRoads.Clear();
             _logger.Debug("Roadblocks have been disposed");
         }
 
@@ -149,16 +155,23 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private Road DetermineRoadblockLocation(Vehicle vehicle, bool atCurrentLocation = false)
         {
             _logger.Trace("Determining roadblock location");
-            var direction = MathHelper.ConvertHeadingToDirection(vehicle.Heading);
             var roadblockDistance = atCurrentLocation ? 2.5f : DetermineRoadblockDistance(vehicle);
 
-            return RoadUtils.GetClosestRoad(vehicle.Position + direction * roadblockDistance, RoadType.All);
+            return RoadUtils.FindRoadTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, RoadType.All);
+        }
+
+        private ICollection<Road> DetermineRoadblockLocationPreview(Vehicle vehicle, bool atCurrentLocation = false)
+        {
+            _logger.Trace("Determining roadblock location");
+            var roadblockDistance = atCurrentLocation ? 2.5f : DetermineRoadblockDistance(vehicle);
+
+            return RoadUtils.FindRoadsTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, RoadType.All);
         }
 
         private float DetermineRoadblockDistance(Vehicle vehicle)
         {
             var vehicleSpeed = vehicle.Speed;
-            var distance = vehicleSpeed * 2.5f;
+            var distance = vehicleSpeed * 3f;
 
             if (distance < MinimumRoadblockPlacementDistance)
                 distance = MinimumRoadblockPlacementDistance;

@@ -58,8 +58,8 @@ namespace AutomaticRoadblocks.Debug
                 MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreviewRemove;
                 var type = (RoadPreviewType)MenuItem.SelectedValue;
                 _roads = type == RoadPreviewType.Closest
-                    ? new List<Road> { RoadUtils.GetClosestRoad(Game.LocalPlayer.Character.Position, RoadType.All) }
-                    : RoadUtils.GetNearbyRoads(Game.LocalPlayer.Character.Position, RoadType.All).ToList();
+                    ? new List<Road> { RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, RoadType.All) }
+                    : RoadUtils.FindNearbyRoads(Game.LocalPlayer.Character.Position, RoadType.All).ToList();
 
                 _logger.Debug("Nearest road info: " + string.Join("---\n", _roads));
                 _roads.ForEach(x => x.CreatePreview());

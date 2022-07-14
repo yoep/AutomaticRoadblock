@@ -25,7 +25,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _pursuitManager.DispatchNow();
+            _pursuitManager.DispatchNow(true);
         }
 
         [IoC.PostConstruct]
