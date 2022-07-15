@@ -3,6 +3,7 @@ using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Forms;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Menu.Switcher;
 using AutomaticRoadblocks.Settings;
 using Rage;
 using RAGENativeUI;
@@ -17,18 +17,20 @@ namespace AutomaticRoadblocks.Menu
         private readonly ILogger _logger;
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
+        private readonly ICollection<IMenuSwitchItem> _menuSwitchItems;
 
-        private static readonly MenuPool MenuPool = new MenuPool();
-        private static readonly IDictionary<MenuType, UIMenu> Menus = new Dictionary<MenuType, UIMenu>();
-        private static readonly List<IMenuComponent<UIMenuItem>> MenuItems = new List<IMenuComponent<UIMenuItem>>();
+        private static readonly MenuPool MenuPool = new();
+        private static readonly List<IMenuComponent<UIMenuItem>> MenuItems = new();
 
+        private UIMenu _lastSelectedMenu;
         private UIMenuSwitchMenusItem _menuSwitcher;
 
-        public MenuImpl(ILogger logger, IGame game, ISettingsManager settingsManager)
+        public MenuImpl(ILogger logger, IGame game, ISettingsManager settingsManager, ICollection<IMenuSwitchItem> menuSwitchItems)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
+            _menuSwitchItems = menuSwitchItems;
         }
 
         #region Properties
@@ -46,13 +48,14 @@ namespace AutomaticRoadblocks.Menu
 
         #region IMenu
 
+        /// <inheritdoc />
         public void RegisterComponent(IMenuComponent<UIMenuItem> component)
         {
             Assert.NotNull(component, "component cannot be null");
-            var uiMenu = Menus[component.Type];
+            var menuSwitchItem = _menuSwitchItems.First(x => x.Type == component.Type);
 
-            uiMenu.AddItem(component.MenuItem);
-            uiMenu.RefreshIndex();
+            menuSwitchItem.Menu.AddItem(component.MenuItem);
+            menuSwitchItem.Menu.RefreshIndex();
 
             MenuItems.Add(component);
         }
@@ -79,20 +82,16 @@ namespace AutomaticRoadblocks.Menu
             try
             {
                 _logger.Trace("Creating sub-menu's");
-                Menus.Add(MenuType.PURSUIT, CreateMenu());
-                Menus.Add(MenuType.MANUAL_PLACEMENT, CreateMenu());
-                AddDebugMenu();
+                _menuSwitchItems
+                    .Select(x => x.Menu)
+                    .ToList()
+                    .ForEach(x => MenuPool.Add(x));
 
                 _logger.Trace("Creating menu switcher");
                 CreateMenuSwitcher();
 
                 _logger.Trace("Initializing sub-menu's");
-                foreach (var menu in Menus)
-                {
-                    menu.Value.AddItem(_menuSwitcher, 0);
-                    menu.Value.RefreshIndex();
-                    menu.Value.OnItemSelect += ItemSelectionHandler;
-                }
+                AddMenuSwitcherToEachMenu();
 
                 _logger.Trace("Adding MenuImpl.Process to FrameRender handler...");
                 Game.FrameRender += Process;
@@ -117,6 +116,7 @@ namespace AutomaticRoadblocks.Menu
                     IsShown = _menuSwitcher.CurrentMenu.Visible;
                 }
 
+                ProcessMenuChanged();
                 MenuPool.ProcessMenus();
             }
             catch (Exception ex)
@@ -126,7 +126,38 @@ namespace AutomaticRoadblocks.Menu
             }
         }
 
-        private void ItemSelectionHandler(UIMenu sender, UIMenuItem selectedItem, int index)
+        private void ProcessMenuChanged()
+        {
+            // var currentMenu = _menuSwitcher.CurrentMenu;
+            //
+            // if (_lastSelectedMenu != null && _lastSelectedMenu != currentMenu)
+            // {
+            //     try
+            //     {
+            //         _menuSwitchItems
+            //             .First(x => x.Menu == currentMenu)
+            //             .OnShown();
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         _logger.Error($"Failed to invoke OnShown on menu switcher item, {ex.Message}", ex);
+            //     }
+            //     try
+            //     {
+            //         _menuSwitchItems
+            //             .First(x => x.Menu == _lastSelectedMenu)
+            //             .OnHiding();
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         _logger.Error($"Failed to invoke OnHiding on menu switcher item, {ex.Message}", ex);
+            //     }
+            // }
+            //
+            // _lastSelectedMenu = currentMenu;
+        }
+
+        private void OnItemSelect(UIMenu sender, UIMenuItem selectedItem, int index)
         {
             var menuComponent = MenuItems.FirstOrDefault(x => x.MenuItem == selectedItem);
 
@@ -172,25 +203,23 @@ namespace AutomaticRoadblocks.Menu
             _menuSwitcher.CurrentMenu.Visible = false;
         }
 
-        private static UIMenu CreateMenu()
+        private void AddMenuSwitcherToEachMenu()
         {
-            var menu = new UIMenu("Automatic Roadblocks", "~b~Dispatch roadblocks");
-            MenuPool.Add(menu);
-            return menu;
+            foreach (var menuSwitchItem in _menuSwitchItems)
+            {
+                menuSwitchItem.Menu.AddItem(_menuSwitcher, 0);
+                menuSwitchItem.Menu.RefreshIndex();
+                menuSwitchItem.Menu.OnItemSelect += OnItemSelect;
+            }
         }
 
         private void CreateMenuSwitcher()
         {
-            _menuSwitcher = new UIMenuSwitchMenusItem("Mode", null,
-                new DisplayItem(Menus[MenuType.PURSUIT], "Pursuit"),
-                new DisplayItem(Menus[MenuType.MANUAL_PLACEMENT], "Manual Placement"),
-                new DisplayItem(Menus[MenuType.DEBUG], "Debug"));
-        }
+            var displayItems = _menuSwitchItems
+                .Select(x => new DisplayItem(x.Menu, x.DisplayText))
+                .ToList();
 
-        [Conditional("DEBUG")]
-        private static void AddDebugMenu()
-        {
-            Menus.Add(MenuType.DEBUG, CreateMenu());
+            _menuSwitcher = new UIMenuSwitchMenusItem("Mode", null, displayItems);
         }
 
         #endregion

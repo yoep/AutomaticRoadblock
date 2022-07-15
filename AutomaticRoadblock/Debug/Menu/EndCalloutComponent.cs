@@ -1,9 +1,8 @@
-using System.Diagnostics;
 using AutomaticRoadblocks.Menu;
 using LSPD_First_Response.Mod.API;
 using RAGENativeUI.Elements;
 
-namespace AutomaticRoadblocks.Debug
+namespace AutomaticRoadblocks.Debug.Menu
 {
     public class EndCalloutComponent : IMenuComponent<UIMenuItem>
     {

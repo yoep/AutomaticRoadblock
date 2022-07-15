@@ -4,11 +4,12 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Utils.Type;
 using LSPD_First_Response.Mod.API;
 using Rage;
 using RAGENativeUI.Elements;
 
-namespace AutomaticRoadblocks.Debug
+namespace AutomaticRoadblocks.Debug.Menu
 {
     public class StartPursuitComponent : IMenuComponent<UIMenuItem>
     {

@@ -8,7 +8,7 @@ using Rage;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
 
-namespace AutomaticRoadblocks.Debug
+namespace AutomaticRoadblocks.Debug.Menu
 {
     public class RoadPreviewComponent : IMenuComponent<UIMenuListItem>
     {

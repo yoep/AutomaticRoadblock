@@ -57,11 +57,12 @@
         <Compile Include="Api\AutomaticRoadblocksApi.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
-        <Compile Include="Debug\EndCalloutComponent.cs" />
-        <Compile Include="Debug\RoadInfoComponent.cs" />
-        <Compile Include="Debug\RoadPreviewComponent.cs" />
-        <Compile Include="Debug\StartPursuitComponent.cs" />
-        <Compile Include="Debug\ZoneInfoComponent.cs" />
+        <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
+        <Compile Include="Debug\Menu\EndCalloutComponent.cs" />
+        <Compile Include="Debug\Menu\RoadInfoComponent.cs" />
+        <Compile Include="Debug\Menu\RoadPreviewComponent.cs" />
+        <Compile Include="Debug\Menu\StartPursuitComponent.cs" />
+        <Compile Include="Debug\Menu\ZoneInfoComponent.cs" />
         <Compile Include="Instance\ARInstance.cs" />
         <Compile Include="Instance\ARPed.cs" />
         <Compile Include="Instance\ARScenery.cs" />
@@ -71,11 +72,13 @@
         <Compile Include="IoC.cs" />
         <Compile Include="IoCException.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualPlacementMenuSwitchItem.cs" />
         <Compile Include="Menu\IMenu.cs" />
         <Compile Include="Menu\IMenuComponent.cs" />
         <Compile Include="Menu\MenuException.cs" />
         <Compile Include="Menu\MenuImpl.cs" />
         <Compile Include="Menu\MenuType.cs" />
+        <Compile Include="Menu\Switcher\IMenuSwitchItem.cs" />
         <Compile Include="Preview\IPreviewSupport.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Pursuit\Menu\DispatchNowComponent.cs" />
@@ -93,6 +96,7 @@
         <Compile Include="Roadblock\IRoadblock.cs" />
         <Compile Include="Roadblock\Menu\CleanRoadblocksComponent.cs" />
         <Compile Include="Roadblock\AbstractRoadblock.cs" />
+        <Compile Include="Roadblock\Menu\RoadblockMenuSwitchItem.cs" />
         <Compile Include="Roadblock\RoadblockEvents.cs" />
         <Compile Include="Roadblock\RoadblockFactory.cs" />
         <Compile Include="Roadblock\RoadblockLevel.cs" />
@@ -129,15 +133,13 @@
         <Compile Include="Utils\Road\RoadUtils.cs" />
         <Compile Include="Utils\Road\VehicleNodeType.cs" />
         <Compile Include="Utils\TimePeriod.cs" />
-        <Compile Include="Utils\VehicleSeat.cs" />
+        <Compile Include="Utils\Type\MarkerType.cs" />
+        <Compile Include="Utils\Type\VehicleSeat.cs" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="AutomaticRoadblocks.ini">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="ManualPlacement\Menu" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

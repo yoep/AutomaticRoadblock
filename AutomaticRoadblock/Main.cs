@@ -4,8 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.AbstractionLayer.Implementation;
-using AutomaticRoadblocks.Debug;
+using AutomaticRoadblocks.Debug.Menu;
+using AutomaticRoadblocks.ManualPlacement.Menu;
 using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Menu.Switcher;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Pursuit.Menu;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
@@ -105,6 +107,8 @@ namespace AutomaticRoadblocks
         private static void InitializeMenuComponents()
         {
             IoC.Instance
+                .Register<IMenuSwitchItem>(typeof(RoadblockMenuSwitchItem))
+                .Register<IMenuSwitchItem>(typeof(ManualPlacementMenuSwitchItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableDuringPursuitComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent));
@@ -142,6 +146,7 @@ namespace AutomaticRoadblocks
 
             logger.Debug("Registering debug menu components");
             IoC.Instance
+                .Register<IMenuSwitchItem>(typeof(DebugMenuSwitchItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(StartPursuitComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EndCalloutComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadInfoComponent))

@@ -1,3 +1,5 @@
+using System.Drawing;
+using AutomaticRoadblocks.Utils.Type;
 using Rage;
 using Rage.Native;
 
@@ -49,6 +51,23 @@ namespace AutomaticRoadblocks.Utils
             newPosition.Z = newHeight;
 
             return newPosition;
+        }
+
+        /// <summary>
+        /// Create a marker at the given position.
+        /// </summary>
+        /// <param name="position">The position of the marker.</param>
+        /// <param name="markerType">The marker type.</param>
+        /// <param name="color">The color of the marker.</param>
+        /// <param name="size">The size of the marker.</param>
+        /// <param name="rotate">Set if the marker should be rotating or not.</param>
+        public static void CreateMarker(Vector3 position, MarkerType markerType, Color color, float size = 1f, bool rotate = true)
+        {
+            Assert.NotNull(position, "position cannot be null");
+            Assert.NotNull(markerType, "markerType cannot be null");
+            Assert.NotNull(color, "color cannot be null");
+            NativeFunction.CallByName<uint>("DRAW_MARKER", (int)markerType, position.X, position.Y, position.Z, position.X, position.Y, position.Z, 0f, 0f, 0f,
+                size, size, size, color.R, color.G, color.B, 100, false, rotate, "", "", false);
         }
     }
 }

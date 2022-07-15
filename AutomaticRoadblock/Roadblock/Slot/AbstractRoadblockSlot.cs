@@ -6,6 +6,7 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Utils.Type;
 using LSPD_First_Response.Mod.API;
 using Rage;
 

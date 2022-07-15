@@ -3,6 +3,12 @@ namespace AutomaticRoadblocks
     public static class AutomaticRoadblocksPlugin
     {
         public const string Name = "Automatic Roadblocks";
+        
+        public const string MenuTitle = "Automatic Roadblocks";
+        public const string MenuSubtitle = "~b~Dispatch roadblocks";
+        public const string MenuDebug = "Debug";
+        public const string MenuPursuit = "Pursuit";
+        public const string MenuManualPlacement = "Manual placement";
 
         public const string RoadInfo = "Road info" + DebugIndicatorText;
         public const string RoadPreview = "Road preview" + DebugIndicatorText;

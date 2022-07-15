@@ -1,11 +1,10 @@
-using System.Diagnostics;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 using RAGENativeUI.Elements;
 
-namespace AutomaticRoadblocks.Debug
+namespace AutomaticRoadblocks.Debug.Menu
 {
     public class RoadInfoComponent : IMenuComponent<UIMenuItem>
     {

@@ -1,4 +1,4 @@
-namespace AutomaticRoadblocks.Utils
+namespace AutomaticRoadblocks.Utils.Type
 {
     public enum VehicleSeat
     {
