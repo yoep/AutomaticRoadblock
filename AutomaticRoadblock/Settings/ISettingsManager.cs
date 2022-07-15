@@ -13,6 +13,11 @@ namespace AutomaticRoadblocks.Settings
         AutomaticRoadblocksSettings AutomaticRoadblocksSettings { get; }
 
         /// <summary>
+        /// Get the manual placement settings.
+        /// </summary>
+        ManualPlacementSettings ManualPlacementSettings { get; }
+
+        /// <summary>
         /// Load the settings from the configuration file.
         /// </summary>
         void Load();

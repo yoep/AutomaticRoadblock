@@ -5,6 +5,7 @@ using System.Reflection;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.AbstractionLayer.Implementation;
 using AutomaticRoadblocks.Debug.Menu;
+using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.ManualPlacement.Menu;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
@@ -70,7 +71,8 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
-                .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher));
+                .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
+                .RegisterSingleton<IManualPlacement>(typeof(ManualPlacement.ManualPlacement));
         }
 
         private static void InitializeDutyListener()

@@ -23,6 +23,9 @@ namespace AutomaticRoadblocks.Settings
         public AutomaticRoadblocksSettings AutomaticRoadblocksSettings { get; private set; }
 
         /// <inheritdoc />
+        public ManualPlacementSettings ManualPlacementSettings { get; private set; }
+
+        /// <inheritdoc />
         public void Load()
         {
             _logger.Debug("Loading settings");
@@ -41,6 +44,7 @@ namespace AutomaticRoadblocks.Settings
 
                 ReadGeneralSettings(settingsFile);
                 ReadAutomaticRoadblocksSettings(settingsFile);
+                ReadManualPlacementSettings(settingsFile);
                 _logger.Info("Settings have been loaded with success");
             }
             catch (Exception ex)
@@ -69,6 +73,14 @@ namespace AutomaticRoadblocks.Settings
                 DispatchInterval = file.ReadUInt32("Automatic Roadblocks", "DispatchAllowedAfter", 45),
                 TimeBetweenAutoLevelIncrements = file.ReadUInt32("Automatic Roadblocks", "TimeBetweenAutoLevelIncrements", 90),
                 SlowTraffic = file.ReadBoolean("Automatic Roadblocks", "SlowTraffic", true)
+            };
+        }
+
+        private void ReadManualPlacementSettings(InitializationFile file)
+        {
+            ManualPlacementSettings = new ManualPlacementSettings
+            {
+                EnablePreview = file.ReadBoolean("Manual Placement", "EnablePreview"),
             };
         }
 
