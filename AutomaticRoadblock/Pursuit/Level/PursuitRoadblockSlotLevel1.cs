@@ -1,17 +1,18 @@
-using System;
 using System.Linq;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Roadblock;
+using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
-namespace AutomaticRoadblocks.Roadblock.Slot
+namespace AutomaticRoadblocks.Pursuit.Level
 {
-    public class RoadblockSlotLevel1 : AbstractRoadblockSlot
+    public class PursuitRoadblockSlotLevel1 : AbstractPursuitRoadblockSlot
     {
-        internal RoadblockSlotLevel1(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
-            : base(lane, heading, targetVehicle, shouldAddLights)
+        internal PursuitRoadblockSlotLevel1(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
+            : base(lane, barrierType, heading, targetVehicle, shouldAddLights)
         {
         }
 
@@ -38,17 +39,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override void InitializeScenery()
         {
-            var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
-            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2.5f;
-            var direction = MathHelper.ConvertHeadingToDirection(Heading - 90);
-            var totalCones = (int)Math.Ceiling(Lane.Width / 1.5f);
-
-            for (var i = 0; i < totalCones; i++)
-            {
-                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
-                    (position, heading) => new ARScenery(PropUtils.CreateSmallConeWithStripes(position))));
-                startPosition += direction * 1.5f;
-            }
+            // no-op
         }
 
         protected override void InitializeLights()
@@ -56,12 +47,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 2f;
             var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 3f;
             var direction = MathHelper.ConvertHeadingToDirection(Heading - 90);
-            var totalFlares = (int) Lane.Width;
+            var totalFlares = (int)Lane.Width;
 
             for (var i = 0; i < totalFlares; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
-                    (position, heading) => new ARScenery(PropUtils.CreateFlare(position, heading + Random.Next(91)))));
+                    (position, heading) => new ARScenery(PropUtils.CreateHorizontalFlare(position, heading + Random.Next(360)))));
                 startPosition += direction * 1f;
             }
         }

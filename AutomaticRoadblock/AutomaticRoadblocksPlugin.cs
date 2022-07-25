@@ -37,6 +37,8 @@ namespace AutomaticRoadblocks
         
         public const string Place = "Place";
         public const string PlaceDescription = "Place a roadblock at the current hightlighted location";
+        public const string Barrier = "Barrier";
+        public const string BarrierDescription = "The barrier type to use";
 
         private const string DebugIndicatorText = " [DEBUG]";
     }

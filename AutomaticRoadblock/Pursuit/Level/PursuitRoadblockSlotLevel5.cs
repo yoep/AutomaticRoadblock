@@ -1,15 +1,17 @@
 using System.Linq;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Roadblock;
+using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
-namespace AutomaticRoadblocks.Roadblock.Slot
+namespace AutomaticRoadblocks.Pursuit.Level
 {
-    public class RoadblockSlotLevel5 : AbstractRoadblockSlot
+    public class PursuitRoadblockSlotLevel5 : AbstractPursuitRoadblockSlot
     {
-        internal RoadblockSlotLevel5(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
-            : base(lane, heading, targetVehicle, shouldAddLights)
+        internal PursuitRoadblockSlotLevel5(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
+            : base(lane, barrierType, heading, targetVehicle, shouldAddLights)
         {
         }
 
@@ -46,15 +48,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override void InitializeScenery()
         {
-            var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
-            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2f;
-
-            for (var i = 0; i < 2; i++)
-            {
-                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
-                    (position, heading) => new ARScenery(PropUtils.CreatePoliceDoNotCrossBarrier(position, heading))));
-                startPosition += MathHelper.ConvertHeadingToDirection(Heading - 90) * 3f;
-            }
+            // no-op
         }
 
         protected override void InitializeLights()

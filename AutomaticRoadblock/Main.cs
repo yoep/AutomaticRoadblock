@@ -114,7 +114,8 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableDuringPursuitComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PlaceComponentItem));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PlaceComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(BarrierComponentItem));
         }
 
         private static void OnDutyStateChanged(bool onDuty)

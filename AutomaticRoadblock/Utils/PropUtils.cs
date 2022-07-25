@@ -97,9 +97,27 @@ namespace AutomaticRoadblocks.Utils
             return PlaceCorrectlyOnGround(instance);
         }
 
-        public static Object CreateBarrier(Vector3 position, float heading = 0f)
+        public static Object CreateWorkBarrier(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_ld_barrier_01"), position, heading);
+            var instance = new Object(new Model("prop_barrier_work06a"), position, heading);
+            return PlaceCorrectlyOnGround(instance);
+        }
+
+        public static Object CreateWorkBarrierSmall(Vector3 position, float heading = 0f)
+        {
+            var instance = new Object(new Model("prop_barrier_work01a"), position, heading);
+            return PlaceCorrectlyOnGround(instance);
+        }
+
+        public static Object CreateBarrierWithWorkAhead(Vector3 position, float heading = 0f)
+        {
+            var instance = new Object(new Model("prop_barrier_work04a"), position, heading);
+            return PlaceCorrectlyOnGround(instance);
+        }
+
+        public static Object CreateBarrierWithWorkAheadWithLights(Vector3 position, float heading = 0f)
+        {
+            var instance = new Object(new Model("prop_barrier_work06b"), position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
@@ -180,7 +198,17 @@ namespace AutomaticRoadblocks.Utils
             return new Object(new Model("prop_ld_health_pack"), position);
         }
 
-        public static Object CreateFlare(Vector3 position, float heading)
+        public static Object CreateHorizontalFlare(Vector3 position, float heading)
+        {
+            var instance = PlaceCorrectlyOnGround(new Weapon(new WeaponAsset("weapon_flare"), position, -1)
+            {
+                Heading = heading
+            });
+            instance.Rotation = new Rotator(heading, 90f, 0f);
+            return instance;
+        }
+
+        public static Object CreateVerticalFlare(Vector3 position, float heading)
         {
             var instance = new Weapon(new WeaponAsset("weapon_flare"), position, -1)
             {

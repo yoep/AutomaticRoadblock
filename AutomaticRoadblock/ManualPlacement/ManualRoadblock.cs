@@ -1,47 +1,43 @@
 using System.Collections.Generic;
-using AutomaticRoadblocks.Instance;
-using AutomaticRoadblocks.Preview;
+using System.Linq;
+using AutomaticRoadblocks.Roadblock;
+using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils.Road;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
-    public class ManualRoadblock : IPreviewSupport
+    public class ManualRoadblock : AbstractRoadblock
     {
-        private readonly Road _road;
-        private readonly BarrierType _type;
-
-        internal ManualRoadblock(Road road, BarrierType type)
+        internal ManualRoadblock(Road road, float targetHeading, BarrierType barrierType, bool limitSpeed, bool addLights)
+            : base(road, barrierType, null, targetHeading, limitSpeed, addLights)
         {
-            _road = road;
-            _type = type;
-
-            Init();
         }
 
-        #region IPreviewSupport
+        #region IRoadblock
 
         /// <inheritdoc />
-        public bool IsPreviewActive { get; }
-
-        /// <inheritdoc />
-        public void CreatePreview()
-        {
-            
-        }
-
-        /// <inheritdoc />
-        public void DeletePreview()
-        {
-            
-        }
+        public override RoadblockLevel Level => RoadblockLevel.None;
 
         #endregion
 
         #region Funtions
 
-        private void Init()
+        /// <inheritdoc />
+        protected override IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock, bool addLights)
         {
-            
+            return lanesToBlock
+                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, TargetHeading, addLights))
+                .ToList();
+        }
+
+        /// <inheritdoc />
+        protected override void InitializeScenery()
+        {
+        }
+
+        /// <inheritdoc />
+        protected override void InitializeLights()
+        {
         }
 
         #endregion

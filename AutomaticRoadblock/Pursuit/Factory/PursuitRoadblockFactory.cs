@@ -1,34 +1,36 @@
 using System;
 using System.Collections.Generic;
+using AutomaticRoadblocks.Pursuit.Level;
+using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
-namespace AutomaticRoadblocks.Roadblock
+namespace AutomaticRoadblocks.Pursuit.Factory
 {
-    public static class RoadblockFactory
+    public static class PursuitRoadblockFactory
     {
         private static readonly Dictionary<RoadblockLevel, Func<Road, Vehicle, bool, bool, IRoadblock>> Roadblocks =
             new()
             {
                 {
                     RoadblockLevel.Level1,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new RoadblockLevel1(road, vehicle, limitSpeed, shouldAddLights)
+                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel1(road, vehicle, limitSpeed, shouldAddLights)
                 },
                 {
                     RoadblockLevel.Level2,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new RoadblockLevel2(road, vehicle, limitSpeed, shouldAddLights)
+                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel2(road, vehicle, limitSpeed, shouldAddLights)
                 },
                 {
                     RoadblockLevel.Level3,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new RoadblockLevel3(road, vehicle, limitSpeed, shouldAddLights)
+                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel3(road, vehicle, limitSpeed, shouldAddLights)
                 },
                 {
                     RoadblockLevel.Level4,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new RoadblockLevel4(road, vehicle, limitSpeed, shouldAddLights)
+                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel4(road, vehicle, limitSpeed, shouldAddLights)
                 },
                 {
                     RoadblockLevel.Level5,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new RoadblockLevel5(road, vehicle, limitSpeed, shouldAddLights)
+                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel5(road, vehicle, limitSpeed, shouldAddLights)
                 }
             };
 

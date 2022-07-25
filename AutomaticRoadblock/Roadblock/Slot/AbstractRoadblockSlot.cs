@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Utils.Type;
@@ -18,16 +19,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected readonly List<InstanceSlot> Instances = new();
         protected readonly Random Random = new();
 
-        private bool _monitoring;
-
-        protected AbstractRoadblockSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
+        protected AbstractRoadblockSlot(Road.Lane lane, BarrierType barrierType, float heading, bool shouldAddLights)
         {
             Assert.NotNull(lane, "lane cannot be null");
+            Assert.NotNull(barrierType, "barrierType cannot be null");
             Assert.NotNull(heading, "heading cannot be null");
-            Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             Lane = lane;
+            BarrierType = barrierType;
             Heading = heading;
-            TargetVehicle = targetVehicle;
             VehicleModel = GetVehicleModel();
 
             Init(shouldAddLights);
@@ -53,14 +52,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected Road.Lane Lane { get; }
 
         /// <summary>
+        /// The barrier type that is used within this slot.
+        /// </summary>
+        public BarrierType BarrierType { get; }
+
+        /// <summary>
         /// Get the police vehicle model which is used for the slot.
         /// </summary>
         protected Model VehicleModel { get; }
-
-        /// <summary>
-        /// Get the target vehicle of the slot.
-        /// </summary>
-        protected Vehicle TargetVehicle { get; }
 
         /// <summary>
         /// Get the AR vehicle instance of this slot.
@@ -122,9 +121,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         #region IDisposable
 
         /// <inheritdoc />
-        public void Dispose()
+        public virtual void Dispose()
         {
-            _monitoring = false;
             Instances.ForEach(x => x.Dispose());
         }
 
@@ -156,8 +154,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                     Functions.SetPedAsCop(x);
                     Functions.SetCopAsBusy(x, true);
                 });
-
-            Monitor();
         }
 
         /// <inheritdoc />
@@ -198,6 +194,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             InitializeVehicleSlot();
             InitializeCopPeds();
             InitializeScenery();
+
+            if (!BarrierType.IsNone)
+                InitializeBarriers();
 
             if (shouldAddLights)
                 InitializeLights();
@@ -259,12 +258,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected abstract void InitializeCopPeds();
 
         /// <summary>
-        /// Initialize the prop slots of the slot.
+        /// Initialize the scenery props of this slot.
         /// </summary>
         protected abstract void InitializeScenery();
 
         /// <summary>
-        /// Initialize the light slots.
+        /// Initialize the light props of this slots.
         /// </summary>
         protected abstract void InitializeLights();
 
@@ -274,28 +273,42 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <returns>Returns the vehicle model that should be used for this slot.</returns>
         protected abstract Model GetVehicleModel();
 
-        private void Monitor()
+        /// <summary>
+        /// Invoked the event that a cop from this slot has been killed.
+        /// </summary>
+        protected void InvokedCopHasBeenKilled()
         {
-            var game = IoC.Instance.GetInstance<IGame>();
-            _monitoring = true;
+            RoadblockCopKilled?.Invoke(this);
+        }
 
-            game.NewSafeFiber(() =>
+        private void InitializeBarriers()
+        {
+            Logger.Trace("Initializing the roadblock slot barriers");
+            var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
+            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * Lane.Width;
+            var direction = MathHelper.ConvertHeadingToDirection(Heading - 90);
+            var barrierTotalWidth = BarrierType.Spacing + BarrierType.Width;
+            var totalBarriers = (int)Math.Ceiling(Lane.Width / barrierTotalWidth);
+
+            Logger.Debug($"Creating a total of {totalBarriers} barriers for the roadblock slot");
+            for (var i = 0; i < totalBarriers; i++)
             {
-                while (_monitoring)
-                {
-                    var hasACopBeenKilled = Instances
-                        .Where(x => x.Type == EntityType.CopPed)
-                        .Select(x => (ARPed)x.Instance)
-                        .Where(x => x.GameInstance.IsDead)
-                        .Where(x => x.GameInstance.HasBeenDamagedByAnyVehicle)
-                        .Any(x => x.GameInstance.HasBeenDamagedBy(TargetVehicle));
+                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading, CreateBarrier));
+                startPosition += direction * barrierTotalWidth;
+            }
+        }
 
-                    if (hasACopBeenKilled)
-                        RoadblockCopKilled?.Invoke(this);
-
-                    game.FiberYield();
-                }
-            }, "AbstractRoadblockSlot.Monitor");
+        private ARInstance<Entity> CreateBarrier(Vector3 position, float heading)
+        {
+            try
+            {
+                return BarrierFactory.Create(BarrierType, position, heading);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to create barrier of type {BarrierType}, {ex.Message}", ex);
+                return null;
+            }
         }
 
         #endregion

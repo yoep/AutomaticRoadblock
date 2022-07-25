@@ -48,7 +48,10 @@ namespace AutomaticRoadblocks.Instance
             if (Instance != null)
                 return;
 
-            Instance = _factory.Invoke(GameUtils.GetOnTheGroundVector(Position), Heading);
+            var instance = _factory.Invoke(GameUtils.GetOnTheGroundVector(Position), Heading);
+
+            if (instance != null)
+                Instance = instance;
         }
 
         #region IPreviewSupport
@@ -80,7 +83,7 @@ namespace AutomaticRoadblocks.Instance
         {
             if (Instance == null)
                 return;
-            
+
             Instance.Dispose();
             Instance = null;
         }

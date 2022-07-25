@@ -29,6 +29,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         /// <inheritdoc />
         public string DisplayText => AutomaticRoadblocksPlugin.MenuManualPlacement;
 
+        /// <inheritdoc />
         public void Dispose()
         {
             _running = false;

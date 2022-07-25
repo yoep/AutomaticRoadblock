@@ -1,15 +1,17 @@
 using System.Linq;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Roadblock;
+using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
-namespace AutomaticRoadblocks.Roadblock.Slot
+namespace AutomaticRoadblocks.Pursuit.Level
 {
-    public class RoadblockSlotLevel3 : AbstractRoadblockSlot
+    public class PursuitRoadblockSlotLevel4 : AbstractPursuitRoadblockSlot
     {
-        internal RoadblockSlotLevel3(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
-            : base(lane, heading, targetVehicle, shouldAddLights)
+        internal PursuitRoadblockSlotLevel4(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
+            : base(lane, barrierType, heading, targetVehicle, shouldAddLights)
         {
         }
 
@@ -28,7 +30,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override Model GetVehicleModel()
         {
-            return Random.Next(3) == 0 ? ModelUtils.Vehicles.GetLocalPoliceVehicle(Position, false) : ModelUtils.Vehicles.GetStatePoliceVehicle(false);
+            return Random.Next(3) == 0 ? ModelUtils.Vehicles.GetStatePoliceVehicle() : ModelUtils.Vehicles.GetFbiPoliceVehicle();
         }
 
         protected override void InitializeCopPeds()
@@ -45,30 +47,18 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         protected override void InitializeScenery()
         {
-            var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
-            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 2f;
-
-            for (var i = 0; i < 2; i++)
-            {
-                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
-                    (position, heading) => new ARScenery(PropUtils.CreatePoliceDoNotCrossBarrier(position, heading))));
-                startPosition += MathHelper.ConvertHeadingToDirection(Heading - 90) * 3f;
-            }
+            // no-op
         }
 
         protected override void InitializeLights()
         {
         }
 
-        private ARPed AssignCopWeapons(ARPed ped)
+        private static ARPed AssignCopWeapons(ARPed ped)
         {
-            var primaryWeapon = Random.Next(2) == 1 ? ModelUtils.Weapons.Shotgun : ModelUtils.Weapons.Pistol;
-
-            ped.GivePrimaryWeapon(primaryWeapon);
-            ped.GiveWeapon(ModelUtils.Weapons.Pistol);
-            ped.GiveWeapon(ModelUtils.Weapons.Shotgun);
-            ped.GiveWeapon(ModelUtils.Weapons.Nightstick);
+            ped.GivePrimaryWeapon(ModelUtils.Weapons.HeavyRifle);
             ped.GiveWeapon(ModelUtils.Weapons.StunGun);
+            ped.GiveWeapon(ModelUtils.Weapons.Shotgun);
             return ped;
         }
     }

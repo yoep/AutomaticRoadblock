@@ -1,15 +1,16 @@
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
-namespace AutomaticRoadblocks.Roadblock
+namespace AutomaticRoadblocks.Pursuit.Level
 {
-    public class RoadblockLevel2 : AbstractRoadblock
+    internal class PursuitRoadblockLevel2 : AbstractPursuitRoadblock
     {
-        public RoadblockLevel2(Road road, Vehicle vehicle, bool limitSpeed, bool addLights) 
-            : base(road, vehicle, limitSpeed, addLights)
+        public PursuitRoadblockLevel2(Road road, Vehicle vehicle, bool limitSpeed, bool addLights)
+            : base(road, BarrierType.BigCone, vehicle, limitSpeed, addLights)
         {
         }
 
@@ -40,7 +41,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
-            return new RoadblockSlotLevel2(lane, heading, targetVehicle, shouldAddLights);
+            return new PursuitRoadblockSlotLevel2(lane, MainBarrierType, heading, targetVehicle, shouldAddLights);
         }
 
         #endregion

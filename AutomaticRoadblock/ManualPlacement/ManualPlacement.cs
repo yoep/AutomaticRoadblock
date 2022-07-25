@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
@@ -12,17 +13,42 @@ namespace AutomaticRoadblocks.ManualPlacement
 {
     public class ManualPlacement : IManualPlacement
     {
+        private readonly ILogger _logger;
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly List<ManualRoadblock> _roadblocks = new();
 
         private Road _lastDeterminedRoad;
+        private BarrierType _barrier = BarrierType.SmallCone;
 
-        public ManualPlacement(IGame game, ISettingsManager settingsManager)
+        public ManualPlacement(ILogger logger, IGame game, ISettingsManager settingsManager)
         {
             _game = game;
             _settingsManager = settingsManager;
+            _logger = logger;
         }
+
+        #region Properties
+
+        /// <inheritdoc />
+        public BarrierType Barrier
+        {
+            get => _barrier;
+            set => UpdateBarrier(value);
+        }
+
+        #endregion
+
+        #region IDisposable
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _roadblocks.ForEach(x => x.Dispose());
+            _roadblocks.Clear();
+        }
+
+        #endregion
 
         #region Methods
 
@@ -36,13 +62,13 @@ namespace AutomaticRoadblocks.ManualPlacement
         }
 
         /// <inheritdoc />
-        public void CreatePreview()
+        public void CreatePreview(bool force = false)
         {
             var road = DetermineLocation();
 
             if (_settingsManager.ManualPlacementSettings.EnablePreview)
             {
-                CreateManualRoadblockPreview(road);
+                CreateManualRoadblockPreview(road, force);
             }
             else
             {
@@ -54,35 +80,53 @@ namespace AutomaticRoadblocks.ManualPlacement
         public void RemovePreview()
         {
             _lastDeterminedRoad = null;
-            _roadblocks
+            var roadblocksToClean = _roadblocks
                 .Where(x => x.IsPreviewActive)
-                .ToList()
-                .ForEach(x => x.DeletePreview());
+                .ToList();
+
+            if (roadblocksToClean.Count == 0)
+                return;
+
+            _logger.Debug($"Cleaning a total of {roadblocksToClean.Count} manual roadblock previews");
+            roadblocksToClean.ForEach(x =>
+            {
+                _logger.Trace($"Removing manual roadblock preview {x}");
+                x.DeletePreview();
+                _roadblocks.Remove(x);
+            });
         }
 
         /// <inheritdoc />
         public void PlaceRoadblock()
         {
-            
         }
 
         #endregion
 
-        private void CreateManualRoadblockPreview(Road road)
+        private void CreateManualRoadblockPreview(Road road, bool force)
         {
-            if (road == _lastDeterminedRoad)
+            if (!force && Equals(road, _lastDeterminedRoad))
                 return;
 
             // remove any existing previews first
             RemovePreview();
 
-            _roadblocks.Add(new ManualRoadblock(road, BarrierType.SmallCone));
+            var roadblock = new ManualRoadblock(road, _game.PlayerHeading, Barrier, false, false);
+            roadblock.CreatePreview();
+
+            _roadblocks.Add(roadblock);
             _lastDeterminedRoad = road;
         }
 
         private static void CreatePreviewMarker(Road road)
         {
             GameUtils.CreateMarker(road.Position, MarkerType.MarkerTypeVerticalCylinder, Color.LightBlue, 2.5f, false);
+        }
+
+        private void UpdateBarrier(BarrierType newType)
+        {
+            _barrier = newType;
+            CreatePreview(true);
         }
     }
 }

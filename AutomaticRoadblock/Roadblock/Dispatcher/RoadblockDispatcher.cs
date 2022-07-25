@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Pursuit.Factory;
+using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
@@ -80,7 +82,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 _logger.Trace($"Dispatching roadblock on {road}");
 
                 _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
-                var roadblock = RoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
+                var roadblock = PursuitRoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
                     ShouldAddLightsToRoadblock());
                
                 _roadblocks.Add(roadblock);
@@ -138,7 +140,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
                     LspdfrUtils.PlayScannerAudioUsingPosition("WE_HAVE OFFICER_IN_NEED_OF_ASSISTANCE IN_OR_ON_POSITION", road.Position);
 
-                    var roadblock = RoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
+                    var roadblock = PursuitRoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
                         ShouldAddLightsToRoadblock());
                     _logger.Info($"Dispatching new roadblock\n{roadblock}");
                     _roadblocks.Add(roadblock);

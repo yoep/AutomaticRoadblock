@@ -154,6 +154,21 @@ namespace AutomaticRoadblocks.Utils.Road
                    "\n---";
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null || obj.GetType() != typeof(Road))
+                return false;
+
+            var otherRoad = (Road)obj;
+
+            return Position == otherRoad.Position;
+        }
+
+        public override int GetHashCode()
+        {
+            return Position.GetHashCode();
+        }
+
         #endregion
 
         #region Functions
