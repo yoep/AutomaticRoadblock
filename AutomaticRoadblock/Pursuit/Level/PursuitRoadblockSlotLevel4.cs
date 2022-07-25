@@ -30,7 +30,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         protected override Model GetVehicleModel()
         {
-            return Random.Next(3) == 0 ? ModelUtils.Vehicles.GetStatePoliceVehicle() : ModelUtils.Vehicles.GetFbiPoliceVehicle();
+            return Random.Next(3) == 0 ? ModelUtils.Vehicles.GetStatePoliceVehicle(false) : ModelUtils.Vehicles.GetFbiPoliceVehicle();
         }
 
         protected override void InitializeCopPeds()

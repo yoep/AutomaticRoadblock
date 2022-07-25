@@ -279,6 +279,12 @@ namespace AutomaticRoadblocks.Roadblock
                 .First();
             var lanesToBlock = LanesToBlock();
 
+            if (lanesToBlock.Count == 0)
+            {
+                Logger.Warn("Lanes to block returned 0 lanes, resetting and using all road lanes instead");
+                lanesToBlock = Road.Lanes;
+            }
+
             Logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
             Slots = CreateRoadblockSlots(lanesToBlock, addLights);
         }

@@ -151,7 +151,7 @@ namespace AutomaticRoadblocks.Utils
             /// <returns>Returns a state police vehicle.</returns>
             public static Model GetStatePoliceVehicle(bool includePoliceBike = true, bool includePoliceTransporter = true)
             {
-                var list = Vehicles.StateVehicleModels.ToList();
+                var list = StateVehicleModels.ToList();
 
                 if (!includePoliceBike)
                     list.Remove(PoliceBikeModelName);
@@ -167,7 +167,7 @@ namespace AutomaticRoadblocks.Utils
             /// <returns>Returns an FBI police vehicle model.</returns>
             public static Model GetFbiPoliceVehicle()
             {
-                return new Model(Vehicles.FbiVehicleModels[Random.Next(Vehicles.FbiVehicleModels.Count)]);
+                return new Model(FbiVehicleModels[Random.Next(FbiVehicleModels.Count)]);
             }
 
             /// <summary>
@@ -176,7 +176,7 @@ namespace AutomaticRoadblocks.Utils
             /// <returns>Returns an swat police vehicle model.</returns>
             public static Model GetSwatPoliceVehicle()
             {
-                return new Model(Vehicles.SwatVehicleModels[Random.Next(Vehicles.SwatVehicleModels.Count)]);
+                return new Model(SwatVehicleModels[Random.Next(SwatVehicleModels.Count)]);
             }
         }
         
