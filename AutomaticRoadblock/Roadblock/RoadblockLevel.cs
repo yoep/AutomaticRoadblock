@@ -2,11 +2,11 @@ namespace AutomaticRoadblocks.Roadblock
 {
     public class RoadblockLevel
     {
-        public static readonly RoadblockLevel Level1 = new RoadblockLevel(1);
-        public static readonly RoadblockLevel Level2 = new RoadblockLevel(2);
-        public static readonly RoadblockLevel Level3 = new RoadblockLevel(3);
-        public static readonly RoadblockLevel Level4 = new RoadblockLevel(4);
-        public static readonly RoadblockLevel Level5 = new RoadblockLevel(5);
+        public static readonly RoadblockLevel Level1 = new(1);
+        public static readonly RoadblockLevel Level2 = new(2);
+        public static readonly RoadblockLevel Level3 = new(3);
+        public static readonly RoadblockLevel Level4 = new(4);
+        public static readonly RoadblockLevel Level5 = new(5);
 
         public static readonly RoadblockLevel[] Levels =
         {

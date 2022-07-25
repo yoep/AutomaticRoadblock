@@ -34,6 +34,9 @@ namespace AutomaticRoadblocks
         public const string CleanAllRoadblocks = "Clean all roadblocks" + DebugIndicatorText;
         public const string StartPursuit = "Start pursuit now" + DebugIndicatorText;
         public const string EndPursuit = "End pursuit now" + DebugIndicatorText;
+        
+        public const string Place = "Place";
+        public const string PlaceDescription = "Place a roadblock at the current hightlighted location";
 
         private const string DebugIndicatorText = " [DEBUG]";
     }

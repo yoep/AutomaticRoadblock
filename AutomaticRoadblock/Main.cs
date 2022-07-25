@@ -113,7 +113,8 @@ namespace AutomaticRoadblocks
                 .Register<IMenuSwitchItem>(typeof(ManualPlacementMenuSwitchItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableDuringPursuitComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PlaceComponentItem));
         }
 
         private static void OnDutyStateChanged(bool onDuty)

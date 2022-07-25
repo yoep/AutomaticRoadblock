@@ -22,7 +22,6 @@ namespace AutomaticRoadblocks.Menu
         private static readonly MenuPool MenuPool = new();
         private static readonly List<IMenuComponent<UIMenuItem>> MenuItems = new();
 
-        private UIMenu _lastSelectedMenu;
         private UIMenuSwitchMenusItem _menuSwitcher;
 
         public MenuImpl(ILogger logger, IGame game, ISettingsManager settingsManager, ICollection<IMenuSwitchItem> menuSwitchItems)

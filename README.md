@@ -12,4 +12,6 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 ## Planned features
 
 - Spikestrips
-- 
+- Police smart radio integration
+- Close the road
+- Redirect traffic

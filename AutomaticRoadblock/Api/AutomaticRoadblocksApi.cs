@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 
@@ -17,5 +18,10 @@ namespace AutomaticRoadblocks.Api
         /// Get the automatic roadblock pursuit manager. 
         /// </summary>
         public static IPursuitManager PursuitManager => IoC.Instance.GetInstance<IPursuitManager>();
+
+        /// <summary>
+        /// Get the manual placement instance.
+        /// </summary>
+        public static IManualPlacement ManualPlacement => IoC.Instance.GetInstance<IManualPlacement>();
     }
 }
