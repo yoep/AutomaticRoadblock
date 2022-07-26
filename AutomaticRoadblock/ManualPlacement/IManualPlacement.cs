@@ -12,6 +12,16 @@ namespace AutomaticRoadblocks.ManualPlacement
         BarrierType Barrier { get; set; }
         
         /// <summary>
+        /// The vehicle type to use within the roadblock.
+        /// </summary>
+        VehicleType VehicleType { get; set; }
+        
+        /// <summary>
+        /// Indication if flares should be added to the roadblock.
+        /// </summary>
+        bool FlaresEnabled { get; set; }
+        
+        /// <summary>
         /// Determine the placement location based on the current player location.
         /// </summary>
         /// <returns>Returns the road for the placement.</returns>

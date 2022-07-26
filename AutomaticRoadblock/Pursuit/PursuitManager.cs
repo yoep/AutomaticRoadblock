@@ -323,6 +323,7 @@ namespace AutomaticRoadblocks.Pursuit
         private void RoadblockCopKilled(IRoadblock roadblock)
         {
             _totalCopsKilled++;
+            NotifySuspectKilledCop();
         }
 
         private bool IsSuspectVehicleOnRoad()
@@ -348,6 +349,12 @@ namespace AutomaticRoadblocks.Pursuit
         private void NotifyPursuitLevelIncreased()
         {
             _game.DisplayNotification($"Pursuit level has changed to ~g~{PursuitLevel.Level}");
+        }
+
+        [Conditional("DEBUG")]
+        private void NotifySuspectKilledCop()
+        {
+            _game.DisplayNotification($"Suspect killed a total of ~r~{_totalCopsKilled}~s~ cops");
         }
 
         private static RoadblockLevel ToRoadblockLevel(PursuitLevel pursuitLevel)

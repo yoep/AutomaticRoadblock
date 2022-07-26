@@ -20,6 +20,7 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         private Road _lastDeterminedRoad;
         private BarrierType _barrier = BarrierType.SmallCone;
+        private VehicleType _vehicleType = VehicleType.Locale;
 
         public ManualPlacement(ILogger logger, IGame game, ISettingsManager settingsManager)
         {
@@ -36,6 +37,16 @@ namespace AutomaticRoadblocks.ManualPlacement
             get => _barrier;
             set => UpdateBarrier(value);
         }
+
+        /// <inheritdoc />
+        public VehicleType VehicleType
+        {
+            get => _vehicleType;
+            set => UpdateVehicle(value);
+        }
+
+        /// <inheritdoc />
+        public bool FlaresEnabled { get; set; }
 
         #endregion
 
@@ -103,6 +114,8 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         #endregion
 
+        #region Functions
+
         private void CreateManualRoadblockPreview(Road road, bool force)
         {
             if (!force && Equals(road, _lastDeterminedRoad))
@@ -111,7 +124,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             // remove any existing previews first
             RemovePreview();
 
-            var roadblock = new ManualRoadblock(road, _game.PlayerHeading, Barrier, false, false);
+            var roadblock = new ManualRoadblock(road, Barrier, VehicleType, _game.PlayerHeading, false, false);
             roadblock.CreatePreview();
 
             _roadblocks.Add(roadblock);
@@ -128,5 +141,13 @@ namespace AutomaticRoadblocks.ManualPlacement
             _barrier = newType;
             CreatePreview(true);
         }
+
+        private void UpdateVehicle(VehicleType value)
+        {
+            _vehicleType = value;
+            CreatePreview(true);
+        }
+        
+        #endregion
     }
 }

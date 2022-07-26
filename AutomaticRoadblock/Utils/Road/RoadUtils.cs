@@ -9,6 +9,8 @@ namespace AutomaticRoadblocks.Utils.Road
 {
     public static class RoadUtils
     {
+        private const float MaxLaneWidth = 10f;
+
         #region Methods
 
         /// <summary>
@@ -231,8 +233,8 @@ namespace AutomaticRoadblocks.Utils.Road
         private static Road DiscoverRoad(NodeInfo nodeInfo)
         {
             var rightSideHeading = nodeInfo.Heading;
-            var roadRightSide = GetLastPointOnTheLane(nodeInfo.Position, rightSideHeading - 90f);
-            var roadLeftSide = GetLastPointOnTheLane(nodeInfo.Position, rightSideHeading + 90f);
+            var roadRightSide = GetLastPointOnTheLane(nodeInfo.Position, rightSideHeading - 90f, nodeInfo.NumberOfLanes1);
+            var roadLeftSide = GetLastPointOnTheLane(nodeInfo.Position, rightSideHeading + 90f, nodeInfo.NumberOfLanes2);
 
             // Fix a side if it's the same as the middle of the road as GetLastPointOnTheLane probably failed to determine the last point
             if (roadRightSide == nodeInfo.Position)
@@ -340,11 +342,12 @@ namespace AutomaticRoadblocks.Utils.Road
             return new NodeInfo(nodePosition, MathHelper.NormalizeHeading(nodeHeading));
         }
 
-        private static Vector3 GetLastPointOnTheLane(Vector3 position, float heading)
+        private static Vector3 GetLastPointOnTheLane(Vector3 position, float heading, int numberOfLanes)
         {
-            var checkInterval = 1f;
+            var checkInterval = 0.5f;
             var direction = MathHelper.ConvertHeadingToDirection(heading);
             var lastPositionOnTheRoad = position;
+            var maxWidth = numberOfLanes != 0 ? numberOfLanes * MaxLaneWidth : 2 * MaxLaneWidth;
 
             do
             {
@@ -358,7 +361,7 @@ namespace AutomaticRoadblocks.Utils.Road
                 {
                     checkInterval /= 1.5f;
                 }
-            } while (checkInterval >= 0.25f);
+            } while (checkInterval >= 0.25f && position.DistanceTo(lastPositionOnTheRoad) < maxWidth);
 
             return lastPositionOnTheRoad;
         }

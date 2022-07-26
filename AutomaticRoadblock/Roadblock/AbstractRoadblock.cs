@@ -13,6 +13,7 @@ namespace AutomaticRoadblocks.Roadblock
     /// <summary>
     /// The abstract basic implementation of <see cref="IRoadblock"/> which can be used for manual and pursuit roadblocks.
     /// This implementation does not verify any states, use <see cref="AbstractPursuitRoadblock"/> instead.
+    /// <remarks>Make sure that the <see cref="Initialize"/> method is called within the constructor after all properties/fields are set for the roadblock.</remarks>
     /// </summary>
     public abstract class AbstractRoadblock : IRoadblock
     {
@@ -22,6 +23,8 @@ namespace AutomaticRoadblocks.Roadblock
 
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected readonly IGame Game = IoC.Instance.GetInstance<IGame>();
+        protected readonly bool IsSpeedLimitEnabled;
+        protected readonly bool IsLightsEnabled;
 
         protected Blip Blip;
         private int _speedZoneId;
@@ -31,20 +34,18 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         /// <param name="road">The road of that the roadblock will block.</param>
         /// <param name="mainBarrierType">The main barrier used within the slots.</param>
-        /// <param name="vehicle">The vehicle which is targeted by the roadblock (optional).</param>
         /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
         /// <param name="limitSpeed">Indicates if a speed limit should be added.</param>
         /// <param name="addLights">Indicates if light props should be added.</param>
-        internal AbstractRoadblock(Road road, BarrierType mainBarrierType, Vehicle vehicle, float targetHeading, bool limitSpeed, bool addLights)
+        internal AbstractRoadblock(Road road, BarrierType mainBarrierType, float targetHeading, bool limitSpeed, bool addLights)
         {
             Assert.NotNull(road, "road cannot be null");
             Assert.NotNull(mainBarrierType, "mainBarrierType cannot be null");
             Road = road;
             MainBarrierType = mainBarrierType;
-            Vehicle = vehicle;
             TargetHeading = targetHeading;
-
-            Init(limitSpeed, addLights);
+            IsSpeedLimitEnabled = limitSpeed;
+            IsLightsEnabled = addLights;
         }
 
         #region Properties
@@ -79,11 +80,6 @@ namespace AutomaticRoadblocks.Roadblock
         /// Get the main barrier type of the roadblock.
         /// </summary>
         protected BarrierType MainBarrierType { get; }
-
-        /// <summary>
-        /// Get the target vehicle of this roadblock.
-        /// </summary>
-        protected Vehicle Vehicle { get; }
 
         /// <summary>
         /// Get the target heading of the roadblock.
@@ -138,11 +134,7 @@ namespace AutomaticRoadblocks.Roadblock
         public void DeletePreview()
         {
             DeleteBlip();
-            foreach (var roadblockSlot in Slots)
-            {
-                roadblockSlot.DeletePreview();
-            }
-
+            Slots.ToList().ForEach(x => x.DeletePreview());
             Road.DeletePreview();
             Instances.ForEach(x => x.DeletePreview());
         }
@@ -256,21 +248,33 @@ namespace AutomaticRoadblocks.Roadblock
         /// Create roadblock slots for the given lanes.
         /// </summary>
         /// <param name="lanesToBlock">The lanes to block.</param>
-        /// <param name="addLights">Indicates if lights should be added.</param>
         /// <returns>Returns a list of created slots.</returns>
-        protected abstract IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock, bool addLights);
+        protected abstract IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock);
 
-        private void Init(bool limitSpeed, bool shouldAddLights)
+        /// <summary>
+        /// Initialize the roadblock data.
+        /// This method will calculate the slots and create all necessary entities for the roadblock.
+        /// </summary>
+        protected void Initialize()
         {
-            InitializeRoadblockSlots(shouldAddLights);
+            InitializeRoadblockSlots();
             InitializeScenery();
-            InitializeSpeedLimit(limitSpeed);
+            InitializeSpeedLimit(IsSpeedLimitEnabled);
 
-            if (shouldAddLights)
+            if (IsLightsEnabled)
                 InitializeLights();
         }
 
-        private void InitializeRoadblockSlots(bool addLights)
+        /// <summary>
+        /// Indicate that a cop from the given roadblock slot was killed.
+        /// </summary>
+        /// <param name="roadblockSlot">The slot from which the cop was killed.</param>
+        protected void RoadblockSlotCopKilled(IRoadblockSlot roadblockSlot)
+        {
+            RoadblockCopKilled?.Invoke(this);
+        }
+
+        private void InitializeRoadblockSlots()
         {
             Heading = Road.Lanes
                 .Select(x => x.Heading)
@@ -286,16 +290,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
 
             Logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
-            Slots = CreateRoadblockSlots(lanesToBlock, addLights);
-        }
-
-        /// <summary>
-        /// Indicate that a cop from the given roadblock slot was killed.
-        /// </summary>
-        /// <param name="roadblockSlot">The slot from which the cop was killed.</param>
-        protected void RoadblockSlotCopKilled(IRoadblockSlot roadblockSlot)
-        {
-            RoadblockCopKilled?.Invoke(this);
+            Slots = CreateRoadblockSlots(lanesToBlock);
         }
 
         private void InitializeSpeedLimit(bool limitSpeed)

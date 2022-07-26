@@ -72,6 +72,7 @@
         <Compile Include="IoC.cs" />
         <Compile Include="IoCException.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="ManualPlacement\Factory\VehicleFactory.cs" />
         <Compile Include="ManualPlacement\IManualPlacement.cs" />
         <Compile Include="ManualPlacement\ManualPlacement.cs" />
         <Compile Include="ManualPlacement\ManualRoadblock.cs" />
@@ -79,6 +80,8 @@
         <Compile Include="ManualPlacement\Menu\BarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementMenuSwitchItem.cs" />
         <Compile Include="ManualPlacement\Menu\PlaceComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\VehicleComponentItem.cs" />
+        <Compile Include="ManualPlacement\VehicleType.cs" />
         <Compile Include="Menu\IMenu.cs" />
         <Compile Include="Menu\IMenuComponent.cs" />
         <Compile Include="Menu\MenuException.cs" />

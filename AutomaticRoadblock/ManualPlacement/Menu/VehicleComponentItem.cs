@@ -1,22 +1,21 @@
 using AutomaticRoadblocks.Menu;
-using AutomaticRoadblocks.Roadblock;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class BarrierComponentItem : IMenuComponent<UIMenuListScrollerItem<BarrierType>>
+    public class VehicleComponentItem : IMenuComponent<UIMenuListScrollerItem<VehicleType>>
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public BarrierComponentItem(IManualPlacement manualPlacement)
+        public VehicleComponentItem(IManualPlacement manualPlacement)
         {
             _manualPlacement = manualPlacement;
             Init();
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<BarrierType> MenuItem { get; } =
-            new(AutomaticRoadblocksPlugin.Barrier, AutomaticRoadblocksPlugin.BarrierDescription, BarrierType.Values);
+        public UIMenuListScrollerItem<VehicleType> MenuItem { get; } =
+            new(AutomaticRoadblocksPlugin.Vehicle, AutomaticRoadblocksPlugin.VehicleDescription, VehicleType.Values);
 
         /// <inheritdoc />
         public MenuType Type => MenuType.MANUAL_PLACEMENT;
@@ -32,13 +31,13 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
 
         private void Init()
         {
-            MenuItem.SelectedItem = _manualPlacement.Barrier;
+            MenuItem.SelectedItem = _manualPlacement.VehicleType;
             MenuItem.IndexChanged += MenuIndexChanged;
         }
 
         private void MenuIndexChanged(UIMenuScrollerItem sender, int oldindex, int newindex)
         {
-            _manualPlacement.Barrier = MenuItem.SelectedItem;
+            _manualPlacement.VehicleType = MenuItem.SelectedItem;
         }
     }
 }

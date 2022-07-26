@@ -8,10 +8,24 @@ namespace AutomaticRoadblocks.ManualPlacement
 {
     public class ManualRoadblock : AbstractRoadblock
     {
-        internal ManualRoadblock(Road road, float targetHeading, BarrierType barrierType, bool limitSpeed, bool addLights)
-            : base(road, barrierType, null, targetHeading, limitSpeed, addLights)
+
+        internal ManualRoadblock(Road road, BarrierType barrierType, VehicleType vehicleType, float targetHeading, bool limitSpeed, bool addLights)
+            : base(road, barrierType, targetHeading, limitSpeed, addLights)
         {
+            Assert.NotNull(vehicleType, "vehicleType cannot be null");
+            VehicleType = vehicleType;
+            
+            Initialize();
         }
+
+        #region Properties
+        
+        /// <summary>
+        /// The vehicle type used within the roadblock.
+        /// </summary>
+        public VehicleType VehicleType { get; }
+
+        #endregion
 
         #region IRoadblock
 
@@ -23,10 +37,10 @@ namespace AutomaticRoadblocks.ManualPlacement
         #region Funtions
 
         /// <inheritdoc />
-        protected override IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock, bool addLights)
+        protected override IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
         {
             return lanesToBlock
-                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, TargetHeading, addLights))
+                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, VehicleType, TargetHeading, IsLightsEnabled))
                 .ToList();
         }
 

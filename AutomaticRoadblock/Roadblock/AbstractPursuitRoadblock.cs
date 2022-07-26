@@ -19,9 +19,22 @@ namespace AutomaticRoadblocks.Roadblock
         private float _lastKnownDistanceToRoadblock = 9999f;
 
         protected AbstractPursuitRoadblock(Road road, BarrierType mainBarrierType, Vehicle vehicle, bool limitSpeed, bool addLights)
-            : base(road, mainBarrierType, vehicle, vehicle != null ? vehicle.Heading : 0f, limitSpeed, addLights)
+            : base(road, mainBarrierType, vehicle != null ? vehicle.Heading : 0f, limitSpeed, addLights)
         {
+            Assert.NotNull(vehicle, "vehicle cannot be null");
+            Vehicle = vehicle;
+
+            Initialize();
         }
+
+        #region Properties
+        
+        /// <summary>
+        /// Get the target vehicle of this roadblock.
+        /// </summary>
+        protected Vehicle Vehicle { get; }
+
+        #endregion
 
         #region Methods
 
@@ -47,10 +60,10 @@ namespace AutomaticRoadblocks.Roadblock
         protected abstract IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights);
 
         /// <inheritdoc />
-        protected override IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock, bool addLights)
+        protected override IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
         {
             return lanesToBlock
-                .Select(lane => CreateSlot(lane, Heading, Vehicle, addLights))
+                .Select(lane => CreateSlot(lane, Heading, Vehicle, IsLightsEnabled))
                 .Select(x =>
                 {
                     x.RoadblockCopKilled += RoadblockSlotCopKilled;
