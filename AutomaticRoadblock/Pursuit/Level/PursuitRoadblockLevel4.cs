@@ -1,9 +1,8 @@
-using System;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
@@ -28,7 +27,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeScenery()
         {
-            var position = Postion + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 3f;
+            var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 3f;
 
             Instances.Add(new InstanceSlot(EntityType.Scenery, position, 0f,
                 (conePosition, _) => BarrierFactory.Create(BarrierType.BigCone, conePosition)));
@@ -37,13 +36,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeLights()
         {
-            var roadRightSidePosition = Road.RightSide + MathHelper.ConvertHeadingToDirection(Heading) * 5f;
-            var roadLeftSidePosition = Road.LeftSide + MathHelper.ConvertHeadingToDirection(Heading) * 5f;
-
-            Instances.Add(new InstanceSlot(EntityType.Scenery, roadRightSidePosition, Math.Abs(Heading - 225) % 360,
-                (position, heading) => new ARScenery(PropUtils.CreateGeneratorWithLights(position, heading))));
-            Instances.Add(new InstanceSlot(EntityType.Scenery, roadLeftSidePosition, Math.Abs(Heading + 225) % 360,
-                (position, heading) => new ARScenery(PropUtils.CreateGeneratorWithLights(position, heading))));
+            Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));
         }
 
         /// <inheritdoc />

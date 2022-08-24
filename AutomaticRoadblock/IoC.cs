@@ -142,7 +142,7 @@ namespace AutomaticRoadblocks
             {
                 var type = typeof(T);
 
-                if (GetDefinitionsFor(type).Count == 0)
+                if (!TypeExists<T>())
                     throw new IoCException(type + " has not been registered");
 
                 var definition = GetSingletonDefinitionFor(type);
@@ -151,6 +151,20 @@ namespace AutomaticRoadblocks
                     throw new IoCException(type + " is not registered as a singleton");
 
                 return _singletons.ContainsKey(definition);
+            }
+        }
+
+        /// <summary>
+        /// Verify if the given type has already been registered.
+        /// </summary>
+        /// <typeparam name="T">The component type to verify.</typeparam>
+        /// <returns>Returns true when the given type is known, else false.</returns>
+        public bool TypeExists<T>()
+        {
+            lock (_lockState)
+            {
+                var type = typeof(T);
+                return GetDefinitionsFor(type).Count > 0;
             }
         }
 

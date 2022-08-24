@@ -36,11 +36,11 @@
           <HintPath>..\Libs\LSPD First Response.dll</HintPath>
         </Reference>
         <Reference Include="Microsoft.CSharp" />
-        <Reference Include="RAGENativeUI">
-          <HintPath>..\Libs\RAGENativeUI.dll</HintPath>
+        <Reference Include="RAGENativeUI, Version=1.9.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\RAGENativeUI.1.9.0\lib\net472\RAGENativeUI.dll</HintPath>
         </Reference>
-        <Reference Include="RagePluginHook">
-          <HintPath>..\Libs\RagePluginHookSDK.dll</HintPath>
+        <Reference Include="RagePluginHook, Version=0.0.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\RagePluginHook.1.86.1\lib\net472\RagePluginHook.dll</HintPath>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
@@ -71,13 +71,17 @@
         <Compile Include="Instance\InstanceType.cs" />
         <Compile Include="IoC.cs" />
         <Compile Include="IoCException.cs" />
+        <Compile Include="LightSources\LightSourceRoadblockFactory.cs" />
+        <Compile Include="LightSources\LightSourceSlotFactory.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="ManualPlacement\Factory\VehicleFactory.cs" />
         <Compile Include="ManualPlacement\IManualPlacement.cs" />
+        <Compile Include="ManualPlacement\LightSourceType.cs" />
         <Compile Include="ManualPlacement\ManualPlacement.cs" />
         <Compile Include="ManualPlacement\ManualRoadblock.cs" />
         <Compile Include="ManualPlacement\ManualRoadblockSlot.cs" />
         <Compile Include="ManualPlacement\Menu\BarrierComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\LightComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementMenuSwitchItem.cs" />
         <Compile Include="ManualPlacement\Menu\PlaceComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\VehicleComponentItem.cs" />
@@ -154,6 +158,9 @@
       <Content Include="AutomaticRoadblocks.ini">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="packages.config" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

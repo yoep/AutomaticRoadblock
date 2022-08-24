@@ -41,6 +41,8 @@ namespace AutomaticRoadblocks
         public const string BarrierDescription = "The barrier type to use";
         public const string Vehicle = "Vehicle";
         public const string VehicleDescription = "The vehicle type to use";
+        public const string LightSource = "Lights";
+        public const string LightSourceDescription = "The lights type to use";
 
         private const string DebugIndicatorText = " [DEBUG]";
     }

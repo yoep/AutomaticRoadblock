@@ -9,7 +9,6 @@ namespace AutomaticRoadblocks.ManualPlacement.Factory
     {
         private static IDictionary<VehicleType, Func<Vector3, Model>> Vehicles = new Dictionary<VehicleType, Func<Vector3, Model>>
         {
-            { VehicleType.None, _ => null },
             { VehicleType.Locale, position => ModelUtils.Vehicles.GetLocalPoliceVehicle(position) },
             { VehicleType.State, _ => ModelUtils.Vehicles.GetStatePoliceVehicle() },
             { VehicleType.Fbi, _ => ModelUtils.Vehicles.GetFbiPoliceVehicle() },

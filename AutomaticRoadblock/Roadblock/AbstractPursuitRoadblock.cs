@@ -102,7 +102,7 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void VerifyIfRoadblockIsBypassed()
         {
-            var currentDistance = Vehicle.DistanceTo(Postion);
+            var currentDistance = Vehicle.DistanceTo(Position);
 
             if (currentDistance < _lastKnownDistanceToRoadblock)
             {

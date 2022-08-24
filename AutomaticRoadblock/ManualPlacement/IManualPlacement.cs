@@ -17,6 +17,11 @@ namespace AutomaticRoadblocks.ManualPlacement
         VehicleType VehicleType { get; set; }
         
         /// <summary>
+        /// The light source type to use within the roadblock.
+        /// </summary>
+        LightSourceType LightSourceType { get; set; }
+        
+        /// <summary>
         /// Indication if flares should be added to the roadblock.
         /// </summary>
         bool FlaresEnabled { get; set; }
@@ -34,9 +39,9 @@ namespace AutomaticRoadblocks.ManualPlacement
         void CreatePreview(bool force = false);
 
         /// <summary>
-        /// Remove the preview of the roadblock that will be placed.
+        /// Remove all previews of the roadblock that might be placed.
         /// </summary>
-        void RemovePreview();
+        void RemovePreviews();
 
         /// <summary>
         /// Place a roadblock based on the <see cref="DetermineLocation"/> <see cref="Road"/>.

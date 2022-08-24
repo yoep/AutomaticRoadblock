@@ -137,6 +137,31 @@ namespace AutomaticRoadblocks.Utils.Road
 
         #region Methods
 
+        /// <summary>
+        /// Retrieve the lane which is the closest to the given position.
+        /// </summary>
+        /// <param name="position">The position to compare the lanes to.</param>
+        /// <returns>Returns the lane closest to the given position.</returns>
+        public Lane LaneClosestTo(Vector3 position)
+        {
+            Assert.NotNull(position, "position cannot be null");
+            var closestLaneDistance = 9999f;
+            var closestLane = (Lane) null;
+            
+            foreach (var lane in Lanes)
+            {
+                var distance = position.DistanceTo(lane.Position);
+
+                if (distance > closestLaneDistance)
+                    continue;
+                
+                closestLaneDistance = distance;
+                closestLane = lane;
+            }
+
+            return closestLane;
+        }
+
         public override string ToString()
         {
             return $"\n{nameof(Position)}: {Position}," +
@@ -154,19 +179,27 @@ namespace AutomaticRoadblocks.Utils.Road
                    "\n---";
         }
 
-        public override bool Equals(object obj)
+        private bool Equals(Road other)
         {
-            if (obj == null || obj.GetType() != typeof(Road))
-                return false;
-
-            var otherRoad = (Road)obj;
-
-            return Position == otherRoad.Position;
+            return Position.Equals(other.Position) && Equals(Node, other.Node);
         }
 
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Road)obj);
+        }
+
+        /// <inheritdoc />
         public override int GetHashCode()
         {
-            return Position.GetHashCode();
+            unchecked
+            {
+                return (Position.GetHashCode() * 397) ^ (Node != null ? Node.GetHashCode() : 0);
+            }
         }
 
         #endregion
@@ -238,7 +271,7 @@ namespace AutomaticRoadblocks.Utils.Road
             /// Get the width of the lane.
             /// </summary>
             public float Width { get; }
-            
+
             /// <summary>
             /// Get the lane type.
             /// </summary>
@@ -373,6 +406,27 @@ namespace AutomaticRoadblocks.Utils.Road
             public override string ToString()
             {
                 return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}";
+            }
+
+            protected bool Equals(VehicleNode other)
+            {
+                return Position.Equals(other.Position) && Heading.Equals(other.Heading);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((VehicleNode)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (Position.GetHashCode() * 397) ^ Heading.GetHashCode();
+                }
             }
 
             private static Vector3 FloatAboveGround(Vector3 position)

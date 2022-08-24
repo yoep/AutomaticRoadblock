@@ -3,19 +3,19 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class VehicleComponentItem : IMenuComponent<UIMenuListScrollerItem<VehicleType>>
+    public class LightComponentItem : IMenuComponent<UIMenuListScrollerItem<LightSourceType>>
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public VehicleComponentItem(IManualPlacement manualPlacement)
+        public LightComponentItem(IManualPlacement manualPlacement)
         {
             _manualPlacement = manualPlacement;
             Init();
         }
-
+        
         /// <inheritdoc />
-        public UIMenuListScrollerItem<VehicleType> MenuItem { get; } =
-            new(AutomaticRoadblocksPlugin.Vehicle, AutomaticRoadblocksPlugin.VehicleDescription, VehicleType.Values);
+        public UIMenuListScrollerItem<LightSourceType> MenuItem { get; } =
+            new(AutomaticRoadblocksPlugin.LightSource, AutomaticRoadblocksPlugin.LightSourceDescription, LightSourceType.Values);
 
         /// <inheritdoc />
         public MenuType Type => MenuType.MANUAL_PLACEMENT;
@@ -31,13 +31,13 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
 
         private void Init()
         {
-            MenuItem.SelectedItem = _manualPlacement.VehicleType;
+            MenuItem.SelectedItem = _manualPlacement.LightSourceType;
             MenuItem.IndexChanged += MenuIndexChanged;
         }
 
         private void MenuIndexChanged(UIMenuScrollerItem sender, int oldIndex, int newIndex)
         {
-            _manualPlacement.VehicleType = MenuItem.SelectedItem;
+            _manualPlacement.LightSourceType = MenuItem.SelectedItem;
         }
     }
 }

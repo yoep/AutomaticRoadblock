@@ -4,7 +4,6 @@ namespace AutomaticRoadblocks.ManualPlacement
 {
     public class VehicleType
     {
-        public static readonly VehicleType None = new("None");
         public static readonly VehicleType Locale = new("Locale");
         public static readonly VehicleType State = new("State");
         public static readonly VehicleType Fbi = new("FBI");
@@ -12,7 +11,6 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         public static readonly IEnumerable<VehicleType> Values = new[]
         {
-            None,
             Locale,
             State,
             Fbi,

@@ -15,6 +15,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
+            
+            Initialize();
         }
 
         #region Properties

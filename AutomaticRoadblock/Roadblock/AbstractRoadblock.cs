@@ -61,20 +61,14 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public RoadblockState State { get; private set; } = RoadblockState.Preparing;
 
-        /// <summary>
-        /// Get the central position of the roadblock.
-        /// </summary>
-        public Vector3 Postion => Road.Position;
+        /// <inheritdoc />
+        public Vector3 Position => Road.Position;
 
-        /// <summary>
-        /// Get the heading of the roadblock.
-        /// </summary>
+        /// <inheritdoc />
         public float Heading { get; private set; }
 
-        /// <summary>
-        /// Get the road of this roadblock.
-        /// </summary>
-        protected Road Road { get; }
+        /// <inheritdoc />
+        public Road Road { get; }
 
         /// <summary>
         /// Get the main barrier type of the roadblock.
@@ -120,12 +114,15 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public void CreatePreview()
         {
+            Logger.Trace($"Creating roadblock preview for {this}");
             CreateBlip();
+            Logger.Debug($"Creating a total of {Slots.Count} slot previews for the roadblock preview");
             foreach (var roadblockSlot in Slots)
             {
                 roadblockSlot.CreatePreview();
             }
 
+            Logger.Trace($"Creating roadblock road preview");
             Road.CreatePreview();
             Instances.ForEach(x => x.CreatePreview());
         }
@@ -190,7 +187,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             return $"{nameof(Level)}: {Level}\n" +
                    $"{nameof(State)}: {State}\n" +
-                   $"{nameof(Slots)}: [{Slots.Count}]{string.Join(",", Slots)}\n" +
+                   $"{nameof(Slots)}: [{Slots.Count}]{string.Join(",\n", Slots)}\n" +
                    $"{nameof(Road)}: {Road}";
         }
 
@@ -306,7 +303,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             try
             {
-                _speedZoneId = RoadUtils.CreateSpeedZone(Postion, 10f, SpeedLimit);
+                _speedZoneId = RoadUtils.CreateSpeedZone(Position, 10f, SpeedLimit);
             }
             catch (Exception ex)
             {
@@ -325,7 +322,8 @@ namespace AutomaticRoadblocks.Roadblock
             if (Blip != null)
                 return;
 
-            Blip = new Blip(Postion)
+            Logger.Trace("Creating roadblock blip");
+            Blip = new Blip(Position)
             {
                 IsRouteEnabled = false,
                 IsFriendly = true,

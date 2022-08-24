@@ -1,5 +1,6 @@
 using System;
 using AutomaticRoadblocks.Preview;
+using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
@@ -21,6 +22,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// It returns null when <see cref="Spawn"/> has not been called yet.
         /// </summary>
         Vehicle Vehicle { get; }
+
+        /// <summary>
+        /// The lane this slot blocks of a certain road.
+        /// </summary>
+        Road.Lane Lane { get; }
 
         /// <summary>
         /// Invoked when a cop from this slot has been killed.

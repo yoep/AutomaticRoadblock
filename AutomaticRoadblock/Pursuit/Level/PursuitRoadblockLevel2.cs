@@ -26,7 +26,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeScenery()
         {
-            var position = Postion + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 3f;
+            var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 3f;
 
             Instances.Add(new InstanceSlot(EntityType.Scenery, position, 0f,
                 (conePosition, _) => new ARScenery(PropUtils.CreateBigConeWithStripes(conePosition))));

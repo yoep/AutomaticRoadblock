@@ -13,11 +13,18 @@ using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
+    /// <summary>
+    /// Abstract implementation of the <see cref="IRoadblockSlot"/>.
+    /// This slot defines the entities & scenery items used within the <see cref="IRoadblock"/>.
+    /// <remarks>Make sure that the <see cref="Initialize"/> method is called within the constructor after all properties/fields are set for the slot.</remarks>
+    /// </summary>
     public abstract class AbstractRoadblockSlot : IRoadblockSlot
     {
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected readonly List<InstanceSlot> Instances = new();
         protected readonly Random Random = new();
+
+        private readonly bool _shouldAddLights;
 
         protected AbstractRoadblockSlot(Road.Lane lane, BarrierType barrierType, float heading, bool shouldAddLights)
         {
@@ -27,9 +34,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             Lane = lane;
             BarrierType = barrierType;
             Heading = heading;
-            VehicleModel = GetVehicleModel();
-
-            Init(shouldAddLights);
+            _shouldAddLights = shouldAddLights;
         }
 
         #region Properties
@@ -45,11 +50,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         /// <inheritdoc />
         public event RoadblockEvents.RoadblockSlotEvents.RoadblockCopKilled RoadblockCopKilled;
-
-        /// <summary>
-        /// Get the lane of this slot.
-        /// </summary>
-        protected Road.Lane Lane { get; }
+        
+        /// <inheritdoc />
+        public Road.Lane Lane { get; }
 
         /// <summary>
         /// The barrier type that is used within this slot.
@@ -58,8 +61,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         /// <summary>
         /// Get the police vehicle model which is used for the slot.
+        /// <remarks>This field is only available after the <see cref="Initialize"/> method is called.</remarks>
         /// </summary>
-        protected Model VehicleModel { get; }
+        protected Model VehicleModel { get; private set; }
 
         /// <summary>
         /// Get the AR vehicle instance of this slot.
@@ -96,7 +100,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             var game = IoC.Instance.GetInstance<IGame>();
 
+            Logger.Debug($"Creating a total of {Instances.Count} instances for the roadblock slot preview");
+            Logger.Trace($"Roadblock slot instances: \n{string.Join("\n---\n", Instances.Select(x => x.ToString()).ToList())}");
             Instances.ForEach(x => x.CreatePreview());
+            Logger.Trace("Drawing the roadblock slot information within the preview");
             game.NewSafeFiber(() =>
             {
                 var direction = MathHelper.ConvertHeadingToDirection(Heading);
@@ -135,7 +142,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             return $"{nameof(Instances)}: {Instances.Count},\n" +
                    $"{nameof(Position)}: {Position},\n" +
-                   $"{nameof(Heading)}: {Heading}";
+                   $"{nameof(Heading)}: {Heading}\n" +
+                   $"{nameof(BarrierType)}: {BarrierType}\n" +
+                   $"{nameof(VehicleModel)}: {VehicleModel.Name}";
         }
 
         /// <inheritdoc />
@@ -189,8 +198,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         #region Functions
 
-        private void Init(bool shouldAddLights)
+        /// <summary>
+        /// Initialize this roadblock slot.
+        /// This will create all entities/scenery items of this slot.
+        /// </summary>
+        protected void Initialize()
         {
+            VehicleModel = GetVehicleModel();
+
             InitializeVehicleSlot();
             InitializeCopPeds();
             InitializeScenery();
@@ -198,7 +213,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             if (!BarrierType.IsNone)
                 InitializeBarriers();
 
-            if (shouldAddLights)
+            if (_shouldAddLights)
                 InitializeLights();
         }
 
@@ -290,10 +305,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             var barrierTotalWidth = BarrierType.Spacing + BarrierType.Width;
             var totalBarriers = (int)Math.Ceiling(Lane.Width / barrierTotalWidth);
 
-            Logger.Debug($"Creating a total of {totalBarriers} barriers for the roadblock slot");
+            Logger.Debug($"Creating a total of {totalBarriers} barriers with type {BarrierType} for the roadblock slot");
             for (var i = 0; i < totalBarriers; i++)
             {
-                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading, CreateBarrier));
+                Instances.Add(new InstanceSlot(EntityType.Barrier, startPosition, Heading, CreateBarrier));
                 startPosition += direction * barrierTotalWidth;
             }
         }
@@ -302,6 +317,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             try
             {
+                Logger.Trace($"Spawning barrier type {BarrierType} at {position} with heading {heading}");
                 return BarrierFactory.Create(BarrierType, position, heading);
             }
             catch (Exception ex)

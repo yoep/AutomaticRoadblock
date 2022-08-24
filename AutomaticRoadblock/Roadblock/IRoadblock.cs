@@ -1,10 +1,27 @@
 using System;
 using AutomaticRoadblocks.Preview;
+using AutomaticRoadblocks.Utils.Road;
+using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
 {
     public interface IRoadblock : IDisposable, IPreviewSupport
     {
+        /// <summary>
+        /// Retrieve the position of the roadblock. 
+        /// </summary>
+        Vector3 Position { get; }
+        
+        /// <summary>
+        /// Retrieve the heading of the roadblock.
+        /// </summary>
+        float Heading { get; }
+
+        /// <summary>
+        /// Retrieve the road that this roadblock is blocking.
+        /// </summary>
+        Road Road { get; }
+
         /// <summary>
         /// Get the last game time the state of this roadblock was changed.
         /// </summary>

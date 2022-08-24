@@ -1,3 +1,4 @@
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.ManualPlacement.Factory;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
@@ -8,11 +9,16 @@ namespace AutomaticRoadblocks.ManualPlacement
 {
     public class ManualRoadblockSlot : AbstractRoadblockSlot
     {
-        public ManualRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, float heading, bool shouldAddLights)
+        public ManualRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, LightSourceType lightSourceType, float heading,
+            bool shouldAddLights)
             : base(lane, barrierType, heading, shouldAddLights)
         {
             Assert.NotNull(vehicleType, "vehicleType cannot be null");
+            Assert.NotNull(lightSourceType, "lightSourceType cannot be null");
             VehicleType = vehicleType;
+            LightSourceType = lightSourceType;
+
+            Initialize();
         }
 
         #region Properties
@@ -21,6 +27,11 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// The vehicle type of the slot.
         /// </summary>
         public VehicleType VehicleType { get; }
+
+        /// <summary>
+        /// The light type of the slot.
+        /// </summary>
+        public LightSourceType LightSourceType { get; }
 
         #endregion
 
@@ -39,7 +50,11 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         protected override void InitializeLights()
         {
-            // no-op
+            Logger.Trace("Initializing the manual roadblock slot lights");
+            if (LightSourceType == LightSourceType.Flares)
+            {
+                Instances.AddRange(LightSourceSlotFactory.CreateFlares(this));
+            }
         }
 
         /// <inheritdoc />

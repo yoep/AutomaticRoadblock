@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeScenery()
         {
-            var position = Postion + MathHelper.ConvertHeadingToDirection(MathHelper.NormalizeHeading(Road.Node.Heading - 180)) * 3f;
+            var position = Position + MathHelper.ConvertHeadingToDirection(MathHelper.NormalizeHeading(Road.Node.Heading - 180)) * 3f;
 
             Instances.Add(new InstanceSlot(EntityType.Scenery, position, 0f,
                 (conePosition, _) => BarrierFactory.Create(BarrierType.BigCone, conePosition)));
