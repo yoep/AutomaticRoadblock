@@ -22,6 +22,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private BarrierType _barrier = BarrierType.SmallCone;
         private VehicleType _vehicleType = VehicleType.Locale;
         private LightSourceType _lightSourceType = LightSourceType.Flares;
+        private PlacementType _placementType = PlacementType.All;
 
         public ManualPlacement(ILogger logger, IGame game, ISettingsManager settingsManager)
         {
@@ -51,6 +52,13 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             get => _lightSourceType;
             set => UpdateLightSource(value);
+        }
+
+        /// <inheritdoc />
+        public PlacementType PlacementType
+        {
+            get => _placementType;
+            set => UpdatePlacementType(value);
         }
 
         /// <inheritdoc />
@@ -153,10 +161,10 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             if (!force && Equals(road, _lastDeterminedRoad))
                 return;
-            
+
             // remove any existing previews first
             RemovePreviews();
-            
+
             _lastDeterminedRoad = road;
             _game.NewSafeFiber(() =>
             {
@@ -219,6 +227,12 @@ namespace AutomaticRoadblocks.ManualPlacement
         private void UpdateLightSource(LightSourceType lightSourceType)
         {
             _lightSourceType = lightSourceType;
+            CreatePreview(true);
+        }
+
+        private void UpdatePlacementType(PlacementType placementType)
+        {
+            _placementType = placementType;
             CreatePreview(true);
         }
 

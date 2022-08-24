@@ -19,8 +19,8 @@ namespace AutomaticRoadblocks
         public const string ZoneInfo = "Zone info " + DebugIndicatorText;
         public const string EndCallout = "End current callout " + DebugIndicatorText;
 
-        public const string EnableDuringPursuit = "Enabled";
-        public const string EnableDuringPursuitDescription = "Enable automatic roadblock dispatching during pursuit";
+        public const string EnableDuringPursuit = "Automatic";
+        public const string EnableDuringPursuitDescription = "Enable automatic roadblock dispatching during a pursuit";
         public const string DispatchNow = "Dispatch now";
         public const string DispatchNowDescription = "Dispatch a roadblock now for the current pursuit";
         public const string DispatchPreview = "Dispatch preview" + DebugIndicatorText;
@@ -43,6 +43,8 @@ namespace AutomaticRoadblocks
         public const string VehicleDescription = "The vehicle type to use";
         public const string LightSource = "Lights";
         public const string LightSourceDescription = "The lights type to use";
+        public const string BlockLanes = "Block lanes";
+        public const string BlockLanesDescription = "The lanes which should be blocked";
 
         private const string DebugIndicatorText = " [DEBUG]";
     }

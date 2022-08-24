@@ -22,6 +22,11 @@ namespace AutomaticRoadblocks.ManualPlacement
         LightSourceType LightSourceType { get; set; }
         
         /// <summary>
+        /// The placement type of the roadblock.
+        /// </summary>
+        PlacementType PlacementType { get; set; }
+        
+        /// <summary>
         /// Indication if flares should be added to the roadblock.
         /// </summary>
         bool FlaresEnabled { get; set; }

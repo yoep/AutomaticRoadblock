@@ -5,6 +5,7 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -153,6 +154,7 @@ namespace AutomaticRoadblocks.Pursuit
             PursuitLevel = level;
             PursuitLevelChanged?.Invoke(level);
             NotifyPursuitLevelIncreased();
+            Functions.PlayScannerAudio("PURSUIT_LEVEL_INCREASE");
         }
 
         private void IncreasePursuitLevel()
@@ -257,6 +259,7 @@ namespace AutomaticRoadblocks.Pursuit
 
             if (HasAtLeastDeployedXRoadblocks() &&
                 HasEnoughTimePassedBetweenLastLevelIncrease() &&
+                !IsPursuitOnFoot &&
                 _random.Next(101) >= increaseLevelThreshold)
             {
                 IncreasePursuitLevel();

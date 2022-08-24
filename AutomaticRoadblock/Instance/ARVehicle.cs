@@ -17,6 +17,7 @@ namespace AutomaticRoadblocks.Instance
             GameInstance = EntityUtils.CreateVehicle(model, position, heading);
             GameInstance.NeedsCollision = true;
             GameInstance.IsRecordingCollisions = true;
+            GameInstance.IsEngineOn = true;
         }
 
         /// <inheritdoc />

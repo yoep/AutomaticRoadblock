@@ -74,6 +74,7 @@
         <Compile Include="LightSources\LightSourceRoadblockFactory.cs" />
         <Compile Include="LightSources\LightSourceSlotFactory.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="ManualPlacement\PlacementType.cs" />
         <Compile Include="ManualPlacement\Factory\VehicleFactory.cs" />
         <Compile Include="ManualPlacement\IManualPlacement.cs" />
         <Compile Include="ManualPlacement\LightSourceType.cs" />
@@ -81,6 +82,7 @@
         <Compile Include="ManualPlacement\ManualRoadblock.cs" />
         <Compile Include="ManualPlacement\ManualRoadblockSlot.cs" />
         <Compile Include="ManualPlacement\Menu\BarrierComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\PlacementTypeComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\LightComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementMenuSwitchItem.cs" />
         <Compile Include="ManualPlacement\Menu\PlaceComponentItem.cs" />

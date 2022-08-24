@@ -115,6 +115,7 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PlaceComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PlacementTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(BarrierComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(LightComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(VehicleComponentItem));
