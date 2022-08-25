@@ -15,6 +15,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
         }
 
+        /// <inheritdoc />
         public override void Spawn()
         {
             base.Spawn();
@@ -28,11 +29,13 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 });
         }
 
+        /// <inheritdoc />
         protected override Model GetVehicleModel()
         {
             return Random.Next(3) == 0 ? ModelUtils.Vehicles.GetFbiPoliceVehicle() : ModelUtils.Vehicles.GetSwatPoliceVehicle();
         }
 
+        /// <inheritdoc />
         protected override void InitializeCopPeds()
         {
             var pedSpawnPosition = GetPositionBehindVehicle();
@@ -46,13 +49,24 @@ namespace AutomaticRoadblocks.Pursuit.Level
             }
         }
 
+        /// <inheritdoc />
         protected override void InitializeScenery()
         {
             // no-op
         }
 
+        /// <inheritdoc />
         protected override void InitializeLights()
         {
+        }
+
+        /// <inheritdoc />
+        protected override float CalculateVehicleHeading()
+        {
+            if (ModelUtils.IsRiot(VehicleModel))
+                return base.CalculateVehicleHeading() + 30;
+
+            return base.CalculateVehicleHeading();
         }
     }
 }

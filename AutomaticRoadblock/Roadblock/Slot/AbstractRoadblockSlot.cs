@@ -20,9 +20,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
     /// </summary>
     public abstract class AbstractRoadblockSlot : IRoadblockSlot
     {
+        protected const int VehicleHeadingMaxOffset = 10;
+        protected static readonly Random Random = new();
+
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected readonly List<InstanceSlot> Instances = new();
-        protected readonly Random Random = new();
 
         private readonly bool _shouldAddLights;
 
@@ -282,10 +284,21 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             RoadblockCopKilled?.Invoke(this);
         }
 
+        /// <summary>
+        /// Calculate the heading of the vehicle for this slot.
+        /// </summary>
+        /// <returns>Returns the heading for the vehicle.</returns>
+        protected virtual float CalculateVehicleHeading()
+        {
+            // because nobody is perfect and we want a natural look on the roadblocks
+            // we slightly create an offset in the heading for each created vehicle
+            return Heading + Random.Next(90 - VehicleHeadingMaxOffset, 91 + VehicleHeadingMaxOffset);
+        }
+
         private void InitializeVehicleSlot()
         {
             Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
-            Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Heading + 90,
+            Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, CalculateVehicleHeading(),
                 (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundVector(position), heading)));
         }
 

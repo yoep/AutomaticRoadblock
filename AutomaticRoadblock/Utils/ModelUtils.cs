@@ -12,6 +12,7 @@ namespace AutomaticRoadblocks.Utils
         private const string PoliceBikeModelName = "POLICEB";
         private const string PoliceTransporterModelName = "POLICET";
         private const string PoliceBikeCopModelName = "s_m_y_hwaycop_01";
+        private const string RiotModelName = "Riot";
 
         private static readonly Random Random = new();
 
@@ -120,7 +121,7 @@ namespace AutomaticRoadblocks.Utils
 
             public static readonly IReadOnlyList<string> SwatVehicleModels = new List<string>
             {
-                "Riot"
+                RiotModelName
             };
 
             /// <summary>
@@ -225,6 +226,17 @@ namespace AutomaticRoadblocks.Utils
         {
             Assert.NotNull(model, "model cannot be null");
             return model.Name.Equals(PoliceBikeModelName);
+        }
+
+        /// <summary>
+        /// Verify if the given model is a riot vehicle.
+        /// </summary>
+        /// <param name="model">The model to verify.</param>
+        /// <returns>Returns true if the model is a riot, else false.</returns>
+        public static bool IsRiot(Model model)
+        {
+            Assert.NotNull(model, "model cannot be null");
+            return model.Name.Equals(RiotModelName);
         }
 
         private static bool IsCountyZone(WorldZone zone)
