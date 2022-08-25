@@ -9,20 +9,21 @@ namespace AutomaticRoadblocks.ManualPlacement
 {
     public class ManualRoadblock : AbstractRoadblock
     {
-
-        internal ManualRoadblock(Road road, BarrierType barrierType, VehicleType vehicleType, LightSourceType lightSourceType, float targetHeading, bool limitSpeed, bool addLights)
-            : base(road, barrierType, targetHeading, limitSpeed, addLights)
+        internal ManualRoadblock(Request request)
+            : base(request.Road, request.BarrierType, request.TargetHeading, request.LimitSpeed, request.AddLights)
         {
-            Assert.NotNull(vehicleType, "vehicleType cannot be null");
-            Assert.NotNull(lightSourceType, "lightSourceType cannot be null");
-            VehicleType = vehicleType;
-            LightSourceType = lightSourceType;
+            Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
+            Assert.NotNull(request.LightSourceType, "lightSourceType cannot be null");
+            VehicleType = request.VehicleType;
+            LightSourceType = request.LightSourceType;
+            PlacementType = request.PlacementType;
+            CopsEnabled = request.CopsEnabled;
 
             Initialize();
         }
 
         #region Properties
-        
+
         /// <summary>
         /// The vehicle type used within the roadblock.
         /// </summary>
@@ -32,6 +33,16 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// The light type used within the roadblock.
         /// </summary>
         public LightSourceType LightSourceType { get; }
+
+        /// <summary>
+        /// The placement type of the roadblock.
+        /// </summary>
+        public PlacementType PlacementType { get; }
+        
+        /// <summary>
+        /// Set if cops should be added.
+        /// </summary>
+        public bool CopsEnabled { get; }
 
         #endregion
 
@@ -45,10 +56,20 @@ namespace AutomaticRoadblocks.ManualPlacement
         #region Funtions
 
         /// <inheritdoc />
-        protected override IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
+        protected override IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
         {
+            // check which lane(s) we need to block
+            if (PlacementType == PlacementType.ClosestToPlayer)
+            {
+                lanesToBlock = new List<Road.Lane> { Road.LaneClosestTo(Game.PlayerPosition) };
+            }
+            else if (PlacementType == PlacementType.SameDirectionAsPlayer)
+            {
+                lanesToBlock = Road.LanesHeadingTo(Heading).ToList();
+            }
+
             return lanesToBlock
-                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, VehicleType, LightSourceType, TargetHeading, IsLightsEnabled))
+                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, VehicleType, LightSourceType, TargetHeading, IsLightsEnabled, CopsEnabled))
                 .ToList();
         }
 
@@ -69,5 +90,21 @@ namespace AutomaticRoadblocks.ManualPlacement
         }
 
         #endregion
+
+        /// <summary>
+        /// A simple wrapper class for creating a new <see cref="ManualRoadblock"/> to prevent constructor param mismatches.
+        /// </summary>
+        public class Request
+        {
+            public Road Road { get; set; }
+            public BarrierType BarrierType { get; set; }
+            public VehicleType VehicleType { get; set; }
+            public LightSourceType LightSourceType { get; set; }
+            public PlacementType PlacementType { get; set; }
+            public float TargetHeading { get; set; }
+            public bool LimitSpeed { get; set; }
+            public bool AddLights { get; set; }
+            public bool CopsEnabled { get; set; }
+        }
     }
 }

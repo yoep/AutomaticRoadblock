@@ -6,6 +6,7 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 
 - Automatic roadblock placement during pursuits
 - Roadblock hit/bypass detection
+- Roadblock cops automatically join the pursuit after a hit/bypass
 - Request a roadblock during a pursuit
 - Dynamic roadblocks with light sources during the evening/night
 - Manual configurable roadblock placement 

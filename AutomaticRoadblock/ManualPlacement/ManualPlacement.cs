@@ -23,6 +23,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private VehicleType _vehicleType = VehicleType.Locale;
         private LightSourceType _lightSourceType = LightSourceType.Flares;
         private PlacementType _placementType = PlacementType.All;
+        private bool _copsEnabled;
 
         public ManualPlacement(ILogger logger, IGame game, ISettingsManager settingsManager)
         {
@@ -62,7 +63,14 @@ namespace AutomaticRoadblocks.ManualPlacement
         }
 
         /// <inheritdoc />
-        public bool FlaresEnabled { get; set; }
+        public bool CopsEnabled
+        {
+            get => _copsEnabled;
+            set => UpdateCopsEnabled(value);
+        }
+
+        /// <inheritdoc />
+        public bool SpeedLimit { get; set; }
 
         /// <summary>
         /// Get a list of roadblocks which are previewed.
@@ -153,6 +161,46 @@ namespace AutomaticRoadblocks.ManualPlacement
             _game.NewSafeFiber(() => { roadblockToSpawn.Spawn(); }, "ManualPlacement.PlaceRoadblock");
         }
 
+        /// <inheritdoc />
+        public void RemoveRoadblocks(PlacementRemoveType removeType)
+        {
+            var toBoRemoved = new List<ManualRoadblock>();
+
+            lock (_roadblocks)
+            {
+                if (removeType == PlacementRemoveType.All)
+                {
+                    toBoRemoved = _roadblocks
+                        .Where(x => !x.IsPreviewActive)
+                        .ToList();
+                }
+                else
+                {
+                    var closestRoadblockDistance = 9999f;
+                    var closestRoadblock = (ManualRoadblock)null;
+                    var playerPosition = _game.PlayerPosition;
+
+                    foreach (var roadblock in _roadblocks)
+                    {
+                        var distance = playerPosition.DistanceTo(roadblock.Position);
+
+                        if (distance > closestRoadblockDistance)
+                            continue;
+
+                        closestRoadblockDistance = distance;
+                        closestRoadblock = roadblock;
+                    }
+
+                    if (closestRoadblock != null)
+                        toBoRemoved.Add(closestRoadblock);
+                }
+
+                _roadblocks.RemoveAll(x => toBoRemoved.Contains(x));
+            }
+
+            toBoRemoved.ForEach(x => x.Dispose());
+        }
+
         #endregion
 
         #region Functions
@@ -181,8 +229,19 @@ namespace AutomaticRoadblocks.ManualPlacement
         private ManualRoadblock CreateRoadblock(Road road)
         {
             Assert.NotNull(road, "road cannot be null");
-            return new ManualRoadblock(road, Barrier, VehicleType, LightSourceType, _game.PlayerHeading, false,
-                LightSourceType != LightSourceType.None);
+
+            return new ManualRoadblock(new ManualRoadblock.Request
+            {
+                Road = road,
+                BarrierType = _barrier,
+                VehicleType = _vehicleType,
+                LightSourceType = _lightSourceType,
+                PlacementType = _placementType,
+                TargetHeading = _game.PlayerHeading,
+                LimitSpeed = SpeedLimit,
+                AddLights = LightSourceType != LightSourceType.None,
+                CopsEnabled = _copsEnabled
+            });
         }
 
         private void DoRemovePreviews()
@@ -233,6 +292,12 @@ namespace AutomaticRoadblocks.ManualPlacement
         private void UpdatePlacementType(PlacementType placementType)
         {
             _placementType = placementType;
+            CreatePreview(true);
+        }
+
+        private void UpdateCopsEnabled(bool copsEnabled)
+        {
+            _copsEnabled = copsEnabled;
             CreatePreview(true);
         }
 

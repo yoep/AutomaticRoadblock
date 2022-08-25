@@ -28,7 +28,7 @@ namespace AutomaticRoadblocks.Roadblock
         }
 
         #region Properties
-        
+
         /// <summary>
         /// Get the target vehicle of this roadblock.
         /// </summary>
@@ -60,7 +60,7 @@ namespace AutomaticRoadblocks.Roadblock
         protected abstract IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights);
 
         /// <inheritdoc />
-        protected override IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
+        protected override IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
         {
             return lanesToBlock
                 .Select(lane => CreateSlot(lane, Heading, Vehicle, IsLightsEnabled))
@@ -123,7 +123,7 @@ namespace AutomaticRoadblocks.Roadblock
                 return;
 
             Logger.Trace("Collision has been detected for target vehicle");
-            if (Slots.Any(slot => slot.Vehicle.HasBeenDamagedBy(Vehicle)))
+            if (Slots.Any(HasBeenDamagedBy))
             {
                 Logger.Debug("Determined that the collision must have been against a roadblock slot");
                 BlipFlashNewState(Color.Green);
@@ -135,6 +135,15 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 Logger.Debug("Determined that the collision was not the roadblock");
             }
+        }
+
+        private bool HasBeenDamagedBy(IRoadblockSlot slot)
+        {
+            if (slot.Vehicle != null)
+                return slot.Vehicle.HasBeenDamagedBy(Vehicle);
+
+            Logger.Warn($"Unable to verify the vehicle collision for slot {slot}, vehicle is null");
+            return false;
         }
 
         private void BlipFlashNewState(Color color)

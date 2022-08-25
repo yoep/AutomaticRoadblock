@@ -25,11 +25,16 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// The placement type of the roadblock.
         /// </summary>
         PlacementType PlacementType { get; set; }
-        
+
         /// <summary>
-        /// Indication if flares should be added to the roadblock.
+        /// The indication if cops should be added to the roadblock.
         /// </summary>
-        bool FlaresEnabled { get; set; }
+        bool CopsEnabled { get; set; }
+
+        /// <summary>
+        /// Set if the speed should be limited around the roadblock.
+        /// </summary>
+        bool SpeedLimit { get; set; }
         
         /// <summary>
         /// Determine the placement location based on the current player location.
@@ -52,5 +57,11 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// Place a roadblock based on the <see cref="DetermineLocation"/> <see cref="Road"/>.
         /// </summary>
         void PlaceRoadblock();
+
+        /// <summary>
+        /// Remove one or more placed roadblocks.
+        /// </summary>
+        /// <param name="removeType">The remove criteria for the roadblocks.</param>
+        void RemoveRoadblocks(PlacementRemoveType removeType);
     }
 }

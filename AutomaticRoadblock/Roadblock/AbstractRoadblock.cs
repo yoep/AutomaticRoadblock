@@ -83,7 +83,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Get the generated slots for this roadblock.
         /// </summary>
-        protected IReadOnlyCollection<IRoadblockSlot> Slots { get; private set; }
+        protected IReadOnlyList<IRoadblockSlot> Slots { get; private set; }
 
         /// <summary>
         /// Get the scenery slots for this roadblock.
@@ -246,7 +246,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         /// <param name="lanesToBlock">The lanes to block.</param>
         /// <returns>Returns a list of created slots.</returns>
-        protected abstract IReadOnlyCollection<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock);
+        protected abstract IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock);
 
         /// <summary>
         /// Initialize the roadblock data.
@@ -288,6 +288,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             Logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
             Slots = CreateRoadblockSlots(lanesToBlock);
+            PreventSlotVehicleClipping();
         }
 
         private void InitializeSpeedLimit(bool limitSpeed)
@@ -354,6 +355,15 @@ namespace AutomaticRoadblocks.Roadblock
 
             Logger.Warn("Lanes too close filter has filtered out all lanes, resetting to original list");
             return lanesToBlock.ToList();
+        }
+
+        private void PreventSlotVehicleClipping()
+        {
+            for (var i = 0; i < Slots.Count - 1; i++)
+            {
+                var currentSlot = Slots[i];
+                var nextSlot = Slots[i + 1];
+            }
         }
 
         #endregion

@@ -3,7 +3,7 @@ namespace AutomaticRoadblocks
     public static class AutomaticRoadblocksPlugin
     {
         public const string Name = "Automatic Roadblocks";
-        
+
         public const string MenuTitle = "Automatic Roadblocks";
         public const string MenuSubtitle = "~b~Dispatch roadblocks";
         public const string MenuDebug = "Debug";
@@ -36,17 +36,23 @@ namespace AutomaticRoadblocks
         public const string CleanAllRoadblocks = "Clean all roadblocks" + DebugIndicatorText;
         public const string StartPursuit = "Start pursuit now" + DebugIndicatorText;
         public const string EndPursuit = "End pursuit now" + DebugIndicatorText;
-        
+
         public const string Place = "Place";
         public const string PlaceDescription = "Place a roadblock at the current hightlighted location";
         public const string Barrier = "Barrier";
         public const string BarrierDescription = "The barrier type to use";
+        public const string EnableCops = "Enable cops";
+        public const string EnableCopsDescription = "Set if cops should be spawned with the roadblock";
+        public const string SpeedLimit = "Limit speed";
+        public const string SpeedLimitDescription = "Set if the speed around the roadblock should be limited for traffic";
         public const string Vehicle = "Vehicle";
         public const string VehicleDescription = "The vehicle type to use";
         public const string LightSource = "Lights";
         public const string LightSourceDescription = "The lights type to use";
         public const string BlockLanes = "Block lanes";
         public const string BlockLanesDescription = "The lanes which should be blocked";
+        public const string CleanRoadblockPlacement = "Remove";
+        public const string CleanRoadblockPlacementDescription = "Remove one or more placed roadblocks";
 
         private const string DebugIndicatorText = " [DEBUG]";
     }

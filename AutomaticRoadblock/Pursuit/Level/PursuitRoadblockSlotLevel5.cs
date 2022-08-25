@@ -41,7 +41,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
             for (var i = 0; i < totalOccupants; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.CopPed, pedSpawnPosition, 0f,
-                    (position, heading) => AssignCopWeapons(new ARPed(GetPedModelForVehicle(), position, heading))));
+                    (position, heading) => PedFactory.CreateCopWeapons(new ARPed(GetPedModelForVehicle(), position, heading))));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }
@@ -53,14 +53,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         protected override void InitializeLights()
         {
-        }
-
-        private static ARPed AssignCopWeapons(ARPed ped)
-        {
-            ped.GivePrimaryWeapon(ModelUtils.Weapons.HeavyRifle);
-            ped.GiveWeapon(ModelUtils.Weapons.StunGun);
-            ped.GiveWeapon(ModelUtils.Weapons.Shotgun);
-            return ped;
         }
     }
 }

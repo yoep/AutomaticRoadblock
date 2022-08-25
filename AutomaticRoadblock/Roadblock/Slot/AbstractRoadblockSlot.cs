@@ -49,8 +49,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public Vehicle Vehicle => VehicleInstance?.GameInstance;
 
         /// <inheritdoc />
+        /// <remarks>This field is only available after the <see cref="Initialize"/> method is called.</remarks>
+        public Model VehicleModel { get; private set; }
+
+        /// <inheritdoc />
         public event RoadblockEvents.RoadblockSlotEvents.RoadblockCopKilled RoadblockCopKilled;
-        
+
         /// <inheritdoc />
         public Road.Lane Lane { get; }
 
@@ -58,12 +62,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The barrier type that is used within this slot.
         /// </summary>
         public BarrierType BarrierType { get; }
-
-        /// <summary>
-        /// Get the police vehicle model which is used for the slot.
-        /// <remarks>This field is only available after the <see cref="Initialize"/> method is called.</remarks>
-        /// </summary>
-        protected Model VehicleModel { get; private set; }
 
         /// <summary>
         /// Get the AR vehicle instance of this slot.
@@ -154,7 +152,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 DeletePreview();
 
             Instances.ForEach(x => x.Spawn());
-            Vehicle.IsSirenOn = true;
+            
+            // verify that the vehicle was spawned
+            if (Vehicle != null)
+                Vehicle.IsSirenOn = true;
+            
             CopInstances
                 .Select(x => x.GameInstance)
                 .ToList()
@@ -217,27 +219,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 InitializeLights();
         }
 
-        protected virtual void InitializeVehicleSlot()
-        {
-            Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
-            var initialPosition = Position;
-
-            // move the vehicle a little bit to the border of the road
-            // this should prevent clipping
-            switch (Lane.Type)
-            {
-                case Road.Lane.LaneType.RightLane:
-                    initialPosition += MathHelper.ConvertHeadingToDirection(Lane.Heading + 90) * 1.5f;
-                    break;
-                case Road.Lane.LaneType.LeftLane:
-                    initialPosition += MathHelper.ConvertHeadingToDirection(Lane.Heading - 90) * 1.5f;
-                    break;
-            }
-
-            Instances.Add(new InstanceSlot(EntityType.CopVehicle, initialPosition, Heading + 90,
-                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundVector(position), heading)));
-        }
-
         protected Vector3 GetPositionBehindVehicle()
         {
             return Position + MathHelper.ConvertHeadingToDirection(Heading) * 3f;
@@ -294,6 +275,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected void InvokedCopHasBeenKilled()
         {
             RoadblockCopKilled?.Invoke(this);
+        }
+        
+        private void InitializeVehicleSlot()
+        {
+            Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
+            Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Heading + 90,
+                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundVector(position), heading)));
         }
 
         private void InitializeBarriers()

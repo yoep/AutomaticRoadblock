@@ -1,6 +1,7 @@
 using System;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils.Road;
+using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
@@ -16,11 +17,17 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Get the heading of the roadblock slot.
         /// </summary>
         float Heading { get; }
+        
+        /// <summary>
+        /// Retrieve the vehicle model that is used within this slot.
+        /// </summary>
+        Model VehicleModel { get; }
 
         /// <summary>
-        /// Get the vehicle instance of this slot.
+        /// Retrieve the vehicle instance (nullable) of this slot.
         /// It returns null when <see cref="Spawn"/> has not been called yet.
         /// </summary>
+        [CanBeNull]
         Vehicle Vehicle { get; }
 
         /// <summary>

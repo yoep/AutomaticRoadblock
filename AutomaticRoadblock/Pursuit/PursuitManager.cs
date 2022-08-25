@@ -34,6 +34,7 @@ namespace AutomaticRoadblocks.Pursuit
             _settingsManager = settingsManager;
             _roadblockDispatcher = roadblockDispatcher;
             EnableAutomaticDispatching = settingsManager.AutomaticRoadblocksSettings.EnableDuringPursuits;
+            EnableAutomaticLevelIncreases = true;
         }
 
         #region Properties

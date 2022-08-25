@@ -43,7 +43,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
             for (var i = 0; i < totalOccupants; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.CopPed, pedSpawnPosition, Heading - 180,
-                    (position, heading) => AssignCopWeapons(new ARPed(GetPedModelForVehicle(), position, heading))));
+                    (position, heading) => PedFactory.CreateCopWeapons(new ARPed(GetPedModelForVehicle(), position, heading))));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }
@@ -66,15 +66,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
                     (position, heading) => new ARScenery(PropUtils.CreateHorizontalFlare(position, heading + Random.Next(91)))));
                 startPosition += direction * 1f;
             }
-        }
-
-        private static ARPed AssignCopWeapons(ARPed ped)
-        {
-            ped.GivePrimaryWeapon(ModelUtils.Weapons.Pistol);
-            ped.GiveWeapon(ModelUtils.Weapons.Nightstick);
-            ped.GiveWeapon(ModelUtils.Weapons.StunGun);
-            ped.GiveWeapon(ModelUtils.Weapons.Shotgun);
-            return ped;
         }
     }
 }

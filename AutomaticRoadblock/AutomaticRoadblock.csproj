@@ -32,6 +32,9 @@
       <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+          <HintPath>..\packages\JetBrains.Annotations.2022.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+        </Reference>
         <Reference Include="LSPD First Response">
           <HintPath>..\Libs\LSPD First Response.dll</HintPath>
         </Reference>
@@ -67,6 +70,7 @@
         <Compile Include="Instance\ARPed.cs" />
         <Compile Include="Instance\ARScenery.cs" />
         <Compile Include="Instance\ARVehicle.cs" />
+        <Compile Include="Instance\PedFactory.cs" />
         <Compile Include="Instance\InstanceSlot.cs" />
         <Compile Include="Instance\InstanceType.cs" />
         <Compile Include="IoC.cs" />
@@ -74,6 +78,10 @@
         <Compile Include="LightSources\LightSourceRoadblockFactory.cs" />
         <Compile Include="LightSources\LightSourceSlotFactory.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="ManualPlacement\Menu\RemovePlacedRoadblocksComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\EnableCopsComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\EnableSpeedLimitComponentItem.cs" />
+        <Compile Include="ManualPlacement\PlacementRemoveType.cs" />
         <Compile Include="ManualPlacement\PlacementType.cs" />
         <Compile Include="ManualPlacement\Factory\VehicleFactory.cs" />
         <Compile Include="ManualPlacement\IManualPlacement.cs" />

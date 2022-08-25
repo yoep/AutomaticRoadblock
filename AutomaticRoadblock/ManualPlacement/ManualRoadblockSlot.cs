@@ -1,8 +1,10 @@
+using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.ManualPlacement.Factory;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
 namespace AutomaticRoadblocks.ManualPlacement
@@ -10,13 +12,14 @@ namespace AutomaticRoadblocks.ManualPlacement
     public class ManualRoadblockSlot : AbstractRoadblockSlot
     {
         public ManualRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, LightSourceType lightSourceType, float heading,
-            bool shouldAddLights)
+            bool shouldAddLights, bool copsEnabled)
             : base(lane, barrierType, heading, shouldAddLights)
         {
             Assert.NotNull(vehicleType, "vehicleType cannot be null");
             Assert.NotNull(lightSourceType, "lightSourceType cannot be null");
             VehicleType = vehicleType;
             LightSourceType = lightSourceType;
+            CopsEnabled = copsEnabled;
 
             Initialize();
         }
@@ -33,12 +36,24 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// </summary>
         public LightSourceType LightSourceType { get; }
 
+        /// <summary>
+        /// The indication if cops are added to the slot.
+        /// </summary>
+        public bool CopsEnabled { get; }
+
         #endregion
+
+        #region Functions
 
         /// <inheritdoc />
         protected override void InitializeCopPeds()
         {
-            // no-op
+            Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, _) =>
+            {
+                var cop = PedFactory.CreateCopWeapons(new ARPed(GetPedModelForVehicle(), position));
+                cop.GameInstance.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Driver);
+                return cop;
+            }));
         }
 
         /// <inheritdoc />
@@ -62,5 +77,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             return VehicleFactory.Create(VehicleType, Position);
         }
+
+        #endregion
     }
 }

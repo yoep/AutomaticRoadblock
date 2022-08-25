@@ -14,7 +14,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         }
 
         /// <inheritdoc />
-        public UIMenuCheckboxItem MenuItem => new(AutomaticRoadblocksPlugin.EnableDuringPursuit, true,
+        public UIMenuCheckboxItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.EnableDuringPursuit, true,
             AutomaticRoadblocksPlugin.EnableDuringPursuitDescription);
 
         /// <inheritdoc />

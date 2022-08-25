@@ -9,6 +9,8 @@ namespace AutomaticRoadblocks.Utils.Road
 {
     public class Road : IPreviewSupport
     {
+        private const float LaneHeadingTolerance = 15f;
+
         #region Constructors
 
         internal Road(Vector3 position, Vector3 rightSide, Vector3 leftSide, IReadOnlyList<Lane> lanes, VehicleNode node, int numberOfLanes1,
@@ -146,20 +148,32 @@ namespace AutomaticRoadblocks.Utils.Road
         {
             Assert.NotNull(position, "position cannot be null");
             var closestLaneDistance = 9999f;
-            var closestLane = (Lane) null;
-            
+            var closestLane = (Lane)null;
+
             foreach (var lane in Lanes)
             {
                 var distance = position.DistanceTo(lane.Position);
 
                 if (distance > closestLaneDistance)
                     continue;
-                
+
                 closestLaneDistance = distance;
                 closestLane = lane;
             }
 
             return closestLane;
+        }
+
+        /// <summary>
+        /// Retrieve the lanes which are heading towards the given heading.
+        /// </summary>
+        /// <param name="heading">The heading the lanes should follow.</param>
+        /// <returns>Returns the lanes towards the same heading if any match, else an empty <see cref="IEnumerable{T}"/>.</returns>
+        public IEnumerable<Lane> LanesHeadingTo(float heading)
+        {
+            return Lanes
+                .Where(x => Math.Abs(x.Heading - heading) < LaneHeadingTolerance)
+                .ToList();
         }
 
         public override string ToString()

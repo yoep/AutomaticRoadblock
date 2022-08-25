@@ -115,7 +115,6 @@ namespace AutomaticRoadblocks.Menu
                     IsShown = _menuSwitcher.CurrentMenu.Visible;
                 }
 
-                ProcessMenuChanged();
                 MenuPool.ProcessMenus();
             }
             catch (Exception ex)
@@ -123,37 +122,6 @@ namespace AutomaticRoadblocks.Menu
                 _logger.Error($"An unexpected error occurred while processing the menu with error {ex.Message}", ex);
                 _game.DisplayPluginNotification("an unexpected error occurred");
             }
-        }
-
-        private void ProcessMenuChanged()
-        {
-            // var currentMenu = _menuSwitcher.CurrentMenu;
-            //
-            // if (_lastSelectedMenu != null && _lastSelectedMenu != currentMenu)
-            // {
-            //     try
-            //     {
-            //         _menuSwitchItems
-            //             .First(x => x.Menu == currentMenu)
-            //             .OnShown();
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         _logger.Error($"Failed to invoke OnShown on menu switcher item, {ex.Message}", ex);
-            //     }
-            //     try
-            //     {
-            //         _menuSwitchItems
-            //             .First(x => x.Menu == _lastSelectedMenu)
-            //             .OnHiding();
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         _logger.Error($"Failed to invoke OnHiding on menu switcher item, {ex.Message}", ex);
-            //     }
-            // }
-            //
-            // _lastSelectedMenu = currentMenu;
         }
 
         private void OnItemSelect(UIMenu sender, UIMenuItem selectedItem, int index)

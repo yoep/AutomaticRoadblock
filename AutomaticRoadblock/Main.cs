@@ -113,16 +113,19 @@ namespace AutomaticRoadblocks
                 .Register<IMenuSwitchItem>(typeof(RoadblockMenuSwitchItem))
                 .Register<IMenuSwitchItem>(typeof(ManualPlacementMenuSwitchItem))
                 // pursuit components
-                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableDuringPursuitComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableAutomaticLevelIncreaseComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableDuringPursuitComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableAutomaticLevelIncreaseComponent))
                 // manual placement components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PlaceComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PlacementTypeComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableCopsComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableSpeedLimitComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(BarrierComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(LightComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(VehicleComponentItem));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(VehicleComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RemovePlacedRoadblocksComponentItem));
         }
 
         private static void OnDutyStateChanged(bool onDuty)
