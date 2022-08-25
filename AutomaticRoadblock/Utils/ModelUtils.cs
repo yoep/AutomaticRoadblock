@@ -67,18 +67,18 @@ namespace AutomaticRoadblocks.Utils
                 var zone = GetZone(position);
 
                 return IsCountyZone(zone)
-                    ? new Model(Peds.CopCountyPedModels[Random.Next(Peds.CopCountyPedModels.Count)])
-                    : new Model(Peds.CopCityPedModels[Random.Next(Peds.CopCityPedModels.Count)]);
+                    ? new Model(CopCountyPedModels[Random.Next(CopCountyPedModels.Count)])
+                    : new Model(CopCityPedModels[Random.Next(CopCityPedModels.Count)]);
             }
             
             public static Model GetPoliceFbiCop()
             {
-                return new Model(Peds.CopFbiPedModels[Random.Next(Peds.CopFbiPedModels.Count)]);
+                return new Model(CopFbiPedModels[Random.Next(CopFbiPedModels.Count)]);
             }
 
             public static Model GetPoliceSwatCop()
             {
-                return new Model(Peds.CopSwatPedModels[Random.Next(Peds.CopSwatPedModels.Count)]);
+                return new Model(CopSwatPedModels[Random.Next(CopSwatPedModels.Count)]);
             }
 
             public static Model GetPoliceBikeCop()
@@ -133,7 +133,7 @@ namespace AutomaticRoadblocks.Utils
             public static Model GetLocalPoliceVehicle(Vector3 position, bool includePoliceBike = true, bool includePoliceTransporter = true)
             {
                 var zone = GetZone(position);
-                var list = IsCountyZone(zone) ? Vehicles.CountyVehicleModels.ToList() : Vehicles.CityVehicleModels.ToList();
+                var list = IsCountyZone(zone) ? CountyVehicleModels.ToList() : CityVehicleModels.ToList();
 
                 if (!includePoliceBike)
                     list.Remove(PoliceBikeModelName);

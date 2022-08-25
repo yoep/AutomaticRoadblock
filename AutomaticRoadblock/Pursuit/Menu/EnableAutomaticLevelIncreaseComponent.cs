@@ -4,18 +4,18 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
 {
-    public class EnableDuringPursuitComponent : IMenuComponent<UIMenuCheckboxItem>
+    public class EnableAutomaticLevelIncreaseComponent : IMenuComponent<UIMenuCheckboxItem>
     {
         private readonly IPursuitManager _pursuitManager;
 
-        public EnableDuringPursuitComponent(IPursuitManager pursuitManager)
+        public EnableAutomaticLevelIncreaseComponent(IPursuitManager pursuitManager)
         {
             _pursuitManager = pursuitManager;
         }
 
         /// <inheritdoc />
-        public UIMenuCheckboxItem MenuItem => new(AutomaticRoadblocksPlugin.EnableDuringPursuit, true,
-            AutomaticRoadblocksPlugin.EnableDuringPursuitDescription);
+        public UIMenuCheckboxItem MenuItem => new(AutomaticRoadblocksPlugin.EnableAutoPursuitLevelIncrease, true,
+            AutomaticRoadblocksPlugin.EnableAutoPursuitLevelIncreaseDescription);
 
         /// <inheritdoc />
         public MenuType Type => MenuType.PURSUIT;
@@ -26,14 +26,14 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _pursuitManager.EnableAutomaticDispatching = MenuItem.Checked;
+            _pursuitManager.EnableAutomaticLevelIncreases = MenuItem.Checked;
         }
 
         [IoC.PostConstruct]
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            MenuItem.Checked = _pursuitManager.EnableAutomaticDispatching;
+            MenuItem.Checked = _pursuitManager.EnableAutomaticLevelIncreases;
         }
     }
 }

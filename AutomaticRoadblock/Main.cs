@@ -109,11 +109,15 @@ namespace AutomaticRoadblocks
         private static void InitializeMenuComponents()
         {
             IoC.Instance
+                // menu switchers
                 .Register<IMenuSwitchItem>(typeof(RoadblockMenuSwitchItem))
                 .Register<IMenuSwitchItem>(typeof(ManualPlacementMenuSwitchItem))
+                // pursuit components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableDuringPursuitComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableAutomaticLevelIncreaseComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent))
+                // manual placement components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PlaceComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PlacementTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(BarrierComponentItem))

@@ -110,6 +110,7 @@
         <Compile Include="Pursuit\Menu\DispatchNowComponent.cs" />
         <Compile Include="Pursuit\Menu\DispatchPreviewComponent.cs" />
         <Compile Include="Pursuit\Menu\DispatchSpawnComponent.cs" />
+        <Compile Include="Pursuit\Menu\EnableAutomaticLevelIncreaseComponent.cs" />
         <Compile Include="Pursuit\Menu\EnableDuringPursuitComponent.cs" />
         <Compile Include="Pursuit\Menu\PursuitLevelComponent.cs" />
         <Compile Include="Pursuit\NoPursuitActiveException.cs" />

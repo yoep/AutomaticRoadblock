@@ -21,6 +21,8 @@ namespace AutomaticRoadblocks
 
         public const string EnableDuringPursuit = "Automatic";
         public const string EnableDuringPursuitDescription = "Enable automatic roadblock dispatching during a pursuit";
+        public const string EnableAutoPursuitLevelIncrease = "Level increase";
+        public const string EnableAutoPursuitLevelIncreaseDescription = "Enable automatic level increases during a pursuit";
         public const string DispatchNow = "Dispatch now";
         public const string DispatchNowDescription = "Dispatch a roadblock now for the current pursuit";
         public const string DispatchPreview = "Dispatch preview" + DebugIndicatorText;

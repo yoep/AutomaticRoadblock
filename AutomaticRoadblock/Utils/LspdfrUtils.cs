@@ -6,7 +6,7 @@ namespace AutomaticRoadblocks.Utils
     public static class LspdfrUtils
     {
         /// <summary>
-        /// Extension on the <see cref="Functions#PlayScannerAudio"/> function which prevents audio from overlapping.
+        /// Extension on the <see cref="Functions"/> function which prevents audio from overlapping.
         /// As an addition, it can wait for the audio to complete before continuing.
         /// </summary>
         /// <param name="sound">The sound string to play.</param>

@@ -5,7 +5,6 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Settings;
-using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -34,6 +33,7 @@ namespace AutomaticRoadblocks.Pursuit
             _game = game;
             _settingsManager = settingsManager;
             _roadblockDispatcher = roadblockDispatcher;
+            EnableAutomaticDispatching = settingsManager.AutomaticRoadblocksSettings.EnableDuringPursuits;
         }
 
         #region Properties
@@ -43,6 +43,9 @@ namespace AutomaticRoadblocks.Pursuit
 
         /// <inheritdoc />
         public bool EnableAutomaticDispatching { get; set; }
+
+        /// <inheritdoc />
+        public bool EnableAutomaticLevelIncreases { get; set; }
 
         /// <inheritdoc />
         public bool IsPursuitActive => PursuitHandle != null && Functions.IsPursuitStillRunning(PursuitHandle);
@@ -257,13 +260,19 @@ namespace AutomaticRoadblocks.Pursuit
         {
             var increaseLevelThreshold = 100 - PursuitLevel.AutomaticLevelIncreaseFactor * 100;
 
-            if (HasAtLeastDeployedXRoadblocks() &&
-                HasEnoughTimePassedBetweenLastLevelIncrease() &&
-                !IsPursuitOnFoot &&
+            if (IsAutomaticLevelIncreaseAllowed() &&
                 _random.Next(101) >= increaseLevelThreshold)
             {
                 IncreasePursuitLevel();
             }
+        }
+
+        private bool IsAutomaticLevelIncreaseAllowed()
+        {
+            return EnableAutomaticLevelIncreases &&
+                   HasAtLeastDeployedXRoadblocks() &&
+                   HasEnoughTimePassedBetweenLastLevelIncrease() &&
+                   !IsPursuitOnFoot;
         }
 
         private bool DoDispatch(Vehicle vehicle, bool userRequested, bool force)

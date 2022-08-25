@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Pursuit.Factory;
-using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;

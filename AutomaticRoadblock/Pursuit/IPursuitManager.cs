@@ -25,6 +25,11 @@ namespace AutomaticRoadblocks.Pursuit
         /// Enable automatic dispatching of roadblocks during a pursuit.
         /// </summary>
         bool EnableAutomaticDispatching { get; set; }
+        
+        /// <summary>
+        /// Enable automatic level increases during a pursuit.
+        /// </summary>
+        bool EnableAutomaticLevelIncreases { get; set; }
 
         /// <summary>
         /// Retrieve the current pursuit level.
