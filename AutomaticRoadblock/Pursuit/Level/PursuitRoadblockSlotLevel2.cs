@@ -20,13 +20,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
             base.Spawn();
             CopInstances
                 .ToList()
-                .ForEach(x =>
-                {
-                    x.EquipPrimaryWeapon();
-                    Logger.Trace("Taking cover from target vehicle driver");
-                    x.Cover();
-                    x.GameInstance.Tasks.TakeCoverAt(Vehicle.Position + MathHelper.ConvertHeadingToDirection(Heading) * 2f, TargetVehicle.Position, -1, false);
-                });
+                .ForEach(x => x.AimAt(TargetVehicle, 45000));
         }
 
         protected override Model GetVehicleModel()

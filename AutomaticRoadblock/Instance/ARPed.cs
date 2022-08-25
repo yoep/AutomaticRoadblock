@@ -81,6 +81,28 @@ namespace AutomaticRoadblocks.Instance
             EntityUtils.CanPeekInCover(GameInstance, true);
             EntityUtils.LoadCover(GameInstance, true);
         }
+
+        /// <summary>
+        /// Aim at the given entity.
+        /// </summary>
+        /// <param name="entity">The entity to aim at.</param>
+        /// <param name="duration">The duration.</param>
+        public void AimAt(Entity entity, int duration)
+        {
+            EquipPrimaryWeapon();
+            GameInstance.Tasks.AimWeaponAt(entity, duration);
+        }
+
+        /// <summary>
+        /// Fire at the given entity.
+        /// </summary>
+        /// <param name="entity">The entity to fire at.</param>
+        /// <param name="duration">The duration.</param>
+        public void FireAt(Entity entity, int duration)
+        {
+            EquipPrimaryWeapon();
+            GameInstance.Tasks.FireWeaponAt(entity, duration, FiringPattern.BurstFire);
+        }
         
         #endregion
 
