@@ -178,16 +178,10 @@ namespace AutomaticRoadblocks.Utils.Road
 
         public override string ToString()
         {
-            return $"\n{nameof(Position)}: {Position}," +
-                   $"\n{nameof(RightSide)}: {RightSide}," +
-                   $"\n{nameof(LeftSide)}: {LeftSide}," +
-                   $"\n{nameof(NumberOfLanes1)}: {NumberOfLanes1}," +
-                   $"\n{nameof(NumberOfLanes2)}: {NumberOfLanes2}," +
-                   $"\n{nameof(JunctionIndicator)}: {JunctionIndicator}," +
-                   $"\n{nameof(IsAtJunction)}: {IsAtJunction}," +
-                   $"\n{nameof(IsSingleDirection)}: {IsSingleDirection}," +
-                   $"\n{nameof(Width)}: {Width}" +
-                   $"\n{nameof(Node)}: {Node}" +
+            return $"{nameof(Position)}: {Position}, {nameof(Width)}: {Width}, {nameof(RightSide)}: {RightSide}, {nameof(LeftSide)}: {LeftSide}\n" +
+                   $"{nameof(NumberOfLanes1)}: {NumberOfLanes1}, {nameof(NumberOfLanes2)}: {NumberOfLanes2}, {nameof(JunctionIndicator)}: {JunctionIndicator}, " +
+                   $"{nameof(IsAtJunction)}: {IsAtJunction}, {nameof(IsSingleDirection)}: {IsSingleDirection}\n" +
+                   $"{nameof(Node)}: {Node}" +
                    "\n--- Lanes ---" +
                    $"\n{string.Join("\n", Lanes)}" +
                    "\n---";
@@ -336,14 +330,10 @@ namespace AutomaticRoadblocks.Utils.Road
 
             public override string ToString()
             {
-                return $"{nameof(Number)}: {Number}," + Environment.NewLine +
-                       $"{nameof(Heading)}: {Heading}," + Environment.NewLine +
-                       $"{nameof(RightSide)}: {RightSide}," + Environment.NewLine +
-                       $"{nameof(LeftSide)}: {LeftSide}," + Environment.NewLine +
-                       $"{nameof(NodePosition)}: {NodePosition}," + Environment.NewLine +
-                       $"{nameof(Width)}: {Width}," + Environment.NewLine +
-                       $"{nameof(Type)}: {Type}," + Environment.NewLine +
-                       $"{nameof(IsPreviewActive)}: {IsPreviewActive}" + Environment.NewLine;
+                return "{" +
+                       $"{nameof(Number)}: {Number}, {nameof(Heading)}: {Heading}, {nameof(RightSide)}: {RightSide}, {nameof(LeftSide)}: {LeftSide}, " +
+                       $"{nameof(NodePosition)}: {NodePosition}, {nameof(Width)}: {Width}, {nameof(Type)}: {Type}, {nameof(IsPreviewActive)}: {IsPreviewActive}" +
+                       "}";
             }
 
             private Vector3 CalculatePosition()
@@ -419,7 +409,7 @@ namespace AutomaticRoadblocks.Utils.Road
 
             public override string ToString()
             {
-                return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}";
+                return "{" + $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}" + "}";
             }
 
             protected bool Equals(VehicleNode other)

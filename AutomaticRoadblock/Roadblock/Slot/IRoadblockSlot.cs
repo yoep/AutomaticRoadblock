@@ -33,6 +33,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <summary>
         /// The lane this slot blocks of a certain road.
         /// </summary>
+        [NotNull]
         Road.Lane Lane { get; }
 
         /// <summary>
@@ -44,6 +45,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Spawn the slot entities into the world.
         /// </summary>
         void Spawn();
+
+        /// <summary>
+        /// Modify/move the current position of the vehicle within this slot.
+        /// </summary>
+        /// <param name="newPosition">The new position of the vehicle within the slot.</param>
+        /// <remarks>It's recommended to NOT use this method when this slot has been <see cref="Spawn"/>.</remarks>
+        void ModifyVehiclePosition(Vector3 newPosition);
 
         /// <summary>
         /// Release the AI entities to LSPDFR.

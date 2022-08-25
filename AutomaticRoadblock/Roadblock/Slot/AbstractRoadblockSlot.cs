@@ -165,6 +165,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         /// <inheritdoc />
+        public void ModifyVehiclePosition(Vector3 newPosition)
+        {
+            Assert.NotNull(newPosition, "newPosition cannot be null");
+            var vehicleSlot = Instances.First(x => x.Type == EntityType.CopVehicle);
+            vehicleSlot.Position = newPosition;
+        }
+
+        /// <inheritdoc />
         public void ReleaseToLspdfr()
         {
             var copPeds = Instances

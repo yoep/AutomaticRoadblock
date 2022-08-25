@@ -219,7 +219,6 @@ namespace AutomaticRoadblocks.ManualPlacement
                 lock (_roadblocks)
                 {
                     var roadblock = CreateRoadblock(road);
-                    _logger.Debug($"Created manual roadblock {roadblock}");
                     roadblock.CreatePreview();
 
                     _roadblocks.Add(roadblock);
@@ -230,8 +229,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private ManualRoadblock CreateRoadblock(Road road)
         {
             Assert.NotNull(road, "road cannot be null");
-            _logger.Info($"Current CopsEnabled status {CopsEnabled}");
-            return new ManualRoadblock(new ManualRoadblock.Request
+            var roadblock = new ManualRoadblock(new ManualRoadblock.Request
             {
                 Road = road,
                 BarrierType = _barrier,
@@ -243,6 +241,8 @@ namespace AutomaticRoadblocks.ManualPlacement
                 AddLights = LightSourceType != LightSourceType.None,
                 CopsEnabled = CopsEnabled
             });
+            _logger.Trace($"Created manual roadblock {roadblock}");
+            return roadblock;
         }
 
         private void DoRemovePreviews()
@@ -298,7 +298,6 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         private void UpdateCopsEnabled(bool copsEnabled)
         {
-            _logger.Info($"Updated cops enabled to {copsEnabled}");
             _copsEnabled = copsEnabled;
             CreatePreview(true);
         }

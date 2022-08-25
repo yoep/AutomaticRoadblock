@@ -31,9 +31,10 @@ namespace AutomaticRoadblocks.Instance
         public EntityType Type { get; }
 
         /// <summary>
-        /// Get the position of the entity.
+        /// The position of the entity.
         /// </summary>
-        public Vector3 Position { get; }
+        /// <remarks>It's recommended to not change the position when the entity has been <see cref="Spawn"/></remarks>
+        public Vector3 Position { get; set; }
 
         /// <summary>
         /// Get the heading of the entity.

@@ -139,7 +139,9 @@ namespace AutomaticRoadblocks.Pursuit
 
             if (vehicle == null)
             {
-                _logger.Warn("Unable to create pursuit roadblock preview, no active vehicle in pursuit or player not in vehicle");
+                const string message = "Unable to create pursuit roadblock preview, no active vehicle in pursuit or player not in vehicle";
+                _logger.Warn(message);
+                _game.DisplayNotification("~r" + message);
                 return;
             }
 

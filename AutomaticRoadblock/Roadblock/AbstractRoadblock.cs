@@ -20,6 +20,7 @@ namespace AutomaticRoadblocks.Roadblock
         protected const float SpeedLimit = 5f;
         protected const float LaneHeadingTolerance = 40f;
         protected const int BlipFlashDuration = 3000;
+        protected const float AdditionalClippingSpace = 0.5f;
 
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected readonly IGame Game = IoC.Instance.GetInstance<IGame>();
@@ -185,9 +186,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Level)}: {Level}, {nameof(State)}: {State}\n" +
-                   $"Number of {nameof(Slots)}: [{Slots.Count}]\n" +
-                   $"{nameof(Road)}: {Road}";
+            return $"{nameof(Level)}: {Level}, {nameof(State)}: {State}, Number of {nameof(Slots)}: [{Slots.Count}]\n" +
+                   $"--- {nameof(Slots)} ---\n" +
+                   $"{string.Join("\n", Slots)}\n" +
+                   $"--- {nameof(Road)} ---\n" +
+                   $"{Road}";
         }
 
         #endregion
@@ -287,7 +290,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             Logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
             Slots = CreateRoadblockSlots(lanesToBlock);
-            PreventSlotVehicleClipping();
+            PreventSlotVehiclesClipping();
         }
 
         private void InitializeSpeedLimit(bool limitSpeed)
@@ -356,13 +359,43 @@ namespace AutomaticRoadblocks.Roadblock
             return lanesToBlock.ToList();
         }
 
-        private void PreventSlotVehicleClipping()
+        private void PreventSlotVehiclesClipping()
         {
             for (var i = 0; i < Slots.Count - 1; i++)
             {
                 var currentSlot = Slots[i];
                 var nextSlot = Slots[i + 1];
+                var currentSlotDifference = CalculateSlotVehicleDifference(currentSlot);
+                var nextSlotDifference = CalculateSlotVehicleDifference(nextSlot);
+
+                // verify if the slot difference is smaller than 0
+                // this means that the vehicle is exceeding the lane width and might clip into the other vehicle
+                if (currentSlotDifference > 0)
+                    continue;
+
+                Logger.Trace($"Current slot vehicle is exceeding by {currentSlotDifference}");
+                // check if there is enough space between this lane and the other one
+                // if so, we're using the next lane space for the current exceeding slot vehicle
+                if (nextSlotDifference > 0 && nextSlotDifference - Math.Abs(currentSlotDifference) >= 0)
+                {
+                    Logger.Trace($"Next slot had enough space ({nextSlotDifference}) for the current exceeding slot vehicle");
+                    continue;
+                }
+
+                // move the current slot vehicle position by the difference
+                var newPosition = currentSlot.Position + MathHelper.ConvertHeadingToDirection(currentSlot.Lane.Heading - 90) *
+                    (Math.Abs(currentSlotDifference) + AdditionalClippingSpace);
+                Logger.Debug($"Slot vehicle is clipping into next slot by ({currentSlotDifference}), old position {currentSlot.Position}, new position {newPosition}");
+                currentSlot.ModifyVehiclePosition(newPosition);
             }
+        }
+
+        private float CalculateSlotVehicleDifference(IRoadblockSlot slot)
+        {
+            var laneWidth = slot.Lane.Width;
+            var vehicleLength = slot.VehicleModel.Dimensions.Y;
+
+            return laneWidth - vehicleLength;
         }
 
         #endregion

@@ -42,13 +42,15 @@ namespace AutomaticRoadblocks.ManualPlacement
         public bool CopsEnabled { get; }
 
         #endregion
-        
+
         #region Methods
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, {nameof(CopsEnabled)}: {CopsEnabled}";
+            return "{" +
+                   $"{base.ToString()}, {nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, {nameof(CopsEnabled)}: {CopsEnabled}" +
+                   "}";
         }
 
         #endregion

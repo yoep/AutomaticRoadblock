@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
@@ -15,7 +14,6 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
             Assert.NotNull(request.LightSourceType, "lightSourceType cannot be null");
-            IoC.Instance.GetInstance<ILogger>().Info($"Received request {request}");
             VehicleType = request.VehicleType;
             LightSourceType = request.LightSourceType;
             PlacementType = request.PlacementType;
