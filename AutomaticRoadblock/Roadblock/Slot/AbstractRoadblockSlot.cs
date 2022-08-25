@@ -306,10 +306,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Logger.Trace("Initializing the roadblock slot barriers");
             var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
-            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * Lane.Width;
+            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * (Lane.Width / 2 - BarrierType.Width / 2);
             var direction = MathHelper.ConvertHeadingToDirection(Heading - 90);
             var barrierTotalWidth = BarrierType.Spacing + BarrierType.Width;
-            var totalBarriers = (int)Math.Ceiling(Lane.Width / barrierTotalWidth);
+            var totalBarriers = (int)Math.Floor(Lane.Width / barrierTotalWidth);
 
             Logger.Debug($"Creating a total of {totalBarriers} barriers with type {BarrierType} for the roadblock slot");
             for (var i = 0; i < totalBarriers; i++)
