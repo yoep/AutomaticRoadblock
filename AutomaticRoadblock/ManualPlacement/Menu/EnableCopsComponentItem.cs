@@ -34,6 +34,12 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         private void Init()
         {
             MenuItem.Checked = _manualPlacement.CopsEnabled;
+            MenuItem.CheckboxEvent += CheckedStateChanged;
+        }
+
+        private void CheckedStateChanged(UIMenuCheckboxItem sender, bool @checked)
+        {
+            _manualPlacement.CopsEnabled = MenuItem.Checked;
         }
     }
 }

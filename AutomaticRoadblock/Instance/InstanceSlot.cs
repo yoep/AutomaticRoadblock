@@ -22,6 +22,9 @@ namespace AutomaticRoadblocks.Instance
             Heading = heading;
         }
 
+        #region Properties
+
+
         /// <summary>
         /// Get the slot entity type.
         /// </summary>
@@ -41,7 +44,11 @@ namespace AutomaticRoadblocks.Instance
         /// Get the instance if it's spawned.
         /// </summary>
         public ARInstance<Entity> Instance { get; private set; }
+        
+        #endregion
 
+        #region Methods
+        
         /// <summary>
         /// Spawn the entity if it's not already spawned.
         /// </summary>
@@ -50,7 +57,6 @@ namespace AutomaticRoadblocks.Instance
             if (Instance != null)
                 return;
 
-            _logger.Trace($"Creating instance slot {Type}");
             var instance = _factory.Invoke(Position, Heading);
 
             if (instance != null)
@@ -64,10 +70,10 @@ namespace AutomaticRoadblocks.Instance
 
         public override string ToString()
         {
-            return $"{nameof(Type)}: {Type}\n" +
-                   $"{nameof(Position)}: {Position}\n" +
-                   $"{nameof(Heading)}: {Heading}";
+            return $"{nameof(Type)}: {Type}, {nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}";
         }
+
+        #endregion
 
         #region IPreviewSupport
 

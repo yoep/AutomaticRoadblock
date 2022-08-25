@@ -26,7 +26,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _manualPlacement.SpeedLimit = MenuItem.Checked;
+            // no-op
         }
 
         [IoC.PostConstruct]
@@ -34,6 +34,12 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         private void Init()
         {
             MenuItem.Checked = _manualPlacement.SpeedLimit;
+            MenuItem.CheckboxEvent += CheckedStateChanged;
+        }
+
+        private void CheckedStateChanged(UIMenuCheckboxItem sender, bool @checked)
+        {
+            _manualPlacement.SpeedLimit = MenuItem.Checked;
         }
     }
 }

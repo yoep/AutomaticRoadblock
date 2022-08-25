@@ -99,7 +99,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             var game = IoC.Instance.GetInstance<IGame>();
 
             Logger.Debug($"Creating a total of {Instances.Count} instances for the roadblock slot preview");
-            Logger.Trace($"Roadblock slot instances: \n{string.Join("\n---\n", Instances.Select(x => x.ToString()).ToList())}");
+            Logger.Trace($"Roadblock slot instances: \n{string.Join("\n", Instances.Select(x => x.ToString()).ToList())}");
             Instances.ForEach(x => x.CreatePreview());
             Logger.Trace("Drawing the roadblock slot information within the preview");
             game.NewSafeFiber(() =>
@@ -138,11 +138,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Instances)}: {Instances.Count},\n" +
-                   $"{nameof(Position)}: {Position},\n" +
-                   $"{nameof(Heading)}: {Heading}\n" +
-                   $"{nameof(BarrierType)}: {BarrierType}\n" +
-                   $"{nameof(VehicleModel)}: {VehicleModel.Name}";
+            return $"Number of {nameof(Instances)}: {Instances.Count}, {nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}, " +
+                   $"{nameof(BarrierType)}: {BarrierType} {nameof(VehicleModel)}: {VehicleModel.Name}";
         }
 
         /// <inheritdoc />
@@ -152,11 +149,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 DeletePreview();
 
             Instances.ForEach(x => x.Spawn());
-            
+
             // verify that the vehicle was spawned
             if (Vehicle != null)
                 Vehicle.IsSirenOn = true;
-            
+
             CopInstances
                 .Select(x => x.GameInstance)
                 .ToList()
@@ -276,7 +273,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             RoadblockCopKilled?.Invoke(this);
         }
-        
+
         private void InitializeVehicleSlot()
         {
             Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
@@ -305,7 +302,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             try
             {
-                Logger.Trace($"Spawning barrier type {BarrierType} at {position} with heading {heading}");
                 return BarrierFactory.Create(BarrierType, position, heading);
             }
             catch (Exception ex)

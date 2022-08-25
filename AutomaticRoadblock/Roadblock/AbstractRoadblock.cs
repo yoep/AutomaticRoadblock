@@ -185,9 +185,8 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Level)}: {Level}\n" +
-                   $"{nameof(State)}: {State}\n" +
-                   $"{nameof(Slots)}: [{Slots.Count}]{string.Join(",\n", Slots)}\n" +
+            return $"{nameof(Level)}: {Level}, {nameof(State)}: {State}\n" +
+                   $"Number of {nameof(Slots)}: [{Slots.Count}]\n" +
                    $"{nameof(Road)}: {Road}";
         }
 

@@ -42,12 +42,25 @@ namespace AutomaticRoadblocks.ManualPlacement
         public bool CopsEnabled { get; }
 
         #endregion
+        
+        #region Methods
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, {nameof(CopsEnabled)}: {CopsEnabled}";
+        }
+
+        #endregion
 
         #region Functions
 
         /// <inheritdoc />
         protected override void InitializeCopPeds()
         {
+            if (!CopsEnabled)
+                return;
+
             Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, _) =>
             {
                 var cop = PedFactory.CreateCopWeapons(new ARPed(GetPedModelForVehicle(), position));

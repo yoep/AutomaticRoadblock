@@ -219,6 +219,7 @@ namespace AutomaticRoadblocks.ManualPlacement
                 lock (_roadblocks)
                 {
                     var roadblock = CreateRoadblock(road);
+                    _logger.Debug($"Created manual roadblock {roadblock}");
                     roadblock.CreatePreview();
 
                     _roadblocks.Add(roadblock);
@@ -229,7 +230,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private ManualRoadblock CreateRoadblock(Road road)
         {
             Assert.NotNull(road, "road cannot be null");
-
+            _logger.Info($"Current CopsEnabled status {CopsEnabled}");
             return new ManualRoadblock(new ManualRoadblock.Request
             {
                 Road = road,
@@ -240,7 +241,7 @@ namespace AutomaticRoadblocks.ManualPlacement
                 TargetHeading = _game.PlayerHeading,
                 LimitSpeed = SpeedLimit,
                 AddLights = LightSourceType != LightSourceType.None,
-                CopsEnabled = _copsEnabled
+                CopsEnabled = CopsEnabled
             });
         }
 
@@ -297,6 +298,7 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         private void UpdateCopsEnabled(bool copsEnabled)
         {
+            _logger.Info($"Updated cops enabled to {copsEnabled}");
             _copsEnabled = copsEnabled;
             CreatePreview(true);
         }

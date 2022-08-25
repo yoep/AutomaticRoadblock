@@ -26,7 +26,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _pursuitManager.EnableAutomaticDispatching = MenuItem.Checked;
+            // no-op
         }
 
         [IoC.PostConstruct]
@@ -34,6 +34,12 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         private void Init()
         {
             MenuItem.Checked = _pursuitManager.EnableAutomaticDispatching;
+            MenuItem.CheckboxEvent += CheckedStateChanged;
+        }
+
+        private void CheckedStateChanged(UIMenuCheckboxItem sender, bool @checked)
+        {
+            _pursuitManager.EnableAutomaticDispatching = MenuItem.Checked;
         }
     }
 }

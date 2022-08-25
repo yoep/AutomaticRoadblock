@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
@@ -14,6 +15,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
             Assert.NotNull(request.LightSourceType, "lightSourceType cannot be null");
+            IoC.Instance.GetInstance<ILogger>().Info($"Received request {request}");
             VehicleType = request.VehicleType;
             LightSourceType = request.LightSourceType;
             PlacementType = request.PlacementType;
@@ -38,7 +40,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// The placement type of the roadblock.
         /// </summary>
         public PlacementType PlacementType { get; }
-        
+
         /// <summary>
         /// Set if cops should be added.
         /// </summary>
@@ -50,6 +52,18 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         /// <inheritdoc />
         public override RoadblockLevel Level => RoadblockLevel.None;
+
+        #endregion
+
+        #region Methods
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return
+                $"{nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, {nameof(PlacementType)}: {PlacementType}, {nameof(CopsEnabled)}: {CopsEnabled}\n" +
+                $"{nameof(Slots)}: [{Slots.Count}]{string.Join(",\n", Slots)}";
+        }
 
         #endregion
 
@@ -105,6 +119,13 @@ namespace AutomaticRoadblocks.ManualPlacement
             public bool LimitSpeed { get; set; }
             public bool AddLights { get; set; }
             public bool CopsEnabled { get; set; }
+
+            public override string ToString()
+            {
+                return $"{nameof(BarrierType)}: {BarrierType}, {nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, " +
+                       $"{nameof(PlacementType)}: {PlacementType}, {nameof(TargetHeading)}: {TargetHeading}, {nameof(LimitSpeed)}: {LimitSpeed}, " +
+                       $"{nameof(AddLights)}: {AddLights}, {nameof(CopsEnabled)}: {CopsEnabled}";
+            }
         }
     }
 }
