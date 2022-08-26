@@ -189,21 +189,45 @@ namespace AutomaticRoadblocks.Utils
             return PlaceCorrectlyOnGround(instance);
         }
 
-        public static Object CreateRedGroundLight(Vector3 position)
+        public static Object CreateRedStandingGroundLight(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_air_lights_02b"), position);
+            var instance = new Object(new Model("prop_air_lights_02b"), position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
-        public static Object CreateBlueGroundLight(Vector3 position)
+        public static Object CreateBlueStandingGroundLight(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_air_lights_02a"), position);
+            var instance = new Object(new Model("prop_air_lights_02a"), position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
-        public static Object CreateAirGroundLight(Vector3 position)
+        public static Object CreateBlueGroundLight(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_air_lights_03a"), position);
+            var instance = new Object(new Model("prop_runlight_b"), position, heading);
+            return instance;
+        }
+
+        public static Object CreateRedGroundLight(Vector3 position, float heading = 0f)
+        {
+            var instance = new Object(new Model("prop_runlight_r"), position, heading);
+            return instance;
+        }
+
+        public static Object CreateGreenGroundLight(Vector3 position)
+        {
+            var instance = new Object(new Model("prop_runlight_g"), position);
+            return instance;
+        }
+
+        public static Object CreateYellowGroundLight(Vector3 position)
+        {
+            var instance = new Object(new Model("prop_runlight_y"), position);
+            return instance;
+        }
+
+        public static Object CreateWarningLight(Vector3 position, float heading = 0f)
+        {
+            var instance = new Object(new Model("prop_warninglight_01"), position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 

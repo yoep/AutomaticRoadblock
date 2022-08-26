@@ -46,10 +46,10 @@ namespace AutomaticRoadblocks.LightSources
                 {
                     new(EntityType.Scenery, roadRightSidePosition, roadblock.Heading,
                         (position, _) =>
-                            new ARScenery(unmodifiedCount % 2 == 0 ? PropUtils.CreateBlueGroundLight(position) : PropUtils.CreateRedGroundLight(position))),
+                            new ARScenery(unmodifiedCount % 2 == 0 ? PropUtils.CreateBlueStandingGroundLight(position) : PropUtils.CreateRedStandingGroundLight(position))),
                     new(EntityType.Scenery, roadLeftSidePosition, roadblock.Heading,
                         (position, _) =>
-                            new ARScenery(unmodifiedCount % 2 == 0 ? PropUtils.CreateBlueGroundLight(position) : PropUtils.CreateRedGroundLight(position)))
+                            new ARScenery(unmodifiedCount % 2 == 0 ? PropUtils.CreateBlueStandingGroundLight(position) : PropUtils.CreateRedStandingGroundLight(position)))
                 });
 
                 initialDistance += 2.5f;

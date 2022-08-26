@@ -45,7 +45,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         protected override void InitializeLights()
         {
-            Instances.AddRange(LightSourceSlotFactory.CreateFlares(this));
+            Instances.AddRange(LightSourceSlotFactory.Create(LightSourceType.Flares, this));
         }
     }
 }

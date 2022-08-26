@@ -1,4 +1,5 @@
 using System;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Utils.Road;
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Utils;

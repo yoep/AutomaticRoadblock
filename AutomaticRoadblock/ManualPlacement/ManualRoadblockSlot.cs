@@ -81,10 +81,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         protected override void InitializeLights()
         {
             Logger.Trace("Initializing the manual roadblock slot lights");
-            if (LightSourceType == LightSourceType.Flares)
-            {
-                Instances.AddRange(LightSourceSlotFactory.CreateFlares(this));
-            }
+                Instances.AddRange(LightSourceSlotFactory.Create(LightSourceType, this));
         }
 
         /// <inheritdoc />
