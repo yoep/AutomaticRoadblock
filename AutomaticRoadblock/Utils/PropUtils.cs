@@ -94,7 +94,9 @@ namespace AutomaticRoadblocks.Utils
         public static Object CreateConeWithLight(Vector3 position, float heading = 0f)
         {
             var instance = new Object(new Model("prop_air_conelight"), position, heading);
-            return PlaceCorrectlyOnGround(instance);
+            PlaceCorrectlyOnGround(instance);
+            instance.Position += Vector3.WorldDown * 0.1f;
+            return instance;
         }
 
         public static Object CreateWorkBarrier(Vector3 position, float heading = 0f)
@@ -190,6 +192,18 @@ namespace AutomaticRoadblocks.Utils
         public static Object CreateRedGroundLight(Vector3 position)
         {
             var instance = new Object(new Model("prop_air_lights_02b"), position);
+            return PlaceCorrectlyOnGround(instance);
+        }
+
+        public static Object CreateBlueGroundLight(Vector3 position)
+        {
+            var instance = new Object(new Model("prop_air_lights_02a"), position);
+            return PlaceCorrectlyOnGround(instance);
+        }
+
+        public static Object CreateAirGroundLight(Vector3 position)
+        {
+            var instance = new Object(new Model("prop_air_lights_03a"), position);
             return PlaceCorrectlyOnGround(instance);
         }
 

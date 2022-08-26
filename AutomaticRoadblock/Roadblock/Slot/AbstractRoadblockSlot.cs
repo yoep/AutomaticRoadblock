@@ -28,7 +28,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private readonly bool _shouldAddLights;
 
-        protected AbstractRoadblockSlot(Road.Lane lane, BarrierType barrierType, float heading, bool shouldAddLights)
+        protected AbstractRoadblockSlot(Road.Lane lane, BarrierType barrierType, float heading, bool shouldAddLights, bool recordVehicleCollisions)
         {
             Assert.NotNull(lane, "lane cannot be null");
             Assert.NotNull(barrierType, "barrierType cannot be null");
@@ -36,6 +36,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             Lane = lane;
             BarrierType = barrierType;
             Heading = heading;
+            RecordVehicleCollisions = recordVehicleCollisions;
             _shouldAddLights = shouldAddLights;
         }
 
@@ -64,6 +65,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The barrier type that is used within this slot.
         /// </summary>
         public BarrierType BarrierType { get; }
+
+        /// <summary>
+        /// The indication if the spawned vehicle should record collisions.
+        /// </summary>
+        protected bool RecordVehicleCollisions { get; }
 
         /// <summary>
         /// Get the AR vehicle instance of this slot.
@@ -180,6 +186,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             var copPeds = Instances
                 .Where(x => x.Type == EntityType.CopPed)
                 .ToList();
+            
+            // release the instances before giving them to LSPDFR
+            // this should prevent accidental override of attributes set by LSPDFR
+            Instances
+                .Where(x => x.Type is EntityType.CopPed or EntityType.CopVehicle)
+                .Select(x => x.Instance)
+                .ToList()
+                .ForEach(x => x.Release());
 
             Logger.Trace($"Releasing a total of {copPeds.Count} to LSPDFR");
             copPeds
@@ -213,10 +227,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// </summary>
         protected void Initialize()
         {
+            // get the vehicle model and make sure it's loaded into memory
             VehicleModel = GetVehicleModel();
+            VehicleModel.Load();
 
             InitializeVehicleSlot();
-            InitializeCopPeds();
+            InitializeCops();
             InitializeScenery();
 
             if (!BarrierType.IsNone)
@@ -258,7 +274,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <summary>
         /// Initialize the cop ped slots.
         /// </summary>
-        protected abstract void InitializeCopPeds();
+        protected abstract void InitializeCops();
 
         /// <summary>
         /// Initialize the scenery props of this slot.
@@ -299,7 +315,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
             Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, CalculateVehicleHeading(),
-                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundVector(position), heading)));
+                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundVector(position), heading, RecordVehicleCollisions)));
         }
 
         private void InitializeBarriers()
@@ -319,7 +335,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             }
         }
 
-        private ARInstance<Entity> CreateBarrier(Vector3 position, float heading)
+        private IARInstance<Entity> CreateBarrier(Vector3 position, float heading)
         {
             try
             {

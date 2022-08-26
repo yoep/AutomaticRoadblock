@@ -32,7 +32,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
             return ModelUtils.Vehicles.GetLocalPoliceVehicle(Position, true, false);
         }
 
-        protected override void InitializeCopPeds()
+        protected override void InitializeCops()
         {
             Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, _) =>
                 PedFactory.CreateCopWeapons(new ARPed(GetPedModelForVehicle(), position))));

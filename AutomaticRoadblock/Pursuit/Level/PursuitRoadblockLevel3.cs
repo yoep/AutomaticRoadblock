@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
@@ -37,6 +39,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         protected override void InitializeLights()
         {
             Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));
+            Instances.AddRange(LightSourceRoadblockFactory.CreateAlternatingGroundLights(this, 4));
         }
 
         /// <inheritdoc />

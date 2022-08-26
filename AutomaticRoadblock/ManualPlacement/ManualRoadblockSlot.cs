@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.ManualPlacement
     {
         public ManualRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, LightSourceType lightSourceType, float heading,
             bool shouldAddLights, bool copsEnabled)
-            : base(lane, barrierType, heading, shouldAddLights)
+            : base(lane, barrierType, heading, shouldAddLights, false)
         {
             Assert.NotNull(vehicleType, "vehicleType cannot be null");
             Assert.NotNull(lightSourceType, "lightSourceType cannot be null");
@@ -58,7 +58,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         #region Functions
 
         /// <inheritdoc />
-        protected override void InitializeCopPeds()
+        protected override void InitializeCops()
         {
             if (!CopsEnabled)
                 return;
@@ -66,7 +66,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, _) =>
             {
                 var cop = PedFactory.CreateCopWeapons(new ARPed(GetPedModelForVehicle(), position));
-                cop.GameInstance.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Driver);
+                cop.GameInstance?.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Driver);
                 return cop;
             }));
         }

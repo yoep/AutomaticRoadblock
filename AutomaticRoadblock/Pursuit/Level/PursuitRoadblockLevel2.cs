@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;

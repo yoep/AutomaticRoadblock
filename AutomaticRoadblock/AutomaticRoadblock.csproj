@@ -66,7 +66,7 @@
         <Compile Include="Debug\Menu\RoadPreviewComponent.cs" />
         <Compile Include="Debug\Menu\StartPursuitComponent.cs" />
         <Compile Include="Debug\Menu\ZoneInfoComponent.cs" />
-        <Compile Include="Instance\ARInstance.cs" />
+        <Compile Include="Instance\IARInstance.cs" />
         <Compile Include="Instance\ARPed.cs" />
         <Compile Include="Instance\ARScenery.cs" />
         <Compile Include="Instance\ARVehicle.cs" />
@@ -163,6 +163,7 @@
         <Compile Include="Utils\Road\VehicleNodeType.cs" />
         <Compile Include="Utils\TimePeriod.cs" />
         <Compile Include="Utils\Type\MarkerType.cs" />
+        <Compile Include="Utils\Type\VehicleLightState.cs" />
         <Compile Include="Utils\Type\VehicleSeat.cs" />
     </ItemGroup>
     <ItemGroup>

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Utils;
+using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Instance
@@ -8,7 +9,7 @@ namespace AutomaticRoadblocks.Instance
     /// A ped which is controlled by the Automatic Roadblock plugin.
     /// </summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class ARPed : ARInstance<Ped>
+    public class ARPed : IARInstance<Ped>
     {
         public ARPed(Model model, Vector3 position, float heading = 0f)
         {
@@ -24,6 +25,7 @@ namespace AutomaticRoadblocks.Instance
         #region Properties
 
         /// <inheritdoc />
+        [CanBeNull]
         public Ped GameInstance { get; }
 
         /// <summary>
@@ -39,6 +41,20 @@ namespace AutomaticRoadblocks.Instance
         public void Dispose()
         {
             EntityUtils.Remove(GameInstance);
+        }
+
+        #endregion
+
+        #region IARInstance
+
+        /// <inheritdoc />
+        public void Release()
+        {
+            if (GameInstance == null || !GameInstance.IsValid())
+                return;
+            
+            GameInstance.IsPersistent = false;
+            GameInstance.KeepTasks = false;
         }
 
         #endregion

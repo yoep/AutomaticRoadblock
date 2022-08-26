@@ -1,4 +1,5 @@
 using System.Linq;
+using AutomaticRoadblocks.Utils.Type;
 using Rage;
 using Rage.Native;
 
@@ -18,10 +19,20 @@ namespace AutomaticRoadblocks.Utils
             Assert.NotNull(model, "model cannot be null");
             Assert.NotNull(position, "position cannot be null");
             var vehicle = new Vehicle(model, position, heading);
-            NativeFunction.Natives.SET_VEHICLE_ON_GROUND_PROPERLY(vehicle);
+            // PutVehicleOnTheGround(vehicle);
             return vehicle;
         }
-        
+
+        /// <summary>
+        /// Put the given vehicle correctly on the ground.
+        /// </summary>
+        /// <param name="vehicle">The vehicle to put on the ground.</param>
+        public static void PutVehicleOnTheGround(Vehicle vehicle)
+        {
+            Assert.NotNull(vehicle, "vehicle cannot be null");
+            NativeFunction.Natives.SET_VEHICLE_ON_GROUND_PROPERLY(vehicle);
+        }
+
         /// <summary>
         /// Attach the given attachment to the given entity.
         /// </summary>
@@ -118,6 +129,17 @@ namespace AutomaticRoadblocks.Utils
             {
                 Remove(entity);
             }
+        }
+
+        /// <summary>
+        /// Set the vehicle lights state.
+        /// </summary>
+        /// <param name="vehicle">The vehicle to modify.</param>
+        /// <param name="state">The state of the vehicle lights.</param>
+        public static void VehicleLights(Vehicle vehicle, VehicleLightState state)
+        {
+            Assert.NotNull(vehicle, "vehicle cannot be null");
+            NativeFunction.Natives.SET_VEHICLE_LIGHTS(vehicle, (int)state);
         }
     }
 }

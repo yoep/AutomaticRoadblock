@@ -435,7 +435,7 @@ namespace AutomaticRoadblocks.Utils.Road
 
             private static Vector3 FloatAboveGround(Vector3 position)
             {
-                return position + Vector3.WorldUp * 0.5f;
+                return position + Vector3.WorldUp * 1f;
             }
         }
     }

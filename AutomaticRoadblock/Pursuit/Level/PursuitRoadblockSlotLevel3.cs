@@ -28,7 +28,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
             return Random.Next(3) == 0 ? ModelUtils.Vehicles.GetLocalPoliceVehicle(Position, false) : ModelUtils.Vehicles.GetStatePoliceVehicle(false);
         }
 
-        protected override void InitializeCopPeds()
+        protected override void InitializeCops()
         {
             var pedSpawnPosition = GetPositionBehindVehicle();
 

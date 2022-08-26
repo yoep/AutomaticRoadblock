@@ -11,11 +11,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         private bool _monitoring;
 
         protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
-            : base(lane, barrierType, heading, shouldAddLights)
+            : base(lane, barrierType, heading, shouldAddLights, true)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
-            
+
             Initialize();
         }
 

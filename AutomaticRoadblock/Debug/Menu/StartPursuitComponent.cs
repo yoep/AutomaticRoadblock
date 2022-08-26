@@ -54,18 +54,17 @@ namespace AutomaticRoadblocks.Debug.Menu
 
                 var road = RoadUtils.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, RoadType.All);
                 var lane = road.Lanes.First();
-                var ped = new Ped(road.Position);
+                var driver = new Ped(road.Position);
+                var passenger = new Ped(road.Position);
                 var vehicle = EntityUtils.CreateVehicle(new Model("Buffalo3"), lane.Position, lane.Heading);
 
-                var weaponDescriptor = ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Pistol), -1, true);
-                ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.HeavyRifle), -1, false);
-                ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Shotgun), -1, false);
-                ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Smg), -1, false);
-                ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.MicroSmg), -1, false);
-                ped.WarpIntoVehicle(vehicle, (int)VehicleSeat.Driver);
-                ped.Inventory.EquippedWeapon = weaponDescriptor;
+                AddWeaponsToPed(driver);
+                AddWeaponsToPed(passenger);
+                driver.WarpIntoVehicle(vehicle, (int)VehicleSeat.Driver);
+                passenger.WarpIntoVehicle(vehicle, (int)VehicleSeat.RightFront);
 
-                Functions.AddPedToPursuit(_currentPursuit, ped);
+                Functions.AddPedToPursuit(_currentPursuit, driver);
+                Functions.AddPedToPursuit(_currentPursuit, passenger);
                 Functions.SetPursuitIsActiveForPlayer(_currentPursuit, true);
                 MenuItem.Text = AutomaticRoadblocksPlugin.EndPursuit;
             }, "StartPursuitComponent.StartPursuit");
@@ -82,6 +81,17 @@ namespace AutomaticRoadblocks.Debug.Menu
         {
             if (Functions.IsPursuitStillRunning(_currentPursuit))
                 Functions.ForceEndPursuit(_currentPursuit);
+        }
+        
+        [Conditional("DEBUG")]
+        private static void AddWeaponsToPed(Ped ped)
+        {
+            var weaponDescriptor = ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Pistol), -1, true);
+            ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.HeavyRifle), -1, false);
+            ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Shotgun), -1, false);
+            ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.Smg), -1, false);
+            ped.Inventory.GiveNewWeapon(new WeaponAsset(ModelUtils.Weapons.MicroSmg), -1, false);
+            ped.Inventory.EquippedWeapon = weaponDescriptor;
         }
     }
 }

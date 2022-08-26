@@ -9,9 +9,9 @@ namespace AutomaticRoadblocks.Instance
     public class InstanceSlot : IDisposable, IPreviewSupport
     {
         private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
-        private readonly Func<Vector3, float, ARInstance<Entity>> _factory;
+        private readonly Func<Vector3, float, IARInstance<Entity>> _factory;
 
-        public InstanceSlot(EntityType type, Vector3 position, float heading, Func<Vector3, float, ARInstance<Entity>> factory)
+        public InstanceSlot(EntityType type, Vector3 position, float heading, Func<Vector3, float, IARInstance<Entity>> factory)
         {
             Assert.NotNull(type, "type cannot be null");
             Assert.NotNull(position, "position cannot be null");
@@ -44,7 +44,7 @@ namespace AutomaticRoadblocks.Instance
         /// <summary>
         /// Get the instance if it's spawned.
         /// </summary>
-        public ARInstance<Entity> Instance { get; private set; }
+        public IARInstance<Entity> Instance { get; private set; }
         
         #endregion
 

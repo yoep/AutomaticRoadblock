@@ -28,7 +28,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
             return ModelUtils.Vehicles.GetLocalPoliceVehicle(Position, true, false);
         }
 
-        protected override void InitializeCopPeds()
+        protected override void InitializeCops()
         {
             var isBike = ModelUtils.IsBike(VehicleModel);
             var totalOccupants = isBike ? 1 : 2;

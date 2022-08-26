@@ -31,7 +31,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         }
 
         /// <inheritdoc />
-        protected override void InitializeCopPeds()
+        protected override void InitializeCops()
         {
             var pedSpawnPosition = GetPositionBehindVehicle();
             var totalOccupants = Random.Next(3) + 2;
