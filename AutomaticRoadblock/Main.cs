@@ -66,7 +66,7 @@ namespace AutomaticRoadblocks
         private static void InitializeIoC()
         {
             IoC.Instance
-                .Register<IGame>(typeof(AbstractionLayer.Implementation.Rage))
+                .Register<IGame>(typeof(AbstractionLayer.Implementation.RageImpl))
                 .Register<ILogger>(typeof(RageLogger))
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
@@ -130,16 +130,18 @@ namespace AutomaticRoadblocks
 
         private static void OnDutyStateChanged(bool onDuty)
         {
-            var logger = IoC.Instance.GetInstance<ILogger>();
-            var pursuitListener = IoC.Instance.GetInstance<IPursuitManager>();
+            var ioC = IoC.Instance;
+            var logger = ioC.GetInstance<ILogger>();
+            var pursuitListener = ioC.GetInstance<IPursuitManager>();
             logger.Trace($"On duty state changed to {onDuty}");
 
             if (onDuty)
             {
                 pursuitListener.StartListener();
 
-                var game = IoC.Instance.GetInstance<IGame>();
-                game.DisplayPluginNotification($"{Assembly.GetExecutingAssembly().GetName().Version}, developed by ~b~yoep~s~, has been loaded");
+                var game = ioC.GetInstance<IGame>();
+                ioC.GetInstance<IMenu>().Activate();
+                game.DisplayPluginNotification($"{Assembly.GetExecutingAssembly().GetName().Version}, by ~b~yoep~s~, has been loaded");
             }
             else
             {

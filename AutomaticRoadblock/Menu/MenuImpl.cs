@@ -59,6 +59,18 @@ namespace AutomaticRoadblocks.Menu
             MenuItems.Add(component);
         }
 
+        /// <inheritdoc />
+        public void Activate()
+        {
+            if (IsMenuInitialized)
+                return;
+            
+            _logger.Trace("Adding MenuImpl.Process to FrameRender handler...");
+            Game.FrameRender += Process;
+            IsMenuInitialized = true;
+            _logger.Trace("MenuImpl.Process added to FrameRender handler");
+        }
+
         #endregion
 
         #region IDisposable
@@ -66,6 +78,7 @@ namespace AutomaticRoadblocks.Menu
         public void Dispose()
         {
             Game.FrameRender -= Process;
+            IsMenuInitialized = false;
         }
 
         #endregion
@@ -91,12 +104,8 @@ namespace AutomaticRoadblocks.Menu
 
                 _logger.Trace("Initializing sub-menu's");
                 AddMenuSwitcherToEachMenu();
-
-                _logger.Trace("Adding MenuImpl.Process to FrameRender handler...");
-                Game.FrameRender += Process;
-                _logger.Trace("MenuImpl.Process added to FrameRender handler");
-
-                IsMenuInitialized = true;
+                
+                Activate();
             }
             catch (Exception ex)
             {

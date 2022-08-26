@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Drawing;
 using Rage;
 
 namespace AutomaticRoadblocks.AbstractionLayer
@@ -50,5 +52,11 @@ namespace AutomaticRoadblocks.AbstractionLayer
         /// </summary>
         /// <param name="message">Set the message to display in a notification.</param>
         void DisplayNotification(string message);
+
+        void DrawLine(Vector3 start, Vector3 end, Color color);
+
+        void DrawArrow(Vector3 position, Vector3 direction, Rotator rotationOffset, float scale, Color color);
+        
+        void DrawSphere(Vector3 position, float radius, Color color);
     }
 }

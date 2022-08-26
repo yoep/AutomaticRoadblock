@@ -23,7 +23,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         public MenuType Type => MenuType.PURSUIT;
 
         /// <inheritdoc />
-        public bool IsAutoClosed => false;
+        public bool IsAutoClosed => true;
 
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)

@@ -1,14 +1,15 @@
 using System;
+using System.Drawing;
 using System.Threading;
 using Rage;
 
 namespace AutomaticRoadblocks.AbstractionLayer.Implementation
 {
-    public class Rage : IGame
+    public class RageImpl : IGame
     {
         private readonly ILogger _logger;
 
-        public Rage(ILogger logger)
+        public RageImpl(ILogger logger)
         {
             _logger = logger;
         }
@@ -66,6 +67,21 @@ namespace AutomaticRoadblocks.AbstractionLayer.Implementation
         public void DisplayNotification(string message)
         {
             Game.DisplayNotification(message.Trim());
+        }
+
+        public void DrawLine(Vector3 start, Vector3 end, Color color)
+        {
+            Rage.Debug.DrawLineDebug(start, end, color);
+        }
+
+        public void DrawArrow(Vector3 position, Vector3 direction, Rotator rotationOffset, float scale, Color color)
+        {
+            Rage.Debug.DrawArrowDebug(position, direction, rotationOffset, scale, color);
+        }
+
+        public void DrawSphere(Vector3 position, float radius, Color color)
+        {
+            Rage.Debug.DrawSphereDebug(position, radius, color);
         }
     }
 }

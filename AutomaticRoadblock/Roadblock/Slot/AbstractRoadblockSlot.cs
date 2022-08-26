@@ -117,7 +117,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
                 while (IsPreviewActive)
                 {
-                    Rage.Debug.DrawArrow(position, direction, Rotator.Zero, 2f, Color.Yellow);
+                    game.DrawArrow(position, direction, Rotator.Zero, 2f, Color.Yellow);
                     game.FiberYield();
                 }
             }, "IRoadblockSlot.CreatePreview");
@@ -207,7 +207,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                     if (!x.IsInVehicle(Vehicle, true))
                         x.Tasks.EnterVehicle(Vehicle, (int)VehicleSeat.Any);
 
-                    x.Dismiss();
                     Functions.SetPedAsCop(x);
                     Functions.SetCopAsBusy(x, false);
                 });

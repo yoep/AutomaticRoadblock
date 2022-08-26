@@ -81,7 +81,7 @@ namespace AutomaticRoadblocks.Utils.Road
             Assert.NotNull(roadType, "roadType cannot be null");
             var vehicleNodeType = Convert(roadType);
 
-            FindVehicleNodes(position, vehicleNodeType, out NodeInfo node1, out NodeInfo node2);
+            FindVehicleNodes(position, vehicleNodeType, roadType, out var node1, out var node2);
 
             return new List<Road>
             {
@@ -175,11 +175,21 @@ namespace AutomaticRoadblocks.Utils.Road
             };
         }
 
-        private static NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, VehicleNodeType roadType)
+        private static RoadType Convert(VehicleNodeType nodeType)
+        {
+            return nodeType switch
+            {
+                VehicleNodeType.MainRoads => RoadType.MajorRoads,
+                VehicleNodeType.AllRoadNoJunctions => RoadType.MajorRoadsNoJunction,
+                _ => RoadType.All
+            };
+        }
+
+        private static NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, VehicleNodeType nodeType, RoadType roadType)
         {
             var logger = IoC.Instance.GetInstance<ILogger>();
             logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading}");
-            FindVehicleNodes(position, roadType, out var node1, out var node2);
+            FindVehicleNodes(position, nodeType, roadType, out var node1, out var node2);
             logger.Trace($"Found vehicle node 1 at {node1.Position} with heading {node1.Heading}");
             logger.Trace($"Found vehicle node 2 at {node2.Position} with heading {node2.Heading}");
 
@@ -197,11 +207,12 @@ namespace AutomaticRoadblocks.Utils.Road
             return nodeMatchingClosestToHeading;
         }
 
-        private static List<NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, VehicleNodeType roadType,
+        private static List<NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, VehicleNodeType nodeType,
             out NodeInfo lastFoundNode)
         {
             var distanceTraversed = 0f;
             var distanceToMove = 5f;
+            var roadType = Convert(nodeType);
             var nodeInfos = new List<NodeInfo>();
 
             lastFoundNode = new NodeInfo(position, heading, -1, -1, -1f);
@@ -209,7 +220,7 @@ namespace AutomaticRoadblocks.Utils.Road
             while (distanceTraversed < distance)
             {
                 var findNodeAt = lastFoundNode.Position + MathHelper.ConvertHeadingToDirection(lastFoundNode.Heading) * distanceToMove;
-                var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNode.Heading, roadType);
+                var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNode.Heading, nodeType, roadType);
 
                 if (nodeTowardsHeading.Position == lastFoundNode.Position)
                 {
@@ -227,15 +238,15 @@ namespace AutomaticRoadblocks.Utils.Road
             return nodeInfos;
         }
 
-        private static void FindVehicleNodes(Vector3 position, VehicleNodeType roadType, out NodeInfo node1, out NodeInfo node2)
+        private static void FindVehicleNodes(Vector3 position, VehicleNodeType nodeType, RoadType roadType, out NodeInfo node1, out NodeInfo node2)
         {
             Assert.NotNull(position, "position cannot be null");
-            Assert.NotNull(roadType, "roadType cannot be null");
+            Assert.NotNull(nodeType, "roadType cannot be null");
             NativeFunction.Natives.GET_CLOSEST_ROAD(position.X, position.Y, position.Z, 1f, 1, out Vector3 roadPosition1, out Vector3 roadPosition2,
                 out int numberOfLanes1, out int numberOfLanes2, out float junctionIndication, (int)roadType);
 
-            var vehicleNode1 = FindVehicleNode(roadPosition1, roadType);
-            var vehicleNode2 = FindVehicleNode(roadPosition2, roadType);
+            var vehicleNode1 = FindVehicleNode(roadPosition1, nodeType);
+            var vehicleNode2 = FindVehicleNode(roadPosition2, nodeType);
 
             node1 = new NodeInfo(vehicleNode1.Position, vehicleNode1.Heading, numberOfLanes1, numberOfLanes2, junctionIndication);
             node2 = new NodeInfo(vehicleNode2.Position, vehicleNode2.Heading, numberOfLanes2, numberOfLanes1, junctionIndication);

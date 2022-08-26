@@ -136,10 +136,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 {
                     var road = DetermineRoadblockLocation(level, vehicle, atCurrentLocation);
                     _logger.Trace($"Dispatching roadblock on {road}");
-
-                    _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
-                    LspdfrUtils.PlayScannerAudioUsingPosition("WE_HAVE OFFICER_IN_NEED_OF_ASSISTANCE IN_OR_ON_POSITION", road.Position);
-
+                    
                     var roadblock = PursuitRoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
                         ShouldAddLightsToRoadblock());
                     _logger.Info($"Dispatching new roadblock\n{roadblock}");
@@ -149,7 +146,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     roadblock.RoadblockStateChanged += InternalRoadblockStateChanged;
                     roadblock.RoadblockCopKilled += InternalRoadblockCopKilled;
 
+                    _logger.Trace($"Distance between vehicle and roadblock before spawn {road.Position.DistanceTo(vehicle.Position)}");
                     roadblock.Spawn();
+                    _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
+                    _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
+                    LspdfrUtils.PlayScannerAudio("ROADBLOCK_DEPLOYED");
                 },
                 "RoadblockDispatcher.Dispatch");
         }
@@ -228,7 +229,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private static float DetermineRoadblockDistanceFor(Vehicle vehicle)
         {
             var vehicleSpeed = vehicle.Speed;
-            var distance = vehicleSpeed * 3f;
+            var distance = vehicleSpeed * 3.5f;
 
             if (distance < MinimumRoadblockPlacementDistance)
                 distance = MinimumRoadblockPlacementDistance;

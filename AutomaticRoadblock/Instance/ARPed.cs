@@ -18,7 +18,8 @@ namespace AutomaticRoadblocks.Instance
             GameInstance = new Ped(model, position, heading)
             {
                 IsPersistent = true,
-                KeepTasks = true
+                KeepTasks = true,
+                RelationshipGroup = RelationshipGroup.Cop
             };
         }
 
@@ -54,7 +55,6 @@ namespace AutomaticRoadblocks.Instance
                 return;
             
             GameInstance.IsPersistent = false;
-            GameInstance.KeepTasks = false;
         }
 
         #endregion

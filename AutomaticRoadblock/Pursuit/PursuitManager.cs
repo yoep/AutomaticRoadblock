@@ -5,6 +5,7 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -160,7 +161,7 @@ namespace AutomaticRoadblocks.Pursuit
             PursuitLevel = level;
             PursuitLevelChanged?.Invoke(level);
             NotifyPursuitLevelIncreased();
-            Functions.PlayScannerAudio("PURSUIT_LEVEL_INCREASE");
+            Functions.PlayScannerAudio("ROADBLOCK_PURSUIT_LEVEL_INCREASE");
         }
 
         private void IncreasePursuitLevel()
@@ -281,7 +282,7 @@ namespace AutomaticRoadblocks.Pursuit
         private bool DoDispatch(Vehicle vehicle, bool userRequested, bool force, bool atCurrentLocation)
         {
             _logger.Debug(
-                $"Dispatching roadblock for non active pursuit with {nameof(PursuitLevel)}: {PursuitLevel}, {nameof(userRequested)}: {userRequested}, " +
+                $"Dispatching roadblock for pursuit with {nameof(PursuitLevel)}: {PursuitLevel}, {nameof(userRequested)}: {userRequested}, " +
                 $"{nameof(force)}: {force}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
             var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, userRequested, force, atCurrentLocation);
 
@@ -342,6 +343,7 @@ namespace AutomaticRoadblocks.Pursuit
         {
             _totalCopsKilled++;
             NotifySuspectKilledCop();
+            LspdfrUtils.PlayScannerAudio("ROADBLOCK_COP_KILLED");
         }
 
         private bool IsSuspectVehicleOnRoad()

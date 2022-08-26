@@ -56,15 +56,25 @@ namespace AutomaticRoadblocks.Debug.Menu
                 var lane = road.Lanes.First();
                 var driver = new Ped(road.Position);
                 var passenger = new Ped(road.Position);
-                var vehicle = EntityUtils.CreateVehicle(new Model("Buffalo3"), lane.Position, lane.Heading);
+                var vehicle = new Vehicle(ModelUtils.Vehicles.GetRaceVehicle(), lane.Position, lane.Heading);
+
+                driver.RelationshipGroup = RelationshipGroup.Gang1;
+                passenger.RelationshipGroup = RelationshipGroup.Gang1;
 
                 AddWeaponsToPed(driver);
                 AddWeaponsToPed(passenger);
                 driver.WarpIntoVehicle(vehicle, (int)VehicleSeat.Driver);
                 passenger.WarpIntoVehicle(vehicle, (int)VehicleSeat.RightFront);
+                
+                Game.SetRelationshipBetweenRelationshipGroups(RelationshipGroup.Gang1.Name, RelationshipGroup.Cop.Name, Relationship.Hate);
+                Game.SetRelationshipBetweenRelationshipGroups(RelationshipGroup.Cop.Name, RelationshipGroup.Gang1.Name, Relationship.Hate);
 
                 Functions.AddPedToPursuit(_currentPursuit, driver);
                 Functions.AddPedToPursuit(_currentPursuit, passenger);
+                Functions.GetPedPursuitAttributes(driver).MaxDrivingSpeed = 85f;
+                Functions.GetPedPursuitAttributes(driver).MinDrivingSpeed = 25f;
+                Functions.GetPedPursuitAttributes(passenger).AverageFightTime = 30;
+                
                 Functions.SetPursuitIsActiveForPlayer(_currentPursuit, true);
                 MenuItem.Text = AutomaticRoadblocksPlugin.EndPursuit;
             }, "StartPursuitComponent.StartPursuit");

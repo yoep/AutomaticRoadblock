@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using AutomaticRoadblocks.AbstractionLayer;
 using Rage;
 
@@ -29,6 +30,21 @@ namespace AutomaticRoadblockTests.AbstractionLayer.Implementation
         public void DisplayNotification(string message)
         {
             Console.WriteLine($"[NOTIFICATION] {message}");
+        }
+
+        public void DrawSphere(Vector3 position, float radius, Color color)
+        {
+            // no-op
+        }
+
+        public void DrawArrow(Vector3 position, Vector3 direction, Rotator rotationOffset, float scale, Color color)
+        {
+            // no-op
+        }
+
+        public void DrawLine(Vector3 start, Vector3 end, Color color)
+        {
+            // no-op
         }
     }
 }

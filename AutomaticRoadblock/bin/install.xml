@@ -1,0 +1,12 @@
+<EasyInstall>
+    <Name>Automatic Roadblocks</Name>
+    <Author>yoep</Author>
+    <Version>0.1.0</Version>
+    <Link></Link>
+    <Metadata>
+    </Metadata>
+
+    <ResourceFolders>
+        <GameFolder>Grand Theft Auto V</GameFolder>
+    </ResourceFolders>
+</EasyInstall>

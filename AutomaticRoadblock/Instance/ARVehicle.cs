@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
-using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Instance

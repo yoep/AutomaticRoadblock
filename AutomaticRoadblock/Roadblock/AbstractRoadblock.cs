@@ -169,10 +169,10 @@ namespace AutomaticRoadblocks.Roadblock
             try
             {
                 Logger.Trace("Spawning roadblock");
-                UpdateState(RoadblockState.Active);
 
                 Slots.ToList().ForEach(x => x.Spawn());
                 Instances.ForEach(x => x.Spawn());
+                UpdateState(RoadblockState.Active);
 
                 CreateBlip();
             }

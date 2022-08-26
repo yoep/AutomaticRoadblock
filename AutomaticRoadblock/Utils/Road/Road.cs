@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Preview;
 using Rage;
 
@@ -104,12 +105,14 @@ namespace AutomaticRoadblocks.Utils.Road
             IsPreviewActive = true;
             GameFiber.StartNew(() =>
             {
+                var game = IoC.Instance.GetInstance<IGame>();
+
                 while (IsPreviewActive)
                 {
-                    Rage.Debug.DrawSphere(Position, 1f, Color.White);
-                    Rage.Debug.DrawSphere(RightSide, 1f, Color.Blue);
-                    Rage.Debug.DrawSphere(LeftSide, 1f, Color.Green);
-                    GameFiber.Yield();
+                    game.DrawSphere(Position, 1f, Color.White);
+                    game.DrawSphere(RightSide, 1f, Color.Blue);
+                    game.DrawSphere(LeftSide, 1f, Color.Green);
+                    game.FiberYield();
                 }
             });
             foreach (var lane in Lanes)
@@ -298,8 +301,10 @@ namespace AutomaticRoadblocks.Utils.Road
                 if (IsPreviewActive)
                     return;
 
+                var game = IoC.Instance.GetInstance<IGame>();
+
                 IsPreviewActive = true;
-                GameFiber.StartNew(() =>
+                game.NewSafeFiber(() =>
                 {
                     var direction = MathHelper.ConvertHeadingToDirection(Heading);
                     var rightSideStart = FloatAboveGround(RightSide + direction * (2f * Number));
@@ -309,12 +314,12 @@ namespace AutomaticRoadblocks.Utils.Road
 
                     while (IsPreviewActive)
                     {
-                        Rage.Debug.DrawArrow(FloatAboveGround(Position), direction, Rotator.Zero, Width, Color.Red);
-                        Rage.Debug.DrawLine(rightSideStart, rightSideEnd, Color.Blue);
-                        Rage.Debug.DrawLine(leftSideStart, leftSideEnd, Color.Green);
-                        GameFiber.Yield();
+                        game.DrawArrow(FloatAboveGround(Position), direction, Rotator.Zero, Width, Color.Red);
+                        game.DrawLine(rightSideStart, rightSideEnd, Color.Blue);
+                        game.DrawLine(leftSideStart, leftSideEnd, Color.Green);
+                        game.FiberYield();
                     }
-                });
+                }, "Road.Lane.CreatePreview");
             }
 
             /// <inheritdoc />
@@ -383,17 +388,18 @@ namespace AutomaticRoadblocks.Utils.Road
                 if (IsPreviewActive)
                     return;
 
+                var game = IoC.Instance.GetInstance<IGame>();
                 var direction = MathHelper.ConvertHeadingToDirection(Heading);
 
                 IsPreviewActive = true;
-                GameFiber.StartNew(() =>
+                game.NewSafeFiber(() =>
                 {
                     while (IsPreviewActive)
                     {
-                        Rage.Debug.DrawArrow(FloatAboveGround(Position), direction, Rotator.Zero, 3f, Color.Gold);
-                        GameFiber.Yield();
+                        game.DrawArrow(FloatAboveGround(Position), direction, Rotator.Zero, 3f, Color.Gold);
+                        game.FiberYield();
                     }
-                });
+                }, "Road.VehicleNode.CreatePreview");
             }
 
             /// <inheritdoc />

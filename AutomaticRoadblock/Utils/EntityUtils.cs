@@ -18,19 +18,19 @@ namespace AutomaticRoadblocks.Utils
         {
             Assert.NotNull(model, "model cannot be null");
             Assert.NotNull(position, "position cannot be null");
-            var vehicle = new Vehicle(model, position, heading);
-            // PutVehicleOnTheGround(vehicle);
-            return vehicle;
+            return PutVehicleOnTheGround(new Vehicle(model, position, heading));
         }
 
         /// <summary>
-        /// Put the given vehicle correctly on the ground.
+        /// Put the vehicle correctly on the ground.
+        /// This prevents a vehicle from jumping up when it is being spawned.
         /// </summary>
         /// <param name="vehicle">The vehicle to put on the ground.</param>
-        public static void PutVehicleOnTheGround(Vehicle vehicle)
+        public static Vehicle PutVehicleOnTheGround(Vehicle vehicle)
         {
             Assert.NotNull(vehicle, "vehicle cannot be null");
             NativeFunction.Natives.SET_VEHICLE_ON_GROUND_PROPERLY(vehicle);
+            return vehicle;
         }
 
         /// <summary>

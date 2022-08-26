@@ -25,5 +25,11 @@ namespace AutomaticRoadblocks.Menu
         /// </summary>
         /// <param name="component">Set the component to register.</param>
         void RegisterComponent(IMenuComponent<UIMenuItem> component);
+
+        /// <summary>
+        /// Activate the menu within the game.
+        /// This can be used to activate the menu keys again after the <see cref="IDisposable"/> has been invoked.
+        /// </summary>
+        void Activate();
     }
 }

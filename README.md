@@ -18,3 +18,5 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 - Close road/lane
 - Redirect traffic
 - Junction roadblocks
+- More scenery variations within the roadblocks
+- Additional scenery such as emergency services to manual roadblock placements

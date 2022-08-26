@@ -124,6 +124,22 @@ namespace AutomaticRoadblocks.Utils
                 RiotModelName
             };
 
+            public static readonly IReadOnlyList<string> RaceVehicleModels = new List<string>
+            {
+                "penumbra2",
+                "coquette4",
+                "sugoi",
+                "sultan2",
+                "imorgon",
+                "komoda",
+                "jugular",
+                "neo",
+                "issi7",
+                "drafter",
+                "paragon2",
+                "italigto",
+            };
+
             /// <summary>
             /// Get a local vehicle model for the given position.
             /// </summary>
@@ -178,6 +194,15 @@ namespace AutomaticRoadblocks.Utils
             public static Model GetSwatPoliceVehicle()
             {
                 return new Model(SwatVehicleModels[Random.Next(SwatVehicleModels.Count)]);
+            }
+
+            /// <summary>
+            /// Get a race vehicle model. 
+            /// </summary>
+            /// <returns>Returns a race vehicle model.</returns>
+            public static Model GetRaceVehicle()
+            {
+                return new Model(RaceVehicleModels[Random.Next(RaceVehicleModels.Count)]);
             }
         }
         

@@ -102,10 +102,9 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         public Road DetermineLocation()
         {
-            var position = _game.PlayerPosition;
-            var renderDirection = MathHelper.ConvertHeadingToDirection(_game.PlayerHeading);
+            var position = _game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 5f;
 
-            return RoadUtils.FindClosestRoad(position + renderDirection * 5f, RoadType.All);
+            return RoadUtils.FindClosestRoad(position, RoadType.All);
         }
 
         /// <inheritdoc />
