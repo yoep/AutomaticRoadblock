@@ -11,17 +11,18 @@ namespace AutomaticRoadblocks.Utils
 
         public static class Models
         {
+            public static Model BarrelTrafficCatcher => new("prop_barrier_wat_03b");
             public static Model BigCone => new("prop_roadcone01c");
             public static Model BigConeWithStrips => new("prop_mp_cone_01");
             public static Model ConeWithLight => new("prop_air_conelight");
             public static Model PoliceDoNotCross => new("prop_barrier_work05");
             public static Model SmallCone => new("prop_mp_cone_03");
             public static Model SmallConeWithStrips => new("prop_mp_cone_02");
+            public static Model WorkBarrierAHeadSign => new("prop_barrier_work04a");
+            public static Model WorkBarrierAHeadSignLights => new("prop_barrier_work06b");
             public static Model WorkBarrierHigh => new("prop_mp_barrier_02b");
             public static Model WorkBarrierLarge => new("prop_barrier_work06a");
             public static Model WorkBarrierSmall => new("prop_barrier_work01a");
-            public static Model WorkBarrierAHeadSign => new("prop_barrier_work04a");
-            public static Model WorkBarrierAHeadSignLights => new("prop_barrier_work06b");
         }
 
         #endregion
@@ -273,7 +274,7 @@ namespace AutomaticRoadblocks.Utils
         /// </summary>
         public static Object CreateBarrelTrafficCatcher(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_barrier_wat_03b"), position, heading);
+            var instance = new Object(Models.BarrelTrafficCatcher, position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 

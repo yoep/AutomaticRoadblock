@@ -17,6 +17,7 @@ namespace AutomaticRoadblocks.Roadblock
         public static readonly BarrierType WorkBarrierWithSign = new("Work ahead sign", DimensionOf(PropUtils.Models.WorkBarrierAHeadSign), 0.2f);
         public static readonly BarrierType WorkBarrierWithSignLight = new("Work ahead sign lights", DimensionOf(PropUtils.Models.WorkBarrierAHeadSignLights), 0.2f);
         public static readonly BarrierType WorkBarrierHigh = new("High barrier", DimensionOf(PropUtils.Models.WorkBarrierHigh), 0.2f);
+        public static readonly BarrierType BarrelTrafficCatcher = new("Barrel", DimensionOf(PropUtils.Models.BarrelTrafficCatcher), 0.5f);
 
         public static readonly IEnumerable<BarrierType> Values = new[]
         {
@@ -30,7 +31,8 @@ namespace AutomaticRoadblocks.Roadblock
             WorkBarrierSmall,
             WorkBarrierWithSign,
             WorkBarrierWithSignLight,
-            WorkBarrierHigh
+            WorkBarrierHigh,
+            BarrelTrafficCatcher
         };
 
         private BarrierType(string displayText, float width, float spacing)

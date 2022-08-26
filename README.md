@@ -27,10 +27,10 @@ The pursuit option allows dispatching of roadblocks while in a pursuit.
 
 ### Levels
 
-| Level | Vehicle type | Barrier type | Lanes blocked | Cop action            |
-|-------| --- | --- | --- |-----------------------|
-| 1     | Locale | Small cones | Lanes in the same direction as pursuit | In car                |
-| 2     | Locale | Big cones | All lanes | Aims at target        |
-| 3     | Locale incl. transporter | Police do not cross | All lanes | Aims/shoots at target |
-| 4     | Locale incl. transporter/FBI | Police do not cross | All lanes | Aims/shoots at target |
-| 5     | FBI/Swat | Police do not cross | All lanes | Aims/shoots at target |
+| Level | Vehicle type           | Barrier type | Lanes blocked | Cop action            | Additions     |
+|-------|------------------------| --- | --- |-----------------------|---------------|
+| 1     | Locale                 | Small cones | Lanes in the same direction as pursuit | In car                |               |
+| 2     | Locale                 | Big cones | All lanes | Aims at target        |               |
+| 3     | Locale/transporter     | Police do not cross | All lanes | Aims/shoots at target |               |
+| 4     | Locale/transporter/FBI | Police do not cross | All lanes | Aims/shoots at target | Chase vehicle |
+| 5     | FBI/Swat               | Police do not cross | All lanes | Aims/shoots at target |               |

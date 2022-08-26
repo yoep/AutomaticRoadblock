@@ -414,7 +414,7 @@ namespace AutomaticRoadblocks.Roadblock
             Logger.Debug("Releasing cop peds to LSPDFR");
             foreach (var slot in Slots)
             {
-                slot.ReleaseToLspdfr();
+                slot.Release();
             }
 
             Game.NewSafeFiber(() =>

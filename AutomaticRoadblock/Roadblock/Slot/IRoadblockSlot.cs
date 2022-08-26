@@ -54,9 +54,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         void ModifyVehiclePosition(Vector3 newPosition);
 
         /// <summary>
-        /// Release the AI entities to LSPDFR.
+        /// Release the cop entities to LSPDFR.
         /// This allows the cops to join the pursuit.
         /// </summary>
-        void ReleaseToLspdfr();
+        void Release();
     }
 }

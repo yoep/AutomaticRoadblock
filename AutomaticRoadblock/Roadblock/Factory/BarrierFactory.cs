@@ -25,6 +25,7 @@ namespace AutomaticRoadblocks.Roadblock.Factory
                     (position, heading) => new ARScenery(PropUtils.CreateBarrierWithWorkAheadWithLights(position, heading))
                 },
                 { BarrierType.WorkBarrierHigh, (position, heading) => new ARScenery(PropUtils.CreateWorkBarrierHigh(position, heading)) },
+                { BarrierType.BarrelTrafficCatcher, (position, heading) => new ARScenery(PropUtils.CreateBarrelTrafficCatcher(position, heading)) },
             };
 
         public static ARScenery Create(BarrierType type, Vector3 position, float heading = 0f)

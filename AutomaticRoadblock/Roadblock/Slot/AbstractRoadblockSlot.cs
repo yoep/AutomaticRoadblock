@@ -7,7 +7,6 @@ using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
-using AutomaticRoadblocks.Utils.Type;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -181,39 +180,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         /// <inheritdoc />
-        public void ReleaseToLspdfr()
+        public void Release()
         {
-            var copPeds = Instances
-                .Where(x => x.Type == EntityType.CopPed)
-                .ToList();
-
-            // release the instances before giving them to LSPDFR
-            // this should prevent accidental override of attributes set by LSPDFR
-            Instances
-                .Where(x => x.Type is EntityType.CopPed or EntityType.CopVehicle)
-                .Select(x => x.Instance)
-                .ToList()
-                .ForEach(x => x.Release());
-
-            Logger.Trace($"Releasing a total of {copPeds.Count} to LSPDFR");
-            copPeds
-                .Select(x => x.Instance)
-                .Select(x => x.GameInstance)
-                .Select(x => (Ped)x)
-                .ToList()
-                .ForEach(x =>
-                {
-                    // make sure the ped is the vehicle or at least entering it
-                    if (!x.IsInVehicle(Vehicle, true))
-                        x.Tasks.EnterVehicle(Vehicle, (int)VehicleSeat.Any);
-
-                    Functions.SetPedAsCop(x);
-                    Functions.SetCopAsBusy(x, false);
-                });
-
-            // remove all cop instances so that we don't remove them by accident
-            // these instances are now in control of LSPDFR
-            Instances.RemoveAll(x => x.Type is EntityType.CopPed or EntityType.CopVehicle);
+            RoadblockHelpers.ReleaseInstancesToLspdfr(Instances, Vehicle);
         }
 
         #endregion
