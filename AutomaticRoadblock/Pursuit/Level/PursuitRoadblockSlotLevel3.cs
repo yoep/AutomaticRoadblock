@@ -35,7 +35,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
             for (var i = 0; i < 2; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), 0f,
-                    (position, heading) => PedFactory.CreateCopWeapons(new ARPed(GetPedModelForVehicle(), position, heading))));
+                    (position, heading) => PedFactory.CreateCopWeaponsForModel(new ARPed(GetPedModelForVehicle(), position, heading))));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }

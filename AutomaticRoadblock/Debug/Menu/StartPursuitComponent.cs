@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -14,6 +15,7 @@ namespace AutomaticRoadblocks.Debug.Menu
     public class StartPursuitComponent : IMenuComponent<UIMenuItem>
     {
         private readonly IGame _game;
+        private readonly Random _random = new();
 
         private LHandle _currentPursuit;
 
@@ -65,16 +67,22 @@ namespace AutomaticRoadblocks.Debug.Menu
                 AddWeaponsToPed(passenger);
                 driver.WarpIntoVehicle(vehicle, (int)VehicleSeat.Driver);
                 passenger.WarpIntoVehicle(vehicle, (int)VehicleSeat.RightFront);
-                
+
                 Game.SetRelationshipBetweenRelationshipGroups(RelationshipGroup.Gang1.Name, RelationshipGroup.Cop.Name, Relationship.Hate);
                 Game.SetRelationshipBetweenRelationshipGroups(RelationshipGroup.Cop.Name, RelationshipGroup.Gang1.Name, Relationship.Hate);
 
                 Functions.AddPedToPursuit(_currentPursuit, driver);
                 Functions.AddPedToPursuit(_currentPursuit, passenger);
-                Functions.GetPedPursuitAttributes(driver).MaxDrivingSpeed = 85f;
-                Functions.GetPedPursuitAttributes(driver).MinDrivingSpeed = 25f;
-                Functions.GetPedPursuitAttributes(passenger).AverageFightTime = 30;
-                
+                Functions.GetPedPursuitAttributes(driver).MaxDrivingSpeed = 80f;
+                Functions.GetPedPursuitAttributes(driver).MinDrivingSpeed = 20f;
+
+                // randomize if the suspect will be shooting at the cops or not
+                if (_random.Next(2) == 1)
+                {
+                    Functions.GetPedPursuitAttributes(driver).AverageFightTime = 0;
+                    Functions.GetPedPursuitAttributes(passenger).AverageFightTime = 0;
+                }
+
                 Functions.SetPursuitIsActiveForPlayer(_currentPursuit, true);
                 MenuItem.Text = AutomaticRoadblocksPlugin.EndPursuit;
             }, "StartPursuitComponent.StartPursuit");
@@ -92,7 +100,7 @@ namespace AutomaticRoadblocks.Debug.Menu
             if (Functions.IsPursuitStillRunning(_currentPursuit))
                 Functions.ForceEndPursuit(_currentPursuit);
         }
-        
+
         [Conditional("DEBUG")]
         private static void AddWeaponsToPed(Ped ped)
         {

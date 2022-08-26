@@ -14,6 +14,8 @@ namespace AutomaticRoadblocks.Pursuit
 {
     public class PursuitManager : IPursuitManager
     {
+        private const int TimeBetweenLevelIncreaseShotsFired = 20 * 1000;
+
         private readonly ILogger _logger;
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
@@ -26,6 +28,7 @@ namespace AutomaticRoadblocks.Pursuit
         private uint _timeLastDispatchedRoadblock;
         private uint _timeLastRoadblockActive;
         private uint _timeLastLevelChanged;
+        private uint _timeLastLevelChangedForShotsFired;
         private PursuitLevel _pursuitLevel = PursuitLevel.Level1;
 
         public PursuitManager(ILogger logger, IGame game, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher)
@@ -181,6 +184,8 @@ namespace AutomaticRoadblocks.Pursuit
             _totalCopsKilled = 0;
             _totalRoadblocksDeployed = 0;
             _timePursuitStarted = _game.GameTime;
+            _timeLastLevelChanged = _game.GameTime;
+            _timeLastLevelChangedForShotsFired = 0;
             _roadblockDispatcher.RoadblockCopKilled += RoadblockCopKilled;
             _roadblockDispatcher.RoadblockStateChanged += RoadblockStateChanged;
             PursuitHandle = pursuitHandle;
@@ -241,10 +246,16 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void VerifyShotsFired()
         {
-            if (Functions.GetPursuitPeds(PursuitHandle).Any(x => x.IsShooting || x.IsAiming) && PursuitLevel.Level < 2)
+            // verify if automatic level increase is allowed
+            // if not, we're not going to check any shots fired conditions
+            if (!EnableAutomaticLevelIncreases)
+                return;
+
+            if (IsAnySuspectAimingOrShooting() && IsAutomaticLevelIncreaseForShotsFiredAllowed())
             {
                 _logger.Debug("Suspect is shooting/aiming, increasing level");
-                UpdatePursuitLevel(PursuitLevel.Level2);
+                _timeLastLevelChangedForShotsFired = _game.GameTime;
+                UpdatePursuitLevel(PursuitLevel.From(PursuitLevel.Level + 1));
             }
 
             switch (PursuitLevel.Level)
@@ -253,7 +264,7 @@ namespace AutomaticRoadblocks.Pursuit
                     _logger.Debug("Suspect has killed a roadblock cop, increasing level");
                     UpdatePursuitLevel(PursuitLevel.Level2);
                     break;
-                case < 3 when _totalCopsKilled >= 3:
+                case < 3 when _totalCopsKilled >= 2:
                     _logger.Debug("Suspect has killed multiple roadblock cops, increasing level");
                     UpdatePursuitLevel(PursuitLevel.Level3);
                     break;
@@ -269,6 +280,17 @@ namespace AutomaticRoadblocks.Pursuit
             {
                 IncreasePursuitLevel();
             }
+        }
+
+        private bool IsAnySuspectAimingOrShooting()
+        {
+            return Functions.GetPursuitPeds(PursuitHandle).Any(x => x.IsShooting || x.IsAiming);
+        }
+
+        private bool IsAutomaticLevelIncreaseForShotsFiredAllowed()
+        {
+            return PursuitLevel.Level < 3 &&
+                   _game.GameTime - _timeLastLevelChangedForShotsFired > TimeBetweenLevelIncreaseShotsFired;
         }
 
         private bool IsAutomaticLevelIncreaseAllowed()

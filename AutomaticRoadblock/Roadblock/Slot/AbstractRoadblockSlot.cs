@@ -99,7 +99,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive => Instances.First().IsPreviewActive;
+        public bool IsPreviewActive => Instances.Count > 0 && Instances.First().IsPreviewActive;
 
         /// <inheritdoc />
         public void CreatePreview()

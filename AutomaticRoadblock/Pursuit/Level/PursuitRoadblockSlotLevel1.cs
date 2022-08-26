@@ -35,7 +35,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         protected override void InitializeCops()
         {
             Instances.Add(new InstanceSlot(EntityType.CopPed, GameUtils.GetOnTheGroundPosition(Position), 0f, (position, _) =>
-                PedFactory.CreateCopWeapons(new ARPed(GetPedModelForVehicle(), position))));
+                PedFactory.CreateCopWeaponsForModel(new ARPed(GetPedModelForVehicle(), position))));
         }
 
         protected override void InitializeScenery()

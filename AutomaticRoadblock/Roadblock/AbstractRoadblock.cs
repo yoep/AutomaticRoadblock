@@ -383,7 +383,7 @@ namespace AutomaticRoadblocks.Roadblock
                 }
 
                 // move the current slot vehicle position by the difference
-                var newPosition = currentSlot.Position + MathHelper.ConvertHeadingToDirection(currentSlot.Lane.Heading - 90) *
+                var newPosition = currentSlot.Position + MathHelper.ConvertHeadingToDirection(Heading - 90) *
                     (Math.Abs(currentSlotDifference) + AdditionalClippingSpace);
                 Logger.Debug($"Slot vehicle is clipping into next slot by ({currentSlotDifference}), old position {currentSlot.Position}, new position {newPosition}");
                 currentSlot.ModifyVehiclePosition(newPosition);

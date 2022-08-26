@@ -86,6 +86,28 @@ namespace AutomaticRoadblocks.Utils
             {
                 return new Model(PoliceBikeCopModelName);
             }
+
+            /// <summary>
+            /// Verify if the given model is an FBI cop.
+            /// </summary>
+            /// <param name="model">The model to check.</param>
+            /// <returns>Returns true if the model is an FBI cop.</returns>
+            public static bool IsFbi(Model model)
+            {
+                Assert.NotNull(model, "model cannot be null");
+                return CopFbiPedModels.Contains(model.Name);
+            }
+
+            /// <summary>
+            /// Verify if the given model is an swat unit.
+            /// </summary>
+            /// <param name="model">The model to check.</param>
+            /// <returns>Returns true if the model is an swat unit.</returns>
+            public static bool IsSwat(Model model)
+            {
+                Assert.NotNull(model, "model cannot be null");
+                return CopSwatPedModels.Contains(model.Name);
+            }
         }
 
         public static class Vehicles

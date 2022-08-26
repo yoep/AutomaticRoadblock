@@ -221,7 +221,7 @@ namespace AutomaticRoadblocks.Utils.Road
 
             while (distanceTraversed < distance)
             {
-                if (findNodeAttempt == 5)
+                if (findNodeAttempt == 10)
                 {
                     logger.Warn($"Failed to traverse road, unable to find next node after {lastFoundNode} (tried {findNodeAttempt} times)");
                     break;

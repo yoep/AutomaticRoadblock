@@ -65,7 +65,7 @@ namespace AutomaticRoadblocks.ManualPlacement
 
             Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, _) =>
             {
-                var cop = PedFactory.CreateCopWeapons(new ARPed(GetPedModelForVehicle(), position));
+                var cop = PedFactory.CreateCopWeaponsForModel(new ARPed(GetPedModelForVehicle(), position));
                 cop.GameInstance?.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Driver);
                 return cop;
             }));

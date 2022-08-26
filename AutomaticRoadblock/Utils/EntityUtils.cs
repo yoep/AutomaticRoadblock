@@ -18,7 +18,7 @@ namespace AutomaticRoadblocks.Utils
         {
             Assert.NotNull(model, "model cannot be null");
             Assert.NotNull(position, "position cannot be null");
-            return PutVehicleOnTheGround(new Vehicle(model, position, heading));
+            return new Vehicle(model, position, heading);
         }
 
         /// <summary>
