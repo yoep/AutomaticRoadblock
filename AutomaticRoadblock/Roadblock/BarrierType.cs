@@ -1,28 +1,36 @@
 using System.Collections.Generic;
+using AutomaticRoadblocks.Utils;
+using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
 {
     public class BarrierType
     {
         public static readonly BarrierType None = new("None", 1f, 1f);
-        public static readonly BarrierType SmallCone = new("Small cone", 0.5f, 1.5f);
-        public static readonly BarrierType BigCone = new("Big cone", 0.5f, 1.5f);
-        public static readonly BarrierType PoliceDoNotCross = new("Police do not cross", 1.5f, 1f);
-        public static readonly BarrierType WorkBarrierLarge = new("Work barrier large", 1.5f, 1f);
-        public static readonly BarrierType WorkBarrierSmall = new("Work barrier small", 1f, 0.5f);
-        public static readonly BarrierType WorkBarrierWithSign = new("Work ahead sign", 1.5f, 1f);
-        public static readonly BarrierType WorkBarrierWithSignLight = new("Work ahead sign lights", 1.5f, 1f);
+        public static readonly BarrierType SmallCone = new("Small cone", DimensionOf(PropUtils.Models.SmallCone), 0.35f);
+        public static readonly BarrierType SmallConeStriped = new("Small cone striped", DimensionOf(PropUtils.Models.SmallConeWithStrips), 0.35f);
+        public static readonly BarrierType BigCone = new("Big cone", DimensionOf(PropUtils.Models.BigCone), 0.45f);
+        public static readonly BarrierType BigConeStriped = new("Big cone striped", DimensionOf(PropUtils.Models.BigConeWithStrips), 0.45f);
+        public static readonly BarrierType PoliceDoNotCross = new("Police do not cross", DimensionOf(PropUtils.Models.PoliceDoNotCross), 0.2f);
+        public static readonly BarrierType WorkBarrierLarge = new("Work barrier large", DimensionOf(PropUtils.Models.WorkBarrierLarge), 0.2f);
+        public static readonly BarrierType WorkBarrierSmall = new("Work barrier small", DimensionOf(PropUtils.Models.WorkBarrierSmall), 0.3f);
+        public static readonly BarrierType WorkBarrierWithSign = new("Work ahead sign", DimensionOf(PropUtils.Models.WorkBarrierAHeadSign), 0.2f);
+        public static readonly BarrierType WorkBarrierWithSignLight = new("Work ahead sign lights", DimensionOf(PropUtils.Models.WorkBarrierAHeadSignLights), 0.2f);
+        public static readonly BarrierType WorkBarrierHigh = new("High barrier", DimensionOf(PropUtils.Models.WorkBarrierHigh), 0.2f);
 
         public static readonly IEnumerable<BarrierType> Values = new[]
         {
             None,
             SmallCone,
+            SmallConeStriped,
             BigCone,
+            BigConeStriped,
             PoliceDoNotCross,
             WorkBarrierLarge,
             WorkBarrierSmall,
             WorkBarrierWithSign,
-            WorkBarrierWithSignLight
+            WorkBarrierWithSignLight,
+            WorkBarrierHigh
         };
 
         private BarrierType(string displayText, float width, float spacing)
@@ -56,6 +64,11 @@ namespace AutomaticRoadblocks.Roadblock
         public override string ToString()
         {
             return DisplayText;
+        }
+
+        private static float DimensionOf(Model model)
+        {
+            return model.Dimensions.X;
         }
     }
 }

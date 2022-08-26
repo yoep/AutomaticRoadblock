@@ -186,7 +186,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             var copPeds = Instances
                 .Where(x => x.Type == EntityType.CopPed)
                 .ToList();
-            
+
             // release the instances before giving them to LSPDFR
             // this should prevent accidental override of attributes set by LSPDFR
             Instances
@@ -326,6 +326,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             var barrierTotalWidth = BarrierType.Spacing + BarrierType.Width;
             var totalBarriers = (int)Math.Floor(Lane.Width / barrierTotalWidth);
 
+            Logger.Trace($"Barrier info: lane width {Lane.Width}, type {BarrierType}, width: {BarrierType.Width}, spacing: {BarrierType.Spacing}");
             Logger.Debug($"Creating a total of {totalBarriers} barriers with type {BarrierType} for the roadblock slot");
             for (var i = 0; i < totalBarriers; i++)
             {

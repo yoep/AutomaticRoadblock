@@ -12,16 +12,19 @@ namespace AutomaticRoadblocks.Roadblock.Factory
             new()
             {
                 { BarrierType.None, (_, _) => null },
-                { BarrierType.SmallCone, (position, _) => new ARScenery(PropUtils.CreateSmallConeWithStripes(position)) },
-                { BarrierType.BigCone, (position, _) => new ARScenery(PropUtils.CreateBigConeWithStripes(position)) },
+                { BarrierType.SmallCone, (position, _) => new ARScenery(PropUtils.CreateSmallBlankCone(position)) },
+                { BarrierType.SmallConeStriped, (position, _) => new ARScenery(PropUtils.CreateSmallConeWithStripes(position)) },
+                { BarrierType.BigCone, (position, _) => new ARScenery(PropUtils.CreateBigCone(position)) },
+                { BarrierType.BigConeStriped, (position, _) => new ARScenery(PropUtils.CreateBigConeWithStripes(position)) },
                 { BarrierType.PoliceDoNotCross, (position, heading) => new ARScenery(PropUtils.CreatePoliceDoNotCrossBarrier(position, heading)) },
-                { BarrierType.WorkBarrierLarge, (position, heading) => new ARScenery(PropUtils.CreateWorkBarrier(position, heading)) },
+                { BarrierType.WorkBarrierLarge, (position, heading) => new ARScenery(PropUtils.CreateWorkBarrierLarge(position, heading)) },
                 { BarrierType.WorkBarrierSmall, (position, heading) => new ARScenery(PropUtils.CreateWorkBarrierSmall(position, heading)) },
                 { BarrierType.WorkBarrierWithSign, (position, heading) => new ARScenery(PropUtils.CreateBarrierWithWorkAhead(position, heading)) },
                 {
                     BarrierType.WorkBarrierWithSignLight,
                     (position, heading) => new ARScenery(PropUtils.CreateBarrierWithWorkAheadWithLights(position, heading))
                 },
+                { BarrierType.WorkBarrierHigh, (position, heading) => new ARScenery(PropUtils.CreateWorkBarrierHigh(position, heading)) },
             };
 
         public static ARScenery Create(BarrierType type, Vector3 position, float heading = 0f)

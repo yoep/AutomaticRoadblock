@@ -7,6 +7,25 @@ namespace AutomaticRoadblocks.Utils
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static class PropUtils
     {
+        #region Models
+
+        public static class Models
+        {
+            public static Model BigCone => new("prop_roadcone01c");
+            public static Model BigConeWithStrips => new("prop_mp_cone_01");
+            public static Model ConeWithLight => new("prop_air_conelight");
+            public static Model PoliceDoNotCross => new("prop_barrier_work05");
+            public static Model SmallCone => new("prop_mp_cone_03");
+            public static Model SmallConeWithStrips => new("prop_mp_cone_02");
+            public static Model WorkBarrierHigh => new("prop_mp_barrier_02b");
+            public static Model WorkBarrierLarge => new("prop_barrier_work06a");
+            public static Model WorkBarrierSmall => new("prop_barrier_work01a");
+            public static Model WorkBarrierAHeadSign => new("prop_barrier_work04a");
+            public static Model WorkBarrierAHeadSignLights => new("prop_barrier_work06b");
+        }
+
+        #endregion
+
         #region Ped items
 
         public static Object CreateWand()
@@ -69,19 +88,25 @@ namespace AutomaticRoadblocks.Utils
 
         public static Object CreateSmallBlankCone(Vector3 position)
         {
-            var instance = new Object(new Model("prop_mp_cone_03"), position);
+            var instance = new Object(Models.SmallCone, position);
             return PlaceCorrectlyOnGround(instance);
         }
 
         public static Object CreateSmallConeWithStripes(Vector3 position)
         {
-            var instance = new Object(new Model("prop_mp_cone_02"), position);
+            var instance = new Object(Models.SmallConeWithStrips, position);
+            return PlaceCorrectlyOnGround(instance);
+        }
+
+        public static Object CreateBigCone(Vector3 position)
+        {
+            var instance = new Object(Models.BigCone, position);
             return PlaceCorrectlyOnGround(instance);
         }
 
         public static Object CreateBigConeWithStripes(Vector3 position)
         {
-            var instance = new Object(new Model("prop_mp_cone_01"), position);
+            var instance = new Object(Models.BigConeWithStrips, position);
             return PlaceCorrectlyOnGround(instance);
         }
 
@@ -93,33 +118,42 @@ namespace AutomaticRoadblocks.Utils
 
         public static Object CreateConeWithLight(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_air_conelight"), position, heading);
+            var instance = new Object(Models.ConeWithLight, position, heading);
             PlaceCorrectlyOnGround(instance);
             instance.Position += Vector3.WorldDown * 0.1f;
             return instance;
         }
 
-        public static Object CreateWorkBarrier(Vector3 position, float heading = 0f)
+        public static Object CreateWorkBarrierLarge(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_barrier_work06a"), position, heading);
+            var instance = new Object(Models.WorkBarrierLarge, position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
         public static Object CreateWorkBarrierSmall(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_barrier_work01a"), position, heading);
+            var instance = new Object(Models.WorkBarrierSmall, position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
         public static Object CreateBarrierWithWorkAhead(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_barrier_work04a"), position, heading);
+            var instance = new Object(Models.WorkBarrierAHeadSign, position, heading);
+            return PlaceCorrectlyOnGround(instance);
+        }
+
+        /// <summary>
+        /// https://gta-objects.xyz/gallery/objects/prop_mp_barrier_02b.jpg
+        /// </summary>
+        public static Object CreateWorkBarrierHigh(Vector3 position, float heading = 0f)
+        {
+            var instance = new Object(Models.WorkBarrierHigh, position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
         public static Object CreateBarrierWithWorkAheadWithLights(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_barrier_work06b"), position, heading);
+            var instance = new Object(Models.WorkBarrierAHeadSignLights, position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
@@ -161,7 +195,7 @@ namespace AutomaticRoadblocks.Utils
 
         public static Object CreatePoliceDoNotCrossBarrier(Vector3 position, float heading = 0f)
         {
-            var barrier = new Object(new Model("prop_barrier_work05"), position, heading);
+            var barrier = new Object(Models.PoliceDoNotCross, position, heading);
             return PlaceCorrectlyOnGround(barrier);
         }
 
@@ -225,9 +259,21 @@ namespace AutomaticRoadblocks.Utils
             return instance;
         }
 
+        /// <summary>
+        /// https://gta-objects.xyz/gallery/objects/prop_warninglight_01.jpg
+        /// </summary>
         public static Object CreateWarningLight(Vector3 position, float heading = 0f)
         {
             var instance = new Object(new Model("prop_warninglight_01"), position, heading);
+            return PlaceCorrectlyOnGround(instance);
+        }
+
+        /// <summary>
+        /// https://gta-objects.xyz/gallery/objects/prop_barrier_wat_03b.jpg
+        /// </summary>
+        public static Object CreateBarrelTrafficCatcher(Vector3 position, float heading = 0f)
+        {
+            var instance = new Object(new Model("prop_barrier_wat_03b"), position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
