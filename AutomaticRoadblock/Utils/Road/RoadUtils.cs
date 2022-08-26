@@ -190,8 +190,7 @@ namespace AutomaticRoadblocks.Utils.Road
             var logger = IoC.Instance.GetInstance<ILogger>();
             logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading}");
             FindVehicleNodes(position, nodeType, roadType, out var node1, out var node2);
-            logger.Trace($"Found vehicle node 1 at {node1.Position} with heading {node1.Heading}");
-            logger.Trace($"Found vehicle node 2 at {node2.Position} with heading {node2.Heading}");
+            logger.Trace($"Found vehicles nodes: {node1.Position} with heading {node1.Heading}, {node2.Position} with heading {node2.Heading}");
 
             var nodeMatchingClosestToHeading = Math.Abs(node1.Heading - heading) % 360 < Math.Abs(node2.Heading - heading) % 360 ? node1 : node2;
             logger.Debug($"Using node {nodeMatchingClosestToHeading} as closest matching");
@@ -210,8 +209,11 @@ namespace AutomaticRoadblocks.Utils.Road
         private static List<NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, VehicleNodeType nodeType,
             out NodeInfo lastFoundNode)
         {
+            var logger = IoC.Instance.GetInstance<ILogger>();
+            var startedAt = DateTime.Now.Ticks;
             var distanceTraversed = 0f;
             var distanceToMove = 5f;
+            var findNodeAttempt = 0;
             var roadType = Convert(nodeType);
             var nodeInfos = new List<NodeInfo>();
 
@@ -219,22 +221,36 @@ namespace AutomaticRoadblocks.Utils.Road
 
             while (distanceTraversed < distance)
             {
+                if (findNodeAttempt == 5)
+                {
+                    logger.Warn($"Failed to traverse road, unable to find next node after {lastFoundNode} (tried {findNodeAttempt} times)");
+                    break;
+                }
+
                 var findNodeAt = lastFoundNode.Position + MathHelper.ConvertHeadingToDirection(lastFoundNode.Heading) * distanceToMove;
                 var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNode.Heading, nodeType, roadType);
 
-                if (nodeTowardsHeading.Position == lastFoundNode.Position)
+                if (nodeTowardsHeading.Position.Equals(lastFoundNode.Position) || nodeInfos.Any(x => x.Equals(nodeTowardsHeading)))
                 {
                     distanceToMove *= 1.5f;
+                    findNodeAttempt++;
                 }
                 else
                 {
+                    var additionalDistanceTraversed = lastFoundNode.Position.DistanceTo(nodeTowardsHeading.Position);
                     nodeInfos.Add(nodeTowardsHeading);
                     distanceToMove = 5f;
-                    distanceTraversed += lastFoundNode.Position.DistanceTo(nodeTowardsHeading.Position);
+                    findNodeAttempt = 0;
+                    distanceTraversed += additionalDistanceTraversed;
                     lastFoundNode = nodeTowardsHeading;
+                    logger.Trace($"Traversed an additional {additionalDistanceTraversed} distance, new total traversed distance = {distanceTraversed}");
                 }
             }
 
+            var calculationTime = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
+            logger.Debug(
+                $"Traversed a total of {position.DistanceTo(lastFoundNode.Position)} distance with expectation {distance} within {calculationTime} millis\n" +
+                $"origin: {position}, destination: {lastFoundNode.Position}");
             return nodeInfos;
         }
 
@@ -586,6 +602,32 @@ namespace AutomaticRoadblocks.Utils.Road
         public override string ToString()
         {
             return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}";
+        }
+
+        protected bool Equals(NodeInfo other)
+        {
+            return Position.Equals(other.Position) && Heading.Equals(other.Heading) && NumberOfLanes1 == other.NumberOfLanes1 && NumberOfLanes2 == other.NumberOfLanes2 && AtJunction.Equals(other.AtJunction);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((NodeInfo)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Position.GetHashCode();
+                hashCode = (hashCode * 397) ^ Heading.GetHashCode();
+                hashCode = (hashCode * 397) ^ NumberOfLanes1;
+                hashCode = (hashCode * 397) ^ NumberOfLanes2;
+                hashCode = (hashCode * 397) ^ AtJunction.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }
