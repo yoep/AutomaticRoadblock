@@ -315,7 +315,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
             Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, CalculateVehicleHeading(),
-                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundVector(position), heading, RecordVehicleCollisions)));
+                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundPosition(position), heading, RecordVehicleCollisions)));
         }
 
         private void InitializeBarriers()
@@ -330,7 +330,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             Logger.Debug($"Creating a total of {totalBarriers} barriers with type {BarrierType} for the roadblock slot");
             for (var i = 0; i < totalBarriers; i++)
             {
-                Instances.Add(new InstanceSlot(EntityType.Barrier, startPosition, Heading, CreateBarrier));
+                Instances.Add(new InstanceSlot(EntityType.Barrier, GameUtils.GetOnTheGroundPosition(startPosition), Heading, CreateBarrier));
                 startPosition += direction * barrierTotalWidth;
             }
         }
@@ -339,7 +339,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             try
             {
-                return BarrierFactory.Create(BarrierType, position, heading);
+                return BarrierFactory.Create(BarrierType, GameUtils.GetOnTheGroundPosition(position), heading);
             }
             catch (Exception ex)
             {

@@ -43,8 +43,8 @@ namespace AutomaticRoadblocks
         public const string BarrierDescription = "The barrier type to use";
         public const string EnableCops = "Enable cops";
         public const string EnableCopsDescription = "Set if cops should be spawned with the roadblock";
-        public const string SpeedLimit = "Limit speed";
-        public const string SpeedLimitDescription = "Set if the speed around the roadblock should be limited for traffic";
+        public const string SpeedLimit = "Slow traffic";
+        public const string SpeedLimitDescription = "Slow the traffic around the roadblock";
         public const string Vehicle = "Vehicle";
         public const string VehicleDescription = "The vehicle type to use";
         public const string LightSource = "Lights";

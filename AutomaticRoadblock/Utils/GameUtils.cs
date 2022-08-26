@@ -40,14 +40,17 @@ namespace AutomaticRoadblocks.Utils
 
         /// <summary>
         /// Get a new vector that is placed on the ground in the game world for the current position.
+        /// The Z vector needs to be above the ground before a position can be determined, otherwise, the result will be <see cref="Vector3.Zero"/>.
+        /// Modify the <see cref="heightOffset"/> if needed to prevent an inconclusive <see cref="Vector3.Zero"/> result.
         /// </summary>
         /// <param name="position">The game world position.</param>
+        /// <param name="heightOffset">The height offset to apply to the Z vector before getting the coordinate.</param>
         /// <returns>Returns a new Vector that is placed on the ground.</returns>
-        public static Vector3 GetOnTheGroundVector(Vector3 position)
+        public static Vector3 GetOnTheGroundPosition(Vector3 position, float heightOffset = 5f)
         {
             var newPosition = new Vector3(position.X, position.Y, 0f);
 
-            NativeFunction.Natives.GET_GROUND_Z_FOR_3D_COORD<bool>(position.X, position.Y, position.Z + 15f, out float newHeight, 0);
+            NativeFunction.Natives.GET_GROUND_Z_FOR_3D_COORD<bool>(position.X, position.Y, position.Z + heightOffset, out float newHeight, 0);
             newPosition.Z = newHeight;
 
             return newPosition;

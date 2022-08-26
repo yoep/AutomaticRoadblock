@@ -118,18 +118,18 @@ namespace AutomaticRoadblocks.Pursuit
         }
 
         /// <inheritdoc />
-        public bool DispatchNow(bool userRequested = false, bool force = false)
+        public bool DispatchNow(bool userRequested = false, bool force = false, bool atCurrentLocation = false)
         {
             if (!IsPursuitActive)
             {
-                return DispatchForNonActivePursuit(userRequested, force);
+                return DispatchForNonActivePursuit(userRequested, force, atCurrentLocation);
             }
 
             var vehicle = GetSuspectVehicle();
 
             // try to dispatch a new roadblock for a chased vehicle
             // if successful, store the dispatch time
-            return vehicle != null && DoDispatch(vehicle, userRequested, force);
+            return vehicle != null && DoDispatch(vehicle, userRequested, force, false);
         }
 
         /// <inheritdoc />
@@ -278,9 +278,12 @@ namespace AutomaticRoadblocks.Pursuit
                    !IsPursuitOnFoot;
         }
 
-        private bool DoDispatch(Vehicle vehicle, bool userRequested, bool force)
+        private bool DoDispatch(Vehicle vehicle, bool userRequested, bool force, bool atCurrentLocation)
         {
-            var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, userRequested, force);
+            _logger.Debug(
+                $"Dispatching roadblock for non active pursuit with {nameof(PursuitLevel)}: {PursuitLevel}, {nameof(userRequested)}: {userRequested}, " +
+                $"{nameof(force)}: {force}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
+            var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, userRequested, force, atCurrentLocation);
 
             if (dispatched)
             {
@@ -297,10 +300,10 @@ namespace AutomaticRoadblocks.Pursuit
                 DispatchNow();
         }
 
-        private bool DispatchForNonActivePursuit(bool userRequest, bool force)
+        private bool DispatchForNonActivePursuit(bool userRequest, bool force, bool atCurrentLocation)
         {
             if (!userRequest && force)
-                return DoDispatch(_game.PlayerVehicle, false, true);
+                return DoDispatch(_game.PlayerVehicle, false, true, atCurrentLocation);
 
             _logger.Warn("Unable to dispatch roadblock, no active pursuit ongoing");
             return false;

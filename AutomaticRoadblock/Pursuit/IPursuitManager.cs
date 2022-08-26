@@ -63,8 +63,9 @@ namespace AutomaticRoadblocks.Pursuit
         /// </summary>
         /// <param name="userRequested">Indicates if the roadblock is requested on behalve of the user.</param>
         /// <param name="force">Force the roadblock, this will disable the conditions checking.</param>
+        /// <param name="atCurrentLocation">Indicates if the roadblock location should be calculated or the current location of the target should be used</param>
         /// <returns>Returns true if a roadblock will be dispatched, else false.</returns>
-        bool DispatchNow(bool userRequested = false, bool force = false);
+        bool DispatchNow(bool userRequested = false, bool force = false, bool atCurrentLocation = false);
 
         /// <summary>
         /// Dispatch a preview of a possible roadblock.

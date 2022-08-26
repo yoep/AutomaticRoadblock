@@ -9,6 +9,7 @@ namespace AutomaticRoadblocks.Utils.Road
     public enum RoadType
     {
         All = 0,
-        MajorRoadsOnly = 1
+        MajorRoads = 1,
+        MajorRoadsNoJunction = 2
     }
 }

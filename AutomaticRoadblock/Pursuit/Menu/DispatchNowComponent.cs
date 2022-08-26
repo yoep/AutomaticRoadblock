@@ -4,6 +4,9 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
 {
+    /// <summary>
+    /// Dispatch now menu item for when the user is in a pursuit.
+    /// </summary>
     public class DispatchNowComponent : IMenuComponent<UIMenuItem>
     {
         private readonly IPursuitManager _pursuitManager;

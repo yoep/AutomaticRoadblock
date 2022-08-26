@@ -164,6 +164,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         public void RemoveRoadblocks(PlacementRemoveType removeType)
         {
+            _logger.Debug($"Removing placed roadblocks with criteria {removeType}");
             var toBoRemoved = new List<ManualRoadblock>();
 
             lock (_roadblocks)
@@ -174,25 +175,20 @@ namespace AutomaticRoadblocks.ManualPlacement
                         .Where(x => !x.IsPreviewActive)
                         .ToList();
                 }
-                else
+                else if (removeType == PlacementRemoveType.ClosestToPlayer)
                 {
-                    var closestRoadblockDistance = 9999f;
-                    var closestRoadblock = (ManualRoadblock)null;
-                    var playerPosition = _game.PlayerPosition;
-
-                    foreach (var roadblock in _roadblocks)
-                    {
-                        var distance = playerPosition.DistanceTo(roadblock.Position);
-
-                        if (distance > closestRoadblockDistance)
-                            continue;
-
-                        closestRoadblockDistance = distance;
-                        closestRoadblock = roadblock;
-                    }
+                    var closestRoadblock = FindRoadblockClosestToPlayer();
 
                     if (closestRoadblock != null)
                         toBoRemoved.Add(closestRoadblock);
+                }
+                else if (removeType == PlacementRemoveType.LastPlaced)
+                {
+                    toBoRemoved = new List<ManualRoadblock> { _roadblocks[_roadblocks.Count - 1] };
+                }
+                else
+                {
+                    _logger.Warn($"Remove placed roadblocks has not been implemented for {removeType}");
                 }
 
                 _roadblocks.RemoveAll(x => toBoRemoved.Contains(x));
@@ -270,6 +266,26 @@ namespace AutomaticRoadblocks.ManualPlacement
                     }
                 });
             }
+        }
+
+        private ManualRoadblock FindRoadblockClosestToPlayer()
+        {
+            var closestRoadblockDistance = 9999f;
+            var closestRoadblock = (ManualRoadblock)null;
+            var playerPosition = _game.PlayerPosition;
+
+            foreach (var roadblock in _roadblocks.Where(x => !x.IsPreviewActive))
+            {
+                var distance = playerPosition.DistanceTo(roadblock.Position);
+
+                if (distance > closestRoadblockDistance)
+                    continue;
+
+                closestRoadblockDistance = distance;
+                closestRoadblock = roadblock;
+            }
+
+            return closestRoadblock;
         }
 
         private void UpdateBarrier(BarrierType newType)
