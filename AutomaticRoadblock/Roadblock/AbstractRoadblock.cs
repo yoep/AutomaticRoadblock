@@ -184,6 +184,17 @@ namespace AutomaticRoadblocks.Roadblock
         }
 
         /// <inheritdoc />
+        public void Release()
+        {
+            // verify if the roadblock is still active
+            // otherwise, we cannot release the entities
+            if (State != RoadblockState.Active)
+                return;
+            
+            ReleaseEntitiesToLspdfr();
+        }
+
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"{nameof(Level)}: {Level}, {nameof(State)}: {State}, Number of {nameof(Slots)}: [{Slots.Count}]\n" +
@@ -396,6 +407,21 @@ namespace AutomaticRoadblocks.Roadblock
             var vehicleLength = slot.VehicleModel.Dimensions.Y;
 
             return laneWidth - vehicleLength;
+        }
+        
+        private void ReleaseEntitiesToLspdfr()
+        {
+            Logger.Debug("Releasing cop peds to LSPDFR");
+            foreach (var slot in Slots)
+            {
+                slot.ReleaseToLspdfr();
+            }
+
+            Game.NewSafeFiber(() =>
+            {
+                GameFiber.Wait(BlipFlashDuration);
+                DeleteBlip();
+            }, "Roadblock.ReleaseEntitiesToLspdfr");
         }
 
         #endregion

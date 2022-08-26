@@ -85,21 +85,6 @@ namespace AutomaticRoadblocks.Roadblock
             }, "Roadblock.Monitor");
         }
 
-        private void ReleaseEntitiesToLspdfr()
-        {
-            Logger.Debug("Releasing cop peds to LSPDFR");
-            foreach (var slot in Slots)
-            {
-                slot.ReleaseToLspdfr();
-            }
-
-            Game.NewSafeFiber(() =>
-            {
-                GameFiber.Wait(BlipFlashDuration);
-                DeleteBlip();
-            }, "Roadblock.ReleaseEntitiesToLspdfr");
-        }
-
         private void VerifyIfRoadblockIsBypassed()
         {
             var currentDistance = Vehicle.DistanceTo(Position);
@@ -111,8 +96,8 @@ namespace AutomaticRoadblocks.Roadblock
             else if (Math.Abs(currentDistance - _lastKnownDistanceToRoadblock) > BypassTolerance)
             {
                 BlipFlashNewState(Color.LightGray);
+                Release();
                 UpdateState(RoadblockState.Bypassed);
-                ReleaseEntitiesToLspdfr();
                 Logger.Info("Roadblock has been bypassed");
             }
         }
@@ -127,8 +112,8 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 Logger.Debug("Determined that the collision must have been against a roadblock slot");
                 BlipFlashNewState(Color.Green);
+                Release();
                 UpdateState(RoadblockState.Hit);
-                ReleaseEntitiesToLspdfr();
                 Logger.Info("Roadblock has been hit by the suspect");
             }
             else

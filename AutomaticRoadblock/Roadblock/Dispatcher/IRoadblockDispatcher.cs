@@ -43,5 +43,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// <param name="vehicle">The vehicle for which a roadblock preview should be dispatched.</param>
         /// <param name="atCurrentLocation">Set if the preview should be dispatched at the current vehicle location.</param>
         void DispatchPreview(RoadblockLevel level, Vehicle vehicle, bool atCurrentLocation = false);
+
+        /// <summary>
+        /// Dismiss any currently active roadblocks.
+        /// This is most of the time used when a pursuit had ended.
+        /// </summary>
+        void DismissActiveRoadblocks();
     }
 }

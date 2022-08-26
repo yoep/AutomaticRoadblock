@@ -1,7 +1,19 @@
+using System.Windows.Forms;
+
 namespace AutomaticRoadblocks.Settings
 {
     public class AutomaticRoadblocksSettings
     {
+        /// <summary>
+        /// The key to dispatch a roadblock now.
+        /// </summary>
+        public Keys DispatchNowKey { get; internal set; }
+        
+        /// <summary>
+        /// The modification key to dispatch a roadblock now.
+        /// </summary>
+        public Keys DispatchNowModifierKey { get; internal set; }
+        
         /// <summary>
         /// Verify if automatic roadblocks should be enabled during pursuits (can be changed in-game through the menu)
         /// </summary>

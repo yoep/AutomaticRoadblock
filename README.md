@@ -9,7 +9,7 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 - Roadblock cops automatically join the pursuit after a hit/bypass
 - Request a roadblock during a pursuit
 - Dynamic roadblocks with light sources during the evening/night
-- Manual configurable roadblock placement 
+- Manual configurable roadblock placement
 
 ## Planned features
 
@@ -19,4 +19,18 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 - Redirect traffic
 - Junction roadblocks
 - More scenery variations within the roadblocks
-- Additional scenery such as emergency services to manual roadblock placements
+- Additional scenery such as other emergency vehicles to manual roadblock placements
+
+## Pursuit
+
+The pursuit option allows dispatching of roadblocks while in a pursuit.
+
+### Levels
+
+| Level | Vehicle type | Barrier type | Lanes blocked | Cop action            |
+|-------| --- | --- | --- |-----------------------|
+| 1     | Locale | Small cones | Lanes in the same direction as pursuit | In car                |
+| 2     | Locale | Big cones | All lanes | Aims at target        |
+| 3     | Locale incl. transporter | Police do not cross | All lanes | Aims/shoots at target |
+| 4     | Locale incl. transporter/FBI | Police do not cross | All lanes | Aims/shoots at target |
+| 5     | FBI/Swat | Police do not cross | All lanes | Aims/shoots at target |

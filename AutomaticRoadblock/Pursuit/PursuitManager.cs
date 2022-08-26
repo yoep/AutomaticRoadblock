@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
@@ -101,12 +102,15 @@ namespace AutomaticRoadblocks.Pursuit
             _logger.Trace("Registering pursuit listener to LSPD_First_Response Api");
             Events.OnPursuitStarted += PursuitStarted;
             Events.OnPursuitEnded += PursuitEnded;
+            Game.FrameRender += Process;
         }
 
         public void StopListener()
         {
             _logger.Trace("Removing pursuit listener from LSPD_First_Response Api");
             Events.OnPursuitStarted -= PursuitStarted;
+            Events.OnPursuitEnded -= PursuitEnded;
+            Game.FrameRender -= Process;
         }
 
         /// <inheritdoc />
@@ -157,6 +161,34 @@ namespace AutomaticRoadblocks.Pursuit
 
         #region Functions
 
+        private void Process(object sender, GraphicsEventArgs e)
+        {
+            try
+            {
+                if (IsDispatchNowPressed())
+                    DispatchNow(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"An error occurred while processing the pursuit manager, {ex.Message}", ex);
+            }
+        }
+
+        private bool IsDispatchNowPressed()
+        {
+            var roadblocksSettings = _settingsManager.AutomaticRoadblocksSettings;
+            var secondKey = roadblocksSettings.DispatchNowModifierKey;
+            var secondKeyDown = secondKey == Keys.None;
+
+            if (!secondKeyDown && secondKey == Keys.ShiftKey && Game.IsShiftKeyDownRightNow)
+                secondKeyDown = true;
+
+            if (!secondKeyDown && secondKey == Keys.ControlKey && Game.IsControlKeyDownRightNow)
+                secondKeyDown = true;
+
+            return Game.IsKeyDown(roadblocksSettings.DispatchNowKey) && secondKeyDown;
+        }
+
         private void UpdatePursuitLevel(PursuitLevel level)
         {
             Assert.NotNull(level, "level cannot be null");
@@ -200,6 +232,7 @@ namespace AutomaticRoadblocks.Pursuit
         {
             PursuitHandle = null;
             _roadblockDispatcher.RoadblockCopKilled -= RoadblockCopKilled;
+            _roadblockDispatcher.DismissActiveRoadblocks();
 
             PursuitStateChanged?.Invoke(false);
         }
@@ -289,8 +322,11 @@ namespace AutomaticRoadblocks.Pursuit
 
         private bool IsAutomaticLevelIncreaseForShotsFiredAllowed()
         {
-            return PursuitLevel.Level < 3 &&
-                   _game.GameTime - _timeLastLevelChangedForShotsFired > TimeBetweenLevelIncreaseShotsFired;
+            var allowedSinceLastLevelChange = _game.GameTime - _timeLastLevelChangedForShotsFired > TimeBetweenLevelIncreaseShotsFired;
+            
+            return (PursuitLevel.Level < 2 && allowedSinceLastLevelChange) ||
+                   (PursuitLevel.Level == 2 && _totalRoadblocksDeployed > 0 && allowedSinceLastLevelChange) || 
+                   (PursuitLevel.Level < 3 && allowedSinceLastLevelChange);
         }
 
         private bool IsAutomaticLevelIncreaseAllowed()

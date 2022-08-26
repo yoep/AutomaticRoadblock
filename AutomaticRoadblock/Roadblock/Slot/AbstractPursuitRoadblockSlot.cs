@@ -64,6 +64,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                     var hasACopBeenKilled = Instances
                         .Where(x => x.Type == EntityType.CopPed)
                         .Select(x => (ARPed)x.Instance)
+                        .Where(x => x.GameInstance != null && x.GameInstance.IsValid())
                         .Where(x => x.GameInstance.IsDead)
                         .Where(x => x.GameInstance.HasBeenDamagedByAnyVehicle)
                         .Any(x => x.GameInstance.HasBeenDamagedBy(TargetVehicle));

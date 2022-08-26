@@ -93,6 +93,24 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }, "RoadblockDispatcher.DispatchPreview");
         }
 
+        /// <inheritdoc />
+        public void DismissActiveRoadblocks()
+        {
+            List<IRoadblock> roadblocksToRelease;
+
+            lock (_roadblocks)
+            {
+                roadblocksToRelease = _roadblocks
+                    .Where(x => x.State == RoadblockState.Active)
+                    .ToList();
+
+                _roadblocks.RemoveAll(x => roadblocksToRelease.Contains(x));
+            }
+
+            roadblocksToRelease.ForEach(x => x.Release());
+            _logger.Debug($"Dismissed a total of {roadblocksToRelease.Count} roadblocks which were still active");
+        }
+
         #endregion
 
         #region IDisposable
@@ -136,7 +154,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 {
                     var road = DetermineRoadblockLocation(level, vehicle, atCurrentLocation);
                     _logger.Trace($"Dispatching roadblock on {road}");
-                    
+
                     var roadblock = PursuitRoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
                         ShouldAddLightsToRoadblock());
                     _logger.Info($"Dispatching new roadblock\n{roadblock}");

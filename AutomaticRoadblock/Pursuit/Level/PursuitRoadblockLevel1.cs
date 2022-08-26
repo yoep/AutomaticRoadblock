@@ -47,8 +47,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             var lanesToBlock = base.LanesToBlock();
 
+            // only block the lanes in the same direction as the pursuit
             return lanesToBlock
-                .Where(x => Math.Abs(x.Heading - Vehicle.Heading) < LaneHeadingTolerance)
+                .Where(x => Math.Abs(x.Heading - TargetHeading) < LaneHeadingTolerance)
                 .ToList();
         }
 

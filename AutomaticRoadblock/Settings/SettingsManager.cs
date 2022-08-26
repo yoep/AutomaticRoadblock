@@ -8,6 +8,9 @@ namespace AutomaticRoadblocks.Settings
     public class SettingsManager : ISettingsManager
     {
         private const string File = @"./Plugins/LSPDFR/AutomaticRoadblocks.ini";
+        private const string GeneralSection = "General";
+        private const string AutomaticRoadblocksSection = "Automatic Roadblocks";
+        private const string ManualPlacementSection = "Manual Placement";
 
         private readonly ILogger _logger;
 
@@ -57,8 +60,8 @@ namespace AutomaticRoadblocks.Settings
         {
             GeneralSettings = new GeneralSettings
             {
-                OpenMenuKey = ValueToKey(file.ReadString("General", "OpenMenuKey", "X")),
-                OpenMenuModifierKey = ValueToKey(file.ReadString("General", "OpenMenuModifierKey", "ShiftKey"))
+                OpenMenuKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuKey", "X")),
+                OpenMenuModifierKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuModifierKey", "ShiftKey"))
             };
         }
 
@@ -66,13 +69,15 @@ namespace AutomaticRoadblocks.Settings
         {
             AutomaticRoadblocksSettings = new AutomaticRoadblocksSettings
             {
-                EnableDuringPursuits = file.ReadBoolean("Automatic Roadblocks", "EnableDuringPursuits", true),
-                EnableAutoLevelIncrements = file.ReadBoolean("Automatic Roadblocks", "EnableAutoLevelIncrements", true),
-                EnableLights = file.ReadBoolean("Automatic Roadblocks", "EnableLights", true),
-                DispatchAllowedAfter = file.ReadUInt32("Automatic Roadblocks", "DispatchAllowedAfter", 90),
-                DispatchInterval = file.ReadUInt32("Automatic Roadblocks", "DispatchAllowedAfter", 45),
-                TimeBetweenAutoLevelIncrements = file.ReadUInt32("Automatic Roadblocks", "TimeBetweenAutoLevelIncrements", 90),
-                SlowTraffic = file.ReadBoolean("Automatic Roadblocks", "SlowTraffic", true)
+                DispatchNowKey = ValueToKey(file.ReadString(AutomaticRoadblocksSection, "DispatchNowKey", "X")),
+                DispatchNowModifierKey = ValueToKey(file.ReadString(AutomaticRoadblocksSection, "DispatchNowModifierKey", "ShiftKey")),
+                EnableDuringPursuits = file.ReadBoolean(AutomaticRoadblocksSection, "EnableDuringPursuits", true),
+                EnableAutoLevelIncrements = file.ReadBoolean(AutomaticRoadblocksSection, "EnableAutoLevelIncrements", true),
+                EnableLights = file.ReadBoolean(AutomaticRoadblocksSection, "EnableLights", true),
+                DispatchAllowedAfter = file.ReadUInt32(AutomaticRoadblocksSection, "DispatchAllowedAfter", 90),
+                DispatchInterval = file.ReadUInt32(AutomaticRoadblocksSection, "DispatchAllowedAfter", 45),
+                TimeBetweenAutoLevelIncrements = file.ReadUInt32(AutomaticRoadblocksSection, "TimeBetweenAutoLevelIncrements", 90),
+                SlowTraffic = file.ReadBoolean(AutomaticRoadblocksSection, "SlowTraffic", true)
             };
         }
 
@@ -80,7 +85,7 @@ namespace AutomaticRoadblocks.Settings
         {
             ManualPlacementSettings = new ManualPlacementSettings
             {
-                EnablePreview = file.ReadBoolean("Manual Placement", "EnablePreview"),
+                EnablePreview = file.ReadBoolean(ManualPlacementSection, "EnablePreview"),
             };
         }
 

@@ -46,5 +46,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// Spawn the roadblock in the world.
         /// </summary>
         void Spawn();
+
+        /// <summary>
+        /// Release the roadblock instance back to the world.
+        /// This can only be used when the <see cref="State"/> is <see cref="RoadblockState.Active"/>.
+        /// </summary>
+        void Release();
     }
 }
