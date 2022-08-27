@@ -20,6 +20,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         event RoadblockEvents.RoadblockStateChanged RoadblockStateChanged;
         
         /// <summary>
+        /// Invoked when cops from a roadblock are joining the pursuit.
+        /// </summary>
+        event RoadblockEvents.RoadblockCopsJoiningPursuit RoadblockCopsJoiningPursuit;
+        
+        /// <summary>
         /// Get the roadblocks which have been dispatched.
         /// </summary>
         IEnumerable<IRoadblock> Roadblocks { get; }

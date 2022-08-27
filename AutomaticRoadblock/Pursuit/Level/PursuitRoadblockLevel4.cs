@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.LightSources;
@@ -38,8 +39,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 .Select(x => x.GameInstance)
                 .First();
 
-            vehicle.IsSirenOn = true;
-
             Instances
                 .Where(x => x.Type == EntityType.CopPed)
                 .Select(x => x.Instance)
@@ -52,6 +51,28 @@ namespace AutomaticRoadblocks.Pursuit.Level
         #endregion
 
         #region Functions
+
+        /// <inheritdoc />
+        protected override IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
+        {
+            var slots = base.CreateRoadblockSlots(lanesToBlock);
+            var additionalSlots = new List<IRoadblockSlot>();
+
+            // add additional slots in-between the lanes
+            for (var i = 0; i < slots.Count - 1; i++)
+            {
+                var currentSlot = slots[i];
+                var nextSlot = slots[i + 1];
+                var distanceToNext = currentSlot.Position.DistanceTo(nextSlot.Position);
+                var lane = currentSlot.Lane.MoveTo(MathHelper.ConvertHeadingToDirection(Heading) * 4f +
+                                                   MathHelper.ConvertHeadingToDirection(Heading + 90) * (distanceToNext / 2));
+
+                additionalSlots.Add(new PursuitRoadblockSlotLevel4(lane, BarrierType.None, currentSlot.Heading, Vehicle, false));
+            }
+
+            additionalSlots.AddRange(slots);
+            return additionalSlots;
+        }
 
         /// <inheritdoc />
         protected override void InitializeScenery()
@@ -69,13 +90,25 @@ namespace AutomaticRoadblocks.Pursuit.Level
         protected override void InitializeLights()
         {
             Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));
-            Instances.AddRange(LightSourceRoadblockFactory.CreateRedBlueGroundLights(this, 5));
+            Instances.AddRange(LightSourceRoadblockFactory.CreateRedBlueGroundLights(this, 3));
         }
 
         /// <inheritdoc />
         protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
             return new PursuitRoadblockSlotLevel4(lane, MainBarrierType, heading, targetVehicle, shouldAddLights);
+        }
+
+        /// <inheritdoc />
+        protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit()
+        {
+            // only the chase vehicle will join the pursuit
+            return Instances
+                .Where(x => x.Type == EntityType.CopPed)
+                .Select(x => x.Instance)
+                .Select(x => (ARPed)x)
+                .Select(x => x.GameInstance)
+                .ToList();
         }
 
         private void StateChanged(IRoadblock roadblock, RoadblockState newState)
@@ -86,20 +119,20 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         private void CreateChaseVehicle()
         {
-            var roadPosition = CalculateChaseVehiclePosition();
+            var roadPosition = Road.RightSide + ChaseVehiclePositionDirection();
             var vehicleModel = ModelUtils.Vehicles.GetLocalPoliceVehicle(roadPosition, false, false);
 
             Instances.AddRange(new[]
             {
                 new InstanceSlot(EntityType.CopVehicle, roadPosition, TargetHeading + 25,
-                    (position, heading) =>  new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
+                    (position, heading) => new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
                 new InstanceSlot(EntityType.CopPed, roadPosition, TargetHeading,
-                    (position, heading) => PedFactory.CreateCopWeaponsForModel(new ARPed(ModelUtils.Peds.GetLocalCop(roadPosition), position, heading))),
-                new InstanceSlot(EntityType.CopPed, roadPosition, TargetHeading,
-                    (position, heading) => PedFactory.CreateCopWeaponsForModel(new ARPed(ModelUtils.Peds.GetLocalCop(roadPosition), position, heading)))
+                    (position, heading) =>
+                        PedFactory.CreateCopWeaponsForModel(new ARPed(ModelUtils.Peds.GetLocalCop(roadPosition), GameUtils.GetOnTheGroundPosition(position),
+                            heading)))
             });
 
-            // create barrel behind the vehicle
+            // create buffer barrels behind the vehicle
             CreateChaseVehicleBufferBarrels(roadPosition);
         }
 
@@ -118,11 +151,10 @@ namespace AutomaticRoadblocks.Pursuit.Level
             }
         }
 
-        private Vector3 CalculateChaseVehiclePosition()
+        private Vector3 ChaseVehiclePositionDirection()
         {
-            var position = Road.RightSide + MathHelper.ConvertHeadingToDirection(TargetHeading) * 15f;
-            position += MathHelper.ConvertHeadingToDirection(TargetHeading - 90) * 1.5f;
-            return position;
+            return MathHelper.ConvertHeadingToDirection(TargetHeading) * 15f +
+                   MathHelper.ConvertHeadingToDirection(TargetHeading - 90) * 1.5f;
         }
 
         #endregion

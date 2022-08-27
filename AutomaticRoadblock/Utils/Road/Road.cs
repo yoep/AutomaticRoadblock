@@ -333,6 +333,18 @@ namespace AutomaticRoadblocks.Utils.Road
 
             #endregion
 
+            /// <summary>
+            /// Create a new lane in the direction relative to this lane.
+            /// This will create a clone of this lane (same <see cref="Width"/>, <see cref="Type"/>, etc.) which is relatively moved in regards to this lane. 
+            /// </summary>
+            /// <param name="direction">The direction in which the new lane should be moved.</param>
+            /// <returns>Returns a cloned lane moved relative to this lane.</returns>
+            public Lane MoveTo(Vector3 direction)
+            {
+                Assert.NotNull(direction, "direction cannot be null");
+                return new Lane(Number, Heading, RightSide + direction, LeftSide + direction, NodePosition + direction, Width, Type);
+            }
+
             public override string ToString()
             {
                 return "{" +

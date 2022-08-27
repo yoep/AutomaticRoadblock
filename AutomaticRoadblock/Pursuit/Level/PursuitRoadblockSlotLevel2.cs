@@ -1,5 +1,6 @@
 using System.Linq;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
@@ -32,7 +33,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             var isBike = ModelUtils.IsBike(VehicleModel);
             var totalOccupants = isBike ? 1 : 2;
-            var pedSpawnPosition = GetPositionBehindVehicle();
+            var pedSpawnPosition = CalculatePositionBehindVehicle();
 
             for (var i = 0; i < totalOccupants; i++)
             {
@@ -49,17 +50,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         protected override void InitializeLights()
         {
-            var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 2f;
-            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * 3f;
-            var direction = MathHelper.ConvertHeadingToDirection(Heading - 90);
-            var totalFlares = (int)Lane.Width;
-
-            for (var i = 0; i < totalFlares; i++)
-            {
-                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, Heading,
-                    (position, heading) => new ARScenery(PropUtils.CreateHorizontalFlare(position, heading + Random.Next(91)))));
-                startPosition += direction * 1f;
-            }
+            Instances.AddRange(LightSourceSlotFactory.Create(LightSourceType.Flares, this));
         }
     }
 }

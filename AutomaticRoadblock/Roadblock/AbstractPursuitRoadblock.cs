@@ -125,7 +125,7 @@ namespace AutomaticRoadblocks.Roadblock
                 .Any(x => x.HasCopBeenKilledByTarget);
 
             if (hasACopBeenKilled)
-                InvokedRoadblockCopKilled();
+                InvokeRoadblockCopKilled();
         }
 
         private bool HasBeenDamagedBy(IRoadblockSlot slot)

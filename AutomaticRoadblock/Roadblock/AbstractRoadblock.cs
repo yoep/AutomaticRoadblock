@@ -101,6 +101,9 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public event RoadblockEvents.RoadblockCopKilled RoadblockCopKilled;
 
+        /// <inheritdoc />
+        public event RoadblockEvents.RoadblockCopsJoiningPursuit RoadblockCopsJoiningPursuit;
+
         #endregion
 
         #region IPreviewSupport
@@ -190,7 +193,8 @@ namespace AutomaticRoadblocks.Roadblock
             // otherwise, we cannot release the entities
             if (State != RoadblockState.Active)
                 return;
-            
+
+            InvokeCopsJoiningPursuit();
             ReleaseEntitiesToLspdfr();
         }
 
@@ -278,9 +282,33 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Indicate that a cop from the given roadblock slot was killed.
         /// </summary>
-        protected void InvokedRoadblockCopKilled()
+        protected void InvokeRoadblockCopKilled()
         {
             RoadblockCopKilled?.Invoke(this);
+        }
+
+        /// <summary>
+        /// Indicate that the cops of this roadblock can join the pursuit.
+        /// </summary>
+        protected void InvokeCopsJoiningPursuit()
+        {
+            RoadblockCopsJoiningPursuit?.Invoke(this, RetrieveCopsJoiningThePursuit());
+        }
+
+        /// <summary>
+        /// Retrieve a list of cops who will join the pursuit.
+        /// </summary>
+        /// <returns>Returns the cops joining the pursuit.</returns>
+        protected virtual IEnumerable<Ped> RetrieveCopsJoiningThePursuit()
+        {
+            var copsJoining = new List<Ped>();
+
+            foreach (var slot in Slots)
+            {
+                copsJoining.AddRange(slot.Cops.Select(x => x.GameInstance));
+            }
+
+            return copsJoining;
         }
 
         private void InitializeRoadblockSlots()
@@ -355,12 +383,13 @@ namespace AutomaticRoadblocks.Roadblock
                     var result = true;
 
                     if (lastLane != null)
-                        result = x.Position.DistanceTo(lastLane.Position) >= 5f;
+                        result = x.Position.DistanceTo(lastLane.Position) >= 4f;
 
                     lastLane = x;
                     return result;
                 })
                 .ToList();
+            Logger.Debug($"Filtered a total of {lanesToBlock.Count - filteredLanesToBlock.Count} lanes which are too close to each other");
 
             if (filteredLanesToBlock.Count != 0)
                 return filteredLanesToBlock;
@@ -395,7 +424,8 @@ namespace AutomaticRoadblocks.Roadblock
                 // move the current slot vehicle position by the difference
                 var newPosition = currentSlot.Position + MathHelper.ConvertHeadingToDirection(Heading - 90) *
                     (Math.Abs(currentSlotDifference) + AdditionalClippingSpace);
-                Logger.Debug($"Slot vehicle is clipping into next slot by ({currentSlotDifference}), old position {currentSlot.Position}, new position {newPosition}");
+                Logger.Debug(
+                    $"Slot vehicle is clipping into next slot by ({currentSlotDifference}), old position {currentSlot.Position}, new position {newPosition}");
                 currentSlot.ModifyVehiclePosition(newPosition);
             }
         }
@@ -407,7 +437,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             return laneWidth - vehicleLength;
         }
-        
+
         private void ReleaseEntitiesToLspdfr()
         {
             Logger.Debug("Releasing cop peds to LSPDFR");

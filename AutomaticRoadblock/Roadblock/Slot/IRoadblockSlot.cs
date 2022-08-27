@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils.Road;
 using JetBrains.Annotations;
@@ -35,6 +37,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// </summary>
         [NotNull]
         Road.Lane Lane { get; }
+        
+        /// <summary>
+        /// The cop instances of this roadblock slot.
+        /// </summary>
+        IEnumerable<ARPed> Cops { get; }
 
         /// <summary>
         /// Spawn the slot entities into the world.

@@ -46,8 +46,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public float Heading { get; }
 
-        /// <inheritdoc />
-        public List<InstanceSlot> Instances { get; } = new();
+        /// <summary>
+        /// The game instances of this slot.
+        /// </summary>
+        protected List<InstanceSlot> Instances { get; } = new();
 
         /// <inheritdoc />
         public Vehicle Vehicle => VehicleInstance?.GameInstance;
@@ -58,6 +60,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         /// <inheritdoc />
         public Road.Lane Lane { get; }
+
+        /// <inheritdoc />
+        public IEnumerable<ARPed> Cops => Instances
+            .Where(x => x.Type == EntityType.CopPed)
+            .Select(x => x.Instance)
+            .Select(x => (ARPed)x)
+            .ToList();
 
         /// <summary>
         /// The barrier type that is used within this slot.
@@ -155,11 +164,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 DeletePreview();
 
             Instances.ForEach(x => x.Spawn());
-
-            // verify that the vehicle was spawned
-            if (Vehicle != null)
-                Vehicle.IsSirenOn = true;
-
             CopInstances
                 .Select(x => x.GameInstance)
                 .ToList()
@@ -196,7 +200,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             // get the vehicle model and make sure it's loaded into memory
             VehicleModel = GetVehicleModel();
-            VehicleModel.Load();
 
             InitializeVehicleSlot();
             InitializeCops();
@@ -209,9 +212,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 InitializeLights();
         }
 
-        protected Vector3 GetPositionBehindVehicle()
+        /// <summary>
+        /// Calculate the position for cops which is behind the vehicle.
+        /// This calculation is based on the width of the vehicle model.
+        /// </summary>
+        /// <returns>Returns the position behind the vehicle.</returns>
+        protected Vector3 CalculatePositionBehindVehicle()
         {
-            return Position + MathHelper.ConvertHeadingToDirection(Heading) * 3f;
+            return Position + MathHelper.ConvertHeadingToDirection(Heading) * (VehicleModel.Dimensions.X + 0.5f);
         }
 
         /// <summary>
@@ -273,12 +281,22 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         private void InitializeVehicleSlot()
         {
             Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
+            if (!VehicleModel.IsLoaded)
+            {
+                Logger.Trace($"Loading vehicle slot model {VehicleModel.Name}");
+                VehicleModel.LoadAndWait();
+            }
+
             Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, CalculateVehicleHeading(),
                 (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundPosition(position), heading, RecordVehicleCollisions)));
         }
 
         private void InitializeBarriers()
         {
+            // verify if a barrier type is given
+            if (BarrierType == BarrierType.None)
+                return;
+
             Logger.Trace("Initializing the roadblock slot barriers");
             var rowPosition = Position + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
             var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * (Lane.Width / 2 - BarrierType.Width / 2);

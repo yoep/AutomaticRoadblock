@@ -1,4 +1,5 @@
-using AutomaticRoadblocks.Roadblock.Slot;
+using System.Collections.Generic;
+using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
 {
@@ -18,14 +19,10 @@ namespace AutomaticRoadblocks.Roadblock
         public delegate void RoadblockCopKilled(IRoadblock roadblock);
 
         /// <summary>
-        /// Internal events which can be triggered by a slot.
+        /// Invoked when cops from a roadblock are joining the pursuit.
         /// </summary>
-        public static class RoadblockSlotEvents
-        {
-            /// <summary>
-            /// Invoked when the suspect has killed a cop from the roadblock slot.
-            /// </summary>
-            public delegate void RoadblockCopKilled(IRoadblockSlot slot);
-        }
+        /// <param name="roadblock">The roadblock of which the cops are joining the pursuit.</param>
+        /// <param name="cops">The cops which join the pursuit.</param>
+        public delegate void RoadblockCopsJoiningPursuit(IRoadblock roadblock, IEnumerable<Ped> cops);
     }
 }

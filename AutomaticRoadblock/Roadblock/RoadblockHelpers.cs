@@ -3,7 +3,6 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils.Type;
-using LSPD_First_Response.Mod.API;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
@@ -16,20 +15,14 @@ namespace AutomaticRoadblocks.Roadblock
         {
             var copPeds = instances
                 .Where(x => x.Type == EntityType.CopPed)
+                .Select(x => x.Instance)
+                .Select(x => (ARPed)x)
+                .Select(x => x.GameInstance)
                 .ToList();
 
-            // release the instances before giving them to LSPDFR
-            // this should prevent accidental override of attributes set by LSPDFR
-            instances
-                .Where(x => x.Type is EntityType.CopPed or EntityType.CopVehicle)
-                .Select(x => x.Instance)
-                .ToList()
-                .ForEach(x => x.Release());
-
-            Logger.Trace($"Releasing a total of {copPeds.Count} to LSPDFR");
+            // make sure the cops are in a vehicle when releasing them
+            Logger.Trace($"Releasing a total of {copPeds.Count} cops to LSPDFR");
             copPeds
-                .Select(x => x.Instance)
-                .Select(x => x.GameInstance)
                 .Select(x => (Ped)x)
                 .ToList()
                 .ForEach(x =>
@@ -37,12 +30,16 @@ namespace AutomaticRoadblocks.Roadblock
                     // make sure the ped is the vehicle or at least entering it
                     if (!x.IsInVehicle(vehicle, true))
                         x.Tasks.EnterVehicle(vehicle, (int)VehicleSeat.Any);
-
-                    Functions.SetPedAsCop(x);
-                    Functions.SetCopAsBusy(x, false);
                 });
 
-            // remove all cop instances so that we don't remove them by accident
+            // release the cops & cop vehicles
+            instances
+                .Where(x => x.Type is EntityType.CopPed or EntityType.CopVehicle)
+                .Select(x => x.Instance)
+                .ToList()
+                .ForEach(x => x.Release());
+
+            // remove all cop instances so that we don't remove them by accident when disposing
             // these instances are now in control of LSPDFR
             instances.RemoveAll(x => x.Type is EntityType.CopPed or EntityType.CopVehicle);
         }

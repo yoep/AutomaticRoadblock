@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
@@ -220,6 +221,7 @@ namespace AutomaticRoadblocks.Pursuit
             _timeLastLevelChangedForShotsFired = 0;
             _roadblockDispatcher.RoadblockCopKilled += RoadblockCopKilled;
             _roadblockDispatcher.RoadblockStateChanged += RoadblockStateChanged;
+            _roadblockDispatcher.RoadblockCopsJoiningPursuit += RoadblockCopsJoiningPursuit;
             PursuitHandle = pursuitHandle;
             UpdatePursuitLevel(PursuitLevel.Level1);
 
@@ -323,9 +325,9 @@ namespace AutomaticRoadblocks.Pursuit
         private bool IsAutomaticLevelIncreaseForShotsFiredAllowed()
         {
             var allowedSinceLastLevelChange = _game.GameTime - _timeLastLevelChangedForShotsFired > TimeBetweenLevelIncreaseShotsFired;
-            
+
             return (PursuitLevel.Level < 2 && allowedSinceLastLevelChange) ||
-                   (PursuitLevel.Level == 2 && _totalRoadblocksDeployed > 0 && allowedSinceLastLevelChange) || 
+                   (PursuitLevel.Level == 2 && _totalRoadblocksDeployed > 0 && allowedSinceLastLevelChange) ||
                    (PursuitLevel.Level < 3 && allowedSinceLastLevelChange);
         }
 
@@ -402,6 +404,14 @@ namespace AutomaticRoadblocks.Pursuit
             _totalCopsKilled++;
             NotifySuspectKilledCop();
             LspdfrUtils.PlayScannerAudio("ROADBLOCK_COP_KILLED");
+        }
+
+        private void RoadblockCopsJoiningPursuit(IRoadblock roadblock, IEnumerable<Ped> cops)
+        {
+            if (!IsPursuitActive)
+                return;
+
+            cops.ToList().ForEach(x => Functions.AddCopToPursuit(PursuitHandle, x));
         }
 
         private bool IsSuspectVehicleOnRoad()

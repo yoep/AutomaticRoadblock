@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Utils;
 using JetBrains.Annotations;
+using LSPD_First_Response.Mod.API;
 using Rage;
 
 namespace AutomaticRoadblocks.Instance
@@ -21,6 +22,7 @@ namespace AutomaticRoadblocks.Instance
                 KeepTasks = true,
                 RelationshipGroup = RelationshipGroup.Cop
             };
+            RegisterCopToLspdfr();
         }
 
         #region Properties
@@ -55,6 +57,7 @@ namespace AutomaticRoadblocks.Instance
                 return;
             
             GameInstance.IsPersistent = false;
+            Functions.SetCopAsBusy(GameInstance, false);
         }
 
         #endregion
@@ -86,6 +89,9 @@ namespace AutomaticRoadblocks.Instance
         /// </summary>
         public void EquipPrimaryWeapon()
         {
+            if (GameInstance == null || !GameInstance.IsValid())
+                return;
+            
             GameInstance.Inventory.EquippedWeapon = PrimaryWeapon;
         }
 
@@ -123,6 +129,12 @@ namespace AutomaticRoadblocks.Instance
         #endregion
 
         #region Functions
+
+        private void RegisterCopToLspdfr()
+        {
+            Functions.SetPedAsCop(GameInstance);
+            Functions.SetCopAsBusy(GameInstance, true);
+        }
 
         private WeaponDescriptor CreateWeaponInInventory(string name, bool equipNow = false)
         {

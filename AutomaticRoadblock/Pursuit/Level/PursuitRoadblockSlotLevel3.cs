@@ -30,7 +30,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         protected override void InitializeCops()
         {
-            var pedSpawnPosition = GetPositionBehindVehicle();
+            var pedSpawnPosition = CalculatePositionBehindVehicle();
 
             for (var i = 0; i < 2; i++)
             {

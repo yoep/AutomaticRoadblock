@@ -41,6 +41,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// Invoked when a cop from the roadblock is killed.
         /// </summary>
         event RoadblockEvents.RoadblockCopKilled RoadblockCopKilled;
+        
+        /// <summary>
+        /// Invoked when cops from a roadblock are joining the pursuit.
+        /// </summary>
+        event RoadblockEvents.RoadblockCopsJoiningPursuit RoadblockCopsJoiningPursuit;
 
         /// <summary>
         /// Spawn the roadblock in the world.

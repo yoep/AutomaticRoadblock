@@ -20,6 +20,7 @@ namespace AutomaticRoadblocks.Instance
             GameInstance.NeedsCollision = true;
             GameInstance.IsRecordingCollisions = recordCollisions;
             GameInstance.IsEngineOn = true;
+            GameInstance.IsSirenOn = true;
             EntityUtils.VehicleLights(GameInstance, VehicleLightState.AlwaysOn);
         }
 

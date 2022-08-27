@@ -37,7 +37,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         protected override void InitializeLights()
         {
             Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));
-            Instances.AddRange(LightSourceRoadblockFactory.CreateAlternatingGroundLights(this, 5));
+            Instances.AddRange(LightSourceRoadblockFactory.CreateAlternatingGroundLights(this, 3));
         }
 
         /// <inheritdoc />
