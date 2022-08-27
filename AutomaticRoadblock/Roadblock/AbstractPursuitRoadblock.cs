@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
@@ -65,6 +68,50 @@ namespace AutomaticRoadblocks.Roadblock
             return lanesToBlock
                 .Select(lane => CreateSlot(lane, Heading, Vehicle, IsLightsEnabled))
                 .ToList();
+        }
+        
+        /// <summary>
+        /// Create a chase vehicle for this roadblock.
+        /// The chase vehicle will be created on the right side of the road.
+        /// </summary>
+        protected void CreateChaseVehicle(Model vehicleModel)
+        {
+            Assert.NotNull(vehicleModel, "vehicleModel cannot be null");
+            var roadPosition = Road.RightSide + ChaseVehiclePositionDirection();
+
+            Instances.AddRange(new[]
+            {
+                new InstanceSlot(EntityType.CopVehicle, roadPosition, TargetHeading + 25,
+                    (position, heading) => new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
+                new InstanceSlot(EntityType.CopPed, roadPosition, TargetHeading,
+                    (position, heading) =>
+                        PedFactory.CreateCopWeaponsForModel(new ARPed(RoadblockHelpers.GetPedModelForVehicle(vehicleModel, Position), GameUtils.GetOnTheGroundPosition(position),
+                            heading)))
+            });
+
+            // create buffer barrels behind the vehicle
+            CreateChaseVehicleBufferBarrels(roadPosition);
+        }
+
+        private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
+        {
+            var rowPosition = chasePosition + MathHelper.ConvertHeadingToDirection(TargetHeading - 180) * 4f;
+            var nextPositionDistance = BarrierType.BarrelTrafficCatcher.Width + BarrierType.BarrelTrafficCatcher.Spacing;
+            var nextPositionDirection = MathHelper.ConvertHeadingToDirection(TargetHeading - 90);
+            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(TargetHeading + 90) * (nextPositionDistance * 2f);
+
+            for (var i = 0; i < 5; i++)
+            {
+                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, TargetHeading,
+                    (position, heading) => BarrierFactory.Create(BarrierType.BarrelTrafficCatcher, position, heading)));
+                startPosition += nextPositionDirection * nextPositionDistance;
+            }
+        }
+
+        private Vector3 ChaseVehiclePositionDirection()
+        {
+            return MathHelper.ConvertHeadingToDirection(TargetHeading) * 15f +
+                   MathHelper.ConvertHeadingToDirection(TargetHeading - 90) * 1.5f;
         }
 
         private void Monitor()

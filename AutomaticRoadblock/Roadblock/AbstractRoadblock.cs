@@ -5,7 +5,9 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
@@ -129,6 +131,19 @@ namespace AutomaticRoadblocks.Roadblock
             Logger.Trace($"Creating roadblock road preview");
             Road.CreatePreview();
             Instances.ForEach(x => x.CreatePreview());
+
+            Game.NewSafeFiber(() =>
+            {
+                while (IsPreviewActive)
+                {
+                    foreach (var ped in RetrieveCopsJoiningThePursuit())
+                    {
+                        GameUtils.CreateMarker(ped.Position, MarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, false);
+                    }
+                    
+                    Game.FiberYield();
+                }
+            }, "Roadblock.Preview");
         }
 
         /// <inheritdoc />
@@ -223,6 +238,15 @@ namespace AutomaticRoadblocks.Roadblock
         protected abstract void InitializeLights();
 
         /// <summary>
+        /// Initialize additional vehicles for this roadblock.
+        /// Additional vehicles can exists out of emergency service such as EMS, etc.
+        /// </summary>
+        protected virtual void InitializeAdditionalVehicles()
+        {
+            // no-op
+        }
+
+        /// <summary>
         /// Retrieve the lanes of the road which should be blocked.
         /// </summary>
         /// <returns>Returns the lanes to block.</returns>
@@ -272,6 +296,7 @@ namespace AutomaticRoadblocks.Roadblock
         protected void Initialize()
         {
             InitializeRoadblockSlots();
+            InitializeAdditionalVehicles();
             InitializeScenery();
             InitializeSpeedLimit(IsSpeedLimitEnabled);
 

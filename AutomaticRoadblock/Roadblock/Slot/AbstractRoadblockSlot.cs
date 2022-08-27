@@ -223,30 +223,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         /// <summary>
-        /// Get a police cop ped model for the current vehicle model.
-        /// </summary>
-        /// <returns>Returns a cop ped model.</returns>
-        protected Model GetPedModelForVehicle()
-        {
-            var model = VehicleModel.Name;
-
-            if (ModelUtils.IsBike(model))
-            {
-                return ModelUtils.Peds.GetPoliceBikeCop();
-            }
-
-            if (ModelUtils.Vehicles.CityVehicleModels.Contains(model) || ModelUtils.Vehicles.CountyVehicleModels.Contains(model) ||
-                ModelUtils.Vehicles.StateVehicleModels.Contains(model))
-            {
-                return ModelUtils.Peds.GetLocalCop(Position);
-            }
-
-            return ModelUtils.Vehicles.FbiVehicleModels.Contains(model)
-                ? ModelUtils.Peds.GetPoliceFbiCop()
-                : ModelUtils.Peds.GetPoliceSwatCop();
-        }
-
-        /// <summary>
         /// Initialize the cop ped slots.
         /// </summary>
         protected abstract void InitializeCops();

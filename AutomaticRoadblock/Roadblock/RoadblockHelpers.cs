@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
@@ -42,6 +43,34 @@ namespace AutomaticRoadblocks.Roadblock
             // remove all cop instances so that we don't remove them by accident when disposing
             // these instances are now in control of LSPDFR
             instances.RemoveAll(x => x.Type is EntityType.CopPed or EntityType.CopVehicle);
+        }
+
+        /// <summary>
+        /// Get a police cop ped model for the current vehicle model.
+        /// </summary>
+        /// <param name="vehicleModel">The vehicle model to retrieve the cop model for.</param>
+        /// <param name="roadblockPosition">The roadblock position to determine locale cop models.</param>
+        /// <returns>Returns a cop ped model.</returns>
+        internal static Model GetPedModelForVehicle(Model vehicleModel, Vector3 roadblockPosition)
+        {
+            Assert.NotNull(vehicleModel, "vehicleModel cannot be null");
+            Assert.NotNull(roadblockPosition, "roadblockPosition cannot be null");
+            var model = vehicleModel.Name;
+
+            if (ModelUtils.IsBike(model))
+            {
+                return ModelUtils.Peds.GetPoliceBikeCop();
+            }
+
+            if (ModelUtils.Vehicles.CityVehicleModels.Contains(model) || ModelUtils.Vehicles.CountyVehicleModels.Contains(model) ||
+                ModelUtils.Vehicles.StateVehicleModels.Contains(model))
+            {
+                return ModelUtils.Peds.GetLocalCop(roadblockPosition);
+            }
+
+            return ModelUtils.Vehicles.FbiVehicleModels.Contains(model)
+                ? ModelUtils.Peds.GetPoliceFbiCop()
+                : ModelUtils.Peds.GetPoliceSwatCop();
         }
     }
 }

@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+using System.Linq;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
@@ -41,9 +44,27 @@ namespace AutomaticRoadblocks.Pursuit.Level
         }
 
         /// <inheritdoc />
+        protected override void InitializeAdditionalVehicles()
+        {
+            CreateChaseVehicle(ModelUtils.Vehicles.GetFbiPoliceVehicle());
+        }
+
+        /// <inheritdoc />
         protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
             return new PursuitRoadblockSlotLevel5(lane, MainBarrierType, heading, targetVehicle, shouldAddLights);
+        }
+        
+        /// <inheritdoc />
+        protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit()
+        {
+            // only the chase vehicle will join the pursuit
+            return Instances
+                .Where(x => x.Type == EntityType.CopPed)
+                .Select(x => x.Instance)
+                .Select(x => (ARPed)x)
+                .Select(x => x.GameInstance)
+                .ToList();
         }
 
         #endregion

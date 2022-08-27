@@ -81,9 +81,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
             Instances.Add(new InstanceSlot(EntityType.Scenery, position, 0f,
                 (conePosition, _) => BarrierFactory.Create(BarrierType.BigCone, conePosition)));
-
-            // add a chase vehicle on the right side of the road
-            CreateChaseVehicle();
         }
 
         /// <inheritdoc />
@@ -91,6 +88,12 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));
             Instances.AddRange(LightSourceRoadblockFactory.CreateRedBlueGroundLights(this, 3));
+        }
+
+        /// <inheritdoc />
+        protected override void InitializeAdditionalVehicles()
+        {
+            CreateChaseVehicle(ModelUtils.Vehicles.GetLocalPoliceVehicle(Position, false, false));
         }
 
         /// <inheritdoc />
@@ -115,46 +118,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             if (newState is RoadblockState.Bypassed or RoadblockState.Hit)
                 RoadblockHelpers.ReleaseInstancesToLspdfr(Instances, Vehicle);
-        }
-
-        private void CreateChaseVehicle()
-        {
-            var roadPosition = Road.RightSide + ChaseVehiclePositionDirection();
-            var vehicleModel = ModelUtils.Vehicles.GetLocalPoliceVehicle(roadPosition, false, false);
-
-            Instances.AddRange(new[]
-            {
-                new InstanceSlot(EntityType.CopVehicle, roadPosition, TargetHeading + 25,
-                    (position, heading) => new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
-                new InstanceSlot(EntityType.CopPed, roadPosition, TargetHeading,
-                    (position, heading) =>
-                        PedFactory.CreateCopWeaponsForModel(new ARPed(ModelUtils.Peds.GetLocalCop(roadPosition), GameUtils.GetOnTheGroundPosition(position),
-                            heading)))
-            });
-
-            // create buffer barrels behind the vehicle
-            CreateChaseVehicleBufferBarrels(roadPosition);
-        }
-
-        private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
-        {
-            var rowPosition = chasePosition + MathHelper.ConvertHeadingToDirection(TargetHeading - 180) * 4f;
-            var nextPositionDistance = BarrierType.BarrelTrafficCatcher.Width + BarrierType.BarrelTrafficCatcher.Spacing;
-            var nextPositionDirection = MathHelper.ConvertHeadingToDirection(TargetHeading - 90);
-            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(TargetHeading + 90) * (nextPositionDistance * 2f);
-
-            for (var i = 0; i < 5; i++)
-            {
-                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, TargetHeading,
-                    (position, heading) => BarrierFactory.Create(BarrierType.BarrelTrafficCatcher, position, heading)));
-                startPosition += nextPositionDirection * nextPositionDistance;
-            }
-        }
-
-        private Vector3 ChaseVehiclePositionDirection()
-        {
-            return MathHelper.ConvertHeadingToDirection(TargetHeading) * 15f +
-                   MathHelper.ConvertHeadingToDirection(TargetHeading - 90) * 1.5f;
         }
 
         #endregion
