@@ -1,15 +1,12 @@
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
-    public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot
+    public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot, IPursuitRoadblockSlot
     {
-        private bool _monitoring;
-
         protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
             : base(lane, barrierType, heading, shouldAddLights, true)
         {
@@ -28,53 +25,34 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         #endregion
 
-        #region IDisposable
+        #region IPursuitRoadblockSlot
 
         /// <inheritdoc />
-        public override void Dispose()
-        {
-            _monitoring = false;
-            base.Dispose();
-        }
-
-        #endregion
-
-        #region Methods
-
-        /// <inheritdoc />
-        public override void Spawn()
-        {
-            base.Spawn();
-            Monitor();
-        }
+        public bool HasCopBeenKilledByTarget => Instances.Where(x => x.Type == EntityType.CopPed)
+            .Select(x => (ARPed)x.Instance)
+            .Where(IsGameInstanceValid)
+            .Select(x => x.GameInstance)
+            .Where(x => x.IsDead)
+            .Where(HasCopReceivedDamageFromVehicleOrSuspects)
+            .Any(HasCopBeenKilledBySuspects);
 
         #endregion
 
         #region Functions
 
-        private void Monitor()
+        private bool HasCopBeenKilledBySuspects(Entity cop)
         {
-            var game = IoC.Instance.GetInstance<IGame>();
-            _monitoring = true;
+            return cop.HasBeenDamagedBy(TargetVehicle) || TargetVehicle.Occupants.Any(cop.HasBeenDamagedBy);
+        }
 
-            game.NewSafeFiber(() =>
-            {
-                while (_monitoring)
-                {
-                    var hasACopBeenKilled = Instances
-                        .Where(x => x.Type == EntityType.CopPed)
-                        .Select(x => (ARPed)x.Instance)
-                        .Where(x => x.GameInstance != null && x.GameInstance.IsValid())
-                        .Where(x => x.GameInstance.IsDead)
-                        .Where(x => x.GameInstance.HasBeenDamagedByAnyVehicle)
-                        .Any(x => x.GameInstance.HasBeenDamagedBy(TargetVehicle));
+        private static bool IsGameInstanceValid(ARPed entity)
+        {
+            return entity.GameInstance != null && entity.GameInstance.IsValid();
+        }
 
-                    if (hasACopBeenKilled)
-                        InvokedCopHasBeenKilled();
-
-                    game.FiberYield();
-                }
-            }, "AbstractPursuitRoadblockSlot.Monitor");
+        private static bool HasCopReceivedDamageFromVehicleOrSuspects(Entity x)
+        {
+            return x.HasBeenDamagedByAnyVehicle || x.HasBeenDamagedByAnyPed;
         }
 
         #endregion

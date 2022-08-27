@@ -141,6 +141,7 @@
         <Compile Include="Roadblock\RoadblockState.cs" />
         <Compile Include="Roadblock\Slot\AbstractPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\AbstractRoadblockSlot.cs" />
+        <Compile Include="Roadblock\Slot\IPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IRoadblockSlot.cs" />
         <Compile Include="Scenery\AbstractPlaceableSceneryItem.cs" />
         <Compile Include="Scenery\Barrier.cs" />

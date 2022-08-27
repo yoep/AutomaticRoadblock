@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Get the heading of the roadblock slot.
         /// </summary>
         float Heading { get; }
-        
+
         /// <summary>
         /// Retrieve the vehicle model that is used within this slot.
         /// </summary>
@@ -35,11 +35,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// </summary>
         [NotNull]
         Road.Lane Lane { get; }
-
-        /// <summary>
-        /// Invoked when a cop from this slot has been killed.
-        /// </summary>
-        event RoadblockEvents.RoadblockSlotEvents.RoadblockCopKilled RoadblockCopKilled;
 
         /// <summary>
         /// Spawn the slot entities into the world.

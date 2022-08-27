@@ -64,11 +64,6 @@ namespace AutomaticRoadblocks.Roadblock
         {
             return lanesToBlock
                 .Select(lane => CreateSlot(lane, Heading, Vehicle, IsLightsEnabled))
-                .Select(x =>
-                {
-                    x.RoadblockCopKilled += RoadblockSlotCopKilled;
-                    return x;
-                })
                 .ToList();
         }
 
@@ -80,9 +75,10 @@ namespace AutomaticRoadblocks.Roadblock
                 {
                     VerifyIfRoadblockIsBypassed();
                     VerifyIfRoadblockIsHit();
+                    VerifyRoadblockCopKilled();
                     Game.FiberYield();
                 }
-            }, "Roadblock.Monitor");
+            }, "PursuitRoadblock.Monitor");
         }
 
         private void VerifyIfRoadblockIsBypassed()
@@ -120,6 +116,16 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 Logger.Debug("Determined that the collision was not the roadblock");
             }
+        }
+
+        private void VerifyRoadblockCopKilled()
+        {
+            var hasACopBeenKilled = Slots
+                .Select(x => (IPursuitRoadblockSlot)x)
+                .Any(x => x.HasCopBeenKilledByTarget);
+
+            if (hasACopBeenKilled)
+                InvokedRoadblockCopKilled();
         }
 
         private bool HasBeenDamagedBy(IRoadblockSlot slot)

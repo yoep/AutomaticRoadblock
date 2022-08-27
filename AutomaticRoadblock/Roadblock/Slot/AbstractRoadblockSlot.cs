@@ -23,7 +23,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected static readonly Random Random = new();
 
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        protected readonly List<InstanceSlot> Instances = new();
 
         private readonly bool _shouldAddLights;
 
@@ -48,14 +47,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public float Heading { get; }
 
         /// <inheritdoc />
+        public List<InstanceSlot> Instances { get; } = new();
+
+        /// <inheritdoc />
         public Vehicle Vehicle => VehicleInstance?.GameInstance;
 
         /// <inheritdoc />
         /// <remarks>This field is only available after the <see cref="Initialize"/> method is called.</remarks>
         public Model VehicleModel { get; private set; }
-
-        /// <inheritdoc />
-        public event RoadblockEvents.RoadblockSlotEvents.RoadblockCopKilled RoadblockCopKilled;
 
         /// <inheritdoc />
         public Road.Lane Lane { get; }
@@ -259,14 +258,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// </summary>
         /// <returns>Returns the vehicle model that should be used for this slot.</returns>
         protected abstract Model GetVehicleModel();
-
-        /// <summary>
-        /// Invoked the event that a cop from this slot has been killed.
-        /// </summary>
-        protected void InvokedCopHasBeenKilled()
-        {
-            RoadblockCopKilled?.Invoke(this);
-        }
 
         /// <summary>
         /// Calculate the heading of the vehicle for this slot.

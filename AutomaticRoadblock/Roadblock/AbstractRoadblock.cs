@@ -278,8 +278,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Indicate that a cop from the given roadblock slot was killed.
         /// </summary>
-        /// <param name="roadblockSlot">The slot from which the cop was killed.</param>
-        protected void RoadblockSlotCopKilled(IRoadblockSlot roadblockSlot)
+        protected void InvokedRoadblockCopKilled()
         {
             RoadblockCopKilled?.Invoke(this);
         }
