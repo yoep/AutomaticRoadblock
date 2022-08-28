@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
@@ -9,7 +10,7 @@ using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
-    public class ManualRoadblock : AbstractRoadblock
+    public class ManualRoadblock : AbstractRoadblock, IPlaceableInstance
     {
         internal ManualRoadblock(Request request)
             : base(request.Road, request.BarrierType, request.TargetHeading, request.LimitSpeed, request.AddLights)

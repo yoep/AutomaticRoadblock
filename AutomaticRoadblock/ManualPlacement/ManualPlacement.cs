@@ -1,27 +1,19 @@
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
-using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Settings;
-using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
-using AutomaticRoadblocks.Utils.Type;
-using Rage;
-using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
+using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
-    public class ManualPlacement : IManualPlacement
+    public class ManualPlacement : AbstractInstancePlacementManager<ManualRoadblock>, IManualPlacement
     {
-        private readonly ILogger _logger;
-        private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
-        private readonly List<ManualRoadblock> _roadblocks = new();
 
-        private Road _lastDeterminedRoad;
         private BarrierType _barrier = BarrierType.SmallCone;
         private VehicleType _vehicleType = VehicleType.Locale;
         private LightSourceType _lightSourceType = LightSourceType.Flares;
@@ -29,10 +21,9 @@ namespace AutomaticRoadblocks.ManualPlacement
         private bool _copsEnabled;
 
         public ManualPlacement(ILogger logger, IGame game, ISettingsManager settingsManager)
+            : base(game, logger)
         {
-            _game = game;
             _settingsManager = settingsManager;
-            _logger = logger;
         }
 
         #region Properties
@@ -79,56 +70,19 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// Get a list of roadblocks which are previewed.
         /// <remarks>Make sure this property is called in a lock statement.</remarks>
         /// </summary>
-        private List<ManualRoadblock> PreviewRoadblocks => _roadblocks
+        private List<ManualRoadblock> PreviewRoadblocks => Instances
             .Where(x => x.IsPreviewActive)
             .ToList();
 
-        #endregion
-
-        #region IDisposable
+        /// <inheritdoc />
+        protected override bool IsHologramPreviewEnabled => _settingsManager.ManualPlacementSettings.EnablePreview;
 
         /// <inheritdoc />
-        public void Dispose()
-        {
-            lock (_roadblocks)
-            {
-                _roadblocks.ForEach(x => x.Dispose());
-                _roadblocks.Clear();
-            }
-        }
+        protected override float DistanceInFrontOfPlayer => 8f;
 
         #endregion
 
         #region Methods
-
-        /// <inheritdoc />
-        public Road DetermineLocation()
-        {
-            var position = _game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 5f;
-
-            return RoadUtils.FindClosestRoad(position, RoadType.All);
-        }
-
-        /// <inheritdoc />
-        public void CreatePreview(bool force = false)
-        {
-            var road = DetermineLocation();
-
-            if (_settingsManager.ManualPlacementSettings.EnablePreview)
-            {
-                CreateManualRoadblockPreview(road, force);
-            }
-            else
-            {
-                CreatePreviewMarker(road);
-            }
-        }
-
-        /// <inheritdoc />
-        public void RemovePreviews()
-        {
-            DoRemovePreviews();
-        }
 
         /// <inheritdoc />
         public void PlaceRoadblock()
@@ -136,7 +90,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             ManualRoadblock roadblockToSpawn;
             List<ManualRoadblock> previewRoadblocks;
 
-            lock (_roadblocks)
+            lock (Instances)
             {
                 previewRoadblocks = PreviewRoadblocks;
             }
@@ -152,79 +106,28 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
             else
             {
-                roadblockToSpawn = CreateRoadblock(_lastDeterminedRoad);
-                _logger.Trace("Created the manual roadblock");
-                lock (_roadblocks)
+                roadblockToSpawn = CreateInstance(LastDeterminedRoad);
+                Logger.Trace("Created the manual roadblock");
+                lock (Instances)
                 {
-                    _roadblocks.Add(roadblockToSpawn);
+                    Instances.Add(roadblockToSpawn);
                 }
             }
 
-            _game.NewSafeFiber(() => { roadblockToSpawn.Spawn(); }, "ManualPlacement.PlaceRoadblock");
+            Game.NewSafeFiber(() => { roadblockToSpawn.Spawn(); }, "ManualPlacement.PlaceRoadblock");
         }
 
         /// <inheritdoc />
-        public void RemoveRoadblocks(PlacementRemoveType removeType)
+        public void RemoveRoadblocks(RemoveType removeType)
         {
-            _logger.Debug($"Removing placed roadblocks with criteria {removeType}");
-            var toBoRemoved = new List<ManualRoadblock>();
-
-            lock (_roadblocks)
-            {
-                if (removeType == PlacementRemoveType.All)
-                {
-                    toBoRemoved = _roadblocks
-                        .Where(x => !x.IsPreviewActive)
-                        .ToList();
-                }
-                else if (removeType == PlacementRemoveType.ClosestToPlayer)
-                {
-                    var closestRoadblock = FindRoadblockClosestToPlayer();
-
-                    if (closestRoadblock != null)
-                        toBoRemoved.Add(closestRoadblock);
-                }
-                else if (removeType == PlacementRemoveType.LastPlaced)
-                {
-                    toBoRemoved = new List<ManualRoadblock> { _roadblocks[_roadblocks.Count - 1] };
-                }
-                else
-                {
-                    _logger.Warn($"Remove placed roadblocks has not been implemented for {removeType}");
-                }
-
-                _roadblocks.RemoveAll(x => toBoRemoved.Contains(x));
-            }
-
-            toBoRemoved.ForEach(x => x.Dispose());
+            DoInternalInstanceRemoval(removeType);
         }
 
         #endregion
 
         #region Functions
 
-        private void CreateManualRoadblockPreview(Road road, bool force)
-        {
-            if (!force && Equals(road, _lastDeterminedRoad))
-                return;
-
-            // remove any existing previews first
-            RemovePreviews();
-
-            _lastDeterminedRoad = road;
-            _game.NewSafeFiber(() =>
-            {
-                lock (_roadblocks)
-                {
-                    var roadblock = CreateRoadblock(road);
-                    roadblock.CreatePreview();
-
-                    _roadblocks.Add(roadblock);
-                }
-            }, "ManualPlacement.CreateManualRoadblockPreview");
-        }
-
-        private ManualRoadblock CreateRoadblock(Road road)
+        protected override ManualRoadblock CreateInstance(Road road)
         {
             Assert.NotNull(road, "road cannot be null");
             var roadblock = new ManualRoadblock(new ManualRoadblock.Request
@@ -234,91 +137,43 @@ namespace AutomaticRoadblocks.ManualPlacement
                 VehicleType = _vehicleType,
                 LightSourceType = _lightSourceType,
                 PlacementType = _placementType,
-                TargetHeading = _game.PlayerHeading,
+                TargetHeading = Game.PlayerHeading,
                 LimitSpeed = SpeedLimit,
                 AddLights = LightSourceType != LightSourceType.None,
                 CopsEnabled = CopsEnabled
             });
-            _logger.Trace($"Created manual roadblock {roadblock}");
+            Logger.Trace($"Created manual roadblock {roadblock}");
             return roadblock;
-        }
-
-        private void DoRemovePreviews()
-        {
-            if (_lastDeterminedRoad == null)
-                return;
-
-            lock (_roadblocks)
-            {
-                _lastDeterminedRoad = null;
-                var roadblocksToClean = PreviewRoadblocks;
-
-                if (roadblocksToClean.Count == 0)
-                    return;
-
-                _logger.Debug($"Cleaning a total of {roadblocksToClean.Count} manual roadblock previews");
-                roadblocksToClean.ForEach(x =>
-                {
-                    _logger.Trace($"Removing manual roadblock preview {x}");
-                    x.DeletePreview();
-                    _roadblocks.Remove(x);
-                });
-            }
-        }
-
-        private ManualRoadblock FindRoadblockClosestToPlayer()
-        {
-            var closestRoadblockDistance = 9999f;
-            var closestRoadblock = (ManualRoadblock)null;
-            var playerPosition = _game.PlayerPosition;
-
-            foreach (var roadblock in _roadblocks.Where(x => !x.IsPreviewActive))
-            {
-                var distance = playerPosition.DistanceTo(roadblock.Position);
-
-                if (distance > closestRoadblockDistance)
-                    continue;
-
-                closestRoadblockDistance = distance;
-                closestRoadblock = roadblock;
-            }
-
-            return closestRoadblock;
         }
 
         private void UpdateBarrier(BarrierType newType)
         {
             _barrier = newType;
-            CreatePreview(true);
+            DoInternalPreviewCreation(true);
         }
 
         private void UpdateVehicle(VehicleType value)
         {
             _vehicleType = value;
-            CreatePreview(true);
+            DoInternalPreviewCreation(true);
         }
 
         private void UpdateLightSource(LightSourceType lightSourceType)
         {
             _lightSourceType = lightSourceType;
-            CreatePreview(true);
+            DoInternalPreviewCreation(true);
         }
 
         private void UpdatePlacementType(PlacementType placementType)
         {
             _placementType = placementType;
-            CreatePreview(true);
+            DoInternalPreviewCreation(true);
         }
 
         private void UpdateCopsEnabled(bool copsEnabled)
         {
             _copsEnabled = copsEnabled;
-            CreatePreview(true);
-        }
-
-        private static void CreatePreviewMarker(Road road)
-        {
-            GameUtils.CreateMarker(road.Position, MarkerType.MarkerTypeVerticalCylinder, Color.White, 2.5f, false);
+            DoInternalPreviewCreation(true);
         }
 
         #endregion

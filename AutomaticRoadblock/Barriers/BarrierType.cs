@@ -18,6 +18,7 @@ namespace AutomaticRoadblocks.Barriers
         public static readonly BarrierType WorkBarrierWithSignLight = new("Work ahead sign lights", DimensionOf(PropUtils.Models.WorkBarrierAHeadSignLights), 0.2f);
         public static readonly BarrierType WorkBarrierHigh = new("High barrier", DimensionOf(PropUtils.Models.WorkBarrierHigh), 0.2f);
         public static readonly BarrierType BarrelTrafficCatcher = new("Barrel", DimensionOf(PropUtils.Models.BarrelTrafficCatcher), 0.5f);
+        public static readonly BarrierType ConeWithLight = new("Cone light", DimensionOf(PropUtils.Models.ConeWithLight), 0.5f);
 
         public static readonly IEnumerable<BarrierType> Values = new[]
         {
@@ -26,6 +27,7 @@ namespace AutomaticRoadblocks.Barriers
             SmallConeStriped,
             BigCone,
             BigConeStriped,
+            ConeWithLight,
             PoliceDoNotCross,
             WorkBarrierLarge,
             WorkBarrierSmall,

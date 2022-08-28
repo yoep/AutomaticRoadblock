@@ -29,6 +29,10 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Indicates that the roadblock is disposed and entities have been removed.
         /// </summary>
-        Disposed
+        Disposed,
+        /// <summary>
+        /// Indicates that one or more crucial instances of the roadblock have been invalidated by the game engine.
+        /// </summary>
+        Invalid
     }
 }

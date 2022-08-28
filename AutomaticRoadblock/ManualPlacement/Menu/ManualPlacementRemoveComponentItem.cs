@@ -1,20 +1,21 @@
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class RemovePlacedRoadblocksComponentItem : IMenuComponent<UIMenuListScrollerItem<PlacementRemoveType>>
+    public class ManualPlacementRemoveComponentItem : IMenuComponent<UIMenuListScrollerItem<RemoveType>>
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public RemovePlacedRoadblocksComponentItem(IManualPlacement manualPlacement)
+        public ManualPlacementRemoveComponentItem(IManualPlacement manualPlacement)
         {
             _manualPlacement = manualPlacement;
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<PlacementRemoveType> MenuItem { get; } =
-            new(AutomaticRoadblocksPlugin.CleanRoadblockPlacement, AutomaticRoadblocksPlugin.CleanRoadblockPlacementDescription, PlacementRemoveType.Values);
+        public UIMenuListScrollerItem<RemoveType> MenuItem { get; } =
+            new(AutomaticRoadblocksPlugin.CleanRoadblockPlacement, AutomaticRoadblocksPlugin.CleanRoadblockPlacementDescription, RemoveType.Values);
 
         /// <inheritdoc />
         public MenuType Type => MenuType.ManualPlacement;

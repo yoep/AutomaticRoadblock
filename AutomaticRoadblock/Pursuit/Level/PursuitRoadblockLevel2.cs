@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 2f;
 
-            Instances.Add(new InstanceSlot(EntityType.Scenery, GameUtils.GetOnTheGroundPosition(position), 0f,
+            Instances.Add(new InstanceSlot(EntityType.Scenery, position, 0f,
                 (conePosition, _) => new ARScenery(PropUtils.CreateBigConeWithStripes(conePosition))));
         }
 

@@ -1,13 +1,11 @@
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
-using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Utils.Type;
 using AutomaticRoadblocks.Vehicles;
-using Rage;
-using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -58,9 +56,9 @@ namespace AutomaticRoadblocks.ManualPlacement
             if (!CopsEnabled || VehicleType == VehicleType.None)
                 return;
 
-            Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, _) =>
+            Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, heading) =>
             {
-                var cop = PedFactory.CreateCopWeaponsForModel(new ARPed(RoadblockHelpers.GetPedModelForVehicle(VehicleModel, Position), position));
+                var cop = PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading));
                 cop.GameInstance?.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Driver);
                 return cop;
             }));
@@ -76,7 +74,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         protected override void InitializeLights()
         {
             Logger.Trace("Initializing the manual roadblock slot lights");
-                Instances.AddRange(LightSourceSlotFactory.Create(LightSourceType, this));
+            Instances.AddRange(LightSourceSlotFactory.Create(LightSourceType, this));
         }
 
         #endregion

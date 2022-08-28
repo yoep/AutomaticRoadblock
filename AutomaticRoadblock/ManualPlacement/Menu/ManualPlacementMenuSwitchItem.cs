@@ -56,7 +56,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
                     }
                     else
                     {
-                        _manualPlacement.RemovePreviews();
+                        _manualPlacement.DeletePreview();
                     }
                 }
             }, "ManualPlacementMenuSwitchItem.Process");

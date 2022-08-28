@@ -18,6 +18,11 @@ namespace AutomaticRoadblocks.Settings
         ManualPlacementSettings ManualPlacementSettings { get; }
 
         /// <summary>
+        /// Get the redirect traffic settings.
+        /// </summary>
+        RedirectTrafficSettings RedirectTrafficSettings { get; }
+
+        /// <summary>
         /// Load the settings from the configuration file.
         /// </summary>
         void Load();

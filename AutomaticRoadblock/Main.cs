@@ -129,10 +129,14 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementBarrierComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(LightComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementVehicleTypeComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RemovePlacedRoadblocksComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementRemoveComponentItem))
                 // redirect traffic components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficPlaceComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeDistanceComponentItem));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficLaneTypeComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeDistanceComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeTypeComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficVehicleTypeComponentType))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficRemoveComponentItem));
         }
 
         private static void OnDutyStateChanged(bool onDuty)

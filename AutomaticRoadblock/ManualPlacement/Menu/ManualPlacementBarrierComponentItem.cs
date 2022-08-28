@@ -1,6 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Menu;
-using AutomaticRoadblocks.Roadblock;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
@@ -12,7 +12,6 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         public ManualPlacementBarrierComponentItem(IManualPlacement manualPlacement)
         {
             _manualPlacement = manualPlacement;
-            Init();
         }
 
         /// <inheritdoc />
@@ -31,13 +30,15 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             // no-op   
         }
 
+        [IoC.PostConstruct]
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
             MenuItem.SelectedItem = _manualPlacement.Barrier;
             MenuItem.IndexChanged += MenuIndexChanged;
         }
 
-        private void MenuIndexChanged(UIMenuScrollerItem sender, int oldindex, int newindex)
+        private void MenuIndexChanged(UIMenuScrollerItem sender, int oldIndex, int newIndex)
         {
             _manualPlacement.Barrier = MenuItem.SelectedItem;
         }

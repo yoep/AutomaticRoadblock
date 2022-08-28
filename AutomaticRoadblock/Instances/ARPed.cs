@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using AutomaticRoadblocks.Utils;
 using JetBrains.Annotations;
 using LSPD_First_Response.Mod.API;
@@ -12,6 +14,8 @@ namespace AutomaticRoadblocks.Instance
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class ARPed : IARInstance<Ped>
     {
+        private readonly List<Entity> _attachments = new();
+
         public ARPed(Model model, Vector3 position, float heading = 0f)
         {
             Assert.NotNull(model, "model cannot be null");
@@ -36,6 +40,12 @@ namespace AutomaticRoadblocks.Instance
         /// </summary>
         public WeaponDescriptor PrimaryWeapon { get; private set; }
 
+        /// <summary>
+        /// Verify if the game instance is invalidated.
+        /// </summary>
+        private bool IsInvalid => GameInstance == null ||
+                                  !GameInstance.IsValid();
+
         #endregion
 
         #region IDisposable
@@ -53,9 +63,10 @@ namespace AutomaticRoadblocks.Instance
         /// <inheritdoc />
         public void Release()
         {
-            if (GameInstance == null || !GameInstance.IsValid())
+            if (IsInvalid)
                 return;
 
+            DeleteAttachments();
             GameInstance.KeepTasks = false;
             GameInstance.IsPersistent = false;
             Functions.SetPedAsCop(GameInstance);
@@ -67,6 +78,25 @@ namespace AutomaticRoadblocks.Instance
         #region Methods
 
         /// <summary>
+        /// Clear all tasks of this ped.
+        /// </summary>
+        /// <param name="force">Set if the tasks needs to be cleared immediately.</param>
+        public void ClearAllTasks(bool force = false)
+        {
+            if (IsInvalid)
+                return;
+
+            if (force)
+            {
+                GameInstance.Tasks.ClearImmediately();
+            }
+            else
+            {
+                GameInstance.Tasks.Clear();
+            }
+        }
+
+        /// <summary>
         /// Give the ped a primary weapon which is added in the inventory.
         /// For the list of weapon names, see <see cref="ModelUtils.Weapons"/>.
         /// </summary>
@@ -76,7 +106,7 @@ namespace AutomaticRoadblocks.Instance
         {
             PrimaryWeapon = CreateWeaponInInventory(name, equipNow);
         }
-        
+
         /// <summary>
         /// Give the ped the given weapon name in the inventory.
         /// </summary>
@@ -91,9 +121,9 @@ namespace AutomaticRoadblocks.Instance
         /// </summary>
         public void EquipPrimaryWeapon()
         {
-            if (GameInstance == null || !GameInstance.IsValid())
+            if (IsInvalid)
                 return;
-            
+
             GameInstance.Inventory.EquippedWeapon = PrimaryWeapon;
         }
 
@@ -124,10 +154,42 @@ namespace AutomaticRoadblocks.Instance
         /// <param name="duration">The duration.</param>
         public void FireAt(Entity entity, int duration)
         {
+            Assert.NotNull(entity, "entity cannot be null");
             EquipPrimaryWeapon();
             GameInstance.Tasks.FireWeaponAt(entity, duration, FiringPattern.BurstFire);
         }
-        
+
+        /// <summary>
+        /// Attach the given entity to this ped.
+        /// </summary>
+        /// <param name="attachment">Set the entity to attach.</param>
+        /// <param name="placement">Set the attachment placement on the ped.</param>
+        public void Attach(Entity attachment, PedBoneId placement)
+        {
+            Assert.NotNull(attachment, "attachment cannot be null");
+            if (IsInvalid)
+                return;
+
+            _attachments.Add(attachment);
+
+            EntityUtils.AttachEntity(attachment, GameInstance, placement);
+        }
+
+        /// <summary>
+        /// Delete the attachments of this ped.
+        /// </summary>
+        public void DeleteAttachments()
+        {
+            foreach (var attachment in _attachments.Where(x => x.IsValid()))
+            {
+                EntityUtils.DetachEntity(attachment);
+                attachment.Dismiss();
+                attachment.Delete();
+            }
+
+            _attachments.Clear();
+        }
+
         #endregion
 
         #region Functions

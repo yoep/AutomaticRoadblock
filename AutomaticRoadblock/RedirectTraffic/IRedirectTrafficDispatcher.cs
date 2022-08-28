@@ -1,34 +1,42 @@
-using AutomaticRoadblocks.ManualPlacement;
+using System;
+using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
-    public interface IRedirectTrafficDispatcher
+    public interface IRedirectTrafficDispatcher : IPreviewSupport, IDisposable
     {
         /// <summary>
         /// The cone distance of the redirect traffic.
         /// </summary>
         float ConeDistance { get; set; }
-        
+
         /// <summary>
         /// The vehicle type to use for redirecting the traffic.
         /// </summary>
         VehicleType VehicleType { get; set; }
+        
+        /// <summary>
+        /// The cones which should be used to redirect the traffic.
+        /// </summary>
+        BarrierType ConeType { get; set; }
+        
+        /// <summary>
+        /// The type of the traffic redirection which should be placed.
+        /// </summary>
+        RedirectTrafficType Type { get; set; }
 
         /// <summary>
         /// Dispatch a new redirect traffic instance.
         /// </summary>
-        void Dispatch();
+        void DispatchRedirection();
 
         /// <summary>
-        /// Create a new preview of the redirect traffic instance.
+        /// Remove the traffic redirects.
         /// </summary>
-        /// <param name="force">Force a redraw of the preview.</param>
-        void CreatePreview(bool force = false);
-
-        /// <summary>
-        /// Remove all active redirect traffic previews.
-        /// </summary>
-        void RemovePreviews();
+        /// <param name="removeType">The removal type.</param>
+        void RemoveTrafficRedirects(RemoveType removeType);
     }
 }

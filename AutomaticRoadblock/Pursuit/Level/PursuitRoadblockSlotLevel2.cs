@@ -1,8 +1,8 @@
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
-using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
@@ -35,7 +35,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
             for (var i = 0; i < totalOccupants; i++)
             {
                 Instances.Add(new InstanceSlot(EntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), Heading - 180,
-                    (position, heading) => PedFactory.CreateCopWeaponsForModel(new ARPed(RoadblockHelpers.GetPedModelForVehicle(VehicleModel, Position), position, heading))));
+                    (position, heading) => PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading))));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }

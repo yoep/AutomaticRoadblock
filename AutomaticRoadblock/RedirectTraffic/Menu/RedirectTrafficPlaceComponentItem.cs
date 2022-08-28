@@ -24,7 +24,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _redirectTrafficDispatcher.Dispatch();
+            _redirectTrafficDispatcher.DispatchRedirection();
         }
     }
 }

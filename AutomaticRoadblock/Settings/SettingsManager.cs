@@ -11,6 +11,7 @@ namespace AutomaticRoadblocks.Settings
         private const string GeneralSection = "General";
         private const string AutomaticRoadblocksSection = "Automatic Roadblocks";
         private const string ManualPlacementSection = "Manual Placement";
+        private const string RedirectTrafficSection = "Redirect Traffic";
 
         private readonly ILogger _logger;
 
@@ -27,6 +28,9 @@ namespace AutomaticRoadblocks.Settings
 
         /// <inheritdoc />
         public ManualPlacementSettings ManualPlacementSettings { get; private set; }
+
+        /// <inheritdoc />
+        public RedirectTrafficSettings RedirectTrafficSettings { get; private set; }
 
         /// <inheritdoc />
         public void Load()
@@ -48,6 +52,7 @@ namespace AutomaticRoadblocks.Settings
                 ReadGeneralSettings(settingsFile);
                 ReadAutomaticRoadblocksSettings(settingsFile);
                 ReadManualPlacementSettings(settingsFile);
+                ReadRedirectTrafficSettings(settingsFile);
                 _logger.Info("Settings have been loaded with success");
             }
             catch (Exception ex)
@@ -86,6 +91,14 @@ namespace AutomaticRoadblocks.Settings
             ManualPlacementSettings = new ManualPlacementSettings
             {
                 EnablePreview = file.ReadBoolean(ManualPlacementSection, "EnablePreview"),
+            };
+        }
+
+        private void ReadRedirectTrafficSettings(InitializationFile file)
+        {
+            RedirectTrafficSettings = new RedirectTrafficSettings
+            {
+                EnablePreview = file.ReadBoolean(RedirectTrafficSection, "EnablePreview"),
             };
         }
 

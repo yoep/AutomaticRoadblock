@@ -6,7 +6,6 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
-using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
@@ -253,7 +252,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             if (VehicleType == VehicleType.None)
                 return;
-            
+
             if (!VehicleModel.IsLoaded)
             {
                 Logger.Trace($"Loading vehicle slot model {VehicleModel.Name}");
@@ -281,7 +280,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             Logger.Debug($"Creating a total of {totalBarriers} barriers with type {BarrierType} for the roadblock slot");
             for (var i = 0; i < totalBarriers; i++)
             {
-                Instances.Add(new InstanceSlot(EntityType.Barrier, GameUtils.GetOnTheGroundPosition(startPosition), Heading, CreateBarrier));
+                Instances.Add(new InstanceSlot(EntityType.Barrier, startPosition, Heading, CreateBarrier));
                 startPosition += direction * barrierTotalWidth;
             }
         }
@@ -290,7 +289,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             try
             {
-                return BarrierFactory.Create(BarrierType, GameUtils.GetOnTheGroundPosition(position), heading);
+                return BarrierFactory.Create(BarrierType, position, heading);
             }
             catch (Exception ex)
             {

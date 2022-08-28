@@ -4,9 +4,11 @@ using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Vehicles;
+using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
@@ -35,7 +37,14 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Get the target vehicle of this roadblock.
         /// </summary>
+        [CanBeNull]
         protected Vehicle Vehicle { get; }
+
+        /// <summary>
+        /// Verify if the <see cref="Vehicle"/> instance is invalidated by the game.
+        /// This might be the case by the pursuit suddenly being (forcefully) ended.
+        /// </summary>
+        private bool IsVehicleInstanceInvalid => Vehicle == null || !Vehicle.IsValid();
 
         #endregion
 
@@ -69,7 +78,7 @@ namespace AutomaticRoadblocks.Roadblock
                 .Select(lane => CreateSlot(lane, Heading, Vehicle, IsLightsEnabled))
                 .ToList();
         }
-        
+
         /// <summary>
         /// Create a chase vehicle for this roadblock.
         /// The chase vehicle will be created on the right side of the road.
@@ -82,11 +91,10 @@ namespace AutomaticRoadblocks.Roadblock
             Instances.AddRange(new[]
             {
                 new InstanceSlot(EntityType.CopVehicle, roadPosition, TargetHeading + 25,
-                    (position, heading) => new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
+                    (position, heading) => VehicleFactory.CreateWithModel(vehicleModel, position, heading)),
                 new InstanceSlot(EntityType.CopPed, roadPosition, TargetHeading,
                     (position, heading) =>
-                        PedFactory.CreateCopWeaponsForModel(new ARPed(RoadblockHelpers.GetPedModelForVehicle(vehicleModel, Position), GameUtils.GetOnTheGroundPosition(position),
-                            heading)))
+                        PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(vehicleModel, position, heading)))
             });
 
             // create buffer barrels behind the vehicle
@@ -130,6 +138,12 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void VerifyIfRoadblockIsBypassed()
         {
+            if (IsVehicleInstanceInvalid)
+            {
+                InvalidateTheRoadblock();
+                return;
+            }
+
             var currentDistance = Vehicle.DistanceTo(Position);
 
             if (currentDistance < _lastKnownDistanceToRoadblock)
@@ -147,6 +161,12 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void VerifyIfRoadblockIsHit()
         {
+            if (IsVehicleInstanceInvalid)
+            {
+                InvalidateTheRoadblock();
+                return;
+            }
+
             if (!Vehicle.HasBeenDamagedByAnyVehicle)
                 return;
 
@@ -188,6 +208,15 @@ namespace AutomaticRoadblocks.Roadblock
         {
             Blip.Color = color;
             Blip.Flash(500, BlipFlashDuration);
+        }
+
+        private void InvalidateTheRoadblock()
+        {
+            Logger.Warn("Unable to verify of the roadblock status (bypass/hit), the vehicle instance is no longer valid");
+            // invalidate the roadblock so it can be cleaned up
+            // this will also stop the monitor from running as we're not able
+            // to determine any status anymore
+            UpdateState(RoadblockState.Invalid);
         }
 
         #endregion
