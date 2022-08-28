@@ -1,4 +1,5 @@
 using System.Linq;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
@@ -6,13 +7,14 @@ using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
+using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Pursuit.Level
 {
     public class PursuitRoadblockSlotLevel2 : AbstractPursuitRoadblockSlot
     {
         internal PursuitRoadblockSlotLevel2(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
-            : base(lane, barrierType, heading, targetVehicle, shouldAddLights)
+            : base(lane, barrierType, VehicleType.Locale, heading, targetVehicle, shouldAddLights)
         {
         }
 
@@ -22,11 +24,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
             CopInstances
                 .ToList()
                 .ForEach(x => x.AimAt(TargetVehicle, 45000));
-        }
-
-        protected override Model GetVehicleModel()
-        {
-            return ModelUtils.Vehicles.GetLocalPoliceVehicle(Position, true, false);
         }
 
         protected override void InitializeCops()

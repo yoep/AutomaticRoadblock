@@ -5,6 +5,7 @@ using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils.Road;
 using JetBrains.Annotations;
 using Rage;
+using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
@@ -21,7 +22,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         float Heading { get; }
 
         /// <summary>
-        /// Retrieve the vehicle model that is used within this slot.
+        /// Get the vehicle type that will be used for this slot
+        /// </summary>
+        VehicleType VehicleType { get; }
+        
+        /// <summary>
+        /// Get the vehicle model that will be used in this slot.
         /// </summary>
         Model VehicleModel { get; }
 
@@ -37,7 +43,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// </summary>
         [NotNull]
         Road.Lane Lane { get; }
-        
+
         /// <summary>
         /// The cop instances of this roadblock slot.
         /// </summary>

@@ -18,7 +18,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             new(AutomaticRoadblocksPlugin.BlockLanes, AutomaticRoadblocksPlugin.BlockLanesDescription, PlacementType.Values);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.MANUAL_PLACEMENT;
+        public MenuType Type => MenuType.ManualPlacement;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;

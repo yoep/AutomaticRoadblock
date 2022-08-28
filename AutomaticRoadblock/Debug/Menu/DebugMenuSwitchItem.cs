@@ -10,7 +10,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         public UIMenu Menu { get; } = new(AutomaticRoadblocksPlugin.MenuTitle, AutomaticRoadblocksPlugin.MenuSubtitle);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.DEBUG;
+        public MenuType Type => MenuType.Debug;
 
         /// <inheritdoc />
         public string DisplayText => AutomaticRoadblocksPlugin.MenuDebug;

@@ -55,8 +55,10 @@ namespace AutomaticRoadblocks.Instance
         {
             if (GameInstance == null || !GameInstance.IsValid())
                 return;
-            
+
+            GameInstance.KeepTasks = false;
             GameInstance.IsPersistent = false;
+            Functions.SetPedAsCop(GameInstance);
             Functions.SetCopAsBusy(GameInstance, false);
         }
 
@@ -132,8 +134,8 @@ namespace AutomaticRoadblocks.Instance
 
         private void RegisterCopToLspdfr()
         {
-            Functions.SetPedAsCop(GameInstance);
-            Functions.SetCopAsBusy(GameInstance, true);
+            // Functions.SetPedAsCop(GameInstance);
+            // Functions.SetCopAsBusy(GameInstance, true);
         }
 
         private WeaponDescriptor CreateWeaponInInventory(string name, bool equipNow = false)

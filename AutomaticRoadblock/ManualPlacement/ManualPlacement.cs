@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Settings;
@@ -9,6 +10,7 @@ using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
+using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -259,11 +261,7 @@ namespace AutomaticRoadblocks.ManualPlacement
                 {
                     _logger.Trace($"Removing manual roadblock preview {x}");
                     x.DeletePreview();
-
-                    if (_roadblocks.Remove(x))
-                    {
-                        _logger.Warn($"Failed to remove roadblock {x} from the known roadblocks");
-                    }
+                    _roadblocks.Remove(x);
                 });
             }
         }

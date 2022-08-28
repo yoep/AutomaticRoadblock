@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             new(AutomaticRoadblocksPlugin.LightSource, AutomaticRoadblocksPlugin.LightSourceDescription, LightSourceType.Values);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.MANUAL_PLACEMENT;
+        public MenuType Type => MenuType.ManualPlacement;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;

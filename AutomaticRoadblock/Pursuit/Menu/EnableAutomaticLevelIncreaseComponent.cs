@@ -18,7 +18,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
             AutomaticRoadblocksPlugin.EnableAutoPursuitLevelIncreaseDescription);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.PURSUIT;
+        public MenuType Type => MenuType.Pursuit;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;

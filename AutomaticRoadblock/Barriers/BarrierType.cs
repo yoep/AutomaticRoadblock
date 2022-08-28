@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using AutomaticRoadblocks.Utils;
 using Rage;
 
-namespace AutomaticRoadblocks.Roadblock
+namespace AutomaticRoadblocks.Barriers
 {
     public class BarrierType
     {
         public static readonly BarrierType None = new("None", 1f, 1f);
-        public static readonly BarrierType SmallCone = new("Small cone", DimensionOf(PropUtils.Models.SmallCone), 0.35f);
-        public static readonly BarrierType SmallConeStriped = new("Small cone striped", DimensionOf(PropUtils.Models.SmallConeWithStrips), 0.35f);
-        public static readonly BarrierType BigCone = new("Big cone", DimensionOf(PropUtils.Models.BigCone), 0.45f);
-        public static readonly BarrierType BigConeStriped = new("Big cone striped", DimensionOf(PropUtils.Models.BigConeWithStrips), 0.45f);
+        public static readonly BarrierType SmallCone = new("Small cone", DimensionOf(PropUtils.Models.SmallCone), 0.4f);
+        public static readonly BarrierType SmallConeStriped = new("Small cone striped", DimensionOf(PropUtils.Models.SmallConeWithStrips), 0.4f);
+        public static readonly BarrierType BigCone = new("Big cone", DimensionOf(PropUtils.Models.BigCone), 0.5f);
+        public static readonly BarrierType BigConeStriped = new("Big cone striped", DimensionOf(PropUtils.Models.BigConeWithStrips), 0.5f);
         public static readonly BarrierType PoliceDoNotCross = new("Police do not cross", DimensionOf(PropUtils.Models.PoliceDoNotCross), 0.2f);
         public static readonly BarrierType WorkBarrierLarge = new("Work barrier large", DimensionOf(PropUtils.Models.WorkBarrierLarge), 0.2f);
         public static readonly BarrierType WorkBarrierSmall = new("Work barrier small", DimensionOf(PropUtils.Models.WorkBarrierSmall), 0.3f);

@@ -1,11 +1,13 @@
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.LightSources;
-using AutomaticRoadblocks.ManualPlacement.Factory;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Utils.Type;
+using AutomaticRoadblocks.Vehicles;
 using Rage;
+using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -13,11 +15,9 @@ namespace AutomaticRoadblocks.ManualPlacement
     {
         public ManualRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, LightSourceType lightSourceType, float heading,
             bool shouldAddLights, bool copsEnabled)
-            : base(lane, barrierType, heading, shouldAddLights, false)
+            : base(lane, barrierType, vehicleType, heading, shouldAddLights, false)
         {
-            Assert.NotNull(vehicleType, "vehicleType cannot be null");
             Assert.NotNull(lightSourceType, "lightSourceType cannot be null");
-            VehicleType = vehicleType;
             LightSourceType = lightSourceType;
             CopsEnabled = copsEnabled;
 
@@ -25,11 +25,6 @@ namespace AutomaticRoadblocks.ManualPlacement
         }
 
         #region Properties
-
-        /// <summary>
-        /// The vehicle type of the slot.
-        /// </summary>
-        public VehicleType VehicleType { get; }
 
         /// <summary>
         /// The light type of the slot.
@@ -60,7 +55,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         protected override void InitializeCops()
         {
-            if (!CopsEnabled)
+            if (!CopsEnabled || VehicleType == VehicleType.None)
                 return;
 
             Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, _) =>
@@ -82,12 +77,6 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             Logger.Trace("Initializing the manual roadblock slot lights");
                 Instances.AddRange(LightSourceSlotFactory.Create(LightSourceType, this));
-        }
-
-        /// <inheritdoc />
-        protected override Model GetVehicleModel()
-        {
-            return VehicleFactory.Create(VehicleType, Position);
         }
 
         #endregion

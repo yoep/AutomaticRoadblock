@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {

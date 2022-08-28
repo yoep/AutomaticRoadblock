@@ -60,6 +60,8 @@
         <Compile Include="Api\AutomaticRoadblocksApi.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
+        <Compile Include="Barriers\BarrierFactory.cs" />
+        <Compile Include="Barriers\BarrierType.cs" />
         <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
         <Compile Include="Debug\Menu\EndCalloutComponent.cs" />
         <Compile Include="Debug\Menu\RoadInfoComponent.cs" />
@@ -70,6 +72,7 @@
         <Compile Include="Instance\ARPed.cs" />
         <Compile Include="Instance\ARScenery.cs" />
         <Compile Include="Instance\ARVehicle.cs" />
+        <Compile Include="Instance\InstanceState.cs" />
         <Compile Include="Instance\PedFactory.cs" />
         <Compile Include="Instance\InstanceSlot.cs" />
         <Compile Include="Instance\InstanceType.cs" />
@@ -84,18 +87,16 @@
         <Compile Include="ManualPlacement\Menu\EnableSpeedLimitComponentItem.cs" />
         <Compile Include="ManualPlacement\PlacementRemoveType.cs" />
         <Compile Include="ManualPlacement\PlacementType.cs" />
-        <Compile Include="ManualPlacement\Factory\VehicleFactory.cs" />
         <Compile Include="ManualPlacement\IManualPlacement.cs" />
         <Compile Include="ManualPlacement\ManualPlacement.cs" />
         <Compile Include="ManualPlacement\ManualRoadblock.cs" />
         <Compile Include="ManualPlacement\ManualRoadblockSlot.cs" />
-        <Compile Include="ManualPlacement\Menu\BarrierComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualPlacementBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\PlacementTypeComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\LightComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementMenuSwitchItem.cs" />
-        <Compile Include="ManualPlacement\Menu\PlaceComponentItem.cs" />
-        <Compile Include="ManualPlacement\Menu\VehicleComponentItem.cs" />
-        <Compile Include="ManualPlacement\VehicleType.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualRoadblockPlaceComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualPlacementVehicleTypeComponentItem.cs" />
         <Compile Include="Menu\IMenu.cs" />
         <Compile Include="Menu\IMenuComponent.cs" />
         <Compile Include="Menu\MenuException.cs" />
@@ -117,20 +118,23 @@
         <Compile Include="Pursuit\Level\PursuitRoadblockSlotLevel5.cs" />
         <Compile Include="Pursuit\Menu\DispatchNowComponent.cs" />
         <Compile Include="Pursuit\Menu\DispatchPreviewComponent.cs" />
-        <Compile Include="Pursuit\Menu\DispatchSpawnComponent.cs" />
+        <Compile Include="Pursuit\Menu\PursuitDispatchSpawnComponentItem.cs" />
         <Compile Include="Pursuit\Menu\EnableAutomaticLevelIncreaseComponent.cs" />
-        <Compile Include="Pursuit\Menu\EnableDuringPursuitComponent.cs" />
+        <Compile Include="Pursuit\Menu\PursuitEnableDuringPursuitComponentItem.cs" />
         <Compile Include="Pursuit\Menu\PursuitLevelComponent.cs" />
         <Compile Include="Pursuit\NoPursuitActiveException.cs" />
         <Compile Include="Pursuit\PursuitEvents.cs" />
         <Compile Include="Pursuit\IPursuitManager.cs" />
         <Compile Include="Pursuit\PursuitLevel.cs" />
         <Compile Include="Pursuit\PursuitManager.cs" />
+        <Compile Include="RedirectTraffic\IRedirectTrafficDispatcher.cs" />
+        <Compile Include="RedirectTraffic\Menu\RedirectTrafficConeDistanceComponentItem.cs" />
+        <Compile Include="RedirectTraffic\Menu\RedirectTrafficPlaceComponentItem.cs" />
+        <Compile Include="RedirectTraffic\Menu\RedirectTrafficMenuSwitchItem.cs" />
+        <Compile Include="RedirectTraffic\RedirectTrafficDispatcher.cs" />
         <Compile Include="Roadblock\AbstractPursuitRoadblock.cs" />
-        <Compile Include="Roadblock\BarrierType.cs" />
         <Compile Include="Roadblock\Dispatcher\IRoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockDispatcher.cs" />
-        <Compile Include="Roadblock\Factory\BarrierFactory.cs" />
         <Compile Include="Roadblock\IRoadblock.cs" />
         <Compile Include="Roadblock\Menu\CleanRoadblocksComponent.cs" />
         <Compile Include="Roadblock\AbstractRoadblock.cs" />
@@ -167,6 +171,8 @@
         <Compile Include="Utils\Type\MarkerType.cs" />
         <Compile Include="Utils\Type\VehicleLightState.cs" />
         <Compile Include="Utils\Type\VehicleSeat.cs" />
+        <Compile Include="Vehicles\VehicleFactory.cs" />
+        <Compile Include="Vehicles\VehicleType.cs" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="AutomaticRoadblocks.ini">

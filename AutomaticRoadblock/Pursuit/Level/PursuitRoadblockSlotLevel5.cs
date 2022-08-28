@@ -1,17 +1,19 @@
 using System.Linq;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
+using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Pursuit.Level
 {
     public class PursuitRoadblockSlotLevel5 : AbstractPursuitRoadblockSlot
     {
         internal PursuitRoadblockSlotLevel5(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
-            : base(lane, barrierType, heading, targetVehicle, shouldAddLights)
+            : base(lane, barrierType, DetermineVehicleType(), heading, targetVehicle, shouldAddLights)
         {
         }
 
@@ -22,12 +24,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
             CopInstances
                 .ToList()
                 .ForEach(x => x.FireAt(TargetVehicle, 60000));
-        }
-
-        /// <inheritdoc />
-        protected override Model GetVehicleModel()
-        {
-            return Random.Next(3) == 0 ? ModelUtils.Vehicles.GetFbiPoliceVehicle() : ModelUtils.Vehicles.GetSwatPoliceVehicle();
         }
 
         /// <inheritdoc />
@@ -62,6 +58,15 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 return base.CalculateVehicleHeading() + 30;
 
             return base.CalculateVehicleHeading();
+        }
+
+        private static VehicleType DetermineVehicleType()
+        {
+            return Random.Next(4) switch
+            {
+                0 => VehicleType.Swat,
+                _ => VehicleType.Fbi,
+            };
         }
     }
 }

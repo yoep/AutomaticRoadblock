@@ -4,7 +4,7 @@ using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils;
 using Rage;
 
-namespace AutomaticRoadblocks.Roadblock.Factory
+namespace AutomaticRoadblocks.Barriers
 {
     public static class BarrierFactory
     {

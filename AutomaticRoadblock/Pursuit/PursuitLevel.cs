@@ -4,6 +4,8 @@ namespace AutomaticRoadblocks.Pursuit
 {
     public class PursuitLevel
     {
+        private const string PursuitLevelAudio = "ROADBLOCK_PURSUIT_LEVEL";
+        
         public static readonly PursuitLevel Level1 = new(1, 0.1, 0.20, false);
         public static readonly PursuitLevel Level2 = new(2, 0.15, 0.15, false);
         public static readonly PursuitLevel Level3 = new(3, 0.2, 0.05, true);
@@ -46,6 +48,12 @@ namespace AutomaticRoadblocks.Pursuit
         /// Verify if firing weapons is allowed.
         /// </summary>
         public bool IsLethalForceAllowed { get; }
+
+        /// <summary>
+        /// Retrieve the audio file which should be played for this level.
+        /// </summary>
+        /// <remarks>Audio files for <see cref="Level1"/> are not available.</remarks>
+        public string AudioFile => PursuitLevelAudio + Level;
 
         public override string ToString()
         {

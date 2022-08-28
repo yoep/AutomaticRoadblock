@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
+using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Roadblock
 {
@@ -429,6 +431,12 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 var currentSlot = Slots[i];
                 var nextSlot = Slots[i + 1];
+                
+                // if the current slot doesn't contain any vehicle
+                // skip the clipping calculation and move to the next one
+                if (currentSlot.VehicleType == VehicleType.None)
+                    continue;
+                
                 var currentSlotDifference = CalculateSlotVehicleDifference(currentSlot);
                 var nextSlotDifference = CalculateSlotVehicleDifference(nextSlot);
 

@@ -24,7 +24,7 @@ namespace AutomaticRoadblocks.Roadblock.Menu
         public UIMenu Menu { get; } = new(AutomaticRoadblocksPlugin.MenuTitle, AutomaticRoadblocksPlugin.MenuSubtitle);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.PURSUIT;
+        public MenuType Type => MenuType.Pursuit;
 
         /// <inheritdoc />
         public string DisplayText => AutomaticRoadblocksPlugin.MenuPursuit;

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace AutomaticRoadblocks.ManualPlacement
+namespace AutomaticRoadblocks.Vehicles
 {
     public class VehicleType
     {
@@ -8,13 +8,17 @@ namespace AutomaticRoadblocks.ManualPlacement
         public static readonly VehicleType State = new("State");
         public static readonly VehicleType Fbi = new("FBI");
         public static readonly VehicleType Swat = new("Swat");
+        public static readonly VehicleType Transporter = new("Transporter");
+        public static readonly VehicleType None = new("None");
 
         public static readonly IEnumerable<VehicleType> Values = new[]
         {
             Locale,
             State,
             Fbi,
-            Swat
+            Swat,
+            Transporter,
+            None
         };
 
         private VehicleType(string displayText)

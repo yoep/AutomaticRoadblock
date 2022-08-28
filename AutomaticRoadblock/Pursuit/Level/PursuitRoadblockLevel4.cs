@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
-using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
@@ -77,7 +77,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeScenery()
         {
-            var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 3f;
+            var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 2f;
 
             Instances.Add(new InstanceSlot(EntityType.Scenery, position, 0f,
                 (conePosition, _) => BarrierFactory.Create(BarrierType.BigCone, conePosition)));
@@ -93,7 +93,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeAdditionalVehicles()
         {
-            CreateChaseVehicle(ModelUtils.Vehicles.GetLocalPoliceVehicle(Position, false, false));
+            CreateChaseVehicle(ModelUtils.Vehicles.GetLocalPoliceVehicle(Position));
         }
 
         /// <inheritdoc />

@@ -115,24 +115,19 @@ namespace AutomaticRoadblocks.Utils
             public static readonly IReadOnlyList<string> CityVehicleModels = new List<string>
             {
                 "POLICE",
-                "POLICE2",
-                PoliceBikeModelName,
-                PoliceTransporterModelName
+                "POLICE2"
             };
 
             public static readonly IReadOnlyList<string> CountyVehicleModels = new List<string>
             {
                 "SHERIFF",
-                "SHERIFF2",
-                PoliceBikeModelName,
-                PoliceTransporterModelName
+                "SHERIFF2"
             };
 
             public static readonly IReadOnlyList<string> StateVehicleModels = new List<string>
             {
                 "POLICE3",
                 PoliceBikeModelName,
-                PoliceTransporterModelName
             };
 
             public static readonly IReadOnlyList<string> FbiVehicleModels = new List<string>
@@ -166,18 +161,11 @@ namespace AutomaticRoadblocks.Utils
             /// Get a local vehicle model for the given position.
             /// </summary>
             /// <param name="position">Set the position to get the local model for.</param>
-            /// <param name="includePoliceBike">Set if the police bike can also be returned as a vehicle model.</param>
-            /// <param name="includePoliceTransporter">Set if the police transporter can also be returned as vehicle model.</param>
             /// <returns>Returns the local police vehicle model.</returns>
-            public static Model GetLocalPoliceVehicle(Vector3 position, bool includePoliceBike = true, bool includePoliceTransporter = true)
+            public static Model GetLocalPoliceVehicle(Vector3 position)
             {
                 var zone = GetZone(position);
                 var list = IsCountyZone(zone) ? CountyVehicleModels.ToList() : CityVehicleModels.ToList();
-
-                if (!includePoliceBike)
-                    list.Remove(PoliceBikeModelName);
-                if (!includePoliceTransporter)
-                    list.Remove(PoliceTransporterModelName);
 
                 return new Model(list[Random.Next(list.Count)]);
             }
@@ -216,6 +204,15 @@ namespace AutomaticRoadblocks.Utils
             public static Model GetSwatPoliceVehicle()
             {
                 return new Model(SwatVehicleModels[Random.Next(SwatVehicleModels.Count)]);
+            }
+
+            /// <summary>
+            /// Get an transporter police vehicle model. 
+            /// </summary>
+            /// <returns>Returns an transporter police vehicle model.</returns>
+            public static Model GetTransporterPoliceVehicle()
+            {
+                return new Model(PoliceTransporterModelName);
             }
 
             /// <summary>

@@ -1,3 +1,4 @@
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
@@ -26,7 +27,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeScenery()
         {
-            var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 3f;
+            var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 2f;
 
             Instances.Add(new InstanceSlot(EntityType.Scenery, GameUtils.GetOnTheGroundPosition(position), 0f,
                 (conePosition, _) => new ARScenery(PropUtils.CreateBigConeWithStripes(conePosition))));

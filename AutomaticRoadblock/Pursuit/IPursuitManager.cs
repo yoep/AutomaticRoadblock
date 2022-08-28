@@ -1,16 +1,9 @@
-using System;
-using LSPD_First_Response.Mod.API;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit
 {
     public interface IPursuitManager
     {
-        /// <summary>
-        /// Get the active pursuit handle.
-        /// </summary>
-        LHandle PursuitHandle { get; }
-
         /// <summary>
         /// Verify if there is currently an active pursuit.
         /// </summary>
@@ -26,7 +19,7 @@ namespace AutomaticRoadblocks.Pursuit
         /// Enable automatic dispatching of roadblocks during a pursuit.
         /// </summary>
         bool EnableAutomaticDispatching { get; set; }
-        
+
         /// <summary>
         /// Enable automatic level increases during a pursuit.
         /// </summary>
@@ -62,9 +55,9 @@ namespace AutomaticRoadblocks.Pursuit
         /// <summary>
         /// Dispatch a roadblock for the current pursuit.
         /// </summary>
-        /// <param name="userRequested">Indicates if the roadblock is requested on behalve of the user.</param>
-        /// <param name="force">Force the roadblock, this will disable the conditions checking.</param>
-        /// <param name="atCurrentLocation">Indicates if the roadblock location should be calculated or the current location of the target should be used</param>
+        /// <param name="userRequested">Indicates if the roadblock is requested by the user.</param>
+        /// <param name="force">Force the spawning of a roadblock, this will disable the verification of conditions which are applied before a roadblock can be dispatched.</param>
+        /// <param name="atCurrentLocation">Indicates if the roadblock location should be calculated or the current location of the target should be used.</param>
         /// <returns>Returns true if a roadblock will be dispatched, else false.</returns>
         bool DispatchNow(bool userRequested = false, bool force = false, bool atCurrentLocation = false);
 

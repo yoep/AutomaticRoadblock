@@ -45,7 +45,10 @@ namespace AutomaticRoadblocks.Pursuit
 
         #region Properties
 
-        /// <inheritdoc />
+        /// <summary>
+        /// The pursuit handle of the currently active pursuit.
+        /// When <see cref="IsPursuitActive"/> returns false, this property will be null.
+        /// </summary>
         public LHandle PursuitHandle { get; private set; }
 
         /// <inheritdoc />
@@ -166,8 +169,14 @@ namespace AutomaticRoadblocks.Pursuit
         {
             try
             {
-                if (IsDispatchNowPressed())
+                if (!IsPursuitActive || !IsDispatchNowPressed())
+                    return;
+
+                _game.NewSafeFiber(() =>
+                {
+                    _logger.Trace("User pressed the dispatch now key, trying to dispatch a new roadblock");
                     DispatchNow(true);
+                }, "PursuitManager.Process");
             }
             catch (Exception ex)
             {
@@ -197,7 +206,9 @@ namespace AutomaticRoadblocks.Pursuit
             PursuitLevel = level;
             PursuitLevelChanged?.Invoke(level);
             NotifyPursuitLevelIncreased();
-            Functions.PlayScannerAudio("ROADBLOCK_PURSUIT_LEVEL_INCREASE");
+
+            if (level.Level > 1)
+                LspdfrUtils.PlayScannerAudioNonBlocking(level.AudioFile);
         }
 
         private void IncreasePursuitLevel()
@@ -223,7 +234,11 @@ namespace AutomaticRoadblocks.Pursuit
             _roadblockDispatcher.RoadblockStateChanged += RoadblockStateChanged;
             _roadblockDispatcher.RoadblockCopsJoiningPursuit += RoadblockCopsJoiningPursuit;
             PursuitHandle = pursuitHandle;
-            UpdatePursuitLevel(PursuitLevel.Level1);
+
+            // only reset the pursuit level if automatic level increases is enabled
+            // otherwise, leave it at the current level
+            if (EnableAutomaticLevelIncreases)
+                UpdatePursuitLevel(PursuitLevel.Level1);
 
             StartPursuitMonitor();
 
@@ -328,7 +343,7 @@ namespace AutomaticRoadblocks.Pursuit
 
             return (PursuitLevel.Level < 2 && allowedSinceLastLevelChange) ||
                    (PursuitLevel.Level == 2 && _totalRoadblocksDeployed > 0 && allowedSinceLastLevelChange) ||
-                   (PursuitLevel.Level < 3 && allowedSinceLastLevelChange);
+                   (PursuitLevel.Level < 3 && _totalRoadblocksDeployed > 1 && allowedSinceLastLevelChange);
         }
 
         private bool IsAutomaticLevelIncreaseAllowed()

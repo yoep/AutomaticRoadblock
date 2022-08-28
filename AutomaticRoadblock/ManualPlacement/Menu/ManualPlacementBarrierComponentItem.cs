@@ -1,14 +1,15 @@
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Roadblock;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class BarrierComponentItem : IMenuComponent<UIMenuListScrollerItem<BarrierType>>
+    public class ManualPlacementBarrierComponentItem : IMenuComponent<UIMenuListScrollerItem<BarrierType>>
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public BarrierComponentItem(IManualPlacement manualPlacement)
+        public ManualPlacementBarrierComponentItem(IManualPlacement manualPlacement)
         {
             _manualPlacement = manualPlacement;
             Init();
@@ -19,7 +20,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             new(AutomaticRoadblocksPlugin.Barrier, AutomaticRoadblocksPlugin.BarrierDescription, BarrierType.Values);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.MANUAL_PLACEMENT;
+        public MenuType Type => MenuType.ManualPlacement;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;

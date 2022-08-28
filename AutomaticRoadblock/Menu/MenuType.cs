@@ -2,8 +2,9 @@ namespace AutomaticRoadblocks.Menu
 {
     public enum MenuType 
     {
-        PURSUIT,
-        MANUAL_PLACEMENT,
-        DEBUG
+        Pursuit,
+        ManualPlacement,
+        RedirectTraffic,
+        Debug
     }
 }

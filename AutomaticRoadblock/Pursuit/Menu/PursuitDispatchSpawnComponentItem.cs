@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
@@ -9,13 +10,15 @@ namespace AutomaticRoadblocks.Pursuit.Menu
     /// Dispatch spawn option for debugging which will spawn in a roadblock as it would during a pursuit.
     /// This will target the player vehicle instead of an actual suspect.
     /// </summary>
-    public class DispatchSpawnComponent : IMenuComponent<UIMenuListItem>
+    public class PursuitDispatchSpawnComponentItem : IMenuComponent<UIMenuListItem>
     {
+        private readonly IGame _game;
         private readonly IPursuitManager _pursuitManager;
 
-        public DispatchSpawnComponent(IPursuitManager pursuitManager)
+        public PursuitDispatchSpawnComponentItem(IPursuitManager pursuitManager, IGame game)
         {
             _pursuitManager = pursuitManager;
+            _game = game;
         }
 
         /// <inheritdoc />
@@ -27,7 +30,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
             });
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.PURSUIT;
+        public MenuType Type => MenuType.Pursuit;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;
@@ -39,7 +42,8 @@ namespace AutomaticRoadblocks.Pursuit.Menu
             if (selectedValue.GetType() != typeof(DispatchSpawnType))
                 return;
 
-            _pursuitManager.DispatchNow(false, true, (DispatchSpawnType)selectedValue == DispatchSpawnType.CurrentLocation);
+            _game.NewSafeFiber(() => _pursuitManager.DispatchNow(false, true, (DispatchSpawnType)selectedValue == DispatchSpawnType.CurrentLocation),
+                "DispatchSpawnComponent.OnMenuActivation");
         }
 
         private enum DispatchSpawnType

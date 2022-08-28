@@ -45,6 +45,11 @@ namespace AutomaticRoadblocks.Instance
         /// Get the instance if it's spawned.
         /// </summary>
         public IARInstance<Entity> Instance { get; private set; }
+
+        /// <summary>
+        /// The state of the instance slot.
+        /// </summary>
+        public InstanceState State { get; private set; } = InstanceState.Inactive;
         
         #endregion
 
@@ -58,12 +63,23 @@ namespace AutomaticRoadblocks.Instance
             if (Instance != null)
                 return;
 
-            var instance = _factory.Invoke(Position, Heading);
+            State = InstanceState.Spawning;
 
-            if (instance != null)
+            try
             {
-                Instance = instance;
-                return;
+                var instance = _factory.Invoke(Position, Heading);
+                State = InstanceState.Spawned;
+
+                if (instance != null)
+                {
+                    Instance = instance;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to create instance slot, {ex.Message}", ex);
+                State = InstanceState.Error;
             }
 
             _logger.Warn($"Created a 'null' instance for {GetType().FullName}: {this}");

@@ -3,11 +3,11 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class PlaceComponentItem : IMenuComponent<UIMenuItem>
+    public class ManualRoadblockPlaceComponentItem : IMenuComponent<UIMenuItem>
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public PlaceComponentItem(IManualPlacement manualPlacement)
+        public ManualRoadblockPlaceComponentItem(IManualPlacement manualPlacement)
         {
             _manualPlacement = manualPlacement;
         }
@@ -16,7 +16,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.Place, AutomaticRoadblocksPlugin.PlaceDescription);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.MANUAL_PLACEMENT;
+        public MenuType Type => MenuType.ManualPlacement;
 
         /// <inheritdoc />
         public bool IsAutoClosed => true;

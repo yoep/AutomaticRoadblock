@@ -24,7 +24,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         public UIMenu Menu { get; } = new(AutomaticRoadblocksPlugin.MenuTitle, AutomaticRoadblocksPlugin.MenuSubtitle);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.MANUAL_PLACEMENT;
+        public MenuType Type => MenuType.ManualPlacement;
 
         /// <inheritdoc />
         public string DisplayText => AutomaticRoadblocksPlugin.MenuManualPlacement;

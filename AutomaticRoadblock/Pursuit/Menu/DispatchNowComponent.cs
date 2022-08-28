@@ -20,7 +20,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.DispatchNow, AutomaticRoadblocksPlugin.DispatchNowDescription);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.PURSUIT;
+        public MenuType Type => MenuType.Pursuit;
 
         /// <inheritdoc />
         public bool IsAutoClosed => true;

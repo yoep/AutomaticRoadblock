@@ -1,14 +1,16 @@
 using System.Linq;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
+using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot, IPursuitRoadblockSlot
     {
-        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
-            : base(lane, barrierType, heading, shouldAddLights, true)
+        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, float heading, Vehicle targetVehicle, bool shouldAddLights)
+            : base(lane, barrierType, vehicleType, heading, shouldAddLights, true)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;

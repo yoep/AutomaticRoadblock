@@ -9,6 +9,7 @@ namespace AutomaticRoadblocks
         public const string MenuDebug = "Debug";
         public const string MenuPursuit = "Pursuit";
         public const string MenuManualPlacement = "Manual placement";
+        public const string MenuRedirectTraffic = "Redirect traffic";
 
         public const string RoadInfo = "Road info" + DebugIndicatorText;
         public const string RoadPreview = "Road preview" + DebugIndicatorText;
@@ -53,6 +54,11 @@ namespace AutomaticRoadblocks
         public const string BlockLanesDescription = "The lanes which should be blocked";
         public const string CleanRoadblockPlacement = "Remove";
         public const string CleanRoadblockPlacementDescription = "Remove one or more placed roadblocks";
+        
+        public const string RedirectTraffic = "Place redirection";
+        public const string RedirectTrafficDescription = "Place a redirection at the current location";
+        public const string RedirectTrafficConeDistance = "Cone distance";
+        public const string RedirectTrafficConeDistanceDescription = "The distance along the road to which cones should be placed";
 
         private const string DebugIndicatorText = " [DEBUG]";
     }

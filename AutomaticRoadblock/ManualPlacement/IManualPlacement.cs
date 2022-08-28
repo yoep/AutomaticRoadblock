@@ -1,7 +1,9 @@
 using System;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -46,7 +48,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <summary>
         /// Create a preview of the roadblock that will be placed. 
         /// </summary>
-        /// <param name="force">Force the recreation of the preview.</param>
+        /// <param name="force">Force a redraw of the preview.</param>
         void CreatePreview(bool force = false);
 
         /// <summary>

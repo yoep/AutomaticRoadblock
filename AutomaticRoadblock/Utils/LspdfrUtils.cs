@@ -1,3 +1,4 @@
+using AutomaticRoadblocks.AbstractionLayer;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -37,10 +38,20 @@ namespace AutomaticRoadblocks.Utils
         }
 
         /// <summary>
+        /// Play the given sound without blocking the current game thread.
+        /// This plays <see cref="PlayScannerAudio"/> in a different thread.
+        /// </summary>
+        /// <param name="sound">The sound string to play.</param>
+        public static void PlayScannerAudioNonBlocking(string sound)
+        {
+            IoC.Instance.GetInstance<IGame>().NewSafeFiber(() => PlayScannerAudio(sound), "LspdfrUtils.Audio");
+        }
+
+        /// <summary>
         /// Wait for LSPDFR to complete playing the current audio (if any is playing at the moment).
         /// This will pause the current game fiber.
         /// </summary>
-        public static void WaitForAudioCompletion()
+        private static void WaitForAudioCompletion()
         {
             while (Functions.GetIsAudioEngineBusy())
             {

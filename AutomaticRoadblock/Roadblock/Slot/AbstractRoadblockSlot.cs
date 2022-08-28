@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instance;
-using AutomaticRoadblocks.Roadblock.Factory;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
 using Rage;
+using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
@@ -23,19 +26,26 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected static readonly Random Random = new();
 
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+        protected readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         private readonly bool _shouldAddLights;
 
-        protected AbstractRoadblockSlot(Road.Lane lane, BarrierType barrierType, float heading, bool shouldAddLights, bool recordVehicleCollisions)
+        protected AbstractRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, float heading, bool shouldAddLights,
+            bool recordVehicleCollisions)
         {
             Assert.NotNull(lane, "lane cannot be null");
             Assert.NotNull(barrierType, "barrierType cannot be null");
+            Assert.NotNull(vehicleType, "vehicleType cannot be null");
             Assert.NotNull(heading, "heading cannot be null");
             Lane = lane;
             BarrierType = barrierType;
+            VehicleType = vehicleType;
             Heading = heading;
             RecordVehicleCollisions = recordVehicleCollisions;
             _shouldAddLights = shouldAddLights;
+
+            if (VehicleType != VehicleType.None)
+                VehicleModel = VehicleFactory.CreateModel(VehicleType, Position);
         }
 
         #region Properties
@@ -46,6 +56,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public float Heading { get; }
 
+        /// <inheritdoc />
+        public VehicleType VehicleType { get; }
+
         /// <summary>
         /// The game instances of this slot.
         /// </summary>
@@ -55,8 +68,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public Vehicle Vehicle => VehicleInstance?.GameInstance;
 
         /// <inheritdoc />
-        /// <remarks>This field is only available after the <see cref="Initialize"/> method is called.</remarks>
-        public Model VehicleModel { get; private set; }
+        public Model VehicleModel { get; }
 
         /// <inheritdoc />
         public Road.Lane Lane { get; }
@@ -111,23 +123,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public void CreatePreview()
         {
-            var game = IoC.Instance.GetInstance<IGame>();
-
             Logger.Debug($"Creating a total of {Instances.Count} instances for the roadblock slot preview");
             Logger.Trace($"Roadblock slot instances: \n{string.Join("\n", Instances.Select(x => x.ToString()).ToList())}");
             Instances.ForEach(x => x.CreatePreview());
-            Logger.Trace("Drawing the roadblock slot information within the preview");
-            game.NewSafeFiber(() =>
-            {
-                var direction = MathHelper.ConvertHeadingToDirection(Heading);
-                var position = Position + Vector3.WorldUp * 0.25f;
 
-                while (IsPreviewActive)
-                {
-                    game.DrawArrow(position, direction, Rotator.Zero, 2f, Color.Yellow);
-                    game.FiberYield();
-                }
-            }, "IRoadblockSlot.CreatePreview");
+            if (Instances.Any(x => x.State == InstanceState.Error))
+                Game.DisplayNotification("~r~One or more instance(s) failed to spawn, please check the logs for more info");
+
+            DrawRoadblockDebugInfo();
         }
 
         /// <inheritdoc />
@@ -154,7 +157,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public override string ToString()
         {
             return $"Number of {nameof(Instances)}: {Instances.Count}, {nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}, " +
-                   $"{nameof(BarrierType)}: {BarrierType} {nameof(VehicleModel)}: {VehicleModel.Name}";
+                   $"{nameof(BarrierType)}: {BarrierType} {nameof(VehicleType)}: {VehicleType}";
         }
 
         /// <inheritdoc />
@@ -198,9 +201,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// </summary>
         protected void Initialize()
         {
-            // get the vehicle model and make sure it's loaded into memory
-            VehicleModel = GetVehicleModel();
-
             InitializeVehicleSlot();
             InitializeCops();
             InitializeScenery();
@@ -219,7 +219,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <returns>Returns the position behind the vehicle.</returns>
         protected Vector3 CalculatePositionBehindVehicle()
         {
-            return Position + MathHelper.ConvertHeadingToDirection(Heading) * (VehicleModel.Dimensions.X + 0.5f);
+            var model = VehicleFactory.CreateModel(VehicleType, Position);
+            return Position + MathHelper.ConvertHeadingToDirection(Heading) * (model.Dimensions.X + 0.5f);
         }
 
         /// <summary>
@@ -238,12 +239,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected abstract void InitializeLights();
 
         /// <summary>
-        /// Get the vehicle model of the slot.
-        /// </summary>
-        /// <returns>Returns the vehicle model that should be used for this slot.</returns>
-        protected abstract Model GetVehicleModel();
-
-        /// <summary>
         /// Calculate the heading of the vehicle for this slot.
         /// </summary>
         /// <returns>Returns the heading for the vehicle.</returns>
@@ -256,7 +251,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private void InitializeVehicleSlot()
         {
-            Assert.NotNull(VehicleModel, "VehicleModel has not been initialized, unable to create vehicle slot");
+            if (VehicleType == VehicleType.None)
+                return;
+            
             if (!VehicleModel.IsLoaded)
             {
                 Logger.Trace($"Loading vehicle slot model {VehicleModel.Name}");
@@ -264,7 +261,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             }
 
             Instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, CalculateVehicleHeading(),
-                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundPosition(position), heading, RecordVehicleCollisions)));
+                (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading, RecordVehicleCollisions)));
         }
 
         private void InitializeBarriers()
@@ -300,6 +297,23 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 Logger.Error($"Failed to create barrier of type {BarrierType}, {ex.Message}", ex);
                 return null;
             }
+        }
+
+        [Conditional("DEBUG")]
+        private void DrawRoadblockDebugInfo()
+        {
+            Logger.Trace("Drawing the roadblock slot debug information within the preview");
+            Game.NewSafeFiber(() =>
+            {
+                var direction = MathHelper.ConvertHeadingToDirection(Heading);
+                var position = Position + Vector3.WorldUp * 0.25f;
+
+                while (IsPreviewActive)
+                {
+                    Game.DrawArrow(position, direction, Rotator.Zero, 2f, Color.Yellow);
+                    Game.FiberYield();
+                }
+            }, "IRoadblockSlot.CreatePreview");
         }
 
         #endregion

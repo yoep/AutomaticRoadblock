@@ -1,13 +1,14 @@
 using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Vehicles;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class VehicleComponentItem : IMenuComponent<UIMenuListScrollerItem<VehicleType>>
+    public class ManualPlacementVehicleTypeComponentItem : IMenuComponent<UIMenuListScrollerItem<VehicleType>>
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public VehicleComponentItem(IManualPlacement manualPlacement)
+        public ManualPlacementVehicleTypeComponentItem(IManualPlacement manualPlacement)
         {
             _manualPlacement = manualPlacement;
             Init();
@@ -18,7 +19,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             new(AutomaticRoadblocksPlugin.Vehicle, AutomaticRoadblocksPlugin.VehicleDescription, VehicleType.Values);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.MANUAL_PLACEMENT;
+        public MenuType Type => MenuType.ManualPlacement;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;

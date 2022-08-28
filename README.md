@@ -14,7 +14,7 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 ## Planned features
 
 - Spikestrips
-- Police smart radio integration
+- Police SmartRadio integration
 - Close road/lane
 - Redirect traffic
 - Junction roadblocks
@@ -34,3 +34,13 @@ The pursuit option allows dispatching of roadblocks while in a pursuit.
 | 3     | Locale/transporter     | Police do not cross | All lanes | Aims/shoots at target |               |
 | 4     | Locale/transporter/FBI | Police do not cross | All lanes | Aims/shoots at target | Chase vehicle |
 | 5     | FBI/Swat               | Police do not cross | All lanes | Aims/shoots at target |               |
+
+
+## Changelog 0.1.1
+
+- Fixed issue with flares when creating a manual roadblock preview
+- Updated old audio files with better quality
+- Added audio files for automatic pursuit level increases
+- Added audio files for user request roadblocks
+- Added audio files for roadblock bypass/hit
+- Added option to place no vehicles within the manual placement 

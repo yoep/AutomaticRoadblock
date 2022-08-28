@@ -11,6 +11,8 @@ using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Pursuit.Menu;
+using AutomaticRoadblocks.RedirectTraffic;
+using AutomaticRoadblocks.RedirectTraffic.Menu;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
@@ -66,13 +68,14 @@ namespace AutomaticRoadblocks
         private static void InitializeIoC()
         {
             IoC.Instance
-                .Register<IGame>(typeof(AbstractionLayer.Implementation.RageImpl))
+                .Register<IGame>(typeof(RageImpl))
                 .Register<ILogger>(typeof(RageLogger))
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
-                .RegisterSingleton<IManualPlacement>(typeof(ManualPlacement.ManualPlacement));
+                .RegisterSingleton<IManualPlacement>(typeof(ManualPlacement.ManualPlacement))
+                .RegisterSingleton<IRedirectTrafficDispatcher>(typeof(RedirectTrafficDispatcher));
         }
 
         private static void InitializeDutyListener()
@@ -112,20 +115,24 @@ namespace AutomaticRoadblocks
                 // menu switchers
                 .Register<IMenuSwitchItem>(typeof(RoadblockMenuSwitchItem))
                 .Register<IMenuSwitchItem>(typeof(ManualPlacementMenuSwitchItem))
+                .Register<IMenuSwitchItem>(typeof(RedirectTrafficMenuSwitchItem))
                 // pursuit components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableDuringPursuitComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitEnableDuringPursuitComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableAutomaticLevelIncreaseComponent))
                 // manual placement components
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PlaceComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualRoadblockPlaceComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PlacementTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableCopsComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableSpeedLimitComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(BarrierComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementBarrierComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(LightComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(VehicleComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RemovePlacedRoadblocksComponentItem));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementVehicleTypeComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RemovePlacedRoadblocksComponentItem))
+                // redirect traffic components
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficPlaceComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeDistanceComponentItem));
         }
 
         private static void OnDutyStateChanged(bool onDuty)
@@ -168,7 +175,7 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ZoneInfoComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchSpawnComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent));
         }

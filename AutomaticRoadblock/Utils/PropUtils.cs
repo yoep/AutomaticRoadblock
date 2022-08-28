@@ -285,11 +285,11 @@ namespace AutomaticRoadblocks.Utils
 
         public static Object CreateHorizontalFlare(Vector3 position, float heading)
         {
-            var instance = PlaceCorrectlyOnGround(new Weapon(new WeaponAsset("weapon_flare"), position, -1)
-            {
-                Heading = heading
-            });
-            instance.Rotation = new Rotator(heading, 90f, 0f);
+            var instance = new Weapon(new WeaponAsset("weapon_flare"), position, -1);
+
+            if (instance.IsValid())
+                instance.Rotation = new Rotator(heading, 90f, 0f);
+
             return instance;
         }
 

@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.StartPursuit);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.DEBUG;
+        public MenuType Type => MenuType.Debug;
 
         /// <inheritdoc />
         public bool IsAutoClosed => true;

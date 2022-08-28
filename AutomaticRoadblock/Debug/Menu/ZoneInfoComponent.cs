@@ -18,7 +18,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         }
 
         public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.ZoneInfo);
-        public MenuType Type => MenuType.DEBUG;
+        public MenuType Type => MenuType.Debug;
         public bool IsAutoClosed => false;
 
         public void OnMenuActivation(IMenu sender)
