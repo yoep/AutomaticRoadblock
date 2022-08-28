@@ -27,5 +27,7 @@ The pursuit option allows dispatching of roadblocks while in a pursuit.
 
 ## Changelog 0.2.0
 
+- Added traffic redirection
+- Fixed issue when spawning a manual roadblock 
+- Fixed issue with playing audio when the dispatch now menu item is activated
 - Fixed crash in roadblock bypass/hit detection when one or more instances are cleaned by the game
-- 

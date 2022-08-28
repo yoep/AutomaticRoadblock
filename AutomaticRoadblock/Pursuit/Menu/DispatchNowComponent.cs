@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
@@ -9,11 +10,13 @@ namespace AutomaticRoadblocks.Pursuit.Menu
     /// </summary>
     public class DispatchNowComponent : IMenuComponent<UIMenuItem>
     {
+        private readonly IGame _game;
         private readonly IPursuitManager _pursuitManager;
 
-        public DispatchNowComponent(IPursuitManager pursuitManager)
+        public DispatchNowComponent(IPursuitManager pursuitManager, IGame game)
         {
             _pursuitManager = pursuitManager;
+            _game = game;
         }
 
         /// <inheritdoc />
@@ -28,7 +31,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _pursuitManager.DispatchNow(true);
+            _game.NewSafeFiber(() => _pursuitManager.DispatchNow(true), "DispatchNowComponent.OnMenuActivation");
         }
 
         [IoC.PostConstruct]
