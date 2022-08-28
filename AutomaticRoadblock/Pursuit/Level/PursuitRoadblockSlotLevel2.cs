@@ -28,7 +28,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         protected override void InitializeCops()
         {
-            var isBike = ModelUtils.IsBike(VehicleModel);
+            var isBike = ModelUtils.Vehicles.IsBike(VehicleModel);
             var totalOccupants = isBike ? 1 : 2;
             var pedSpawnPosition = CalculatePositionBehindVehicle();
 

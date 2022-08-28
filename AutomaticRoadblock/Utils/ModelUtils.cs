@@ -57,7 +57,7 @@ namespace AutomaticRoadblocks.Utils
             {
                 "s_m_y_swat_01",
             };
-            
+
             /// <summary>
             /// Get a local ped model for the given position.
             /// </summary>
@@ -71,7 +71,7 @@ namespace AutomaticRoadblocks.Utils
                     ? new Model(CopCountyPedModels[Random.Next(CopCountyPedModels.Count)])
                     : new Model(CopCityPedModels[Random.Next(CopCityPedModels.Count)]);
             }
-            
+
             public static Model GetPoliceFbiCop()
             {
                 return new Model(CopFbiPedModels[Random.Next(CopFbiPedModels.Count)]);
@@ -169,7 +169,7 @@ namespace AutomaticRoadblocks.Utils
 
                 return new Model(list[Random.Next(list.Count)]);
             }
-            
+
             /// <summary>
             /// Get a state police vehicle.
             /// </summary>
@@ -223,8 +223,41 @@ namespace AutomaticRoadblocks.Utils
             {
                 return new Model(RaceVehicleModels[Random.Next(RaceVehicleModels.Count)]);
             }
+
+            /// <summary>
+            /// Verify if the given vehicle model is a transporter.
+            /// </summary>
+            /// <param name="model">The model to verify.</param>
+            /// <returns>Returns true if transporter, else false.</returns>
+            public static bool IsTransporter(Model model)
+            {
+                Assert.NotNull(model, "model cannot be null");
+                return model.Name.Equals(PoliceTransporterModelName);
+            }
+
+            /// <summary>
+            /// Verify if the given model is a bike.
+            /// </summary>
+            /// <param name="model">The model to verify.</param>
+            /// <returns>Returns true if the model is a bike, else false.</returns>
+            public static bool IsBike(Model model)
+            {
+                Assert.NotNull(model, "model cannot be null");
+                return model.Name.Equals(PoliceBikeModelName);
+            }
+
+            /// <summary>
+            /// Verify if the given model is a riot vehicle.
+            /// </summary>
+            /// <param name="model">The model to verify.</param>
+            /// <returns>Returns true if the model is a riot, else false.</returns>
+            public static bool IsRiot(Model model)
+            {
+                Assert.NotNull(model, "model cannot be null");
+                return model.Name.Equals(RiotModelName);
+            }
         }
-        
+
         /// <summary>
         /// Get the medic model.
         /// </summary>
@@ -259,28 +292,6 @@ namespace AutomaticRoadblocks.Utils
         public static Model GetFireTruck()
         {
             return new Model("FIRETRUK");
-        }
-
-        /// <summary>
-        /// Verify if the given model is a bike.
-        /// </summary>
-        /// <param name="model">The model to verify.</param>
-        /// <returns>Returns true if the model is a bike, else false.</returns>
-        public static bool IsBike(Model model)
-        {
-            Assert.NotNull(model, "model cannot be null");
-            return model.Name.Equals(PoliceBikeModelName);
-        }
-
-        /// <summary>
-        /// Verify if the given model is a riot vehicle.
-        /// </summary>
-        /// <param name="model">The model to verify.</param>
-        /// <returns>Returns true if the model is a riot, else false.</returns>
-        public static bool IsRiot(Model model)
-        {
-            Assert.NotNull(model, "model cannot be null");
-            return model.Name.Equals(RiotModelName);
         }
 
         private static bool IsCountyZone(WorldZone zone)

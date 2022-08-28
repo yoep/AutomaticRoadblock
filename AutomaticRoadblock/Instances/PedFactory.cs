@@ -61,12 +61,12 @@ namespace AutomaticRoadblocks.Instances
             var modelName = vehicleModel.Name;
             Model model;
 
-            if (ModelUtils.IsBike(modelName))
+            if (ModelUtils.Vehicles.IsBike(modelName))
             {
                 model = ModelUtils.Peds.GetPoliceBikeCop();
             }
             else if (ModelUtils.Vehicles.CityVehicleModels.Contains(modelName) || ModelUtils.Vehicles.CountyVehicleModels.Contains(modelName) ||
-                     ModelUtils.Vehicles.StateVehicleModels.Contains(modelName))
+                     ModelUtils.Vehicles.StateVehicleModels.Contains(modelName) || ModelUtils.Vehicles.IsTransporter(vehicleModel))
             {
                 model = ModelUtils.Peds.GetLocalCop(position);
             }
@@ -77,7 +77,17 @@ namespace AutomaticRoadblocks.Instances
                     : ModelUtils.Peds.GetPoliceSwatCop();
             }
 
-            return new ARPed(model, position, heading);
+            return DoInternalCreateCop(model, position, heading);
+        }
+
+        public static ARPed CreateLocaleCop(Vector3 position, float heading)
+        {
+            return DoInternalCreateCop(ModelUtils.Peds.GetLocalCop(position), position, heading);
+        }
+
+        private static ARPed DoInternalCreateCop(Model model, Vector3 position, float heading)
+        {
+            return new ARPed(model, GameUtils.GetOnTheGroundPosition(position), heading);
         }
     }
 }

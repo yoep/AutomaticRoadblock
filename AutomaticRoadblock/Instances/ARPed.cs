@@ -53,6 +53,7 @@ namespace AutomaticRoadblocks.Instance
         /// <inheritdoc />
         public void Dispose()
         {
+            DeleteAttachments();
             EntityUtils.Remove(GameInstance);
         }
 
@@ -180,6 +181,9 @@ namespace AutomaticRoadblocks.Instance
         /// </summary>
         public void DeleteAttachments()
         {
+            if (IsInvalid)
+                return;
+            
             foreach (var attachment in _attachments.Where(x => x.IsValid()))
             {
                 EntityUtils.DetachEntity(attachment);

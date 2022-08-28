@@ -54,7 +54,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override float CalculateVehicleHeading()
         {
-            if (ModelUtils.IsRiot(VehicleModel))
+            if (ModelUtils.Vehicles.IsRiot(VehicleModel))
                 return base.CalculateVehicleHeading() + 30;
 
             return base.CalculateVehicleHeading();

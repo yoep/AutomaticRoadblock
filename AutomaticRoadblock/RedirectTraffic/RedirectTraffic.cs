@@ -92,6 +92,15 @@ namespace AutomaticRoadblocks.RedirectTraffic
             .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .First();
+        
+        /// <summary>
+        /// The vehicle instance of this redirect traffic instance.
+        /// </summary>
+        private ARVehicle Vehicle => _instances
+            .Where(x => x.Type == EntityType.CopVehicle)
+            .Select(x => x.Instance)
+            .Select(x => (ARVehicle)x)
+            .First();
 
         #endregion
 
@@ -126,6 +135,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             CreateBlip();
             _instances.ForEach(x => x.Spawn());
 
+            Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
             Cop.Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
             AnimationUtils.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
         }
@@ -161,7 +171,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             VehicleModel = VehicleFactory.CreateModel(VehicleType, Position);
 
-            _instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Lane.Heading + 45,
+            _instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Lane.Heading + 35,
                 (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading)));
         }
 
@@ -172,13 +182,21 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var positionBehindVehicle = Position + MathHelper.ConvertHeadingToDirection(copPedHeading) * distanceBehindVehicle;
 
             _instances.Add(new InstanceSlot(EntityType.CopPed, positionBehindVehicle, copPedHeading,
-                (position, heading) => PedFactory.CreateCopForVehicle(VehicleModel, position, heading)));
+                (position, heading) => CreateCop(position, heading)));
         }
 
         private void InitializeScenery()
         {
             PlaceConesAlongTheRoad();
             PlaceConesBehindTheVehicle();
+        }
+
+        private ARPed CreateCop(Vector3 position, float heading)
+        {
+            if (VehicleType != VehicleType.None)
+                return PedFactory.CreateCopForVehicle(VehicleModel, position, heading);
+
+            return PedFactory.CreateLocaleCop(position, heading);
         }
 
         private void PlaceConesAlongTheRoad()
