@@ -106,7 +106,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
             else
             {
-                roadblockToSpawn = CreateInstance(LastDeterminedRoad);
+                roadblockToSpawn = CreateInstance(LastDeterminedRoad ?? CalculateNewLocationForInstance());
                 Logger.Trace("Created the manual roadblock");
                 lock (Instances)
                 {

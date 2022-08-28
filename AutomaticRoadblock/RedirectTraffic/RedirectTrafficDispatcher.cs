@@ -76,7 +76,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             if (redirectTraffic == null)
             {
-                redirectTraffic = CreateInstance(LastDeterminedRoad);
+                redirectTraffic = CreateInstance(LastDeterminedRoad ?? CalculateNewLocationForInstance());
                 lock (Instances)
                 {
                     Instances.Add(redirectTraffic);

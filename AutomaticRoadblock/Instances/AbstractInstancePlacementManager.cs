@@ -89,11 +89,20 @@ namespace AutomaticRoadblocks.Instances
 
         #region Functions
 
+        /// <summary>
+        /// Create a new placeable instance for the given <see cref="Road"/>.
+        /// </summary>
+        /// <param name="road">The road to create the instance for.</param>
+        /// <returns>Returns the created instance.</returns>
         protected abstract T CreateInstance(Road road);
 
+        /// <summary>
+        /// Create a preview for the current properties.
+        /// </summary>
+        /// <param name="force">Force a redraw of the preview.</param>
         protected void DoInternalPreviewCreation(bool force)
         {
-            var road = DetermineLocation();
+            var road = CalculateNewLocationForInstance();
 
             if (IsHologramPreviewEnabled)
             {
@@ -105,6 +114,10 @@ namespace AutomaticRoadblocks.Instances
             }
         }
 
+        /// <summary>
+        /// Remove instance based on the given removal condition type.
+        /// </summary>
+        /// <param name="removeType">The removal condition.</param>
         protected void DoInternalInstanceRemoval(RemoveType removeType)
         {
             Logger.Debug($"Removing placed instances with criteria {removeType}");
@@ -140,6 +153,13 @@ namespace AutomaticRoadblocks.Instances
             toBoRemoved.ForEach(x => x.Dispose());
         }
 
+        protected Road CalculateNewLocationForInstance()
+        {
+            var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
+
+            return RoadUtils.FindClosestRoad(position, RoadType.All);
+        }
+
         private void DoHologramPreviewCreation(Road road, bool force)
         {
             if (!force && Equals(road, LastDeterminedRoad))
@@ -161,7 +181,7 @@ namespace AutomaticRoadblocks.Instances
                 }
             }, "AbstractInstancePlacement.DoHologramPreviewCreation");
         }
-        
+
         private T FindInstanceClosestToPlayer()
         {
             T closestInstance = default;
@@ -180,13 +200,6 @@ namespace AutomaticRoadblocks.Instances
             }
 
             return closestInstance;
-        }
-        
-        private Road DetermineLocation()
-        {
-            var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
-
-            return RoadUtils.FindClosestRoad(position, RoadType.All);
         }
 
         private static void CreatePreviewMarker(Road road)
