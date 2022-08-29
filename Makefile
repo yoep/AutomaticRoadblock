@@ -5,7 +5,7 @@ bump-dependencies: # Install required dependencies
 	@pip install bump2version --user
 
 bump-%: bump-dependencies # Bump the (major, minor, patch) version of the application
-	@bumpversion $@
+	@bumpversion $*
 
 clean:	# Clean the build directory of the application
 	@dotnet clean
