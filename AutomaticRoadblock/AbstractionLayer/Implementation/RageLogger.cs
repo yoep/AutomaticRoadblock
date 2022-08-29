@@ -46,8 +46,9 @@ namespace AutomaticRoadblocks.AbstractionLayer.Implementation
         private static string BuildMessage(string level, string message, Exception exception = null)
         {
             var stacktrace = exception?.StackTrace;
+            var newline = string.IsNullOrWhiteSpace(stacktrace) ? "" : "\n";
 
-            return $"{AutomaticRoadblocksPlugin.Name}: [{level}] {message}\n{stacktrace}";
+            return $"{AutomaticRoadblocksPlugin.Name}: [{level}] {message}{newline}{stacktrace}";
         }
     }
 }
