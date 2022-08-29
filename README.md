@@ -23,10 +23,7 @@ When roadblocks are deployed, custom scanner audio is played as well as for the 
 
 - NuGet
 - .NET 4.8 SDK
-- Rage Plugin Hook
+- Rage Plugin Hook SDK
 - Rage Native UI
-
-## Changelog 0.2.1
-
-- Added missing RAGENativeUI.dll dependency
-- Fixed manual roadblock placement failing due to an invalid weapon
+- LSPDFR SDK 4.9+
+- Make

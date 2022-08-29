@@ -155,11 +155,6 @@
         <Compile Include="Roadblock\Slot\AbstractRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IRoadblockSlot.cs" />
-        <Compile Include="Scenery\AbstractPlaceableSceneryItem.cs" />
-        <Compile Include="Scenery\Barrier.cs" />
-        <Compile Include="Scenery\Cone.cs" />
-        <Compile Include="Scenery\ConeWithLight.cs" />
-        <Compile Include="Scenery\ISceneryItem.cs" />
         <Compile Include="Settings\AutomaticRoadblocksSettings.cs" />
         <Compile Include="Settings\GeneralSettings.cs" />
         <Compile Include="Settings\ISettingsManager.cs" />

@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ master, hotfix/*, feature/*, bugfix/* ]
+    branches: [ master, feature/* ]
   pull_request:
     branches: [ master ]
   workflow_dispatch:
@@ -24,10 +24,7 @@ jobs:
         id: cache
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-      - name: NuGet Restore
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: nuget restore AutomaticRoadblock.sln
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.json') }}
       - name: Build
         run: make build
       - name: Archive artifacts

@@ -32,6 +32,7 @@ namespace AutomaticRoadblocks.Pursuit
         private uint _timeLastLevelChanged;
         private uint _timeLastLevelChangedForShotsFired;
         private PursuitLevel _pursuitLevel = PursuitLevel.Level1;
+        private bool _keyListenerActive;
 
         public PursuitManager(ILogger logger, IGame game, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher)
         {
@@ -106,7 +107,7 @@ namespace AutomaticRoadblocks.Pursuit
             _logger.Trace("Registering pursuit listener to LSPD_First_Response Api");
             Events.OnPursuitStarted += PursuitStarted;
             Events.OnPursuitEnded += PursuitEnded;
-            Game.FrameRender += Process;
+            StartKeyListener();
         }
 
         public void StopListener()
@@ -114,7 +115,7 @@ namespace AutomaticRoadblocks.Pursuit
             _logger.Trace("Removing pursuit listener from LSPD_First_Response Api");
             Events.OnPursuitStarted -= PursuitStarted;
             Events.OnPursuitEnded -= PursuitEnded;
-            Game.FrameRender -= Process;
+            _keyListenerActive = false;
         }
 
         /// <inheritdoc />
@@ -165,35 +166,13 @@ namespace AutomaticRoadblocks.Pursuit
 
         #region Functions
 
-        private void Process(object sender, GraphicsEventArgs e)
-        {
-            try
-            {
-                if (!IsPursuitActive || !IsDispatchNowPressed())
-                    return;
-
-                _game.NewSafeFiber(() =>
-                {
-                    _logger.Trace("User pressed the dispatch now key, trying to dispatch a new roadblock");
-                    DispatchNow(true);
-                }, "PursuitManager.Process");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"An error occurred while processing the pursuit manager, {ex.Message}", ex);
-            }
-        }
-
         private bool IsDispatchNowPressed()
         {
             var roadblocksSettings = _settingsManager.AutomaticRoadblocksSettings;
             var secondKey = roadblocksSettings.DispatchNowModifierKey;
             var secondKeyDown = secondKey == Keys.None;
 
-            if (!secondKeyDown && secondKey == Keys.ShiftKey && Game.IsShiftKeyDownRightNow)
-                secondKeyDown = true;
-
-            if (!secondKeyDown && secondKey == Keys.ControlKey && Game.IsControlKeyDownRightNow)
+            if (!secondKeyDown && Game.IsKeyDownRightNow(secondKey))
                 secondKeyDown = true;
 
             return Game.IsKeyDown(roadblocksSettings.DispatchNowKey) && secondKeyDown;
@@ -446,6 +425,31 @@ namespace AutomaticRoadblocks.Pursuit
             var gameTime = _game.GameTime;
 
             return gameTime - _timeLastLevelChanged > _settingsManager.AutomaticRoadblocksSettings.TimeBetweenAutoLevelIncrements * 1000;
+        }
+
+        private void StartKeyListener()
+        {
+            _keyListenerActive = true;
+            _game.NewSafeFiber(() =>
+            {
+                while (_keyListenerActive)
+                {
+                    _game.FiberYield();
+
+                    try
+                    {
+                        if (!IsPursuitActive || !IsDispatchNowPressed())
+                            return;
+
+                        _logger.Trace("User pressed the dispatch now key, trying to dispatch a new roadblock");
+                        DispatchNow(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error($"An error occurred while processing the pursuit manager, {ex.Message}", ex);
+                    }
+                }
+            }, "PursuitManager.KeyListener");
         }
 
         [Conditional("DEBUG")]
