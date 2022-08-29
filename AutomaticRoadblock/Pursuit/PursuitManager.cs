@@ -344,6 +344,7 @@ namespace AutomaticRoadblocks.Pursuit
             {
                 _timeLastDispatchedRoadblock = _game.GameTime;
                 _totalRoadblocksDeployed++;
+                _logger.Info("Pursuit roadblock has been dispatched");
             }
 
             return dispatched;

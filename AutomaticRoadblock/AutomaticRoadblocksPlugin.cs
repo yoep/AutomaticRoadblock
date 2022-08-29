@@ -23,13 +23,6 @@ namespace AutomaticRoadblocks
         public const string StartPursuit = "Start pursuit now" + DebugIndicatorText;
         public const string EndPursuit = "End pursuit now" + DebugIndicatorText;
 
-        public const string RedirectTraffic = "Place redirection";
-        public const string RedirectTrafficDescription = "Place a redirection at the current location";
-        public const string RedirectTrafficConeDistance = "Cone distance";
-        public const string RedirectTrafficConeDistanceDescription = "The distance along the road to which cones should be placed";
-        public const string RedirectTrafficType = "Redirect";
-        public const string RedirectTrafficTypeDescription = "Place a traffic redirection on";
-
         private const string DebugIndicatorText = " [DEBUG]";
     }
 }

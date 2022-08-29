@@ -35,27 +35,36 @@ namespace AutomaticRoadblocks.Localization
         {
             try
             {
-                InitializationFile localeFile;
-                var expectedLocalizationFile = string.Format(LocaleFile, Lang);
-                var fallbackFile = string.Format(LocaleFile, DefaultLang);
+                var localizationFileLocation = string.Format(LocaleFile, Lang);
+                if (!File.Exists(localizationFileLocation))
+                {
+                    _logger.Warn($"Localization data not found for '{Lang}', using fallback '{DefaultLang}' language instead");
+                    localizationFileLocation = string.Format(LocaleFile, DefaultLang);
+                }
+                
+                _logger.Trace($"Trying to load localization file {localizationFileLocation}");
+                var localeFile = new InitializationFile(localizationFileLocation);
+                _logger.Info($"Loaded localization file {localizationFileLocation}");
 
-                if (File.Exists(expectedLocalizationFile))
-                {
-                    _logger.Trace($"Loading localization data for {Lang} from {expectedLocalizationFile}");
-                    localeFile = new InitializationFile(expectedLocalizationFile);
-                }
-                else
-                {
-                    _logger.Warn($"Localization data not found for {Lang}, using fallback {fallbackFile} instead");
-                    localeFile = new InitializationFile(fallbackFile);
-                }
+                var missingDataKeys = 0;
 
                 // try to find all keys in the file
                 foreach (var key in LocalizationKey.Values)
                 {
-                    _logger.Trace($"Loading localization key {key.Identifier} from ini");
+                    if (localeFile.DoesKeyExist(Section, key.Identifier))
+                    {
+                        _logger.Debug($"Loading localization key {key.Identifier} from ini");
+                    }
+                    else
+                    {
+                        missingDataKeys++;
+                        _logger.Warn($"Missing localization key {key.Identifier} in ini");
+                    }
+
                     _messages[key] = localeFile.ReadString(Section, key.Identifier, key.DefaultText);
                 }
+                
+                _logger.Info($"Localization data has been loaded from {localizationFileLocation}, detected {missingDataKeys} missing data keys");
             }
             catch (Exception ex)
             {
@@ -67,7 +76,7 @@ namespace AutomaticRoadblocks.Localization
         {
             if (!_messages.ContainsKey(key))
             {
-                _logger.Error($"Localization key {key} has not been created in the localizer");
+                _logger.Error($"Unable to load localized message for {key}, key not found in localization data");
                 throw new LocalizationNotFound(key);
             }
 

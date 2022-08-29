@@ -71,7 +71,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             if (force || userRequested || IsRoadblockDispatchingAllowed(vehicle))
                 return DoInternalDispatch(level, vehicle, userRequested, atCurrentLocation);
 
-            _logger.Debug("Dispatching of a roadblock is not allowed");
+            _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
             return false;
         }
 
@@ -189,6 +189,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     roadblock.Spawn();
                     _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
                     _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
+                    _logger.Info($"Roadblock has been dispatched, {roadblock}");
                     LspdfrUtils.PlayScannerAudioNonBlocking("ROADBLOCK_DEPLOYED");
                     _userRequestedRoadblockDispatching = false;
                 },
@@ -272,6 +273,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             _cleanerRunning = true;
             _game.NewSafeFiber(() =>
             {
+                _logger.Info("Roadblock dispatch cleaner started");
                 while (_cleanerRunning)
                 {
                     _roadblocks

@@ -39,8 +39,15 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey BlockLanesDescription = new(nameof(BlockLanesDescription), "The lanes which should be blocked");
         public static readonly LocalizationKey CleanRoadblockPlacement = new(nameof(CleanRoadblockPlacement), "Remove");
         public static readonly LocalizationKey CleanRoadblockPlacementDescription =
-            new(nameof(CleanRoadblockPlacementDescription), "Remove one or more placed roadblocks");
+            new(nameof(CleanRoadblockPlacementDescription), "Remove one or more placed roadblocks based on the selected criteria");
 
+        public static readonly LocalizationKey RedirectTraffic = new(nameof(RedirectTraffic), "Place redirection");
+        public static readonly LocalizationKey RedirectTrafficDescription = new(nameof(RedirectTrafficDescription), "Place a traffic redirection at the highlighted location");
+        public static readonly LocalizationKey RedirectTrafficConeDistance = new(nameof(RedirectTrafficConeDistance), "Cone distance");
+        public static readonly LocalizationKey RedirectTrafficConeDistanceDescription = new(nameof(RedirectTrafficConeDistanceDescription), "The distance along the road to which cones should be placed");
+        public static readonly LocalizationKey RedirectTrafficType = new(nameof(RedirectTrafficType), "Redirect");
+        public static readonly LocalizationKey RedirectTrafficTypeDescription = new(nameof(RedirectTrafficTypeDescription), "Place a traffic redirection on");
+        
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {
             MenuTitle,
@@ -72,6 +79,12 @@ namespace AutomaticRoadblocks.Localization
             BlockLanesDescription,
             CleanRoadblockPlacement,
             CleanRoadblockPlacementDescription,
+            RedirectTraffic,
+            RedirectTrafficDescription,
+            RedirectTrafficConeDistance,
+            RedirectTrafficConeDistanceDescription,
+            RedirectTrafficType,
+            RedirectTrafficTypeDescription,
         };
 
         private LocalizationKey(string identifier, string defaultText)
