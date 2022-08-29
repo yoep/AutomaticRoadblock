@@ -1,0 +1,958 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>LSPD First Response</name>
+    </assembly>
+    <members>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.MaxDrivingSpeed">
+            <summary>
+            Gets or sets the maximum driving speed.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.MinDrivingSpeed">
+            <summary>
+            Gets or sets the minimum driving speed.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.HandlingAbility">
+            <summary>
+            Gets or sets the improvement to the suspect's handling for general driving.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.HandlingAbilityTurns">
+            <summary>
+            Gets or sets the improvement to the suspect's handling when turning.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.MaxTurnAggressiveness">
+            <summary>
+            Gets or sets the maximum modifier for the suspect's aggressiveness to take turns
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.MinTurnAggressiveness">
+            <summary>
+            Gets or sets the minimum modifier for the suspect's aggressiveness to take turns
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.SurrenderChanceCarBadlyDamaged">
+            <summary>
+            Gets or sets the surrender chance after a severe crash that caused the suspect's vehicle to be damaged.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.SurrenderChancePittedAndCrashed">
+            <summary>
+            Gets or sets the surrender chance after a PIT that caused the suspect to crash.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.SurrenderChancePittedAndSlowedDown">
+            <summary>
+            Gets or sets the surrender chance after a PIT that caused the suspect to slow down.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.SurrenderChancePitted">
+            <summary>
+            Gets or sets the surrender chance after a PIT.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.SurrenderChanceTireBurst">
+            <summary>
+            Gets or sets the individual surrender chance that is evaluated once per tire burst.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.SurrenderChanceTireBurstAndCrashed">
+            <summary>
+            Gets or sets the surrender chance after a crash shortly after a tire had burst.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.HandlingAbilityBurstTireMult">
+            <summary>
+            Gets or sets how much the suspect's driving ability is affected by a single burst tire. See <see cref="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.BurstTireMaxDrivingSpeedMult"/> for more.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.AverageBurstTireSurrenderTime">
+            <summary>
+            Gets or sets the average time in seconds to surrender when at least one tire is burst.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.BurstTireSurrenderMult">
+            <summary>
+            Gets or sets how much the average surrender time of a suspect is affected by a single burst tire. See <see cref="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.BurstTireMaxDrivingSpeedMult"/> for more.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.BurstTireMaxDrivingSpeedMult">
+            <summary>
+            Gets or sets how much the maximum driving speed is affected by a single burst tire. A value of 0.25f would reduce the driving speed to 0f when all four wheels on a vehicle are destroyed, whereas a value of 0.5f would have the same result after just two burst tires.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.AverageSurrenderTime">
+            <summary>
+            Gets or sets the average time in seconds until a ped will surrender during a pursuit. This depends on the pursuit situation, e.g.a suspect far away will notevaluate this chance.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.AverageFightTime">
+            <summary>
+            Gets or sets the average time in seconds until a ped will fight cops during a pursuit. This depends on the pursuit situation, e.g.a suspect far away will not evaluate this chance.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.MaxRunningSpeed">
+            <summary>
+            Gets or sets the maximum speed.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.ExhaustionDuration">
+            <summary>
+            Gets or sets the amount of time before a suspect becomes exhausted.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.ExhaustionInterval">
+            <summary>
+            Gets or sets the amount of time a suspect stays exhausted.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.PedPursuitAttributes.CanUseCars">
+            <summary>
+            Gets or sets a value indicating whether the suspect can use vehicles.
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.Events.PedSwitchedAnimatedWeaponEventHandler">
+            <summary>
+            
+            </summary>
+            <param name="ped">The ped that switched weapon.</param>
+            <param name="weapon">The weapon that was switched to.  Null if the weapon was holstered/unequipped.</param>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.Events.PursuitSuspectEscapedEventHandler">
+            <summary>
+            
+            </summary>
+            <param name="pursuitHandle">The handle for the pursuit the suspect has left.</param>
+            <param name="suspect">The suspect. Null if suspect is not in a scenario and has been deleted.</param>
+            <param name="suspectPersona">The suspect persona.</param>
+            <param name="vehicleSkin">The suspect vehicle skin. Null if suspect was not in a vehicle when escaping.</param>
+            <param name="busyInScenario">Whether or not the suspect is currently busy in a scenario assigned after escaping. It is not recommended to control suspects
+            that are in a scenario.</param>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.Events.PedPresentedIdEventHandler">
+            <summary>
+            
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="pullover">The pullover instance the ped is currently assigned to, if any.</param>
+            <param name="pedInteraction">Reserved for future use.</param>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.Events.PursuitPedHasVisualChangedEventHandler">
+            <summary>
+            
+            </summary>
+            <param name="pursuit">The pursuit handle.</param>
+            <param name="ped">The ped.</param>
+            <param name="hasVisual">Whether or not the ped is visible to any police unit.</param>
+            <param name="justChanged">Whether visual was just lost. If this is false, visual has been lost for a moment and the search behavior is about to start.</param>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.Events.PedLookedUpEventHandler">
+            <summary>
+            
+            </summary>
+            <param name="ped">The ped that was looked up. Null if not found.</param>
+            <param name="persona">The persona of the ped that was looked up. Can be valid for non-existing peds, for instance when a ped was previously known to the player but has since been deleted. Null if not found.</param>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.Events.VehicleLookedUpEventHandler">
+            <summary>
+            
+            </summary>
+            <param name="vehicle">The vehicle that was looked up. Null if not found.</param>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.Events.EvidenceMarkerEventHandler">
+            <summary>
+            
+            </summary>
+            <param name="evidenceMarker">Reserved for future use.</param>
+            <param name="object">The evidence marker object.</param>
+        </member>
+        <member name="E:LSPD_First_Response.Mod.API.Events.OnPedSwitchedWeaponAnimated">
+            <summary>
+            This event is invoked when a Ped equips or unequips a weapon using our holster animations.
+            </summary>
+        </member>
+        <member name="E:LSPD_First_Response.Mod.API.Events.OnPulloverTalkingToPedAvailable">
+            <summary>
+            This event is invoked for every tick the player is able to talk to a ped during a pullover. This means that the helpbox prompting them to talk to a ped
+            is showing and they are not already talking to the ped.
+            </summary>
+        </member>
+        <member name="E:LSPD_First_Response.Mod.API.Events.OnPulloverTalkingToPed">
+            <summary>
+            This event is invoked for every tick the player is talking to a ped during a pullover. This means that the pullover interaction menu is active.
+            </summary>
+        </member>
+        <member name="E:LSPD_First_Response.Mod.API.Events.OnPursuitPedHasVisualChanged">
+            <summary>
+            This event is invoked every time all police units have lost visual on a given ped or at least one police unit just regained visual. It is also called again a short time
+            after visual has been lost before, to indicate that the search behavior is about to start as indicated by the last parameter.
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.Functions.OnDutyStateChangedEventHandler">
+            <summary>
+            The event handler for when the on duty state has changed.
+            </summary>
+            <param name="onDuty">The new on duty state.</param>
+        </member>
+        <member name="E:LSPD_First_Response.Mod.API.Functions.OnOnDutyStateChanged">
+            <summary>
+            Event fired when the on duty state has changed.
+            </summary>
+        </member>
+        <member name="E:LSPD_First_Response.Mod.API.Functions.PlayerWentOnDutyFinishedSelection">
+            <summary>
+            Event fired after the player went on duty and finished all associated steps such as selecting an outfit or a car. The player is idle at this point. Does not fire when forcing duty.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.AddPedToPursuit(LSPD_First_Response.Mod.API.LHandle,Rage.Ped)">
+            <summary>
+            Adds <paramref name="ped"/> to <paramref name="pursuit"/>.
+            </summary>
+            <param name="pursuit">The pursuit instance.</param>
+            <param name="ped">The ped.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.CreatePursuit">
+            <summary>
+            Creates a pursuit.
+            </summary>
+            <returns>The chase handle.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.DisplayPedId(Rage.Ped,System.Boolean)">
+            <summary>
+            Displays ped ID information, if available.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="noDelay">Whether or not the built-in delay should be skipped.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.DisplayVehicleRecord(Rage.Vehicle,System.Boolean)">
+            <summary>
+            Displays vehicle information based on its license plate, if available.
+            </summary>
+            <param name="vehicle">The vehicle.</param>
+            <param name="noDelay">Whether or not the built-in delay should be skipped.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.ForceEndPursuit(LSPD_First_Response.Mod.API.LHandle)">
+            <summary>
+            Ends <paramref name="pursuit"/> if still running.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.GetAllUserPlugins">
+            <summary>
+            Returns an array of all currently loaded user plugins loaded by LSPDFR. These assemblies are loaded into the byte context and thus can be used for manual
+            assembly resolving.
+            </summary>
+            <returns>An array of assemblies.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.GetActivePursuit">
+            <summary>
+            Gets the active pursuit instance. Returns null if player is not actively involved into a pursuit.
+            </summary>
+            <returns>The pursuit instance.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.GetCalloutFriendlyName(LSPD_First_Response.Mod.API.LHandle)">
+            <summary>
+            Gets the friendly name reprensentation of a callout that is used for LSPDFR Sync.
+            </summary>
+            <param name="callout"></param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.GetNameOfSeat(System.Int32)">
+            <summary>
+            Gets the name LSPDFR uses to describe a vehicle seat during pullovers, for instance driver or left rear.
+            </summary>
+            <param name="seatIndex">The seat index.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.GetPlayerRadioAction">
+            <summary>
+            Retrieves the Police Radio action for the current player character
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.GetIlluminatedClothingStyle">
+            <summary>
+            Retrieves the Illuminated Clothing Style of the current player character
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.GetVehicleOwnerName(Rage.Vehicle)">
+            <summary>
+            Gets the name of the owner of <paramref name="vehicle"/>. 
+            </summary>
+            <param name="vehicle">The vehicle.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.GetVersion">
+            <summary>
+            Gets the LSPDFR version currently running.
+            </summary>
+            <returns>The version.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsCalloutRunning">
+            <summary>
+            Gets whether a callout is running.
+            </summary>
+            <returns>Whether a callout is running.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsPlayerPerformingPullover">
+            <summary>
+            Gets whether the player is performing a pullover.
+            </summary>
+            <returns>Whether player is performing a pullover.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsPursuitCalledIn(LSPD_First_Response.Mod.API.LHandle)">
+            <summary>
+            Gets a value indicating whether a pursuit has been called in.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsPursuitLethalForcePolicySet(LSPD_First_Response.Mod.API.LHandle)">
+            <summary>
+            Gets a value indicating whether a lethal force policy has been set.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsPursuitLethalForceForced(LSPD_First_Response.Mod.API.LHandle)">
+            <summary>
+            Gets a value indicating whether lethal force is forced for the pursuit.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsPursuitStillRunning(LSPD_First_Response.Mod.API.LHandle)">
+            <summary>
+            Gets a value whether <paramref name="pursuit"/> is still running.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+            <returns>The result.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsPedStoppedByPlayer(Rage.Ped)">
+            <summary>
+            Returns whether the ped was stopped by the player for interaction.
+            </summary>
+            <param name="ped">The ped.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsPedVisualLost(Rage.Ped)">
+            <summary>
+            Gets a value indicating whether visual has been lost on a ped. See <see cref="M:LSPD_First_Response.Mod.API.Functions.IsPedVisualLostLonger(Rage.Ped)"/> for when visual has been lost for a moment already.
+            </summary>
+            <param name="ped"></param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsPedVisualLostLonger(Rage.Ped)">
+            <summary>
+            Gets a value indicating whether visual has been lost for a moment and the last known position is being searched.
+            </summary>
+            <param name="ped"></param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.RemovePedFromPursuit(Rage.Ped)">
+            <summary>
+            Removes a ped, either a suspect or a cop, from a pursuit. Note that to prevent cops from rejoining the pursuit, use <see cref="M:LSPD_First_Response.Mod.API.Functions.SetCopAsBusy(Rage.Ped,System.Boolean)"/>.
+            </summary>
+            <param name="ped">The ped.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.RegisterCallout(System.Type)">
+            <summary>
+            Registers a callout of type <paramref name="type"/> to the callout manager to make it being processed with all LCPDFR callouts.
+            </summary>
+            <param name="type">The type.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.RequestBackup(Rage.Vector3,LSPD_First_Response.EBackupResponseType,LSPD_First_Response.EBackupUnitType,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Requests and creates a new backup unit at or around <see paramref="position"/>.
+            </summary>
+            <param name="position">The position where the unit should be created.</param>
+            <param name="responseType">The response type of the unit.</param>
+            <param name="backupUnitType">The type of the unit.</param>
+            <param name="agencyScriptName">The agency script name of the agency to respond. Use <see cref="F:System.String.Empty"/> for automatic selection.</param>
+            <param name="exactLocation">Whether or not the unit should spawn at the exact location specified.</param>
+            <param name="noResponseTask">Whether or not a backup task should be assigned to the unit.</param>
+            <returns>A backup unit if successful. Null otherwise.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.RequestBackup(Rage.Vector3,LSPD_First_Response.EBackupResponseType,LSPD_First_Response.EBackupUnitType,System.String,System.Boolean,System.Boolean,System.Nullable{System.Int32})">
+            <summary>
+            Requests and creates a new backup unit at or around <see paramref="position"/>.
+            </summary>
+            <param name="position">The position where the unit should be created.</param>
+            <param name="responseType">The response type of the unit.</param>
+            <param name="backupUnitType">The type of the unit.</param>
+            <param name="agencyScriptName">The agency script name of the agency to respond. Use <see cref="F:System.String.Empty"/> for automatic selection.</param>
+            <param name="exactLocation">Whether or not the unit should spawn at the exact location specified.</param>
+            <param name="noResponseTask">Whether or not a backup task should be assigned to the unit.</param>
+            <returns>A backup unit if successful. Null otherwise.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.RequestBackup(Rage.Vector3,LSPD_First_Response.EBackupResponseType,LSPD_First_Response.EBackupUnitType,System.String)">
+            <summary>
+            Requests and creates a new backup unit at or around <see paramref="position"/>.
+            </summary>
+            <param name="position">The position where the unit should be created.</param>
+            <param name="responseType">The response type of the unit.</param>
+            <param name="backupUnitType">The type of the unit.</param>
+            <param name="agencyScriptName">The agency script name of the agency to respond. If the script name is invalid, no unit will be created.</param>
+            <returns>A backup unit if successful. Null otherwise.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.RemovePedFromPullover(LSPD_First_Response.Mod.API.LHandle,Rage.Ped,System.Boolean)">
+            <summary>
+            Removes <paramref name="ped"/> from <paramref name="pullover"/> if the ped is part of it. Does nothing otherwise. Please note it is recommended to test for any side-effects
+            when using this function as it forcefully removes the ped immediately.
+            </summary>
+            <param name="pullover">The pullover.</param>
+            <param name="ped">The ped.</param>
+            <param name="clearTasks">Whether or not the tasks of the ped should be cleared when removed.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsCopBusy(Rage.Ped,System.Boolean)">
+            <summary>
+            Gets a value indicating whether a cop is considered busy baesd on their current task.
+            </summary>
+            <param name="ped">The cop.</param>
+            <param name="includeAmbientScenarios">If true, low priority actions are also considered.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetCopAsBusy(Rage.Ped,System.Boolean)">
+            <summary>
+            Sets <paramref name="ped"/> as busy or not. A busy cop will not respond to nearby events, such as pursuits.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="busy">Whether or not the cop is busy.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetCopIgnoreAmbientCombatControl(Rage.Ped,System.Boolean)">
+            <summary>
+            Sets a flag indicating whether <paramref name="ped"/> ignores any ambient combat control settings, such as stopping combat with a downed suspect.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="busy">Whether or not the cop should ignore ambient combat control settings.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPedAsCop(Rage.Ped)">
+            <summary>
+            Makes LSPDFR recognize <paramref name="ped"/> as a ped. Best to use this right after ped creation.
+            </summary>
+            <param name="ped">The ped.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.IsPedCuffedTaskActive(Rage.Ped)">
+            <summary>
+            Returns whether the ped is running LSPDFR's cuffed task
+            </summary>
+            <param name="ped"></param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPedCuffedTask(Rage.Ped,System.Boolean)">
+            <summary>
+            Sets the ped as cuffed by assining the cuffed task or clears the task. Please note that this is a purely visual task and does not manipulate any internal state.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="cuffed">Whether or not the ped is cuffed.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPedAsArrested(Rage.Ped)">
+            <summary>
+            Sets the ped as arrested.
+            </summary>
+            <param name="ped">The ped.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPedAsArrested(Rage.Ped,System.Boolean)">
+            <summary>
+            Sets the ped as arrested.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="cuff">Whether or not the ped should be cuffed.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPedAsArrested(Rage.Ped,System.Boolean,System.Boolean)">
+            <summary>
+            Sets the ped as arrested. Please note that <see cref="M:LSPD_First_Response.Mod.API.Events.InvokeOnPedArrested(Rage.Ped,Rage.Ped)"/> is only invoked for player arrests.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="cuff">Whether or not the ped should be cuffed.</param>
+            <param name="arrestedByPlayer">Whether or not the ped should be treated as arrested by the player. Only works when <see param="cuff"/> is set to true.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPedAsArrested(Rage.Ped,System.Boolean,Rage.Ped)">
+            <summary>
+            Sets the ped as arrested. Please note that <see cref="M:LSPD_First_Response.Mod.API.Events.InvokeOnPedArrested(Rage.Ped,Rage.Ped)"/> is only invoked when <paramref name="arrestingOfficer"/> is valid.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="cuff">Whether or not the ped should be cuffed.</param>
+            <param name="arrestingOfficer">The officer arresting the ped.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPedAsIdentified(Rage.Ped,System.Boolean)">
+            <summary>
+            Sets the ped as known to the player, i.e. its name and personal details have been checked.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="identified">Whether or not the ped has been identified by the player.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPedArrestIgnoreGroup(Rage.Ped,System.Boolean)">
+            <summary>
+            Sets a value indicating whether the ped can be stopped or arrested despite being part of a normally blacklisted group, such as COP or ARMY.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="value">Whether or not the ped group will be ignored for arrests.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPedCantBeArrestedByPlayer(Rage.Ped,System.Boolean)">
+            <summary>
+            Prevents the player from being able to stop and arrest the <paramref name="ped"/> altogether.
+            </summary>
+            <param name="ped"></param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPlayerWalkStyle(LSPD_First_Response.Mod.Menus.EPlayerWalkStyle)">
+            <summary>
+            Sets and saves the player's walking style as available in the Interaction Menu.
+            </summary>
+            <param name="style">The walking style to set</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPlayerRadioAction(LSPD_First_Response.Mod.Menus.EPoliceRadioAction)">
+            <summary>
+            Sets and saves the action which is performed while the Police Radio menu is open.
+            </summary>
+            <param name="action">The police radio action style to set</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.StartPedArrestPed(Rage.Ped,Rage.Ped,System.Boolean)">
+            <summary>
+            Starts an arrest task to make <see paramref="cop"/> arrest <see paramref="suspect"/>. The task is not assigned if the ped is already being arrested.
+            A player attempting to arrest <see paramref="suspect"/> will cancel the task.
+            This function is not supposed to be used on suspects or peds part of a chase and may result in undefined behavior.
+            Return value reserved for future use.
+            </summary>
+            <param name="cop">The cop to make the arrest.</param>
+            <param name="suspect">The suspect to be arrested.</param>
+            <param name="force">Whether internal flags normally preventing the ped from being arrested should be ignored.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.PlayPlayerRadioAction(LSPD_First_Response.Mod.Menus.EPoliceRadioAction,System.Int32)">
+            <summary>
+            Makes the player perform the specified Police Radio animated action.
+            </summary>
+            <param name="action">The police radio action style to play</param>
+            <param name="duration">The duration, in ms, to play for</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.GetIsAudioEngineBusy">
+            <summary>
+            Gets a value indicating whether the audio player is busy.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.PlayScannerAudioUsingPosition(System.String,Rage.Vector3)">
+            <summary>
+            Plays audio over LSPDFR's police radio using a game position.  Any instances of 'POSITION' in <paramref name="sound"/> will be replaced by the audio file for <paramref name="position"/>
+            </summary>
+            <param name="sound">The string containing all sounds. Use whitespace to separate.</param>
+            <param name="position">The position to use.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.PlayScannerAudio(System.String)">
+            <summary>
+            Plays all audio actions in <paramref name="sound"/> using LSPDFR's police radio.
+            </summary>
+            <param name="sound">The string containing all sounds. Use whitespace to separate.</param>
+            <param name="position">The position to use.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.PlayScannerAudio(System.String,System.Boolean)">
+            <summary>
+            Plays all audio actions in <paramref name="sound"/> using LSPDFR's police radio.
+            </summary>
+            <param name="sound">The string containing all sounds. Use whitespace to separate.</param>
+            <param name="shortIntro">Whether or not to use a short intro for the scanner audio.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPursuitAsCalledIn(LSPD_First_Response.Mod.API.LHandle)">
+            <summary>
+            Sets <see paramref="pursuit"/> as called in. Please note that this also allows ambient cops to join. Use <see cref="M:LSPD_First_Response.Mod.API.Functions.SetPursuitCopsCanJoin(LSPD_First_Response.Mod.API.LHandle,System.Boolean)"/> afterwards to prevent this behavior.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPursuitAsCalledIn(LSPD_First_Response.Mod.API.LHandle,System.Boolean)">
+            <summary>
+            Sets <see paramref="pursuit"/> as called in or not called in anymore. Please note that a called in pursuit also allows ambient cops to join. Use <see cref="M:LSPD_First_Response.Mod.API.Functions.SetPursuitCopsCanJoin(LSPD_First_Response.Mod.API.LHandle,System.Boolean)"/> afterwards to prevent this behavior.
+            Changing the called in status of an already running pursuit might result in undefined behavior for existing police units.
+            It is recommended to use this function right after calling <see cref="M:LSPD_First_Response.Mod.API.Functions.CreatePursuit"/>.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+            <param name="calledIn">Whether or not the pursuit is called in.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPursuitCopsCanJoin(LSPD_First_Response.Mod.API.LHandle,System.Boolean)">
+            <summary>
+            Sets whether cops can join <paramref name="pursuit"/>.
+            </summary>
+            <param name="pursuit">
+            The pursuit.
+            </param>
+            <param name="canCopsJoin">
+            Whether cops can join.
+            </param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPursuitDisableAI(LSPD_First_Response.Mod.API.LHandle,System.Boolean)">
+            <summary>
+            Sets a value whether AI processing of <paramref name="pursuit"/> is disabled. Doesn't abort already running tasks.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+            <param name="disabled">Whether the pursuit AI is disabled.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPursuitDisableAIForPed(Rage.Ped,System.Boolean)">
+            <summary>
+            Sets a value whether AI processing of <paramref name="ped"/> is disabled. Aborts already running tasks.
+            </summary>
+            <param name="ped">The ped.</param>
+            <param name="disabled">Whether the pursuit AI is disabled.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPursuitInvestigativeMode(LSPD_First_Response.Mod.API.LHandle,System.Boolean)">
+            <summary>
+            Sets a value indicating whether <paramref name="pursuit"/> is in investigative mode or not. Recommended to call directly after pursuit creation.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+            <param name="active">Whether the pursuit is in investigative mode.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetPursuitIsActiveForPlayer(LSPD_First_Response.Mod.API.LHandle,System.Boolean)">
+            <summary>
+            Sets a value whether <paramref name="pursuit"/> is the active pursuit of the player.
+            </summary>
+            <param name="pursuit">The pursuit.</param>
+            <param name="active">Whether the pursuit is the active player pursuit.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetVehicleAdvisoryText(Rage.Vehicle,System.String)">
+            <summary>
+            Sets the vehicle's advisory text displayed during a records check, if any.
+            </summary>
+            <param name="vehicle">The vehicle.</param>
+            <param name="advisoryText">The advisory text.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.SetVehicleOwnerName(Rage.Vehicle,System.String)">
+            <summary>
+            Sets the owner of <paramref name="vehicle"/> to <paramref name="name"/>,
+            </summary>
+            <param name="vehicle">The vehicle.</param>
+            <param name="name">The name.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.StartPulloverOnParkedVehicle(Rage.Vehicle,System.Boolean,System.Boolean)">
+            <summary>
+            Starts a pullover on an already parked vehicle skipping the parking stage.
+            </summary>
+            <param name="vehicle">The vehicle.</param>
+            <param name="stopVehicle">Whether the driver should stop if currently driving.</param>
+            <param name="force">Whether sanity checks for the vehicle and driver should be ignored.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Functions.StopCurrentCallout">
+            <summary>
+            Stops the currently running callout. Does nothing when no callout is running.
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.LHandle">
+            <summary>
+            Handle to a LSPDFR object.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.LHandle.#ctor(System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:LSPD_First_Response.Mod.API.LHandle"/> class.
+            </summary>
+            <param name="obj">
+            The object.
+            </param>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.LHandle.Object">
+            <summary>
+            Gets the object.
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.API.Plugin">
+            <summary>
+            Plugin class for objects that should run all the time and shouldn't end.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Plugin.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:LSPD_First_Response.Mod.API.Plugin"/> class.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.API.Plugin.ExceptionOccured">
+            <summary>
+            Gets a value indicating whether an exception occured in this plugin.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Plugin.Initialize">
+            <summary>
+            Called when the plugin has been created successfully for the first time.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Plugin.InitializeAgain">
+            <summary>
+            Called when the plugin is initialized again after being previously initialized (i.e. when the player went off duty and then on duty again). You want to override
+            and use this for your initialization logic if you properly free everything in <see cref="M:LSPD_First_Response.Mod.API.Plugin.Finally"/>, most importantly event handlers.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.API.Plugin.Finally">
+            <summary>
+            Called when the plugin is being disposed, e.g. because an unhandled exception occured in Process. Free all resources here!
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.Callouts.CalloutDispatchInfo">
+            <summary>
+            Contains additional information about a callout that are used during dispatch, such as frequency limits.
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.Callouts.Holdup.Holdup">
+            <summary>
+            Store hold-up callout, creates a robbery scenario in random stores throughout San Andreas.
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.Callouts.StudyArrestWarrant">
+            <summary>
+            Callout for our research project on shadow vigilantism.  Player responds to a residence to arrest a wanted suspect
+            New: can now show some advisory text in the callout notification which is relevant to the study (e.g. emphasise the crime or violence or whatever)
+            If the callout is accepted, the player is prompted to look up the suspect on the police computer where we can show further info.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.StudyArrestWarrant.StudyArrestWarrantInfo.SuspectPosition">
+            <summary>
+            The position where the suspect is actually spawned (could be the porch, etc)
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.StudyArrestWarrant.StudyArrestWarrantInfo.ResidencePosition">
+            <summary>
+            The position for the destination blip (the house itself (at the front door))
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.StudyArrestWarrant.StudyArrestWarrantInfo.VehicleSpawnPoint">
+            <summary>
+            Set a vehicle here for the suspect to own (will be parked at their house)
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.Callouts.CalloutAcceptanceState">
+            <summary>
+            The callout acceptance state indicating whether the user has already accepted the callout.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutAcceptanceState.None">
+            <summary>
+            No state.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutAcceptanceState.Pending">
+            <summary>
+            Callout can be accepted by the user.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutAcceptanceState.Running">
+            <summary>
+            Callout is running.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutAcceptanceState.Ended">
+            <summary>
+            Callout has ended.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutCreationSource.APIForcedInternal">
+            <summary>
+            Callout was forced via an API function from the same plugin the callout is located in.
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.Callouts.Callout.OnEndEventHandler">
+            <summary>
+            Event handler for OnEnd.
+            </summary>
+            <param name="sender">The sender.</param>
+        </member>
+        <member name="E:LSPD_First_Response.Mod.Callouts.Callout.OnEnd">
+            <summary>
+            Invoked when the script has ended.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.Callout.AcceptanceState">
+            <summary>
+            Gets the acceptance state of the callout indicating whether the user has already accepted the callout.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.Callout.CalloutMessage">
+            <summary>
+            Gets or sets the callout message.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.Callout.CalloutAdvisory">
+            <summary>
+            Gets or sets the advisory text shown below the callout message.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.Callout.CalloutPosition">
+            <summary>
+            Gets or sets the callout spawn position.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.Callout.FriendlyName">
+            <summary>
+            Gets the friendly name of the current callout which is used for display purposes.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.Callout.ScriptInfo">
+            <summary>
+            Gets the script info.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.Callout.State">
+            <summary>
+            Gets or sets the state of the callout. State can be any enum.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.Callout.CreationSource">
+            <summary>
+            Gets the source that has created this callout.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.OnBeforeCalloutDisplayed">
+            <summary>
+            Called just before the callout message is being displayed. Return false if callout should be aborted.
+            </summary>
+            <returns>
+            True if callout can be displayed, false if it should be aborted.
+            </returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.OnCalloutDisplayed">
+            <summary>
+            Called when the callout message is being displayed. Call base to set state to Pending.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.OnCalloutAccepted">
+            <summary>
+            Called when the callout has been accepted. Call base to set state to Running.
+            </summary>
+            <returns>
+            True if callout was setup properly, false if it failed. Calls <see cref="M:LSPD_First_Response.Mod.Callouts.Callout.End"/> when failed.
+            </returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.OnCalloutNotAccepted">
+            <summary>
+            Called when the callout hasn't been accepted. Call base to set state to None.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.End">
+            <summary>
+            Put all resource free logic here. This is either called by the calloutmanager to shutdown the callout or can be called by the 
+            callout itself to execute the cleanup code. Call base to set state to None.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.End(System.String)">
+            <summary>
+            Put all resource free logic here. This is either called by the calloutmanager to shutdown the callout or can be called by the 
+            callout itself to execute the cleanup code. Call base to set state to None.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.Process">
+            <summary>
+            Called every tick to process all script logic. Call base when overriding.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.IsWithinMinimumDistance">
+            <summary>
+            Checks whether the player is within the minimum distance to the set position.
+            </summary>
+            <returns>True if inside, false if outside.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.IsWithinMaximumDistance">
+            <summary>
+            Checks whether the player is within the maximum distance to the set position.
+            </summary>
+            <returns>True if inside, false if outside.</returns>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.AddMinimumDistanceCheck(System.Single,Rage.Vector3)">
+            <summary>
+            Adds a minimum distance check to the callout, that will compare <paramref name="minimumDistance"/> to player's distance to <paramref name="position"/> when
+            <seealso cref="M:LSPD_First_Response.Mod.Callouts.Callout.OnCalloutAccepted"/> is called. If distance is below <paramref name="minimumDistance"/>, callout is aborted.
+            </summary>
+            <param name="minimumDistance">The minimum distance.</param>
+            <param name="position">The position.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.AddMaximumDistanceCheck(System.Single,Rage.Vector3)">
+            <summary>
+            Adds a maximum distance check to the callout, that will compare <paramref name="maximumDistance"/> to player's distance to <paramref name="position"/> when
+            <seealso cref="M:LSPD_First_Response.Mod.Callouts.Callout.OnCalloutAccepted"/> is called. If distance is above <paramref name="maximumDistance"/>, callout is aborted.
+            </summary>
+            <param name="maximumDistance">The maximum distance.</param> 
+            <param name="position">The position.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.RegisterStateCallback(System.Enum,System.Action)">
+            <summary>
+            Registers <paramref name="state"/> internally so whenever <see cref="P:LSPD_First_Response.Mod.Callouts.Callout.State"/> is <paramref name="state"/><paramref name="callback"/> will be called.
+            </summary>
+            <param name="state">The state. Can be any enum.</param>
+            <param name="callback">The callback.</param>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.Callout.ShowCalloutAreaBlipBeforeAccepting(Rage.Vector3,System.Single)">
+            <summary>
+            Shows a blip on the map where the callout will take place before the callout has been accepted. When accepted, this blip will be deleted
+            and the callout itself is responsible for a new blip.
+            </summary>
+            <param name="position">
+            The position.
+            </param>
+            <param name="size">
+            The size.
+            </param>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.Callouts.CalloutProbability">
+            <summary>
+            Describes the chance how often a callout can occur. After a callout has been selected randomly, this chance is taken into account to check whether the callout will really start.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutProbability.Always">
+            <summary>
+            Will always start when selected.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutProbability.VeryHigh">
+            <summary>
+            Will start in almost all cases.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutProbability.High">
+            <summary>
+            Will start in most cases.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutProbability.Medium">
+            <summary>
+            Will start as often as not.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutProbability.Low">
+            <summary>
+            Will start sometimes.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutProbability.VeryLow">
+            <summary>
+            Will start not very often.
+            </summary>
+        </member>
+        <member name="F:LSPD_First_Response.Mod.Callouts.CalloutProbability.Never">
+            <summary>
+            Will never start.
+            </summary>
+        </member>
+        <member name="T:LSPD_First_Response.Mod.Callouts.CalloutInfoAttribute">
+            <summary>
+            Contains information about a callout.
+            </summary>
+        </member>
+        <member name="M:LSPD_First_Response.Mod.Callouts.CalloutInfoAttribute.#ctor(System.String,LSPD_First_Response.Mod.Callouts.CalloutProbability)">
+            <summary>
+            Initializes a new instance of the <see cref="T:LSPD_First_Response.Mod.Callouts.CalloutInfoAttribute"/> class.
+            </summary>
+            <param name="name">
+            The name.
+            </param>
+            <param name="calloutProbability">
+            The probability of the callout.
+            </param>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.CalloutInfoAttribute.Name">
+            <summary>
+            Gets the name of the callout.
+            </summary>
+        </member>
+        <member name="P:LSPD_First_Response.Mod.Callouts.CalloutInfoAttribute.CalloutProbability">
+            <summary>
+            Gets the probability of the callout.
+            </summary>
+        </member>
+    </members>
+</doc>
