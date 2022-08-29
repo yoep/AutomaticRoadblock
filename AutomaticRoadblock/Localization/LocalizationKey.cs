@@ -4,24 +4,39 @@ namespace AutomaticRoadblocks.Localization
 {
     public class LocalizationKey
     {
+        #region Menu
+
         public static readonly LocalizationKey MenuTitle = new(nameof(MenuTitle), "Automatic Roadblocks");
         public static readonly LocalizationKey MenuSubtitle = new(nameof(MenuSubtitle), "Dispatch roadblocks");
         public static readonly LocalizationKey MenuPursuit = new(nameof(MenuPursuit), "Pursuit");
         public static readonly LocalizationKey MenuManualPlacement = new(nameof(MenuManualPlacement), "Manual placement");
         public static readonly LocalizationKey MenuRedirectTraffic = new(nameof(MenuRedirectTraffic), "Redirect traffic");
 
+        #endregion
+
+        #region Pursuit
+
         public static readonly LocalizationKey EnableDuringPursuit = new(nameof(EnableDuringPursuit), "Automatic");
+
+
         public static readonly LocalizationKey EnableDuringPursuitDescription =
             new(nameof(EnableDuringPursuitDescription), "Enable automatic roadblock dispatching during a pursuit");
+
         public static readonly LocalizationKey EnableAutoPursuitLevelIncrease = new(nameof(EnableAutoPursuitLevelIncrease), "Level increase");
+
         public static readonly LocalizationKey EnableAutoPursuitLevelIncreaseDescription =
             new(nameof(EnableAutoPursuitLevelIncrease), "Enable automatic level increases during a pursuit");
 
-        public static readonly LocalizationKey DispatchNow = new(nameof(EnableAutoPursuitLevelIncrease), "Dispatch now");
+        public static readonly LocalizationKey DispatchNow = new(nameof(DispatchNow), "Dispatch now");
         public static readonly LocalizationKey DispatchNowDescription = new(nameof(DispatchNowDescription), "Dispatch a roadblock now for the current pursuit");
         public static readonly LocalizationKey PursuitLevel = new(nameof(PursuitLevel), "Level");
+
         public static readonly LocalizationKey PursuitLevelDescription =
             new(nameof(PursuitLevelDescription), "The pursuit level which determines the roadblock type");
+
+        #endregion
+
+        #region Manual placement
 
         public static readonly LocalizationKey Place = new(nameof(Place), "Place");
         public static readonly LocalizationKey PlaceDescription = new(nameof(PlaceDescription), "Place a roadblock at the current highlighted location");
@@ -38,16 +53,43 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey BlockLanes = new(nameof(BlockLanes), "Block lanes");
         public static readonly LocalizationKey BlockLanesDescription = new(nameof(BlockLanesDescription), "The lanes which should be blocked");
         public static readonly LocalizationKey CleanRoadblockPlacement = new(nameof(CleanRoadblockPlacement), "Remove");
+
         public static readonly LocalizationKey CleanRoadblockPlacementDescription =
             new(nameof(CleanRoadblockPlacementDescription), "Remove one or more placed roadblocks based on the selected criteria");
 
+        #endregion
+
+        #region Redirect traffic
+
         public static readonly LocalizationKey RedirectTraffic = new(nameof(RedirectTraffic), "Place redirection");
-        public static readonly LocalizationKey RedirectTrafficDescription = new(nameof(RedirectTrafficDescription), "Place a traffic redirection at the highlighted location");
+
+        public static readonly LocalizationKey RedirectTrafficDescription =
+            new(nameof(RedirectTrafficDescription), "Place a traffic redirection at the highlighted location");
+
         public static readonly LocalizationKey RedirectTrafficConeDistance = new(nameof(RedirectTrafficConeDistance), "Cone distance");
-        public static readonly LocalizationKey RedirectTrafficConeDistanceDescription = new(nameof(RedirectTrafficConeDistanceDescription), "The distance along the road to which cones should be placed");
+
+        public static readonly LocalizationKey RedirectTrafficConeDistanceDescription =
+            new(nameof(RedirectTrafficConeDistanceDescription), "The distance along the road to which cones should be placed");
+
         public static readonly LocalizationKey RedirectTrafficType = new(nameof(RedirectTrafficType), "Redirect");
         public static readonly LocalizationKey RedirectTrafficTypeDescription = new(nameof(RedirectTrafficTypeDescription), "Place a traffic redirection on");
+
+        #endregion
+
+        #region Roadblock deployment
+
+        public static readonly LocalizationKey RoadblockDispatchedAt = new(nameof(RoadblockDispatchedAt), "Dispatching ~b~roadblock~s~ at {0}");
+        public static readonly LocalizationKey RoadblockHasBeenHit = new(nameof(RoadblockHasBeenHit), "~g~Roadblock has been hit");
+        public static readonly LocalizationKey RoadblockHasBeenBypassed = new(nameof(RoadblockHasBeenBypassed), "~r~Roadblock has been bypassed");
+
+        public static readonly LocalizationKey RoadblockNoPursuitActive = new(nameof(RoadblockNoPursuitActive),
+            "~r~Unable to create pursuit roadblock preview, no active vehicle in pursuit or player not in vehicle");
         
+        public static readonly LocalizationKey RoadblockInstanceCreationFailed = new(nameof(RoadblockInstanceCreationFailed),
+            "~r~One or more instance(s) failed to spawn, please check the logs for more info");
+
+        #endregion
+
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {
             MenuTitle,
@@ -85,6 +127,12 @@ namespace AutomaticRoadblocks.Localization
             RedirectTrafficConeDistanceDescription,
             RedirectTrafficType,
             RedirectTrafficTypeDescription,
+            RoadblockDispatchedAt,
+            RoadblockDispatchedAt,
+            RoadblockHasBeenHit,
+            RoadblockHasBeenBypassed,
+            RoadblockNoPursuitActive,
+            RoadblockInstanceCreationFailed
         };
 
         private LocalizationKey(string identifier, string defaultText)
