@@ -2,7 +2,7 @@
 
 bump-dependencies: # Install required dependencies
 	@python.exe -m pip install --upgrade pip
-	@pip install bump2version
+	@pip install bump2version --user
 
 bump-%: bump-dependencies # Bump the (major, minor, patch) version of the application
 	@bumpversion $@
