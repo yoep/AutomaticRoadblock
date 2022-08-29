@@ -1,4 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
@@ -8,15 +10,16 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public LightComponentItem(IManualPlacement manualPlacement)
+        public LightComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _manualPlacement = manualPlacement;
-            Init();
+
+            MenuItem = new UIMenuListScrollerItem<LightSourceType>(localizer[LocalizationKey.LightSource], localizer[LocalizationKey.LightSourceDescription],
+                LightSourceType.Values);
         }
-        
+
         /// <inheritdoc />
-        public UIMenuListScrollerItem<LightSourceType> MenuItem { get; } =
-            new(AutomaticRoadblocksPlugin.LightSource, AutomaticRoadblocksPlugin.LightSourceDescription, LightSourceType.Values);
+        public UIMenuListScrollerItem<LightSourceType> MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.ManualPlacement;
@@ -30,6 +33,8 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             // no-op   
         }
 
+        [IoC.PostConstruct]
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
             MenuItem.SelectedItem = _manualPlacement.LightSourceType;

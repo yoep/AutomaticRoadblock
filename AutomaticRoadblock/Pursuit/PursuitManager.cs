@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Settings;
@@ -22,6 +23,7 @@ namespace AutomaticRoadblocks.Pursuit
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly IRoadblockDispatcher _roadblockDispatcher;
+        private readonly ILocalizer _localizer;
         private readonly Random _random = new();
 
         private int _totalCopsKilled;
@@ -34,12 +36,13 @@ namespace AutomaticRoadblocks.Pursuit
         private PursuitLevel _pursuitLevel = PursuitLevel.Level1;
         private bool _keyListenerActive;
 
-        public PursuitManager(ILogger logger, IGame game, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher)
+        public PursuitManager(ILogger logger, IGame game, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher, ILocalizer localizer)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
             _roadblockDispatcher = roadblockDispatcher;
+            _localizer = localizer;
             EnableAutomaticDispatching = settingsManager.AutomaticRoadblocksSettings.EnableDuringPursuits;
             EnableAutomaticLevelIncreases = true;
         }
@@ -152,9 +155,8 @@ namespace AutomaticRoadblocks.Pursuit
 
             if (vehicle == null)
             {
-                const string message = "Unable to create pursuit roadblock preview, no active vehicle in pursuit or player not in vehicle";
-                _logger.Warn(message);
-                _game.DisplayNotification("~r" + message);
+                _logger.Warn("Unable to create pursuit roadblock preview, no active vehicle in pursuit or player not in vehicle");
+                _game.DisplayNotification(_localizer[LocalizationKey.RoadblockNoPursuitActive]);
                 return;
             }
 
@@ -344,6 +346,7 @@ namespace AutomaticRoadblocks.Pursuit
             {
                 _timeLastDispatchedRoadblock = _game.GameTime;
                 _totalRoadblocksDeployed++;
+                _logger.Info("Pursuit roadblock has been dispatched");
             }
 
             return dispatched;

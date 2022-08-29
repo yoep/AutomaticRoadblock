@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Pursuit.Factory;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Utils;
@@ -24,6 +25,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private readonly ILogger _logger;
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
+        private readonly ILocalizer _localizer;
 
         private readonly List<IRoadblock> _roadblocks = new();
         private readonly List<Road> _foundRoads = new();
@@ -31,11 +33,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private bool _cleanerRunning;
         private bool _userRequestedRoadblockDispatching;
 
-        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager)
+        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
+            _localizer = localizer;
         }
 
         #region Properties
@@ -71,7 +74,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             if (force || userRequested || IsRoadblockDispatchingAllowed(vehicle))
                 return DoInternalDispatch(level, vehicle, userRequested, atCurrentLocation);
 
-            _logger.Debug("Dispatching of a roadblock is not allowed");
+            _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
             return false;
         }
 
@@ -88,7 +91,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 var road = roads.Last();
                 _logger.Trace($"Dispatching roadblock on {road}");
 
-                _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
+                _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(road.Position)]);
                 var roadblock = PursuitRoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
                     ShouldAddLightsToRoadblock());
 
@@ -188,7 +191,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     _logger.Trace($"Distance between vehicle and roadblock before spawn {road.Position.DistanceTo(vehicle.Position)}");
                     roadblock.Spawn();
                     _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
-                    _game.DisplayNotification($"Dispatching ~b~roadblock~s~ at {World.GetStreetName(road.Position)}");
+                    _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(road.Position)]);
+                    _logger.Info($"Roadblock has been dispatched, {roadblock}");
                     LspdfrUtils.PlayScannerAudioNonBlocking("ROADBLOCK_DEPLOYED");
                     _userRequestedRoadblockDispatching = false;
                 },
@@ -239,11 +243,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 switch (newState)
                 {
                     case RoadblockState.Hit:
-                        _game.DisplayNotification("~g~Roadblock has been hit");
+                        _game.DisplayNotification(_localizer[LocalizationKey.RoadblockHasBeenHit]);
                         LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockHit);
                         break;
                     case RoadblockState.Bypassed:
-                        _game.DisplayNotification("~r~Roadblock has been bypassed");
+                        _game.DisplayNotification(_localizer[LocalizationKey.RoadblockHasBeenBypassed]);
                         LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockBypassed);
                         break;
                     case RoadblockState.Disposed:
@@ -272,6 +276,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             _cleanerRunning = true;
             _game.NewSafeFiber(() =>
             {
+                _logger.Info("Roadblock dispatch cleaner started");
                 while (_cleanerRunning)
                 {
                     _roadblocks

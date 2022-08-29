@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
@@ -10,22 +11,24 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
     {
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
 
-        public RedirectTrafficConeTypeComponentItem(IRedirectTrafficDispatcher redirectTrafficDispatcher)
+        public RedirectTrafficConeTypeComponentItem(IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
+
+            MenuItem = new UIMenuListScrollerItem<BarrierType>(localizer[LocalizationKey.Barrier], localizer[LocalizationKey.BarrierDescription],
+                new List<BarrierType>
+                {
+                    BarrierType.SmallCone,
+                    BarrierType.SmallConeStriped,
+                    BarrierType.BigCone,
+                    BarrierType.BigConeStriped,
+                    BarrierType.WorkBarrierSmall,
+                    BarrierType.ConeWithLight
+                });
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<BarrierType> MenuItem { get; } =
-            new(AutomaticRoadblocksPlugin.Barrier, AutomaticRoadblocksPlugin.BarrierDescription, new List<BarrierType>
-            {
-                BarrierType.SmallCone,
-                BarrierType.SmallConeStriped,
-                BarrierType.BigCone,
-                BarrierType.BigConeStriped,
-                BarrierType.WorkBarrierSmall,
-                BarrierType.ConeWithLight
-            });
+        public UIMenuListScrollerItem<BarrierType> MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.RedirectTraffic;

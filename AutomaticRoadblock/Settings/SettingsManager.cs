@@ -38,11 +38,11 @@ namespace AutomaticRoadblocks.Settings
             _logger.Debug("Loading settings");
             if (System.IO.File.Exists(File))
             {
-                _logger.Trace("Settings file " + File + " has been found");
+                _logger.Trace($"Settings file {File} has been found");
             }
             else
             {
-                _logger.Warn("Settings file not found, using defaults instead");
+                _logger.Warn($"Settings file {File} not found, using defaults instead");
             }
 
             try
@@ -53,7 +53,7 @@ namespace AutomaticRoadblocks.Settings
                 ReadAutomaticRoadblocksSettings(settingsFile);
                 ReadManualPlacementSettings(settingsFile);
                 ReadRedirectTrafficSettings(settingsFile);
-                _logger.Info("Settings have been loaded with success");
+                _logger.Info($"Settings have been loaded with success");
             }
             catch (Exception ex)
             {

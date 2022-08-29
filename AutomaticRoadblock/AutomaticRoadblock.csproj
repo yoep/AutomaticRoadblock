@@ -84,6 +84,10 @@
         <Compile Include="LightSources\LightSourceRoadblockFactory.cs" />
         <Compile Include="LightSources\LightSourceSlotFactory.cs" />
         <Compile Include="LightSources\LightSourceType.cs" />
+        <Compile Include="Localization\ILocalizer.cs" />
+        <Compile Include="Localization\LocalizationKey.cs" />
+        <Compile Include="Localization\LocalizationNotFound.cs" />
+        <Compile Include="Localization\Localizer.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementRemoveComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableCopsComponentItem.cs" />

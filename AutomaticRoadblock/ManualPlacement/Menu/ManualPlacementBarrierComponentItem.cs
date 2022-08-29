@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
@@ -9,14 +10,16 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public ManualPlacementBarrierComponentItem(IManualPlacement manualPlacement)
+        public ManualPlacementBarrierComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _manualPlacement = manualPlacement;
+
+            MenuItem = new UIMenuListScrollerItem<BarrierType>(localizer[LocalizationKey.Barrier], localizer[LocalizationKey.BarrierDescription],
+                BarrierType.Values);
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<BarrierType> MenuItem { get; } =
-            new(AutomaticRoadblocksPlugin.Barrier, AutomaticRoadblocksPlugin.BarrierDescription, BarrierType.Values);
+        public UIMenuListScrollerItem<BarrierType> MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.ManualPlacement;

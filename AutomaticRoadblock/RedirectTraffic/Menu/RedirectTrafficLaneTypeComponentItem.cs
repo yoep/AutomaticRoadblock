@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
@@ -8,14 +9,15 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
     {
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
 
-        public RedirectTrafficLaneTypeComponentItem(IRedirectTrafficDispatcher redirectTrafficDispatcher)
+        public RedirectTrafficLaneTypeComponentItem(IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
+            
+            MenuItem = new UIMenuListScrollerItem<RedirectTrafficType>(localizer[LocalizationKey.RedirectTrafficType], localizer[LocalizationKey.RedirectTrafficTypeDescription], RedirectTrafficType.Values);
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<RedirectTrafficType> MenuItem { get; } =
-            new(AutomaticRoadblocksPlugin.RedirectTrafficType, AutomaticRoadblocksPlugin.RedirectTrafficTypeDescription, RedirectTrafficType.Values);
+        public UIMenuListScrollerItem<RedirectTrafficType> MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.RedirectTraffic;

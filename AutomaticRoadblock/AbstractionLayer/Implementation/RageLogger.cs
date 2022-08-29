@@ -5,17 +5,17 @@ namespace AutomaticRoadblocks.AbstractionLayer.Implementation
 {
     public class RageLogger : ILogger
     {
-        const string LevelWarn = "WARN";
-        const string LevelError = "ERROR";
+        private const string LevelWarn = "WARN";
+        private const string LevelError = "ERROR";
         
         public void Trace(string message)
         {
-            Game.LogTrivialDebug(BuildMessage("TRACE", message));
+            Game.LogExtremelyVerbose(BuildMessage("TRACE", message));
         }
 
         public void Debug(string message)
         {
-            Game.LogTrivialDebug(BuildMessage("DEBUG", message));
+            Game.LogVeryVerbose(BuildMessage("DEBUG", message));
         }
 
         public void Info(string message)
@@ -46,8 +46,9 @@ namespace AutomaticRoadblocks.AbstractionLayer.Implementation
         private static string BuildMessage(string level, string message, Exception exception = null)
         {
             var stacktrace = exception?.StackTrace;
+            var newline = string.IsNullOrWhiteSpace(stacktrace) ? "" : "\n";
 
-            return $"{AutomaticRoadblocksPlugin.Name}: [{level}] {message}\n{stacktrace}";
+            return $"{AutomaticRoadblocksPlugin.Name}: [{level}] {message}{newline}{stacktrace}";
         }
     }
 }

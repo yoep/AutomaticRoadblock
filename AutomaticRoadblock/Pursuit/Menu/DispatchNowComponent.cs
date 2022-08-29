@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
@@ -13,14 +14,17 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         private readonly IGame _game;
         private readonly IPursuitManager _pursuitManager;
 
-        public DispatchNowComponent(IPursuitManager pursuitManager, IGame game)
+        public DispatchNowComponent(IPursuitManager pursuitManager, IGame game, ILocalizer localizer)
         {
             _pursuitManager = pursuitManager;
             _game = game;
+
+            MenuItem = new UIMenuItem(localizer[LocalizationKey.DispatchNow],
+                localizer[LocalizationKey.DispatchNowDescription]);
         }
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.DispatchNow, AutomaticRoadblocksPlugin.DispatchNowDescription);
+        public UIMenuItem MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.Pursuit;

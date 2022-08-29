@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
 using RAGENativeUI;
@@ -11,23 +12,28 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
     {
         private readonly IGame _game;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
+        private readonly ILocalizer _localizer;
         
         private bool _running = true;
 
-        public RedirectTrafficMenuSwitchItem(IGame game, IRedirectTrafficDispatcher redirectTrafficDispatcher)
+        public RedirectTrafficMenuSwitchItem(IGame game, IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
             _game = game;
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
+            _localizer = localizer;
+
+            Menu = new UIMenu(_localizer[LocalizationKey.MenuTitle],
+                "~b~" + _localizer[LocalizationKey.MenuSubtitle]);
         }
 
         /// <inheritdoc />
-        public UIMenu Menu { get; } = new(AutomaticRoadblocksPlugin.MenuTitle, AutomaticRoadblocksPlugin.MenuSubtitle);
+        public UIMenu Menu { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.RedirectTraffic;
 
         /// <inheritdoc />
-        public string DisplayText => AutomaticRoadblocksPlugin.MenuRedirectTraffic;
+        public string DisplayText => _localizer[LocalizationKey.MenuRedirectTraffic];
         
         /// <inheritdoc />
         public void Dispose()

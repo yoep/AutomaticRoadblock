@@ -5,6 +5,7 @@ using System.Reflection;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.AbstractionLayer.Implementation;
 using AutomaticRoadblocks.Debug.Menu;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.ManualPlacement.Menu;
 using AutomaticRoadblocks.Menu;
@@ -68,8 +69,9 @@ namespace AutomaticRoadblocks
         private static void InitializeIoC()
         {
             IoC.Instance
-                .Register<IGame>(typeof(RageImpl))
-                .Register<ILogger>(typeof(RageLogger))
+                .RegisterSingleton<IGame>(typeof(RageImpl))
+                .RegisterSingleton<ILogger>(typeof(RageLogger))
+                .RegisterSingleton<ILocalizer>(typeof(Localizer))
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))

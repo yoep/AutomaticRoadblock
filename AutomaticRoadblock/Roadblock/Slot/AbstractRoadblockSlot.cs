@@ -6,6 +6,7 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
@@ -127,7 +128,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             Instances.ForEach(x => DoSafeOperation(x.CreatePreview, $"create instance slot {x} preview"));
 
             if (Instances.Any(x => x.State == InstanceState.Error))
-                Game.DisplayNotification("~r~One or more instance(s) failed to spawn, please check the logs for more info");
+                Game.DisplayNotification(IoC.Instance.GetInstance<ILocalizer>()[LocalizationKey.RoadblockInstanceCreationFailed]);
 
             DrawRoadblockDebugInfo();
         }

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
@@ -8,14 +9,16 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public EnableCopsComponentItem(IManualPlacement manualPlacement)
+        public EnableCopsComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _manualPlacement = manualPlacement;
+            
+            MenuItem = new UIMenuCheckboxItem(localizer[LocalizationKey.EnableCops], true,
+                localizer[LocalizationKey.EnableCopsDescription]);
         }
 
         /// <inheritdoc />
-        public UIMenuCheckboxItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.EnableCops, true,
-            AutomaticRoadblocksPlugin.EnableCopsDescription);
+        public UIMenuCheckboxItem MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.ManualPlacement;
