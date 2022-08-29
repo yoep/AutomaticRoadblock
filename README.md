@@ -21,13 +21,13 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 - More scenery variations within the roadblocks
 - Additional scenery such as other emergency vehicles to manual roadblock placements
 
-## Pursuit
+## Development
 
-The pursuit option allows dispatching of roadblocks while in a pursuit.
+### Dependencies
 
-## Changelog 0.2.0
+- NuGet
+- .NET Framework 4.8
 
-- Added traffic redirection
-- Fixed issue when spawning a manual roadblock 
-- Fixed issue with playing audio when the dispatch now menu item is activated
-- Fixed crash in roadblock bypass/hit detection when one or more instances are cleaned by the game
+## Changelog 0.2.1
+
+- Added missing RAGENativeUI.dll dependency
