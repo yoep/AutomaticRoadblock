@@ -23,6 +23,7 @@ namespace AutomaticRoadblocks.Menu
         private static readonly List<IMenuComponent<UIMenuItem>> MenuItems = new();
 
         private UIMenuSwitchMenusItem _menuSwitcher;
+        private bool _menuRunning;
 
         public MenuImpl(ILogger logger, IGame game, ISettingsManager settingsManager, ICollection<IMenuSwitchItem> menuSwitchItems)
         {
@@ -64,9 +65,9 @@ namespace AutomaticRoadblocks.Menu
         {
             if (IsMenuInitialized)
                 return;
-            
+
             _logger.Trace("Adding MenuImpl.Process to FrameRender handler...");
-            Game.FrameRender += Process;
+            StartKeyListener();
             IsMenuInitialized = true;
             _logger.Trace("MenuImpl.Process added to FrameRender handler");
         }
@@ -77,7 +78,7 @@ namespace AutomaticRoadblocks.Menu
 
         public void Dispose()
         {
-            Game.FrameRender -= Process;
+            _menuRunning = false;
             IsMenuInitialized = false;
         }
 
@@ -90,6 +91,8 @@ namespace AutomaticRoadblocks.Menu
         private void Init()
         {
             _logger.Trace("Initializing menu");
+            _logger.Debug(
+                $"Configured menu key combination: {_settingsManager.GeneralSettings.OpenMenuKey} + {_settingsManager.GeneralSettings.OpenMenuModifierKey}");
 
             try
             {
@@ -104,31 +107,12 @@ namespace AutomaticRoadblocks.Menu
 
                 _logger.Trace("Initializing sub-menu's");
                 AddMenuSwitcherToEachMenu();
-                
+
                 Activate();
             }
             catch (Exception ex)
             {
                 _logger.Error($"An unexpected error occurred while initializing the menu with error {ex.Message}", ex);
-                _game.DisplayPluginNotification("an unexpected error occurred");
-            }
-        }
-
-        private void Process(object sender, GraphicsEventArgs e)
-        {
-            try
-            {
-                if (IsMenuKeyPressed())
-                {
-                    _menuSwitcher.CurrentMenu.Visible = !_menuSwitcher.CurrentMenu.Visible;
-                    IsShown = _menuSwitcher.CurrentMenu.Visible;
-                }
-
-                MenuPool.ProcessMenus();
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"An unexpected error occurred while processing the menu with error {ex.Message}", ex);
                 _game.DisplayPluginNotification("an unexpected error occurred");
             }
         }
@@ -165,10 +149,7 @@ namespace AutomaticRoadblocks.Menu
             var secondKey = generalSettings.OpenMenuModifierKey;
             var secondKeyDown = secondKey == Keys.None;
 
-            if (!secondKeyDown && secondKey == Keys.ShiftKey && Game.IsShiftKeyDownRightNow)
-                secondKeyDown = true;
-
-            if (!secondKeyDown && secondKey == Keys.ControlKey && Game.IsControlKeyDownRightNow)
+            if (!secondKeyDown && Game.IsKeyDownRightNow(secondKey))
                 secondKeyDown = true;
 
             return Game.IsKeyDown(generalSettings.OpenMenuKey) && secondKeyDown;
@@ -196,6 +177,34 @@ namespace AutomaticRoadblocks.Menu
                 .ToList();
 
             _menuSwitcher = new UIMenuSwitchMenusItem("Mode", null, displayItems);
+        }
+
+        private void StartKeyListener()
+        {
+            _menuRunning = true;
+            _game.NewSafeFiber(() =>
+            {
+                while (_menuRunning)
+                {
+                    _game.FiberYield();
+                    MenuPool.ProcessMenus();
+                    
+                    try
+                    {
+                        if (IsMenuKeyPressed())
+                        {
+                            _menuSwitcher.CurrentMenu.Visible = !_menuSwitcher.CurrentMenu.Visible;
+                            IsShown = _menuSwitcher.CurrentMenu.Visible;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error($"An unexpected error occurred while processing the menu with error {ex.Message}", ex);
+                        _game.DisplayPluginNotification("an unexpected error occurred");
+                    }
+                }
+                
+            }, "MenuImpl.KeyListener");
         }
 
         #endregion
