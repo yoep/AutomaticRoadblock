@@ -3,7 +3,7 @@ using AutomaticRoadblocks.Utils;
 using JetBrains.Annotations;
 using Rage;
 
-namespace AutomaticRoadblocks.Instance
+namespace AutomaticRoadblocks.Instances
 {
     /// <summary>
     /// A ped which is controlled by the Automatic Roadblock plugin.
@@ -15,10 +15,18 @@ namespace AutomaticRoadblocks.Instance
         {
             GameInstance = gameInstance;
         }
+        
+        #region Properties
 
         /// <inheritdoc />
         [CanBeNull]
         public Entity GameInstance { get; }
+
+        /// <inheritdoc />
+        public bool IsInvalid => GameInstance == null ||
+                                 !GameInstance.IsValid();
+
+        #endregion
 
         #region IDisposable
 

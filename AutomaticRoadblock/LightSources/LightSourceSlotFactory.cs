@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
 using Rage;

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Utils;
 using Rage;

@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
-namespace AutomaticRoadblocks.Instance
+namespace AutomaticRoadblocks.Instances
 {
     /// <summary>
     /// A ped which is controlled by the Automatic Roadblock plugin.
@@ -39,12 +39,10 @@ namespace AutomaticRoadblocks.Instance
         /// Get the primary weapon of this ped.
         /// </summary>
         public WeaponDescriptor PrimaryWeapon { get; private set; }
-
-        /// <summary>
-        /// Verify if the game instance is invalidated.
-        /// </summary>
-        private bool IsInvalid => GameInstance == null ||
-                                  !GameInstance.IsValid();
+        
+        /// <inheritdoc />
+        public bool IsInvalid => GameInstance == null ||
+                                 !GameInstance.IsValid();
 
         #endregion
 

@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
@@ -124,7 +124,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Logger.Debug($"Creating a total of {Instances.Count} instances for the roadblock slot preview");
             Logger.Trace($"Roadblock slot instances: \n{string.Join("\n", Instances.Select(x => x.ToString()).ToList())}");
-            Instances.ForEach(x => x.CreatePreview());
+            Instances.ForEach(x => DoSafeOperation(x.CreatePreview, $"create instance slot {x} preview"));
 
             if (Instances.Any(x => x.State == InstanceState.Error))
                 Game.DisplayNotification("~r~One or more instance(s) failed to spawn, please check the logs for more info");
@@ -135,7 +135,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public void DeletePreview()
         {
-            Instances.ForEach(x => x.DeletePreview());
+            Instances.ForEach(x => DoSafeOperation(x.DeletePreview, $"delete instance slot {x} preview"));
         }
 
         #endregion
@@ -145,7 +145,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public virtual void Dispose()
         {
-            Instances.ForEach(x => x.Dispose());
+            Instances.ForEach(x => DoSafeOperation(x.Dispose, $"dispose instance slot {x}"));
         }
 
         #endregion
@@ -295,6 +295,18 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             {
                 Logger.Error($"Failed to create barrier of type {BarrierType}, {ex.Message}", ex);
                 return null;
+            }
+        }
+
+        private void DoSafeOperation(Action action, string operation)
+        {
+            try
+            {
+                action.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to {operation}, {ex.Message}", ex);
             }
         }
 
