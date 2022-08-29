@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, hotfix/*, feature/*, bugfix/* ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        dotnet-version: [ '4.8.x' ]
+    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build
+        run: make build
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Binaries
+          path: |
+            AutomaticRoadblockTests\bin\x64\Debug\AutomaticRoadblockTests.dll
+            AutomaticRoadblockTests\bin\x64\Debug\AutomaticRoadblocks.ini
+            AutomaticRoadblockTests\bin\x64\Debug\AutomaticRoadblocks.pdb

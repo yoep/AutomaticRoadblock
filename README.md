@@ -24,3 +24,4 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 ## Changelog 0.2.1
 
 - Added missing RAGENativeUI.dll dependency
+- Fixed manual roadblock placement failing due to an invalid weapon
