@@ -17,7 +17,7 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 ### Dependencies
 
 - NuGet
-- .NET Framework 4.8
+- .NET 4.8 SDK
 - Rage Plugin Hook
 - Rage Native UI
 

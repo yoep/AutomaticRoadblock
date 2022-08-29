@@ -6,18 +6,10 @@ on:
     
 jobs:
   build:
-    runs-on: windows-latest
-    
-    strategy:
-      matrix:
-        dotnet-version: [ '4.8.x' ]
+    runs-on: windows-2019
     
     steps:
       - uses: actions/checkout@v3
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: ${{ matrix.dotnet-version }}
       - name: Install dependencies
         run: dotnet restore
       - name: Build
