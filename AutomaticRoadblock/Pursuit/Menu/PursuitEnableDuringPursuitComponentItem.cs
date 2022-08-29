@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
@@ -8,14 +9,16 @@ namespace AutomaticRoadblocks.Pursuit.Menu
     {
         private readonly IPursuitManager _pursuitManager;
 
-        public PursuitEnableDuringPursuitComponentItem(IPursuitManager pursuitManager)
+        public PursuitEnableDuringPursuitComponentItem(IPursuitManager pursuitManager, ILocalizer localizer)
         {
             _pursuitManager = pursuitManager;
+
+            MenuItem = new UIMenuCheckboxItem(localizer[LocalizationKey.EnableDuringPursuit], true,
+                localizer[LocalizationKey.EnableDuringPursuitDescription]);
         }
 
         /// <inheritdoc />
-        public UIMenuCheckboxItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.EnableDuringPursuit, true,
-            AutomaticRoadblocksPlugin.EnableDuringPursuitDescription);
+        public UIMenuCheckboxItem MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.Pursuit;

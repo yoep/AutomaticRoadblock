@@ -12,24 +12,28 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
     {
         private readonly IGame _game;
         private readonly IManualPlacement _manualPlacement;
+        private readonly ILocalizer _localizer;
 
         private bool _running = true;
 
-        public ManualPlacementMenuSwitchItem(IGame game, IManualPlacement manualPlacement)
+        public ManualPlacementMenuSwitchItem(IGame game, IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _game = game;
             _manualPlacement = manualPlacement;
+            _localizer = localizer;
+            
+            Menu = new UIMenu(_localizer[LocalizationKey.MenuTitle],
+                "~b~" + _localizer[LocalizationKey.MenuSubtitle]);
         }
 
         /// <inheritdoc />
-        public UIMenu Menu { get; } = new(IoC.Instance.GetInstance<ILocalizer>()[LocalizationKey.MenuTitle],
-            "~b~" + IoC.Instance.GetInstance<ILocalizer>()[LocalizationKey.MenuSubtitle]);
+        public UIMenu Menu { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.ManualPlacement;
 
         /// <inheritdoc />
-        public string DisplayText => AutomaticRoadblocksPlugin.MenuManualPlacement;
+        public string DisplayText => _localizer[LocalizationKey.MenuManualPlacement];
 
         /// <inheritdoc />
         public void Dispose()

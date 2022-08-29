@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
@@ -9,16 +10,18 @@ namespace AutomaticRoadblocks.Pursuit.Menu
     {
         private readonly IPursuitManager _pursuitManager;
 
-        public PursuitLevelComponent(IPursuitManager pursuitManager)
+        public PursuitLevelComponent(IPursuitManager pursuitManager, ILocalizer localizer)
         {
             _pursuitManager = pursuitManager;
+
+            MenuItem =
+                new UIMenuListScrollerItem<int>(localizer[LocalizationKey.PursuitLevel], localizer[LocalizationKey.PursuitLevelDescription], PursuitLevel.Levels
+                    .Select(x => x.Level)
+                    .ToList());
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<int> MenuItem { get; } =
-            new UIMenuListScrollerItem<int>(AutomaticRoadblocksPlugin.PursuitLevel, AutomaticRoadblocksPlugin.PursuitLevelDescription, PursuitLevel.Levels
-                .Select(x => x.Level)
-                .ToList());
+        public UIMenuListScrollerItem<int> MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.Pursuit;

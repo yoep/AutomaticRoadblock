@@ -12,24 +12,28 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
     {
         private readonly IGame _game;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
+        private readonly ILocalizer _localizer;
         
         private bool _running = true;
 
-        public RedirectTrafficMenuSwitchItem(IGame game, IRedirectTrafficDispatcher redirectTrafficDispatcher)
+        public RedirectTrafficMenuSwitchItem(IGame game, IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
             _game = game;
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
+            _localizer = localizer;
+
+            Menu = new UIMenu(_localizer[LocalizationKey.MenuTitle],
+                "~b~" + _localizer[LocalizationKey.MenuSubtitle]);
         }
 
         /// <inheritdoc />
-        public UIMenu Menu { get; } = new(IoC.Instance.GetInstance<ILocalizer>()[LocalizationKey.MenuTitle],
-            "~b~" + IoC.Instance.GetInstance<ILocalizer>()[LocalizationKey.MenuSubtitle]);
+        public UIMenu Menu { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.RedirectTraffic;
 
         /// <inheritdoc />
-        public string DisplayText => AutomaticRoadblocksPlugin.MenuRedirectTraffic;
+        public string DisplayText => _localizer[LocalizationKey.MenuRedirectTraffic];
         
         /// <inheritdoc />
         public void Dispose()
