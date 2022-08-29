@@ -31,6 +31,6 @@ jobs:
         with:
           name: Binaries
           path: |
-            AutomaticRoadblockTests\bin\x64\Release\AutomaticRoadblockTests.dll
-            AutomaticRoadblockTests\bin\x64\Release\AutomaticRoadblocks.ini
-            AutomaticRoadblockTests\bin\x64\Release\AutomaticRoadblocks.pdb
+            AutomaticRoadblock/bin/x64/Debug/AutomaticRoadblocks.dll
+            AutomaticRoadblock/bin/x64/Debug/AutomaticRoadblocks.ini
+            AutomaticRoadblock/bin/x64/Debug/AutomaticRoadblocks.pdb
