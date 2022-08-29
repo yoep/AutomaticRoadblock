@@ -1,3 +1,4 @@
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Vehicles;
 using RAGENativeUI.Elements;
@@ -8,15 +9,17 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public ManualPlacementVehicleTypeComponentItem(IManualPlacement manualPlacement)
+        public ManualPlacementVehicleTypeComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _manualPlacement = manualPlacement;
+
+            MenuItem = new UIMenuListScrollerItem<VehicleType>(localizer[LocalizationKey.Vehicle], localizer[LocalizationKey.VehicleDescription],
+                VehicleType.Values);
             Init();
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<VehicleType> MenuItem { get; } =
-            new(AutomaticRoadblocksPlugin.Vehicle, AutomaticRoadblocksPlugin.VehicleDescription, VehicleType.Values);
+        public UIMenuListScrollerItem<VehicleType> MenuItem { get; }
 
         /// <inheritdoc />
         public MenuType Type => MenuType.ManualPlacement;

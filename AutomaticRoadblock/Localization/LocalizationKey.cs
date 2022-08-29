@@ -9,15 +9,37 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey MenuPursuit = new(nameof(MenuPursuit), "Pursuit");
         public static readonly LocalizationKey MenuManualPlacement = new(nameof(MenuManualPlacement), "Manual placement");
         public static readonly LocalizationKey MenuRedirectTraffic = new(nameof(MenuRedirectTraffic), "Redirect traffic");
-        
+
         public static readonly LocalizationKey EnableDuringPursuit = new(nameof(EnableDuringPursuit), "Automatic");
-        public static readonly LocalizationKey EnableDuringPursuitDescription = new(nameof(EnableDuringPursuitDescription), "Enable automatic roadblock dispatching during a pursuit");
+        public static readonly LocalizationKey EnableDuringPursuitDescription =
+            new(nameof(EnableDuringPursuitDescription), "Enable automatic roadblock dispatching during a pursuit");
         public static readonly LocalizationKey EnableAutoPursuitLevelIncrease = new(nameof(EnableAutoPursuitLevelIncrease), "Level increase");
-        public static readonly LocalizationKey EnableAutoPursuitLevelIncreaseDescription = new(nameof(EnableAutoPursuitLevelIncrease), "Enable automatic level increases during a pursuit");
+        public static readonly LocalizationKey EnableAutoPursuitLevelIncreaseDescription =
+            new(nameof(EnableAutoPursuitLevelIncrease), "Enable automatic level increases during a pursuit");
+
         public static readonly LocalizationKey DispatchNow = new(nameof(EnableAutoPursuitLevelIncrease), "Dispatch now");
         public static readonly LocalizationKey DispatchNowDescription = new(nameof(DispatchNowDescription), "Dispatch a roadblock now for the current pursuit");
         public static readonly LocalizationKey PursuitLevel = new(nameof(PursuitLevel), "Level");
-        public static readonly LocalizationKey PursuitLevelDescription = new(nameof(PursuitLevelDescription), "The pursuit level which determines the roadblock type");
+        public static readonly LocalizationKey PursuitLevelDescription =
+            new(nameof(PursuitLevelDescription), "The pursuit level which determines the roadblock type");
+
+        public static readonly LocalizationKey Place = new(nameof(Place), "Place");
+        public static readonly LocalizationKey PlaceDescription = new(nameof(PlaceDescription), "Place a roadblock at the current highlighted location");
+        public static readonly LocalizationKey Barrier = new(nameof(Barrier), "Barrier");
+        public static readonly LocalizationKey BarrierDescription = new(nameof(BarrierDescription), "The barrier type to use");
+        public static readonly LocalizationKey EnableCops = new(nameof(EnableCops), "Enable cops");
+        public static readonly LocalizationKey EnableCopsDescription = new(nameof(EnableCopsDescription), "Check if cops should be spawned with the roadblock");
+        public static readonly LocalizationKey SpeedLimit = new(nameof(SpeedLimit), "Slow traffic");
+        public static readonly LocalizationKey SpeedLimitDescription = new(nameof(SpeedLimitDescription), "Slow the traffic around the roadblock");
+        public static readonly LocalizationKey Vehicle = new(nameof(Vehicle), "Vehicle");
+        public static readonly LocalizationKey VehicleDescription = new(nameof(VehicleDescription), "The vehicle type to use");
+        public static readonly LocalizationKey LightSource = new(nameof(LightSource), "Lights");
+        public static readonly LocalizationKey LightSourceDescription = new(nameof(LightSourceDescription), "The lights type to use");
+        public static readonly LocalizationKey BlockLanes = new(nameof(BlockLanes), "Block lanes");
+        public static readonly LocalizationKey BlockLanesDescription = new(nameof(BlockLanesDescription), "The lanes which should be blocked");
+        public static readonly LocalizationKey CleanRoadblockPlacement = new(nameof(CleanRoadblockPlacement), "Remove");
+        public static readonly LocalizationKey CleanRoadblockPlacementDescription =
+            new(nameof(CleanRoadblockPlacementDescription), "Remove one or more placed roadblocks");
 
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {
@@ -33,7 +55,23 @@ namespace AutomaticRoadblocks.Localization
             DispatchNow,
             DispatchNowDescription,
             PursuitLevel,
-            PursuitLevelDescription
+            PursuitLevelDescription,
+            Place,
+            PlaceDescription,
+            Barrier,
+            BarrierDescription,
+            EnableCops,
+            EnableCopsDescription,
+            SpeedLimit,
+            SpeedLimitDescription,
+            Vehicle,
+            VehicleDescription,
+            LightSource,
+            LightSourceDescription,
+            BlockLanes,
+            BlockLanesDescription,
+            CleanRoadblockPlacement,
+            CleanRoadblockPlacementDescription,
         };
 
         private LocalizationKey(string identifier, string defaultText)
@@ -41,12 +79,12 @@ namespace AutomaticRoadblocks.Localization
             Identifier = identifier;
             DefaultText = defaultText;
         }
-        
+
         /// <summary>
         /// The key identifier.
         /// </summary>
         internal string Identifier { get; }
-        
+
         /// <summary>
         /// The fallback text when the identifier could not be found.
         /// </summary>

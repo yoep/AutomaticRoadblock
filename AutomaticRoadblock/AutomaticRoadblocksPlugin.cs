@@ -23,23 +23,6 @@ namespace AutomaticRoadblocks
         public const string StartPursuit = "Start pursuit now" + DebugIndicatorText;
         public const string EndPursuit = "End pursuit now" + DebugIndicatorText;
 
-        public const string Place = "Place";
-        public const string PlaceDescription = "Place a roadblock at the current hightlighted location";
-        public const string Barrier = "Barrier";
-        public const string BarrierDescription = "The barrier type to use";
-        public const string EnableCops = "Enable cops";
-        public const string EnableCopsDescription = "Set if cops should be spawned with the roadblock";
-        public const string SpeedLimit = "Slow traffic";
-        public const string SpeedLimitDescription = "Slow the traffic around the roadblock";
-        public const string Vehicle = "Vehicle";
-        public const string VehicleDescription = "The vehicle type to use";
-        public const string LightSource = "Lights";
-        public const string LightSourceDescription = "The lights type to use";
-        public const string BlockLanes = "Block lanes";
-        public const string BlockLanesDescription = "The lanes which should be blocked";
-        public const string CleanRoadblockPlacement = "Remove";
-        public const string CleanRoadblockPlacementDescription = "Remove one or more placed roadblocks";
-
         public const string RedirectTraffic = "Place redirection";
         public const string RedirectTrafficDescription = "Place a redirection at the current location";
         public const string RedirectTrafficConeDistance = "Cone distance";
