@@ -1,11 +1,11 @@
+using AutomaticRoadblocks.Localization;
+
 namespace AutomaticRoadblocks
 {
     public static class AutomaticRoadblocksPlugin
     {
         public const string Name = "Automatic Roadblocks";
 
-        public const string MenuTitle = "Automatic Roadblocks";
-        public const string MenuSubtitle = "~b~Dispatch roadblocks";
         public const string MenuDebug = "Debug";
         public const string MenuPursuit = "Pursuit";
         public const string MenuManualPlacement = "Manual placement";
@@ -63,5 +63,7 @@ namespace AutomaticRoadblocks
         public const string RedirectTrafficTypeDescription = "Place a traffic redirection on";
 
         private const string DebugIndicatorText = " [DEBUG]";
+
+        private static string X =  string.Format("test {0}", "bla", "bla2");
     }
 }
