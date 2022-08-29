@@ -15,6 +15,9 @@ build: # Build the debug version of the application
 
 build-release: # Build the release version of the application
 	@dotnet build --configuration Release /p:Platform=x64 --no-restore
+	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.dll" "Build\Grand Theft Auto V\plugins\LSPDFR\" /f /y
+	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.ini" "Build\Grand Theft Auto V\plugins\LSPDFR\" /f /y
+	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.pdb" "Build\Grand Theft Auto V\plugins\LSPDFR\" /f /y
 
 release: bump-minor build-release # Build the release version of the application
 	
