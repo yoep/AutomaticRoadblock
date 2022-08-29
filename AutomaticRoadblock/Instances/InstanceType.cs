@@ -1,4 +1,4 @@
-namespace AutomaticRoadblocks.Instance
+namespace AutomaticRoadblocks.Instances
 {
     public enum EntityType
     {

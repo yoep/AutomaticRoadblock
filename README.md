@@ -12,21 +12,14 @@ This LSPDFR plugin allows the creation of automatic roadblocks during pursuits.
 - Manual configurable roadblock placement
 - Configurable traffic redirection
 
-## Planned features
-
-- Spikestrips
-- Police SmartRadio integration
-- Close road/lane
-- Junction roadblocks
-- More scenery variations within the roadblocks
-- Additional scenery such as other emergency vehicles to manual roadblock placements
-
 ## Development
 
 ### Dependencies
 
 - NuGet
 - .NET Framework 4.8
+- Rage Plugin Hook
+- Rage Native UI
 
 ## Changelog 0.2.1
 

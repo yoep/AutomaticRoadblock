@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils.Road;
 using JetBrains.Annotations;

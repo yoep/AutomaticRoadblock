@@ -1,5 +1,4 @@
 using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.Instance;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock.Slot;

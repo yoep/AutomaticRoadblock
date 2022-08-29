@@ -4,7 +4,7 @@ using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils;
 using Rage;
 
-namespace AutomaticRoadblocks.Instance
+namespace AutomaticRoadblocks.Instances
 {
     public class InstanceSlot : IDisposable, IPreviewSupport
     {
@@ -23,7 +23,6 @@ namespace AutomaticRoadblocks.Instance
         }
 
         #region Properties
-
 
         /// <summary>
         /// Get the slot entity type.
@@ -50,11 +49,17 @@ namespace AutomaticRoadblocks.Instance
         /// The state of the instance slot.
         /// </summary>
         public InstanceState State { get; private set; } = InstanceState.Inactive;
-        
+
+        /// <summary>
+        /// Verify if the slot instance is invalidated by the game engine.
+        /// </summary>
+        private bool IsInvalid => Instance == null ||
+                                  Instance.IsInvalid;
+
         #endregion
 
         #region Methods
-        
+
         /// <summary>
         /// Spawn the entity if it's not already spawned.
         /// </summary>
@@ -90,6 +95,31 @@ namespace AutomaticRoadblocks.Instance
             return $"{nameof(Type)}: {Type}, {nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}";
         }
 
+        protected bool Equals(InstanceSlot other)
+        {
+            return Type == other.Type && Position.Equals(other.Position) && Heading.Equals(other.Heading) && State == other.State;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((InstanceSlot)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (int)Type;
+                hashCode = (hashCode * 397) ^ Position.GetHashCode();
+                hashCode = (hashCode * 397) ^ Heading.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int)State;
+                return hashCode;
+            }
+        }
+
         #endregion
 
         #region IPreviewSupport
@@ -103,8 +133,7 @@ namespace AutomaticRoadblocks.Instance
             IsPreviewActive = true;
             Spawn();
 
-            // verify that an instance was created
-            if (Instance != null)
+            if (!IsInvalid)
                 PreviewUtils.TransformToPreview(Instance.GameInstance);
         }
 

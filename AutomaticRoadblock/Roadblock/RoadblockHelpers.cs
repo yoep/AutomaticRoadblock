@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.Instance;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;

@@ -3,7 +3,7 @@ using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
-namespace AutomaticRoadblocks.Instance
+namespace AutomaticRoadblocks.Instances
 {
     /// <summary>
     /// A vehicle which is controlled by the Automatic Roadblock plugin.
@@ -23,9 +23,17 @@ namespace AutomaticRoadblocks.Instance
             GameInstance.IsSirenOn = true;
             EntityUtils.VehicleLights(GameInstance, VehicleLightState.AlwaysOn);
         }
+        
+        #region Properties
 
         /// <inheritdoc />
         public Vehicle GameInstance { get; }
+
+        /// <inheritdoc />
+        public bool IsInvalid => GameInstance == null ||
+                                 !GameInstance.IsValid();
+
+        #endregion
 
         #region IDisposable
 
