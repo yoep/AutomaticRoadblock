@@ -84,9 +84,20 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly LocalizationKey RoadblockNoPursuitActive = new(nameof(RoadblockNoPursuitActive),
             "~r~Unable to create pursuit roadblock preview, no active vehicle in pursuit or player not in vehicle");
-        
+
         public static readonly LocalizationKey RoadblockInstanceCreationFailed = new(nameof(RoadblockInstanceCreationFailed),
             "~r~One or more instance(s) failed to spawn, please check the logs for more info");
+
+        #endregion
+
+        #region VehicleType
+
+        public static readonly LocalizationKey VehicleTypeLocale = new(nameof(VehicleTypeLocale), "Locale");
+        public static readonly LocalizationKey VehicleTypeState = new(nameof(VehicleTypeState), "State");
+        public static readonly LocalizationKey VehicleTypeFbi = new(nameof(VehicleTypeFbi), "FBI");
+        public static readonly LocalizationKey VehicleTypeSwat = new(nameof(VehicleTypeSwat), "Swat");
+        public static readonly LocalizationKey VehicleTypeTransporter = new(nameof(VehicleTypeTransporter), "Transporter");
+        public static readonly LocalizationKey VehicleTypeNone = new(nameof(VehicleTypeNone), "None");
 
         #endregion
 
@@ -132,7 +143,13 @@ namespace AutomaticRoadblocks.Localization
             RoadblockHasBeenHit,
             RoadblockHasBeenBypassed,
             RoadblockNoPursuitActive,
-            RoadblockInstanceCreationFailed
+            RoadblockInstanceCreationFailed,
+            VehicleTypeLocale,
+            VehicleTypeState,
+            VehicleTypeFbi,
+            VehicleTypeSwat,
+            VehicleTypeTransporter,
+            VehicleTypeNone,
         };
 
         private LocalizationKey(string identifier, string defaultText)

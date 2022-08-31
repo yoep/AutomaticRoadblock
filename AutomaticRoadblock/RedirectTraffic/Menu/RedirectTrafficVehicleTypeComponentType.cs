@@ -9,10 +9,12 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
     public class RedirectTrafficVehicleTypeComponentType : IMenuComponent<UIMenuListScrollerItem<VehicleType>>
     {
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
+        private readonly ILocalizer _localizer;
 
         public RedirectTrafficVehicleTypeComponentType(IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
+            _localizer = localizer;
 
             MenuItem = new UIMenuListScrollerItem<VehicleType>(localizer[LocalizationKey.Vehicle], localizer[LocalizationKey.VehicleDescription],
                 VehicleType.Values);
@@ -37,6 +39,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
+            MenuItem.Formatter = type => _localizer[type.LocalizationKey];
             MenuItem.SelectedItem = _redirectTrafficDispatcher.VehicleType;
             MenuItem.IndexChanged += MenuIndexChanged;
         }
