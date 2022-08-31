@@ -252,7 +252,9 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void DoAutoLevelIncrementTick()
         {
-            if (!_settingsManager.AutomaticRoadblocksSettings.EnableAutoLevelIncrements)
+            // verify if automatic level increases is allowed
+            // if not, we're not going to check any conditions
+            if (!EnableAutomaticLevelIncreases)
                 return;
 
             VerifyPursuitLethalForce();
@@ -277,11 +279,9 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void VerifyShotsFired()
         {
-            // verify if automatic level increase is allowed
-            // if not, we're not going to check any shots fired conditions
-            if (!EnableAutomaticLevelIncreases)
+            if (!IsPursuitActive)
                 return;
-
+            
             if (IsAnySuspectAimingOrShooting() && IsAutomaticLevelIncreaseForShotsFiredAllowed())
             {
                 _logger.Debug("Suspect is shooting/aiming, increasing level");
@@ -435,6 +435,7 @@ namespace AutomaticRoadblocks.Pursuit
             _keyListenerActive = true;
             _game.NewSafeFiber(() =>
             {
+                _logger.Debug("Pursuit manager key listener has been started");
                 while (_keyListenerActive)
                 {
                     _game.FiberYield();
@@ -442,16 +443,17 @@ namespace AutomaticRoadblocks.Pursuit
                     try
                     {
                         if (!IsPursuitActive || !IsDispatchNowPressed())
-                            return;
+                            continue;
 
-                        _logger.Trace("User pressed the dispatch now key, trying to dispatch a new roadblock");
+                        _logger.Debug("User pressed the dispatch now key, trying to dispatch a new roadblock");
                         DispatchNow(true);
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error($"An error occurred while processing the pursuit manager, {ex.Message}", ex);
+                        _logger.Error($"An error occurred while processing the pursuit manager key listener, {ex.Message}", ex);
                     }
                 }
+                _logger.Debug("Pursuit manager key listener has been stopped");
             }, "PursuitManager.KeyListener");
         }
 

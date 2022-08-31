@@ -184,6 +184,7 @@ namespace AutomaticRoadblocks.Menu
             _menuRunning = true;
             _game.NewSafeFiber(() =>
             {
+                _logger.Debug("Menu key listener has been started");
                 while (_menuRunning)
                 {
                     _game.FiberYield();
@@ -203,7 +204,7 @@ namespace AutomaticRoadblocks.Menu
                         _game.DisplayPluginNotification("an unexpected error occurred");
                     }
                 }
-                
+                _logger.Debug("Menu key listener has been stopped");
             }, "MenuImpl.KeyListener");
         }
 
