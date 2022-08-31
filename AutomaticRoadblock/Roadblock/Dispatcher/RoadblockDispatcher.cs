@@ -92,7 +92,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 _logger.Trace($"Dispatching roadblock on {road}");
 
                 _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(road.Position)]);
-                var roadblock = PursuitRoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
+                var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
+                var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
                     ShouldAddLightsToRoadblock());
 
                 _roadblocks.Add(roadblock);
@@ -178,7 +179,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             _game.NewSafeFiber(() =>
                 {
-                    var roadblock = PursuitRoadblockFactory.Create(level, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
+                    var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
+                    var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
                         ShouldAddLightsToRoadblock());
                     _logger.Info($"Dispatching new roadblock\n{roadblock}");
                     _roadblocks.Add(roadblock);
@@ -219,20 +221,43 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private Road DetermineRoadblockLocation(RoadblockLevel level, Vehicle vehicle, bool atCurrentLocation)
         {
             var roadblockDistance = CalculateRoadblockDistance(vehicle, atCurrentLocation);
-            var roadType = DetermineAllowedRoadTypes(level);
+            var roadType = DetermineAllowedRoadTypes(vehicle, level);
 
-            _logger.Trace($"Determining roadblock location with {nameof(roadblockDistance)}: {roadblockDistance}, {nameof(roadType)}: {roadType}");
+            _logger.Trace(
+                $"Determining roadblock location with Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(roadblockDistance)}: {roadblockDistance}, {nameof(roadType)}: {roadType}");
             return RoadUtils.FindRoadTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType);
         }
 
         private ICollection<Road> DetermineRoadblockLocationPreview(RoadblockLevel level, Vehicle vehicle, bool atCurrentLocation)
         {
             var roadblockDistance = CalculateRoadblockDistance(vehicle, atCurrentLocation);
-            var roadType = DetermineAllowedRoadTypes(level);
+            var roadType = DetermineAllowedRoadTypes(vehicle, level);
 
             _logger.Trace(
-                $"Determining roadblock location for the preview with {nameof(roadblockDistance)}: {roadblockDistance}, {nameof(roadType)}: {roadType}");
+                $"Determining roadblock location for the preview with Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(roadblockDistance)}: {roadblockDistance}, {nameof(roadType)}: {roadType}");
             return RoadUtils.FindRoadsTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType);
+        }
+
+        private RoadblockLevel DetermineRoadblockLevelBasedOnTheRoadLocation(RoadblockLevel level, Road road)
+        {
+            var actualLevelToUse = level;
+            var isDirtOrOffroad = RoadUtils.IsDirtOrOffroad(road.Position);
+
+            // if we're not a dirt/offroad road
+            // all levels are allowed
+            _logger.Trace($"Roadblock placement is on dirt/offroad road: {isDirtOrOffroad}");
+            if (!isDirtOrOffroad)
+                return actualLevelToUse;
+
+            // otherwise, we're going to reduce the level for simplification
+            _logger.Debug("Detected a dirt/offroad position for the roadblock");
+            if (level.Level > 3)
+            {
+                actualLevelToUse = RoadblockLevel.Level2;
+                _logger.Info($"Roadblock level has been reduced to {RoadblockLevel.Level2} as the location is a dirt/offroad location");
+            }
+
+            return actualLevelToUse;
         }
 
         private void InternalRoadblockStateChanged(IRoadblock roadblock, RoadblockState newState)
@@ -333,9 +358,21 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return distance;
         }
 
-        private static VehicleNodeType DetermineAllowedRoadTypes(RoadblockLevel level)
+        private VehicleNodeType DetermineAllowedRoadTypes(Vehicle vehicle, RoadblockLevel level)
         {
-            return level.Level <= RoadblockLevel.Level2.Level ? VehicleNodeType.AllRoadNoJunctions : VehicleNodeType.MainRoads;
+            // verify the current road type
+            // if we're already at a dirt/offroad road, all road types for the trajectory calculation are allowed
+            if (RoadUtils.IsDirtOrOffroad(vehicle.Position))
+            {
+                _logger.Debug("Following the current dirt/offroad road for the roadblock placement");
+                return VehicleNodeType.AllRoadNoJunctions;
+            }
+
+            // otherwise, we're going to base the allowed road types for the trajectory based
+            // on the current roadblock level
+            var vehicleNodeType = level.Level <= RoadblockLevel.Level2.Level ? VehicleNodeType.AllRoadNoJunctions : VehicleNodeType.MainRoads;
+            _logger.Debug($"Roadblock road traversal will use vehicle node type {vehicleNodeType}");
+            return vehicleNodeType;
         }
 
         #endregion

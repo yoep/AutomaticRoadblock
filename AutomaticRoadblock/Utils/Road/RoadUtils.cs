@@ -11,6 +11,8 @@ namespace AutomaticRoadblocks.Utils.Road
     {
         private const float MaxLaneWidth = 10f;
 
+        private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+
         #region Methods
 
         /// <summary>
@@ -101,34 +103,6 @@ namespace AutomaticRoadblocks.Utils.Road
         }
 
         /// <summary>
-        /// Check if the given lane is the left side lane of the road.
-        /// </summary>
-        /// <param name="road">The road to determine the lane side of.</param>
-        /// <param name="lane">The lane on the road to verify.</param>
-        /// <returns>Returns true if the given lane is the left lane of the road, else false.</returns>
-        public static bool IsLeftSideLane(Road road, Road.Lane lane)
-        {
-            var distanceRightSide = Vector3.Distance2D(road.RightSide, lane.Position);
-            var distanceLeftSide = Vector3.Distance2D(road.LeftSide, lane.Position);
-
-            return distanceLeftSide < distanceRightSide;
-        }
-
-        /// <summary>
-        /// Check if the road has multiple lanes in the same direction as the given lane.
-        /// </summary>
-        /// <param name="road">The road to verify the lanes of.</param>
-        /// <param name="lane">The lane to check for same direction.</param>
-        /// <returns>Returns true if the road has multiple lanes going in the same direction as the given lane.</returns>
-        public static bool HasMultipleLanesInSameDirection(Road road, Road.Lane lane)
-        {
-            Assert.NotNull(road, "road cannot be null");
-            return road.Lanes
-                .Where(x => x != lane)
-                .Any(x => Math.Abs(lane.Heading - x.Heading) < 1f);
-        }
-
-        /// <summary>
         /// Create a new speed zone.
         /// </summary>
         /// <param name="position">The position of the zone.</param>
@@ -161,6 +135,17 @@ namespace AutomaticRoadblocks.Utils.Road
             return NativeFunction.Natives.IS_POINT_ON_ROAD<bool>(position.X, position.Y, position.Z);
         }
 
+        /// <summary>
+        /// Verify if the given position is a dirt/offroad location.
+        /// </summary>
+        /// <param name="position">The position to check.</param>
+        /// <returns>Returns true when the position is a dirt/offroad, else false.</returns>
+        public static bool IsDirtOrOffroad(Vector3 position)
+        {
+            var nodeId = GetClosestNodeId(position);
+            return IsSlowRoad(nodeId);
+        }
+
         #endregion
 
         #region Functions
@@ -179,25 +164,24 @@ namespace AutomaticRoadblocks.Utils.Road
         {
             return nodeType switch
             {
-                VehicleNodeType.MainRoads => RoadType.MajorRoads,
-                VehicleNodeType.AllRoadNoJunctions => RoadType.MajorRoadsNoJunction,
+                VehicleNodeType.MainRoads => RoadType.MajorRoadsNoJunction,
+                VehicleNodeType.MainRoadsWithJunctions => RoadType.MajorRoads,
                 _ => RoadType.All
             };
         }
 
         private static NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, VehicleNodeType nodeType, RoadType roadType)
         {
-            var logger = IoC.Instance.GetInstance<ILogger>();
-            logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading}");
+            Logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading}");
             FindVehicleNodes(position, nodeType, roadType, out var node1, out var node2);
-            logger.Trace($"Found vehicles nodes: {node1.Position} with heading {node1.Heading}, {node2.Position} with heading {node2.Heading}");
+            Logger.Trace($"Found vehicles nodes: {node1.Position} with heading {node1.Heading}, {node2.Position} with heading {node2.Heading}");
 
             var nodeMatchingClosestToHeading = Math.Abs(node1.Heading - heading) % 360 < Math.Abs(node2.Heading - heading) % 360 ? node1 : node2;
-            logger.Debug($"Using node {nodeMatchingClosestToHeading} as closest matching");
+            Logger.Debug($"Using node {nodeMatchingClosestToHeading} as closest matching");
 
             if (Math.Abs(nodeMatchingClosestToHeading.Heading - heading) % 360 > 45)
             {
-                logger.Warn(
+                Logger.Warn(
                     $"Closest matching node {nodeMatchingClosestToHeading} is exceeding the heading tolerance, using the original heading of {heading} instead");
                 nodeMatchingClosestToHeading = new NodeInfo(nodeMatchingClosestToHeading.Position, heading, nodeMatchingClosestToHeading.NumberOfLanes1,
                     nodeMatchingClosestToHeading.NumberOfLanes2, nodeMatchingClosestToHeading.AtJunction);
@@ -209,7 +193,6 @@ namespace AutomaticRoadblocks.Utils.Road
         private static List<NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, VehicleNodeType nodeType,
             out NodeInfo lastFoundNode)
         {
-            var logger = IoC.Instance.GetInstance<ILogger>();
             var startedAt = DateTime.Now.Ticks;
             var distanceTraversed = 0f;
             var distanceToMove = 5f;
@@ -223,7 +206,7 @@ namespace AutomaticRoadblocks.Utils.Road
             {
                 if (findNodeAttempt == 10)
                 {
-                    logger.Warn($"Failed to traverse road, unable to find next node after {lastFoundNode} (tried {findNodeAttempt} times)");
+                    Logger.Warn($"Failed to traverse road, unable to find next node after {lastFoundNode} (tried {findNodeAttempt} times)");
                     break;
                 }
 
@@ -243,12 +226,12 @@ namespace AutomaticRoadblocks.Utils.Road
                     findNodeAttempt = 0;
                     distanceTraversed += additionalDistanceTraversed;
                     lastFoundNode = nodeTowardsHeading;
-                    logger.Trace($"Traversed an additional {additionalDistanceTraversed} distance, new total traversed distance = {distanceTraversed}");
+                    Logger.Trace($"Traversed an additional {additionalDistanceTraversed} distance, new total traversed distance = {distanceTraversed}");
                 }
             }
 
             var calculationTime = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
-            logger.Debug(
+            Logger.Debug(
                 $"Traversed a total of {position.DistanceTo(lastFoundNode.Position)} distance with expectation {distance} within {calculationTime} millis\n" +
                 $"origin: {position}, destination: {lastFoundNode.Position}");
             return nodeInfos;
@@ -260,6 +243,9 @@ namespace AutomaticRoadblocks.Utils.Road
             Assert.NotNull(nodeType, "roadType cannot be null");
             NativeFunction.Natives.GET_CLOSEST_ROAD(position.X, position.Y, position.Z, 1f, 1, out Vector3 roadPosition1, out Vector3 roadPosition2,
                 out int numberOfLanes1, out int numberOfLanes2, out float junctionIndication, (int)roadType);
+            Logger.Trace(
+                $"Found road with Position 1: {roadPosition1}, Position 2: {roadPosition2}, numberOfLanes1: {numberOfLanes1}, numberOfLanes2: {numberOfLanes2}, junctionIndication: {junctionIndication}\n" +
+                $"Based on Position: {position}, {nameof(RoadType)}: {roadType}");
 
             var vehicleNode1 = FindVehicleNode(roadPosition1, nodeType);
             var vehicleNode2 = FindVehicleNode(roadPosition2, nodeType);
@@ -366,7 +352,7 @@ namespace AutomaticRoadblocks.Utils.Road
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(type, "type cannot be null");
             NativeFunction.Natives.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(position.X, position.Y, position.Z, out Vector3 nodePosition, out float nodeHeading,
-                (int)type, 3, 0);
+                1, 3, 0);
 
             return new NodeInfo(nodePosition, MathHelper.NormalizeHeading(nodeHeading));
         }
@@ -403,6 +389,33 @@ namespace AutomaticRoadblocks.Utils.Road
         private static bool IsSingleDirectionRoad(int numberOfLanes1, int numberOfLanes2)
         {
             return numberOfLanes1 == 0 || numberOfLanes2 == 0;
+        }
+
+        private static int GetClosestNodeId(Vector3 position)
+        {
+            return NativeFunction.CallByName<int>("GET_NTH_CLOSEST_VEHICLE_NODE_ID", position.X, position.Y, position.Z, 1, 1, 1077936128, 0f);
+        }
+
+        public static NodeProperties GetVehicleNodeProperties(Vector3 position)
+        {
+            NativeFunction.Natives.GET_VEHICLE_NODE_PROPERTIES<bool>(position.X, position.Y, position.Z, out int density, out int flags);
+
+            return new NodeProperties
+            {
+                Density = density,
+                Flags = flags
+            };
+        }
+
+        /// <summary>
+        /// Verify if the given node is is offroad.
+        /// </summary>
+        /// <param name="nodeId">The node id to check.</param>
+        /// <returns>Returns true when the node is an alley, dirt road or carpark.</returns>
+        private static bool IsSlowRoad(int nodeId)
+        {
+            // PATHFIND::_GET_IS_SLOW_ROAD_FLAG
+            return NativeFunction.CallByHash<bool>(0x4F5070AA58F69279, nodeId);
         }
 
         #endregion
@@ -466,5 +479,12 @@ namespace AutomaticRoadblocks.Utils.Road
                 return hashCode;
             }
         }
+    }
+
+    public class NodeProperties
+    {
+        public int Density { get; internal set; }
+
+        public int Flags { get; internal set; }
     }
 }
