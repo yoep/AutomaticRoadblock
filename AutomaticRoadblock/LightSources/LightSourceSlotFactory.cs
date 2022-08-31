@@ -62,7 +62,7 @@ namespace AutomaticRoadblocks.LightSources
 
         private static Vector3 CalculateRowPosition(IRoadblockSlot roadblockSlot)
         {
-            return roadblockSlot.Position + MathHelper.ConvertHeadingToDirection(roadblockSlot.Heading - 180) * 2f;
+            return roadblockSlot.OffsetPosition + MathHelper.ConvertHeadingToDirection(roadblockSlot.Heading - 180) * 2f;
         }
     }
 }

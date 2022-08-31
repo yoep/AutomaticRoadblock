@@ -32,6 +32,11 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// Enable the redirect arrow based on the side of the placement.
         /// </summary>
         bool EnableRedirectionArrow { get; set; }
+        
+        /// <summary>
+        /// The offset of the placement in regards to the node.
+        /// </summary>
+        float Offset { get; set; }
 
         /// <summary>
         /// Dispatch a new redirect traffic instance.

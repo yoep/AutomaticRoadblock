@@ -39,6 +39,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             ConeDistance = request.ConeDistance;
             EnableRedirectionArrow = request.EnableRedirectionArrow;
             EnableLights = request.EnableLights;
+            Offset = request.Offset;
 
             Init();
         }
@@ -49,6 +50,11 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// The position of the redirect traffic instance.
         /// </summary>
         public Vector3 Position => PositionBasedOnType();
+
+        /// <summary>
+        /// The offset position in regards to the node of the redirect traffic instance.
+        /// </summary>
+        public Vector3 OffsetPosition => Position + MathHelper.ConvertHeadingToDirection(Lane.Heading) * Offset;
 
         /// <summary>
         /// The road on which this redirect traffic instance is created.
@@ -89,6 +95,11 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// The indication if lights are enabled for this redirect traffic instance.
         /// </summary>
         public bool EnableLights { get; }
+
+        /// <summary>
+        /// Get the relative offset for the position in regards to the vehicle node.
+        /// </summary>
+        public float Offset { get; }
 
         /// <summary>
         /// The vehicle model to use for the vehicle within this instance.
@@ -164,7 +175,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
         public override string ToString()
         {
             return
-                $"{nameof(Position)}: {Position}, {nameof(Type)}: {Type}, {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(IsLeftSideOfLanes)}: {IsLeftSideOfLanes},\n" +
+                $"{nameof(Position)}: {Position}, {nameof(OffsetPosition)}: {OffsetPosition}, {nameof(Type)}: {Type}, {nameof(VehicleType)}: {VehicleType}, " +
+                $"{nameof(ConeType)}: {ConeType}, {nameof(IsLeftSideOfLanes)}: {IsLeftSideOfLanes},\n" +
                 $"{nameof(Road)}: {Road}\n" +
                 $"Using {nameof(Lane)}: {Lane}";
         }
@@ -198,9 +210,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 return;
 
             var rotation = IsLeftSideOfLanes ? -35 : 35;
-            VehicleModel = VehicleFactory.CreateModel(VehicleType, Position);
+            VehicleModel = VehicleFactory.CreateModel(VehicleType, OffsetPosition);
 
-            _instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Lane.Heading + rotation,
+            _instances.Add(new InstanceSlot(EntityType.CopVehicle, OffsetPosition, Lane.Heading + rotation,
                 (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading)));
         }
 
@@ -208,7 +220,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             var distanceBehindVehicle = GetVehicleLength() - 1f;
             var copPedHeading = Lane.Heading - 180;
-            var positionBehindVehicle = Position + MathHelper.ConvertHeadingToDirection(copPedHeading) * distanceBehindVehicle;
+            var positionBehindVehicle = OffsetPosition + MathHelper.ConvertHeadingToDirection(copPedHeading) * distanceBehindVehicle;
 
             _instances.Add(new InstanceSlot(EntityType.CopPed, positionBehindVehicle, copPedHeading,
                 (position, heading) => CreateCop(position, heading)));
@@ -237,7 +249,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private void PlaceConesAlongTheRoad()
         {
             var placementDirection = MathHelper.ConvertHeadingToDirection(Lane.Heading);
-            var startPosition = Position + ConeStartDirection();
+            var startPosition = OffsetPosition + ConeStartDirection();
             var actualConeLength = ConeType.Width + ConeType.Spacing;
             var coneDistance = ConeDistance + GetVehicleLength();
             var totalCones = coneDistance / actualConeLength;
@@ -259,7 +271,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var placementDirectionSide = IsLeftSideOfLanes ? 90 : -90;
             var placementDirection = MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * coneDistance +
                                      MathHelper.ConvertHeadingToDirection(Lane.Heading + placementDirectionSide) * coneDistance;
-            var startPosition = Position + ConeStartDirection(0.5f);
+            var startPosition = OffsetPosition + ConeStartDirection(0.5f);
 
             Logger.Trace($"Creating a total of {totalCones} cones behind the vehicle for a lane width of {Lane.Width}");
             for (var i = 0; i < totalCones; i++)
@@ -318,7 +330,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 return;
 
             Logger.Trace("Creating roadblock blip");
-            _blip = new Blip(Position)
+            _blip = new Blip(OffsetPosition)
             {
                 IsRouteEnabled = false,
                 IsFriendly = true,
@@ -456,6 +468,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
             public bool EnableRedirectionArrow { get; set; }
 
             public bool EnableLights { get; set; }
+
+            public float Offset { get; set; }
         }
     }
 }

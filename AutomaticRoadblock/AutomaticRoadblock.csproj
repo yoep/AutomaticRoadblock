@@ -141,6 +141,7 @@
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficConeDistanceComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficConeTypeComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficLaneTypeComponentItem.cs" />
+        <Compile Include="RedirectTraffic\Menu\RedirectTrafficOffsetComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficPlaceComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficMenuSwitchItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficRemoveComponentItem.cs" />
