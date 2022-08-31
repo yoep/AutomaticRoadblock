@@ -34,8 +34,8 @@ namespace AutomaticRoadblocks
 
         public override void Initialize()
         {
-            InitializeDutyListener();
             InitializeSettings();
+            InitializeDutyListener();
             InitializeMenuComponents();
             InitializeDebugComponents();
             InitializeMenu();
@@ -91,9 +91,7 @@ namespace AutomaticRoadblocks
 
         private static void InitializeSettings()
         {
-            var settingsManager = IoC.Instance.GetInstance<ISettingsManager>();
-
-            settingsManager.Load();
+            IoC.Instance.GetInstance<ISettingsManager>().Load();
         }
 
         private static void InitializeMenu()

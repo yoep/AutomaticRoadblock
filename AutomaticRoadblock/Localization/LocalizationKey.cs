@@ -84,9 +84,38 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly LocalizationKey RoadblockNoPursuitActive = new(nameof(RoadblockNoPursuitActive),
             "~r~Unable to create pursuit roadblock preview, no active vehicle in pursuit or player not in vehicle");
-        
+
         public static readonly LocalizationKey RoadblockInstanceCreationFailed = new(nameof(RoadblockInstanceCreationFailed),
             "~r~One or more instance(s) failed to spawn, please check the logs for more info");
+
+        #endregion
+
+        #region VehicleType
+
+        public static readonly LocalizationKey VehicleTypeLocale = new(nameof(VehicleTypeLocale), "Locale");
+        public static readonly LocalizationKey VehicleTypeState = new(nameof(VehicleTypeState), "State");
+        public static readonly LocalizationKey VehicleTypeFbi = new(nameof(VehicleTypeFbi), "FBI");
+        public static readonly LocalizationKey VehicleTypeSwat = new(nameof(VehicleTypeSwat), "Swat");
+        public static readonly LocalizationKey VehicleTypeTransporter = new(nameof(VehicleTypeTransporter), "Transporter");
+        public static readonly LocalizationKey VehicleTypeNone = new(nameof(VehicleTypeNone), "None");
+
+        #endregion
+
+        #region BarrierType
+        
+        public static readonly LocalizationKey BarrierTypeNone = new(nameof(BarrierTypeNone), "None");
+        public static readonly LocalizationKey BarrierTypeSmallCone = new(nameof(BarrierTypeSmallCone), "Small cone");
+        public static readonly LocalizationKey BarrierTypeSmallConeStriped = new(nameof(BarrierTypeSmallConeStriped), "Small cone striped");
+        public static readonly LocalizationKey BarrierTypeBigCone = new(nameof(BarrierTypeBigCone), "Big cone");
+        public static readonly LocalizationKey BarrierTypeBigConeStriped = new(nameof(BarrierTypeBigConeStriped), "Big cone striped");
+        public static readonly LocalizationKey BarrierTypePoliceDoNotCross = new(nameof(BarrierTypePoliceDoNotCross), "Police do not cross");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierLarge = new(nameof(BarrierTypeWorkBarrierLarge), "Work barrier large");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierSmall = new(nameof(BarrierTypeWorkBarrierSmall), "Work barrier small");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierWithSign = new(nameof(BarrierTypeWorkBarrierWithSign), "Work ahead sign");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierWithSignLight = new(nameof(BarrierTypeWorkBarrierWithSignLight), "Work ahead sign lights");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierHigh = new(nameof(BarrierTypeWorkBarrierHigh), "High barrier");
+        public static readonly LocalizationKey BarrierTypeBarrelTrafficCatcher = new(nameof(BarrierTypeBarrelTrafficCatcher), "Barrel");
+        public static readonly LocalizationKey BarrierTypeConeWithLight = new(nameof(BarrierTypeConeWithLight), "Cone light");
 
         #endregion
 
@@ -132,7 +161,26 @@ namespace AutomaticRoadblocks.Localization
             RoadblockHasBeenHit,
             RoadblockHasBeenBypassed,
             RoadblockNoPursuitActive,
-            RoadblockInstanceCreationFailed
+            RoadblockInstanceCreationFailed,
+            VehicleTypeLocale,
+            VehicleTypeState,
+            VehicleTypeFbi,
+            VehicleTypeSwat,
+            VehicleTypeTransporter,
+            VehicleTypeNone,
+            BarrierTypeNone,
+            BarrierTypeSmallCone,
+            BarrierTypeSmallConeStriped,
+            BarrierTypeBigCone,
+            BarrierTypeBigConeStriped,
+            BarrierTypePoliceDoNotCross,
+            BarrierTypeWorkBarrierLarge,
+            BarrierTypeWorkBarrierSmall,
+            BarrierTypeWorkBarrierWithSign,
+            BarrierTypeWorkBarrierWithSignLight,
+            BarrierTypeWorkBarrierHigh,
+            BarrierTypeBarrelTrafficCatcher,
+            BarrierTypeConeWithLight,
         };
 
         private LocalizationKey(string identifier, string defaultText)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Utils;
 using Rage;
 
@@ -6,19 +7,19 @@ namespace AutomaticRoadblocks.Barriers
 {
     public class BarrierType
     {
-        public static readonly BarrierType None = new("None", 1f, 1f);
-        public static readonly BarrierType SmallCone = new("Small cone", DimensionOf(PropUtils.Models.SmallCone), 0.4f);
-        public static readonly BarrierType SmallConeStriped = new("Small cone striped", DimensionOf(PropUtils.Models.SmallConeWithStrips), 0.4f);
-        public static readonly BarrierType BigCone = new("Big cone", DimensionOf(PropUtils.Models.BigCone), 0.5f);
-        public static readonly BarrierType BigConeStriped = new("Big cone striped", DimensionOf(PropUtils.Models.BigConeWithStrips), 0.5f);
-        public static readonly BarrierType PoliceDoNotCross = new("Police do not cross", DimensionOf(PropUtils.Models.PoliceDoNotCross), 0.2f);
-        public static readonly BarrierType WorkBarrierLarge = new("Work barrier large", DimensionOf(PropUtils.Models.WorkBarrierLarge), 0.2f);
-        public static readonly BarrierType WorkBarrierSmall = new("Work barrier small", DimensionOf(PropUtils.Models.WorkBarrierSmall), 0.3f);
-        public static readonly BarrierType WorkBarrierWithSign = new("Work ahead sign", DimensionOf(PropUtils.Models.WorkBarrierAHeadSign), 0.2f);
-        public static readonly BarrierType WorkBarrierWithSignLight = new("Work ahead sign lights", DimensionOf(PropUtils.Models.WorkBarrierAHeadSignLights), 0.2f);
-        public static readonly BarrierType WorkBarrierHigh = new("High barrier", DimensionOf(PropUtils.Models.WorkBarrierHigh), 0.2f);
-        public static readonly BarrierType BarrelTrafficCatcher = new("Barrel", DimensionOf(PropUtils.Models.BarrelTrafficCatcher), 0.5f);
-        public static readonly BarrierType ConeWithLight = new("Cone light", DimensionOf(PropUtils.Models.ConeWithLight), 0.5f);
+        public static readonly BarrierType None = new(LocalizationKey.BarrierTypeNone, 1f, 1f);
+        public static readonly BarrierType SmallCone = new(LocalizationKey.BarrierTypeSmallCone, DimensionOf(PropUtils.Models.SmallCone), 0.4f);
+        public static readonly BarrierType SmallConeStriped = new(LocalizationKey.BarrierTypeSmallConeStriped, DimensionOf(PropUtils.Models.SmallConeWithStrips), 0.4f);
+        public static readonly BarrierType BigCone = new(LocalizationKey.BarrierTypeBigCone, DimensionOf(PropUtils.Models.BigCone), 0.5f);
+        public static readonly BarrierType BigConeStriped = new(LocalizationKey.BarrierTypeBigConeStriped, DimensionOf(PropUtils.Models.BigConeWithStrips), 0.5f);
+        public static readonly BarrierType PoliceDoNotCross = new(LocalizationKey.BarrierTypePoliceDoNotCross, DimensionOf(PropUtils.Models.PoliceDoNotCross), 0.2f);
+        public static readonly BarrierType WorkBarrierLarge = new(LocalizationKey.BarrierTypeWorkBarrierLarge, DimensionOf(PropUtils.Models.WorkBarrierLarge), 0.2f);
+        public static readonly BarrierType WorkBarrierSmall = new(LocalizationKey.BarrierTypeWorkBarrierSmall, DimensionOf(PropUtils.Models.WorkBarrierSmall), 0.3f);
+        public static readonly BarrierType WorkBarrierWithSign = new(LocalizationKey.BarrierTypeWorkBarrierWithSign, DimensionOf(PropUtils.Models.WorkBarrierAHeadSign), 0.2f);
+        public static readonly BarrierType WorkBarrierWithSignLight = new(LocalizationKey.BarrierTypeWorkBarrierWithSignLight, DimensionOf(PropUtils.Models.WorkBarrierAHeadSignLights), 0.2f);
+        public static readonly BarrierType WorkBarrierHigh = new(LocalizationKey.BarrierTypeWorkBarrierHigh, DimensionOf(PropUtils.Models.WorkBarrierHigh), 0.2f);
+        public static readonly BarrierType BarrelTrafficCatcher = new(LocalizationKey.BarrierTypeBarrelTrafficCatcher, DimensionOf(PropUtils.Models.BarrelTrafficCatcher), 0.5f);
+        public static readonly BarrierType ConeWithLight = new(LocalizationKey.BarrierTypeConeWithLight, DimensionOf(PropUtils.Models.ConeWithLight), 0.5f);
 
         public static readonly IEnumerable<BarrierType> Values = new[]
         {
@@ -37,9 +38,9 @@ namespace AutomaticRoadblocks.Barriers
             BarrelTrafficCatcher
         };
 
-        private BarrierType(string displayText, float width, float spacing)
+        private BarrierType(LocalizationKey localizationKey, float width, float spacing)
         {
-            DisplayText = displayText;
+            LocalizationKey = localizationKey;
             Width = width;
             Spacing = spacing;
         }
@@ -50,9 +51,9 @@ namespace AutomaticRoadblocks.Barriers
         public bool IsNone => this == None;
 
         /// <summary>
-        /// Get the display text for this barrier type.
+        /// Get the display localization identifier.
         /// </summary>
-        public string DisplayText { get; }
+        public LocalizationKey LocalizationKey { get; }
 
         /// <summary>
         /// Get the recommended spacing distance for the barrier.
@@ -67,7 +68,7 @@ namespace AutomaticRoadblocks.Barriers
         /// <inheritdoc />
         public override string ToString()
         {
-            return DisplayText;
+            return LocalizationKey.DefaultText;
         }
 
         private static float DimensionOf(Model model)

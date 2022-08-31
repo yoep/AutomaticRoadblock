@@ -78,7 +78,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         protected override bool IsHologramPreviewEnabled => _settingsManager.ManualPlacementSettings.EnablePreview;
 
         /// <inheritdoc />
-        protected override float DistanceInFrontOfPlayer => 8f;
+        protected override float DistanceInFrontOfPlayer => _settingsManager.ManualPlacementSettings.DistanceFromPlayer;
 
         #endregion
 

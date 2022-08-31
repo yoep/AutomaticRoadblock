@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Vehicles;
@@ -8,14 +9,15 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
     public class ManualPlacementVehicleTypeComponentItem : IMenuComponent<UIMenuListScrollerItem<VehicleType>>
     {
         private readonly IManualPlacement _manualPlacement;
+        private readonly ILocalizer _localizer;
 
         public ManualPlacementVehicleTypeComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _manualPlacement = manualPlacement;
+            _localizer = localizer;
 
             MenuItem = new UIMenuListScrollerItem<VehicleType>(localizer[LocalizationKey.Vehicle], localizer[LocalizationKey.VehicleDescription],
                 VehicleType.Values);
-            Init();
         }
 
         /// <inheritdoc />
@@ -33,8 +35,11 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             // no-op   
         }
 
+        [IoC.PostConstruct]
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
+            MenuItem.Formatter = type => _localizer[type.LocalizationKey];
             MenuItem.SelectedItem = _manualPlacement.VehicleType;
             MenuItem.IndexChanged += MenuIndexChanged;
         }

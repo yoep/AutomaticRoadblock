@@ -2,7 +2,13 @@ name: Release
 
 on:
   workflow_dispatch:
-    inputs: {}
+    inputs:
+      type:
+        type: choice
+        description: The release type
+        options:
+          - release
+          - release-bugfix
     
 jobs:
   build:
@@ -25,12 +31,10 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: nuget restore AutomaticRoadblock.sln
       - name: Build
-        run: make release
+        run: make ${{ inputs.choice }}
       - name: Archive artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Binaries
           path: |
-            AutomaticRoadblock/bin/x64/Debug/AutomaticRoadblocks.dll
-            AutomaticRoadblock/bin/x64/Debug/AutomaticRoadblocks.ini
-            AutomaticRoadblock/bin/x64/Debug/AutomaticRoadblocks.pdb
+            Build/

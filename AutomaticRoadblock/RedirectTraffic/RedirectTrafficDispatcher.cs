@@ -57,7 +57,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         protected override bool IsHologramPreviewEnabled => _settingsManager.RedirectTrafficSettings.EnablePreview;
 
         /// <inheritdoc />
-        protected override float DistanceInFrontOfPlayer => 10f;
+        protected override float DistanceInFrontOfPlayer => _settingsManager.RedirectTrafficSettings.DistanceFromPlayer;
 
         #endregion
 
@@ -77,6 +77,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
             if (redirectTraffic == null)
             {
                 redirectTraffic = CreateInstance(LastDeterminedRoad ?? CalculateNewLocationForInstance());
+                Logger.Info($"Created redirect traffic {redirectTraffic}");
+
                 lock (Instances)
                 {
                     Instances.Add(redirectTraffic);
@@ -98,6 +100,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         protected override RedirectTraffic CreateInstance(Road road)
         {
+            Logger.Debug(
+                $"Creating a redirect traffic instance for {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(Type)}: {Type}, {nameof(ConeDistance)}: {ConeDistance}");
             return new RedirectTraffic(road, VehicleType, ConeType, Type, ConeDistance);
         }
 
