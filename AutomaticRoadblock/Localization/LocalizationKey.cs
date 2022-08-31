@@ -73,6 +73,7 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly LocalizationKey RedirectTrafficType = new(nameof(RedirectTrafficType), "Redirect");
         public static readonly LocalizationKey RedirectTrafficTypeDescription = new(nameof(RedirectTrafficTypeDescription), "Place a traffic redirection on");
+        public static readonly LocalizationKey RedirectTrafficEnableRedirectionArrow = new(nameof(RedirectTrafficEnableRedirectionArrow), "Redirect arrow");
 
         #endregion
 
@@ -111,6 +112,7 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey BarrierTypePoliceDoNotCross = new(nameof(BarrierTypePoliceDoNotCross), "Police do not cross");
         public static readonly LocalizationKey BarrierTypeWorkBarrierLarge = new(nameof(BarrierTypeWorkBarrierLarge), "Work barrier large");
         public static readonly LocalizationKey BarrierTypeWorkBarrierSmall = new(nameof(BarrierTypeWorkBarrierSmall), "Work barrier small");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierSmallWithLight = new(nameof(BarrierTypeWorkBarrierSmallWithLight), "Work barrier small light");
         public static readonly LocalizationKey BarrierTypeWorkBarrierWithSign = new(nameof(BarrierTypeWorkBarrierWithSign), "Work ahead sign");
         public static readonly LocalizationKey BarrierTypeWorkBarrierWithSignLight = new(nameof(BarrierTypeWorkBarrierWithSignLight), "Work ahead sign lights");
         public static readonly LocalizationKey BarrierTypeWorkBarrierHigh = new(nameof(BarrierTypeWorkBarrierHigh), "High barrier");
@@ -156,6 +158,7 @@ namespace AutomaticRoadblocks.Localization
             RedirectTrafficConeDistanceDescription,
             RedirectTrafficType,
             RedirectTrafficTypeDescription,
+            RedirectTrafficEnableRedirectionArrow,
             RoadblockDispatchedAt,
             RoadblockDispatchedAt,
             RoadblockHasBeenHit,

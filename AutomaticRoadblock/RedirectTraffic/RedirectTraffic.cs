@@ -25,18 +25,20 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private Blip _blip;
 
-        public RedirectTraffic(Road road, VehicleType vehicleType, BarrierType coneType, RedirectTrafficType type, float coneDistance)
+        public RedirectTraffic(Request request)
         {
-            Assert.NotNull(road, "road cannot be null");
-            Assert.NotNull(vehicleType, "vehicleType cannot be null");
-            Assert.NotNull(coneType, "coneType cannot be null");
-            Assert.NotNull(type, "type cannot be null");
-            Road = road;
+            Assert.NotNull(request.Road, "road cannot be null");
+            Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
+            Assert.NotNull(request.ConeType, "coneType cannot be null");
+            Assert.NotNull(request.Type, "type cannot be null");
+            Road = request.Road;
             Lane = GetLaneClosestToPlayer();
-            VehicleType = vehicleType;
-            ConeType = coneType;
-            Type = type;
-            ConeDistance = coneDistance;
+            VehicleType = request.VehicleType;
+            ConeType = request.ConeType;
+            Type = request.Type;
+            ConeDistance = request.ConeDistance;
+            EnableRedirectionArrow = request.EnableRedirectionArrow;
+            EnableLights = request.EnableLights;
 
             Init();
         }
@@ -77,6 +79,16 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// The distance along the road the cones should be placed.
         /// </summary>
         public float ConeDistance { get; }
+
+        /// <summary>
+        /// The indication if the redirection arrow is enabled.
+        /// </summary>
+        public bool EnableRedirectionArrow { get; }
+
+        /// <summary>
+        /// The indication if lights are enabled for this redirect traffic instance.
+        /// </summary>
+        public bool EnableLights { get; }
 
         /// <summary>
         /// The vehicle model to use for the vehicle within this instance.
@@ -164,8 +176,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void Dispose()
         {
-            // Cop.ClearAllTasks();
-            // Cop.DeleteAttachments();
+            Cop.DeleteAttachments();
             _instances.ForEach(x => x.Dispose());
             DeleteBlip();
         }
@@ -206,7 +217,13 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private void InitializeScenery()
         {
             PlaceConesAlongTheRoad();
-            PlaceConesBehindTheVehicle();
+            var coneEndPosition = PlaceConesBehindTheVehicle();
+            PlaceVehiclesStoppedSign(coneEndPosition);
+
+            if (EnableRedirectionArrow)
+                PlaceRedirectionArrow(coneEndPosition);
+            if (EnableLights)
+                InitializeVehicleStoppedLight(coneEndPosition);
         }
 
         private ARPed CreateCop(Vector3 position, float heading)
@@ -235,7 +252,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             }
         }
 
-        private void PlaceConesBehindTheVehicle()
+        private Vector3 PlaceConesBehindTheVehicle()
         {
             var coneDistance = ConeType.Width + ConeType.Spacing;
             var totalCones = (int)Math.Floor(Lane.Width / coneDistance);
@@ -251,6 +268,48 @@ namespace AutomaticRoadblocks.RedirectTraffic
                     (position, heading) => BarrierFactory.Create(ConeType, position, heading)));
                 startPosition += placementDirection * coneDistance;
             }
+
+            return startPosition;
+        }
+
+        private void PlaceVehiclesStoppedSign(Vector3 coneEndPosition)
+        {
+            var signPosition = VehicleStoppedSignPosition(coneEndPosition);
+
+            _instances.Add(new InstanceSlot(EntityType.Scenery, signPosition, Lane.Heading,
+                (position, heading) => new ARScenery(PropUtils.StoppedVehiclesSign(position, heading))));
+        }
+
+        private void PlaceRedirectionArrow(Vector3 coneEndPosition)
+        {
+            var sideDirection = SignSideDirection();
+            var signPosition = coneEndPosition
+                               + MathHelper.ConvertHeadingToDirection(sideDirection) * 1.5f
+                               + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 1f;
+
+            _instances.Add(new InstanceSlot(EntityType.Scenery, signPosition, Lane.Heading,
+                (position, heading) => new ARScenery(IsLeftSideOfLanes
+                    ? PropUtils.CreateWorkerBarrierArrowRight(position, heading)
+                    : PropUtils.RedirectTrafficArrowLeft(position, heading))));
+        }
+
+        private Vector3 VehicleStoppedSignPosition(Vector3 coneEndPosition)
+        {
+            var sideDirection = SignSideDirection();
+            var distanceToTheSide = Lane.Width / (Type == RedirectTrafficType.Lane ? 1.5f : 2.5f);
+            var signPosition = coneEndPosition
+                               + MathHelper.ConvertHeadingToDirection(sideDirection) * distanceToTheSide
+                               + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 6f;
+            return signPosition;
+        }
+
+        private void InitializeVehicleStoppedLight(Vector3 coneEndPosition)
+        {
+            var groundLightPosition = VehicleStoppedSignPosition(coneEndPosition) +
+                                      MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 1.5f;
+
+            _instances.Add(new InstanceSlot(EntityType.Scenery, groundLightPosition, Lane.Heading - 180,
+                (position, heading) => new ARScenery(PropUtils.CreateGroundFloodLight(position, heading))));
         }
 
         private void CreateBlip()
@@ -308,6 +367,11 @@ namespace AutomaticRoadblocks.RedirectTraffic
             }
 
             return closestLane;
+        }
+
+        private int SignSideDirection()
+        {
+            return IsLeftSideOfLanes ? 90 : -90;
         }
 
         private Vector3 ConeStartDirection(float additionalDistanceBehindVehicle = 0f)
@@ -376,5 +440,22 @@ namespace AutomaticRoadblocks.RedirectTraffic
         }
 
         #endregion
+
+        public class Request
+        {
+            public Road Road { get; set; }
+
+            public VehicleType VehicleType { get; set; }
+
+            public BarrierType ConeType { get; set; }
+
+            public RedirectTrafficType Type { get; set; }
+
+            public float ConeDistance { get; set; }
+
+            public bool EnableRedirectionArrow { get; set; }
+
+            public bool EnableLights { get; set; }
+        }
     }
 }

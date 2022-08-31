@@ -136,6 +136,7 @@
         <Compile Include="Pursuit\PursuitLevel.cs" />
         <Compile Include="Pursuit\PursuitManager.cs" />
         <Compile Include="RedirectTraffic\IRedirectTrafficDispatcher.cs" />
+        <Compile Include="RedirectTraffic\Menu\EnableRedirectArrowComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficConeDistanceComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficConeTypeComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficLaneTypeComponentItem.cs" />

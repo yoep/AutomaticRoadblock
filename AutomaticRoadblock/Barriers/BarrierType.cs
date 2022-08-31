@@ -15,6 +15,7 @@ namespace AutomaticRoadblocks.Barriers
         public static readonly BarrierType PoliceDoNotCross = new(LocalizationKey.BarrierTypePoliceDoNotCross, DimensionOf(PropUtils.Models.PoliceDoNotCross), 0.2f);
         public static readonly BarrierType WorkBarrierLarge = new(LocalizationKey.BarrierTypeWorkBarrierLarge, DimensionOf(PropUtils.Models.WorkBarrierLarge), 0.2f);
         public static readonly BarrierType WorkBarrierSmall = new(LocalizationKey.BarrierTypeWorkBarrierSmall, DimensionOf(PropUtils.Models.WorkBarrierSmall), 0.3f);
+        public static readonly BarrierType WorkBarrierSmallWithLight = new(LocalizationKey.BarrierTypeWorkBarrierSmallWithLight, DimensionOf(PropUtils.Models.WorkBarrierSmallWithLight), 0.3f);
         public static readonly BarrierType WorkBarrierWithSign = new(LocalizationKey.BarrierTypeWorkBarrierWithSign, DimensionOf(PropUtils.Models.WorkBarrierAHeadSign), 0.2f);
         public static readonly BarrierType WorkBarrierWithSignLight = new(LocalizationKey.BarrierTypeWorkBarrierWithSignLight, DimensionOf(PropUtils.Models.WorkBarrierAHeadSignLights), 0.2f);
         public static readonly BarrierType WorkBarrierHigh = new(LocalizationKey.BarrierTypeWorkBarrierHigh, DimensionOf(PropUtils.Models.WorkBarrierHigh), 0.2f);
@@ -32,6 +33,7 @@ namespace AutomaticRoadblocks.Barriers
             PoliceDoNotCross,
             WorkBarrierLarge,
             WorkBarrierSmall,
+            WorkBarrierSmallWithLight,
             WorkBarrierWithSign,
             WorkBarrierWithSignLight,
             WorkBarrierHigh,
