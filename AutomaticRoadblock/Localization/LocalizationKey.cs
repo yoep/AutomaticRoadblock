@@ -101,6 +101,24 @@ namespace AutomaticRoadblocks.Localization
 
         #endregion
 
+        #region BarrierType
+        
+        public static readonly LocalizationKey BarrierTypeNone = new(nameof(BarrierTypeNone), "None");
+        public static readonly LocalizationKey BarrierTypeSmallCone = new(nameof(BarrierTypeSmallCone), "Small cone");
+        public static readonly LocalizationKey BarrierTypeSmallConeStriped = new(nameof(BarrierTypeSmallConeStriped), "Small cone striped");
+        public static readonly LocalizationKey BarrierTypeBigCone = new(nameof(BarrierTypeBigCone), "Big cone");
+        public static readonly LocalizationKey BarrierTypeBigConeStriped = new(nameof(BarrierTypeBigConeStriped), "Big cone striped");
+        public static readonly LocalizationKey BarrierTypePoliceDoNotCross = new(nameof(BarrierTypePoliceDoNotCross), "Police do not cross");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierLarge = new(nameof(BarrierTypeWorkBarrierLarge), "Work barrier large");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierSmall = new(nameof(BarrierTypeWorkBarrierSmall), "Work barrier small");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierWithSign = new(nameof(BarrierTypeWorkBarrierWithSign), "Work ahead sign");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierWithSignLight = new(nameof(BarrierTypeWorkBarrierWithSignLight), "Work ahead sign lights");
+        public static readonly LocalizationKey BarrierTypeWorkBarrierHigh = new(nameof(BarrierTypeWorkBarrierHigh), "High barrier");
+        public static readonly LocalizationKey BarrierTypeBarrelTrafficCatcher = new(nameof(BarrierTypeBarrelTrafficCatcher), "Barrel");
+        public static readonly LocalizationKey BarrierTypeConeWithLight = new(nameof(BarrierTypeConeWithLight), "Cone light");
+
+        #endregion
+
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {
             MenuTitle,
@@ -150,6 +168,19 @@ namespace AutomaticRoadblocks.Localization
             VehicleTypeSwat,
             VehicleTypeTransporter,
             VehicleTypeNone,
+            BarrierTypeNone,
+            BarrierTypeSmallCone,
+            BarrierTypeSmallConeStriped,
+            BarrierTypeBigCone,
+            BarrierTypeBigConeStriped,
+            BarrierTypePoliceDoNotCross,
+            BarrierTypeWorkBarrierLarge,
+            BarrierTypeWorkBarrierSmall,
+            BarrierTypeWorkBarrierWithSign,
+            BarrierTypeWorkBarrierWithSignLight,
+            BarrierTypeWorkBarrierHigh,
+            BarrierTypeBarrelTrafficCatcher,
+            BarrierTypeConeWithLight,
         };
 
         private LocalizationKey(string identifier, string defaultText)
