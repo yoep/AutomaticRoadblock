@@ -173,9 +173,10 @@ namespace AutomaticRoadblocks.RedirectTraffic
             if (VehicleType == VehicleType.None)
                 return;
 
+            var rotation = IsLeftSide ? -35 : 35;
             VehicleModel = VehicleFactory.CreateModel(VehicleType, Position);
 
-            _instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Lane.Heading + 35,
+            _instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Lane.Heading + rotation,
                 (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading)));
         }
 

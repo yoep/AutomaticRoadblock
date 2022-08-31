@@ -35,7 +35,7 @@ namespace AutomaticRoadblocks.Settings
         /// <inheritdoc />
         public void Load()
         {
-            _logger.Debug("Loading settings");
+            _logger.Info("Loading plugin settings");
             if (System.IO.File.Exists(File))
             {
                 _logger.Trace($"Settings file {File} has been found");
@@ -53,10 +53,11 @@ namespace AutomaticRoadblocks.Settings
                 ReadAutomaticRoadblocksSettings(settingsFile);
                 ReadManualPlacementSettings(settingsFile);
                 ReadRedirectTrafficSettings(settingsFile);
-                
+
                 // update the log level of the plugin
                 _logger.LogLevel = GeneralSettings.LogLevel;
-                _logger.Info($"Settings have been loaded with success");
+                _logger.Info($"Plugin log level has been set to {_logger.LogLevel}");
+                _logger.Info("Settings have been loaded with success");
             }
             catch (Exception ex)
             {
@@ -70,7 +71,7 @@ namespace AutomaticRoadblocks.Settings
             {
                 OpenMenuKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuKey", "X")),
                 OpenMenuModifierKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuModifierKey", "ShiftKey")),
-                LogLevel = file.ReadEnum(GeneralSection, "OpenMenuModifierKey", LogLevel.Info)
+                LogLevel = file.ReadEnum(GeneralSection, "Logging", LogLevel.Info)
             };
         }
 
@@ -95,6 +96,7 @@ namespace AutomaticRoadblocks.Settings
             ManualPlacementSettings = new ManualPlacementSettings
             {
                 EnablePreview = file.ReadBoolean(ManualPlacementSection, "EnablePreview"),
+                DistanceFromPlayer = (float)file.ReadDouble(ManualPlacementSection, "DistanceFromPlayer", 8.0)
             };
         }
 
@@ -103,6 +105,8 @@ namespace AutomaticRoadblocks.Settings
             RedirectTrafficSettings = new RedirectTrafficSettings
             {
                 EnablePreview = file.ReadBoolean(RedirectTrafficSection, "EnablePreview"),
+                DistanceFromPlayer = (float)file.ReadDouble(RedirectTrafficSection
+                    , "DistanceFromPlayer", 10.0)
             };
         }
 

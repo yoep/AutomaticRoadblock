@@ -53,7 +53,7 @@ namespace AutomaticRoadblocks.Localization
                 {
                     if (localeFile.DoesKeyExist(Section, key.Identifier))
                     {
-                        _logger.Debug($"Loading localization key {key.Identifier} from ini");
+                        _logger.Trace($"Loading localization key {key.Identifier} from ini");
                     }
                     else
                     {

@@ -57,7 +57,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         protected override bool IsHologramPreviewEnabled => _settingsManager.RedirectTrafficSettings.EnablePreview;
 
         /// <inheritdoc />
-        protected override float DistanceInFrontOfPlayer => 10f;
+        protected override float DistanceInFrontOfPlayer => _settingsManager.RedirectTrafficSettings.DistanceFromPlayer;
 
         #endregion
 
