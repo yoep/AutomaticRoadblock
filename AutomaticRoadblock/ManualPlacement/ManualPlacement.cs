@@ -19,6 +19,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private LightSourceType _lightSourceType = LightSourceType.Flares;
         private PlacementType _placementType = PlacementType.All;
         private bool _copsEnabled;
+        private float _offset;
 
         public ManualPlacement(ILogger logger, IGame game, ISettingsManager settingsManager)
             : base(game, logger)
@@ -65,6 +66,9 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         /// <inheritdoc />
         public bool SpeedLimit { get; set; }
+
+        /// <inheritdoc />
+        public float Offset { get => _offset; set => UpdateOffset(value); }
 
         /// <summary>
         /// Get a list of roadblocks which are previewed.
@@ -140,7 +144,8 @@ namespace AutomaticRoadblocks.ManualPlacement
                 TargetHeading = Game.PlayerHeading,
                 LimitSpeed = SpeedLimit,
                 AddLights = LightSourceType != LightSourceType.None,
-                CopsEnabled = CopsEnabled
+                CopsEnabled = CopsEnabled,
+                Offset = Offset
             });
             Logger.Trace($"Created manual roadblock {roadblock}");
             return roadblock;
@@ -173,6 +178,12 @@ namespace AutomaticRoadblocks.ManualPlacement
         private void UpdateCopsEnabled(bool copsEnabled)
         {
             _copsEnabled = copsEnabled;
+            DoInternalPreviewCreation(true);
+        }
+        
+        private void UpdateOffset(float value)
+        {
+            _offset = value;
             DoInternalPreviewCreation(true);
         }
 

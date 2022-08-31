@@ -91,6 +91,7 @@
         <Compile Include="Localization\LocalizationNotFound.cs" />
         <Compile Include="Localization\Localizer.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementRemoveComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableCopsComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableSpeedLimitComponentItem.cs" />

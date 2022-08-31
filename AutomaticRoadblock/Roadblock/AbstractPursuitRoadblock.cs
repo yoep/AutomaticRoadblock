@@ -143,7 +143,7 @@ namespace AutomaticRoadblocks.Roadblock
                 return;
             }
 
-            var currentDistance = Vehicle.DistanceTo(Position);
+            var currentDistance = Vehicle.DistanceTo(OffsetPosition);
 
             if (currentDistance < _lastKnownDistanceToRoadblock)
             {
