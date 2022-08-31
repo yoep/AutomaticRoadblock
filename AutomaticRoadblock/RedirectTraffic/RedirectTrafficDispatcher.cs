@@ -18,6 +18,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private BarrierType _coneType = BarrierType.SmallCone;
         private RedirectTrafficType _type = RedirectTrafficType.Lane;
         private bool _enableRedirectionArrow = true;
+        private float _offset;
 
         public RedirectTrafficDispatcher(IGame game, ILogger logger, ISettingsManager settingsManager)
             : base(game, logger)
@@ -60,6 +61,13 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             get => _enableRedirectionArrow;
             set => UpdateRedirectArrow(value);
+        }
+
+        /// <inheritdoc />
+        public float Offset
+        {
+            get => _offset;
+            set => UpdateOffset(value);
         }
 
         /// <inheritdoc />
@@ -119,13 +127,14 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 Type = Type,
                 ConeDistance = ConeDistance,
                 EnableRedirectionArrow = EnableRedirectionArrow,
-                EnableLights = ShouldAddLights()
+                EnableLights = ShouldAddLights(),
+                Offset = Offset
             });
         }
 
         private bool ShouldAddLights()
         {
-            return _settingsManager.RedirectTrafficSettings.EnableLights && 
+            return _settingsManager.RedirectTrafficSettings.EnableLights &&
                    GameUtils.TimePeriod is TimePeriod.Evening or TimePeriod.Night;
         }
 
@@ -157,6 +166,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private void UpdateRedirectArrow(bool value)
         {
             _enableRedirectionArrow = value;
+            DoInternalPreviewCreation(true);
+        }
+
+        private void UpdateOffset(float offset)
+        {
+            _offset = offset;
             DoInternalPreviewCreation(true);
         }
 

@@ -39,7 +39,12 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// Set if the speed should be limited around the roadblock.
         /// </summary>
         bool SpeedLimit { get; set; }
-        
+
+        /// <summary>
+        /// The offset of the placement in regards to the node.
+        /// </summary>
+        float Offset { get; set; }
+
         /// <summary>
         /// Place a roadblock based on the <see cref="DetermineLocation"/> <see cref="Road"/>.
         /// </summary>

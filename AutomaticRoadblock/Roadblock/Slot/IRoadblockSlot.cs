@@ -17,6 +17,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         Vector3 Position { get; }
 
         /// <summary>
+        /// The offset position of this roadblock slot.
+        /// </summary>
+        Vector3 OffsetPosition { get; }
+
+        /// <summary>
         /// Get the heading of the roadblock slot.
         /// </summary>
         float Heading { get; }
@@ -25,7 +30,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Get the vehicle type that will be used for this slot
         /// </summary>
         VehicleType VehicleType { get; }
-        
+
         /// <summary>
         /// Get the vehicle model that will be used in this slot.
         /// </summary>
