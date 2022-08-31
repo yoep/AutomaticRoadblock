@@ -111,6 +111,8 @@
         <Compile Include="Menu\MenuImpl.cs" />
         <Compile Include="Menu\MenuType.cs" />
         <Compile Include="Menu\Switcher\IMenuSwitchItem.cs" />
+        <Compile Include="Models\IModelProvider.cs" />
+        <Compile Include="Models\LspdfrModelProvider.cs" />
         <Compile Include="Preview\IPreviewSupport.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Pursuit\Factory\PursuitRoadblockFactory.cs" />
@@ -184,6 +186,24 @@
         <Compile Include="Utils\Type\VehicleSeat.cs" />
         <Compile Include="Vehicles\VehicleFactory.cs" />
         <Compile Include="Vehicles\VehicleType.cs" />
+        <Compile Include="Xml\Attributes\AbstractXmlAnnotationInfo.cs" />
+        <Compile Include="Xml\Attributes\XmlAttribute.cs" />
+        <Compile Include="Xml\Attributes\XmlElement.cs" />
+        <Compile Include="Xml\Attributes\XmlIgnore.cs" />
+        <Compile Include="Xml\Attributes\XmlRootName.cs" />
+        <Compile Include="Xml\Context\XmlContext.cs" />
+        <Compile Include="Xml\Context\XmlDeserializationContext.cs" />
+        <Compile Include="Xml\DeserializationException.cs" />
+        <Compile Include="Xml\Deserializers\BooleanXmlDeserializer.cs" />
+        <Compile Include="Xml\Deserializers\CollectionXmlDeserializer.cs" />
+        <Compile Include="Xml\Deserializers\DoubleXmlDeserializer.cs" />
+        <Compile Include="Xml\Deserializers\ObjectXmlDeserializer.cs" />
+        <Compile Include="Xml\Deserializers\StringXmlDeserializer.cs" />
+        <Compile Include="Xml\IXmlDeserializer.cs" />
+        <Compile Include="Xml\IXmlSerialization.cs" />
+        <Compile Include="Xml\ObjectMapper.cs" />
+        <Compile Include="Xml\ObjectMapperFactory.cs" />
+        <Compile Include="Xml\Parser\XmlParser.cs" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="AutomaticRoadblocks.ini">

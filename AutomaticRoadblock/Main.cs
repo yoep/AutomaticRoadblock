@@ -10,6 +10,7 @@ using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.ManualPlacement.Menu;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
+using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Pursuit.Menu;
 using AutomaticRoadblocks.RedirectTraffic;
@@ -74,6 +75,7 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<ILocalizer>(typeof(Localizer))
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
+                .RegisterSingleton<IModelProvider>(typeof(LspdfrModelProvider))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
                 .RegisterSingleton<IManualPlacement>(typeof(ManualPlacement.ManualPlacement))
