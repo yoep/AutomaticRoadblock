@@ -53,6 +53,9 @@ namespace AutomaticRoadblocks.Settings
                 ReadAutomaticRoadblocksSettings(settingsFile);
                 ReadManualPlacementSettings(settingsFile);
                 ReadRedirectTrafficSettings(settingsFile);
+                
+                // update the log level of the plugin
+                _logger.LogLevel = GeneralSettings.LogLevel;
                 _logger.Info($"Settings have been loaded with success");
             }
             catch (Exception ex)
@@ -66,7 +69,8 @@ namespace AutomaticRoadblocks.Settings
             GeneralSettings = new GeneralSettings
             {
                 OpenMenuKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuKey", "X")),
-                OpenMenuModifierKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuModifierKey", "ShiftKey"))
+                OpenMenuModifierKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuModifierKey", "ShiftKey")),
+                LogLevel = file.ReadEnum(GeneralSection, "OpenMenuModifierKey", LogLevel.Info)
             };
         }
 

@@ -84,6 +84,11 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private Model VehicleModel { get; set; }
 
         /// <summary>
+        /// Check if the current traffic redirection is on the left side of the road.
+        /// </summary>
+        private bool IsLeftSide => Lane.Position.DistanceTo(Road.LeftSide) < Lane.Position.DistanceTo(Road.RightSide);
+
+        /// <summary>
         /// The cop instance of this redirect traffic instance.
         /// </summary>
         private ARPed Cop => _instances
@@ -91,7 +96,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .First();
-        
+
         /// <summary>
         /// The vehicle instance of this redirect traffic instance.
         /// </summary>
@@ -267,7 +272,14 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var closestTo = rightSide;
 
             if (leftSide.DistanceTo(playerPosition) < rightSide.DistanceTo(playerPosition))
+            {
+                Logger.Debug("Using left side of the road for redirecting the traffic");
                 closestTo = leftSide;
+            }
+            else
+            {
+                Logger.Debug("Using right side of the road for redirecting the traffic");
+            }
 
             foreach (var lane in Road.Lanes)
             {
@@ -287,6 +299,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             var vehicleWidth = GetVehicleWidth() + 0.5f;
             var vehicleLength = GetVehicleLength() - 1f;
+            var placementSide = IsLeftSide ? -90 : 90;
 
             if (VehicleType != VehicleType.None)
             {
@@ -298,7 +311,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 Logger.Debug("No vehicle selected, using default vehicle values for calculating cone direction");
             }
 
-            return MathHelper.ConvertHeadingToDirection(Lane.Heading + 90) * vehicleWidth +
+            return MathHelper.ConvertHeadingToDirection(Lane.Heading + placementSide) * vehicleWidth +
                    MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * (vehicleLength + additionalDistanceBehindVehicle);
         }
 

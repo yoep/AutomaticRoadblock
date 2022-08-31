@@ -57,6 +57,7 @@
         <Compile Include="AbstractionLayer\ILogger.cs" />
         <Compile Include="AbstractionLayer\Implementation\RageImpl.cs" />
         <Compile Include="AbstractionLayer\Implementation\RageLogger.cs" />
+        <Compile Include="AbstractionLayer\LogLevel.cs" />
         <Compile Include="Api\AutomaticRoadblocksApi.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
