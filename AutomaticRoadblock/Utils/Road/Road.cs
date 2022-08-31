@@ -14,6 +14,10 @@ namespace AutomaticRoadblocks.Utils.Road
 
         #region Constructors
 
+        internal Road()
+        {
+        }
+
         internal Road(Vector3 position, Vector3 rightSide, Vector3 leftSide, IReadOnlyList<Lane> lanes, VehicleNode node, int numberOfLanes1,
             int numberOfLanes2, int junctionIndicator)
         {
@@ -34,42 +38,42 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <summary>
         /// Get the center position of the road.
         /// </summary>
-        public Vector3 Position { get; }
+        public Vector3 Position { get; internal set; }
 
         /// <summary>
         /// Get the right side position of the road.
         /// </summary>
-        public Vector3 RightSide { get; }
+        public Vector3 RightSide { get; internal set; }
 
         /// <summary>
         /// Get the left side position of the road.
         /// </summary>
-        public Vector3 LeftSide { get; }
+        public Vector3 LeftSide { get; internal set; }
 
         /// <summary>
         /// Get the lanes of this road.
         /// </summary>
-        public IReadOnlyList<Lane> Lanes { get; }
+        public IReadOnlyList<Lane> Lanes { get; internal set; }
 
         /// <summary>
         /// Get the vehicle node that was used to determine this road.
         /// </summary>
-        public VehicleNode Node { get; }
+        public VehicleNode Node { get; internal set; }
 
         /// <summary>
         /// Get the total number of lanes.
         /// </summary>
-        public int NumberOfLanes1 { get; }
+        public int NumberOfLanes1 { get; internal set; }
 
         /// <summary>
         /// Get the total number of lanes.
         /// </summary>
-        public int NumberOfLanes2 { get; }
+        public int NumberOfLanes2 { get; internal set; }
 
         /// <summary>
         /// Get the junction indicator.
         /// </summary>
-        public int JunctionIndicator { get; }
+        public int JunctionIndicator { get; internal set; }
 
         /// <summary>
         /// Get or set the width of the road.
@@ -231,8 +235,12 @@ namespace AutomaticRoadblocks.Utils.Road
         public record Lane : IPreviewSupport
         {
             #region Constructors
-
-            public Lane(int number, float heading, Vector3 rightSide, Vector3 leftSide, Vector3 nodePosition, float width, LaneType type)
+            
+            internal Lane()
+            {
+            }
+            
+            internal Lane(int number, float heading, Vector3 rightSide, Vector3 leftSide, Vector3 nodePosition, float width, bool isOppositeDirectionOfRoad)
             {
                 Number = number;
                 Heading = heading;
@@ -240,8 +248,7 @@ namespace AutomaticRoadblocks.Utils.Road
                 LeftSide = leftSide;
                 NodePosition = nodePosition;
                 Width = width;
-                Type = type;
-                Position = CalculatePosition();
+                IsOppositeDirectionOfRoad = isOppositeDirectionOfRoad;
             }
 
             #endregion
@@ -249,44 +256,44 @@ namespace AutomaticRoadblocks.Utils.Road
             #region Properties
 
             /// <summary>
+            /// Get the middle position of the lane.
+            /// </summary>
+            public Vector3 Position => CalculatePosition();
+
+            /// <summary>
             /// Get the unique lane number.
             /// </summary>
-            public int Number { get; }
+            public int Number { get; internal set; }
 
             /// <summary>
             /// Get the heading of the lane.
             /// </summary>
-            public float Heading { get; }
-
-            /// <summary>
-            /// Get the middle position of the lane.
-            /// </summary>
-            public Vector3 Position { get; }
+            public float Heading { get; internal set; }
 
             /// <summary>
             /// Get the right side start position of the lane.
             /// </summary>
-            public Vector3 RightSide { get; }
+            public Vector3 RightSide { get; internal set; }
 
             /// <summary>
             /// Get the left side start position of the lane.
             /// </summary>
-            public Vector3 LeftSide { get; }
+            public Vector3 LeftSide { get; internal set; }
 
             /// <summary>
             /// Get the position of the node that was used for determining the heading of this lane.
             /// </summary>
-            public Vector3 NodePosition { get; }
+            public Vector3 NodePosition { get; internal set; }
 
             /// <summary>
             /// Get the width of the lane.
             /// </summary>
-            public float Width { get; }
-
+            public float Width { get; internal set; }
+            
             /// <summary>
-            /// Get the lane type.
+            /// Verify if this lane heading is the opposite of the road it belongs to.
             /// </summary>
-            public LaneType Type { get; }
+            public bool IsOppositeDirectionOfRoad { get; internal set; }
 
             #endregion
 
@@ -342,14 +349,14 @@ namespace AutomaticRoadblocks.Utils.Road
             public Lane MoveTo(Vector3 direction)
             {
                 Assert.NotNull(direction, "direction cannot be null");
-                return new Lane(Number, Heading, RightSide + direction, LeftSide + direction, NodePosition + direction, Width, Type);
+                return new Lane(Number, Heading, RightSide + direction, LeftSide + direction, NodePosition + direction, Width, IsOppositeDirectionOfRoad);
             }
 
             public override string ToString()
             {
                 return "{" +
                        $"{nameof(Number)}: {Number}, {nameof(Heading)}: {Heading}, {nameof(RightSide)}: {RightSide}, {nameof(LeftSide)}: {LeftSide}, " +
-                       $"{nameof(NodePosition)}: {NodePosition}, {nameof(Width)}: {Width}, {nameof(Type)}: {Type}, {nameof(IsPreviewActive)}: {IsPreviewActive}" +
+                       $"{nameof(NodePosition)}: {NodePosition}, {nameof(Width)}: {Width}, {nameof(IsPreviewActive)}: {IsPreviewActive}" +
                        "}";
             }
 
@@ -365,17 +372,10 @@ namespace AutomaticRoadblocks.Utils.Road
             {
                 return position + Vector3.WorldUp * 0.25f;
             }
-
-            public enum LaneType
-            {
-                LeftLane,
-                MiddleLane,
-                RightLane
-            }
         }
 
         /// <summary>
-        /// The vehicle node that was used to determine the road.
+        /// The vehicle node that was used to determine the road/lane.
         /// </summary>
         public class VehicleNode : IPreviewSupport
         {

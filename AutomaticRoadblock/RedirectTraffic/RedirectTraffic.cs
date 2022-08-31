@@ -84,9 +84,10 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private Model VehicleModel { get; set; }
 
         /// <summary>
-        /// Check if the current traffic redirection is on the left side of the road.
+        /// Check if the current traffic redirection is on the most left lane of the road
+        /// (for the lanes heading in the same direction as <see cref="Lane"/>).
         /// </summary>
-        private bool IsLeftSide => Lane.Position.DistanceTo(Road.LeftSide) < Lane.Position.DistanceTo(Road.RightSide);
+        private bool IsLeftSideOfLanes => IsLeftSideOfLanesInTheSameHeadingAsTheSelectedLane();
 
         /// <summary>
         /// The cop instance of this redirect traffic instance.
@@ -146,6 +147,18 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         #endregion
 
+        #region Methods
+
+        public override string ToString()
+        {
+            return
+                $"{nameof(Position)}: {Position}, {nameof(Type)}: {Type}, {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(IsLeftSideOfLanes)}: {IsLeftSideOfLanes},\n" +
+                $"{nameof(Road)}: {Road}\n" +
+                $"Using {nameof(Lane)}: {Lane}";
+        }
+
+        #endregion
+
         #region IDisposable
 
         /// <inheritdoc />
@@ -173,7 +186,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             if (VehicleType == VehicleType.None)
                 return;
 
-            var rotation = IsLeftSide ? -35 : 35;
+            var rotation = IsLeftSideOfLanes ? -35 : 35;
             VehicleModel = VehicleFactory.CreateModel(VehicleType, Position);
 
             _instances.Add(new InstanceSlot(EntityType.CopVehicle, Position, Lane.Heading + rotation,
@@ -226,8 +239,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             var coneDistance = ConeType.Width + ConeType.Spacing;
             var totalCones = (int)Math.Floor(Lane.Width / coneDistance);
+            var placementDirectionSide = IsLeftSideOfLanes ? 90 : -90;
             var placementDirection = MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * coneDistance +
-                                     MathHelper.ConvertHeadingToDirection(Lane.Heading - 90) * coneDistance;
+                                     MathHelper.ConvertHeadingToDirection(Lane.Heading + placementDirectionSide) * coneDistance;
             var startPosition = Position + ConeStartDirection(0.5f);
 
             Logger.Trace($"Creating a total of {totalCones} cones behind the vehicle for a lane width of {Lane.Width}");
@@ -300,7 +314,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             var vehicleWidth = GetVehicleWidth() + 0.5f;
             var vehicleLength = GetVehicleLength() - 1f;
-            var placementSide = IsLeftSide ? -90 : 90;
+            var placementSide = IsLeftSideOfLanes ? -90 : 90;
 
             if (VehicleType != VehicleType.None)
             {
@@ -337,11 +351,28 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private Vector3 PositionBasedOnType()
         {
             var lanePosition = Lane.Position;
+            var shoulderRotation = IsLeftSideOfLanes ? 90 : -90;
 
             if (Type == RedirectTrafficType.Shoulder)
-                lanePosition += MathHelper.ConvertHeadingToDirection(Lane.Heading - 90) * (Lane.Width / 2);
+                lanePosition += MathHelper.ConvertHeadingToDirection(Lane.Heading + shoulderRotation) * (Lane.Width / 2);
 
             return lanePosition;
+        }
+
+        private bool IsLeftSideOfLanesInTheSameHeadingAsTheSelectedLane()
+        {
+            var distanceToLeftSide = Lane.Position.DistanceTo(Road.LeftSide);
+            var distanceToRightSide = Lane.Position.DistanceTo(Road.RightSide);
+
+            Logger.Debug($"Left side closer: {distanceToLeftSide < distanceToRightSide}\n" +
+                         $"Right side closer: {distanceToRightSide < distanceToLeftSide}\n" +
+                         $"Is lane opposite: {Lane.IsOppositeDirectionOfRoad}");
+            var isLeftSideCloser = distanceToLeftSide < distanceToRightSide;
+
+            if (Lane.IsOppositeDirectionOfRoad)
+                isLeftSideCloser = !isLeftSideCloser;
+
+            return isLeftSideCloser;
         }
 
         #endregion

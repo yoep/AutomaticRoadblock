@@ -173,6 +173,7 @@ namespace AutomaticRoadblocks.Instances
             {
                 Logger.Trace($"Creating new instance hologram preview at {road}");
                 var instance = CreateInstance(road);
+                Logger.Debug($"Created instance {instance}");
                 instance.CreatePreview();
 
                 lock (Instances)

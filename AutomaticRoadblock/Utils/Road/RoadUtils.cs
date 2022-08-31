@@ -280,20 +280,21 @@ namespace AutomaticRoadblocks.Utils.Road
             if (roadLeftSide == nodeInfo.Position)
                 roadLeftSide = FixFailedLastPointCalculation(nodeInfo.Position, roadRightSide, rightSideHeading + 90f);
 
-            return RoadBuilder.Builder()
-                .Position(nodeInfo.Position)
-                .RightSide(roadRightSide)
-                .LeftSide(roadLeftSide)
-                .NumberOfLanes1(nodeInfo.NumberOfLanes1)
-                .NumberOfLanes2(nodeInfo.NumberOfLanes2)
-                .JunctionIndicator((int)nodeInfo.AtJunction)
-                .Lanes(DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, rightSideHeading, nodeInfo.NumberOfLanes1, nodeInfo.NumberOfLanes2))
-                .Node(new Road.VehicleNode
+            return new Road
+            {
+                Position = nodeInfo.Position,
+                RightSide = roadRightSide,
+                LeftSide = roadLeftSide,
+                NumberOfLanes1 = nodeInfo.NumberOfLanes1,
+                NumberOfLanes2 = nodeInfo.NumberOfLanes2,
+                JunctionIndicator = (int)nodeInfo.AtJunction,
+                Lanes = DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, rightSideHeading, nodeInfo.NumberOfLanes1, nodeInfo.NumberOfLanes2),
+                Node = new Road.VehicleNode
                 {
                     Position = nodeInfo.Position,
                     Heading = nodeInfo.Heading
-                })
-                .Build();
+                },
+            };
         }
 
         private static List<Road.Lane> DiscoverLanes(Vector3 roadRightSide, Vector3 roadLeftSide, Vector3 roadMiddle, float rightSideHeading,
@@ -332,31 +333,21 @@ namespace AutomaticRoadblocks.Utils.Road
                 var laneLeftPosition = lastRightPosition + moveDirection * laneWidth;
                 var vehicleNode = FindVehicleNode(lastRightPosition, VehicleNodeType.AllNodes);
                 var heading = isOpposite ? OppositeHeading(rightSideHeading) : rightSideHeading;
-                var type = DetermineLaneType(index, numberOfLanes);
 
-                lanes.Add(LaneBuilder.Builder()
-                    .Number(index)
-                    .Heading(heading)
-                    .RightSide(isOpposite ? laneLeftPosition : lastRightPosition)
-                    .LeftSide(isOpposite ? lastRightPosition : laneLeftPosition)
-                    .NodePosition(vehicleNode.Position)
-                    .Width(laneWidth)
-                    .Type(type)
-                    .Build());
+                lanes.Add(new Road.Lane
+                {
+                    Number = index,
+                    Heading = heading,
+                    RightSide = isOpposite ? laneLeftPosition : lastRightPosition,
+                    LeftSide = isOpposite ? lastRightPosition : laneLeftPosition,
+                    NodePosition = vehicleNode.Position,
+                    Width = laneWidth,
+                    IsOppositeDirectionOfRoad = isOpposite
+                });
                 lastRightPosition = laneLeftPosition;
             }
 
             return lanes;
-        }
-
-        private static Road.Lane.LaneType DetermineLaneType(int index, int numberOfLanes)
-        {
-            if (index == numberOfLanes)
-            {
-                return Road.Lane.LaneType.RightLane;
-            }
-
-            return index == 1 ? Road.Lane.LaneType.LeftLane : Road.Lane.LaneType.MiddleLane;
         }
 
         // This fix is a simple workaround if the last point detection failed with the native function of GTA
@@ -417,161 +408,6 @@ namespace AutomaticRoadblocks.Utils.Road
         #endregion
     }
 
-    internal class RoadBuilder
-    {
-        private readonly List<Road.Lane> _lanes = new();
-        private Vector3 _position;
-        private Vector3 _rightSide;
-        private Vector3 _leftSide;
-        private int _numberOfLanes1;
-        private int _numberOfLanes2;
-        private int _junctionIndicator;
-        private Road.VehicleNode _node;
-
-        private RoadBuilder()
-        {
-        }
-
-        public static RoadBuilder Builder()
-        {
-            return new RoadBuilder();
-        }
-
-        public RoadBuilder Position(Vector3 position)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            _position = position;
-            return this;
-        }
-
-        public RoadBuilder RightSide(Vector3 position)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            _rightSide = position;
-            return this;
-        }
-
-        public RoadBuilder LeftSide(Vector3 position)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            _leftSide = position;
-            return this;
-        }
-
-        public RoadBuilder NumberOfLanes1(int value)
-        {
-            _numberOfLanes1 = value;
-            return this;
-        }
-
-        public RoadBuilder NumberOfLanes2(int value)
-        {
-            _numberOfLanes2 = value;
-            return this;
-        }
-
-        public RoadBuilder JunctionIndicator(int value)
-        {
-            _junctionIndicator = value;
-            return this;
-        }
-
-        public RoadBuilder Lanes(List<Road.Lane> lanes)
-        {
-            Assert.NotNull(lanes, "lanes cannot be null");
-            _lanes.AddRange(lanes);
-            return this;
-        }
-
-        public RoadBuilder Node(Road.VehicleNode node)
-        {
-            Assert.NotNull(node, "node cannot be null");
-            _node = node;
-            return this;
-        }
-
-        public Road Build()
-        {
-            Assert.NotNull(_position, "position has not been set");
-            Assert.NotNull(_rightSide, "rightSide has not been set");
-            Assert.NotNull(_leftSide, "leftSide has not been set");
-            return new Road(_position, _rightSide, _leftSide, _lanes.AsReadOnly(), _node, _numberOfLanes1, _numberOfLanes2, _junctionIndicator);
-        }
-    }
-
-    internal class LaneBuilder
-    {
-        private int _number;
-        private float _heading;
-        private Vector3 _rightSide;
-        private Vector3 _leftSide;
-        private Vector3 _nodePosition;
-        private float _width;
-        private Road.Lane.LaneType _type;
-
-        private LaneBuilder()
-        {
-        }
-
-        public static LaneBuilder Builder()
-        {
-            return new LaneBuilder();
-        }
-
-        public LaneBuilder Number(int number)
-        {
-            _number = number;
-            return this;
-        }
-
-        public LaneBuilder Heading(float heading)
-        {
-            Assert.NotNull(heading, "heading cannot be null");
-            _heading = heading;
-            return this;
-        }
-
-        public LaneBuilder RightSide(Vector3 position)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            _rightSide = position;
-            return this;
-        }
-
-        public LaneBuilder LeftSide(Vector3 position)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            _leftSide = position;
-            return this;
-        }
-
-        public LaneBuilder NodePosition(Vector3 position)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            _nodePosition = position;
-            return this;
-        }
-
-        public LaneBuilder Width(float width)
-        {
-            Assert.NotNull(width, "width cannot be null");
-            _width = width;
-            return this;
-        }
-
-        public LaneBuilder Type(Road.Lane.LaneType type)
-        {
-            Assert.NotNull(type, "type cannot be null");
-            _type = type;
-            return this;
-        }
-
-        public Road.Lane Build()
-        {
-            return new Road.Lane(_number, _heading, _rightSide, _leftSide, _nodePosition, _width, _type);
-        }
-    }
-
     internal class NodeInfo
     {
         public NodeInfo(Vector3 position, float heading)
@@ -606,7 +442,8 @@ namespace AutomaticRoadblocks.Utils.Road
 
         protected bool Equals(NodeInfo other)
         {
-            return Position.Equals(other.Position) && Heading.Equals(other.Heading) && NumberOfLanes1 == other.NumberOfLanes1 && NumberOfLanes2 == other.NumberOfLanes2 && AtJunction.Equals(other.AtJunction);
+            return Position.Equals(other.Position) && Heading.Equals(other.Heading) && NumberOfLanes1 == other.NumberOfLanes1 &&
+                   NumberOfLanes2 == other.NumberOfLanes2 && AtJunction.Equals(other.AtJunction);
         }
 
         public override bool Equals(object obj)
