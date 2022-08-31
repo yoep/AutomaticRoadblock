@@ -136,6 +136,7 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeDistanceComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficVehicleTypeComponentType))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableRedirectArrowComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficRemoveComponentItem));
         }
 

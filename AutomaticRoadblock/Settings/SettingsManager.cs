@@ -95,7 +95,7 @@ namespace AutomaticRoadblocks.Settings
         {
             ManualPlacementSettings = new ManualPlacementSettings
             {
-                EnablePreview = file.ReadBoolean(ManualPlacementSection, "EnablePreview"),
+                EnablePreview = file.ReadBoolean(ManualPlacementSection, "EnablePreview", true),
                 DistanceFromPlayer = (float)file.ReadDouble(ManualPlacementSection, "DistanceFromPlayer", 8.0)
             };
         }
@@ -104,9 +104,9 @@ namespace AutomaticRoadblocks.Settings
         {
             RedirectTrafficSettings = new RedirectTrafficSettings
             {
-                EnablePreview = file.ReadBoolean(RedirectTrafficSection, "EnablePreview"),
-                DistanceFromPlayer = (float)file.ReadDouble(RedirectTrafficSection
-                    , "DistanceFromPlayer", 10.0)
+                EnablePreview = file.ReadBoolean(RedirectTrafficSection, "EnablePreview", true),
+                DistanceFromPlayer = (float)file.ReadDouble(RedirectTrafficSection, "DistanceFromPlayer", 10.0),
+                EnableLights = file.ReadBoolean(RedirectTrafficSection, "EnableLights", true),
             };
         }
 

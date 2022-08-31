@@ -3,6 +3,7 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
 
@@ -16,6 +17,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private VehicleType _vehicleType = VehicleType.Locale;
         private BarrierType _coneType = BarrierType.SmallCone;
         private RedirectTrafficType _type = RedirectTrafficType.Lane;
+        private bool _enableRedirectionArrow = true;
 
         public RedirectTrafficDispatcher(IGame game, ILogger logger, ISettingsManager settingsManager)
             : base(game, logger)
@@ -51,6 +53,13 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             get => _type;
             set => UpdateType(value);
+        }
+
+        /// <inheritdoc />
+        public bool EnableRedirectionArrow
+        {
+            get => _enableRedirectionArrow;
+            set => UpdateRedirectArrow(value);
         }
 
         /// <inheritdoc />
@@ -102,7 +111,22 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             Logger.Debug(
                 $"Creating a redirect traffic instance for {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(Type)}: {Type}, {nameof(ConeDistance)}: {ConeDistance}");
-            return new RedirectTraffic(road, VehicleType, ConeType, Type, ConeDistance);
+            return new RedirectTraffic(new RedirectTraffic.Request
+            {
+                Road = road,
+                VehicleType = VehicleType,
+                ConeType = ConeType,
+                Type = Type,
+                ConeDistance = ConeDistance,
+                EnableRedirectionArrow = EnableRedirectionArrow,
+                EnableLights = ShouldAddLights()
+            });
+        }
+
+        private bool ShouldAddLights()
+        {
+            return _settingsManager.RedirectTrafficSettings.EnableLights && 
+                   GameUtils.TimePeriod is TimePeriod.Evening or TimePeriod.Night;
         }
 
         private void UpdateConeDistance(float newDistance)
@@ -126,6 +150,13 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private void UpdateType(RedirectTrafficType value)
         {
             _type = value;
+            DoInternalPreviewCreation(true);
+        }
+
+
+        private void UpdateRedirectArrow(bool value)
+        {
+            _enableRedirectionArrow = value;
             DoInternalPreviewCreation(true);
         }
 
