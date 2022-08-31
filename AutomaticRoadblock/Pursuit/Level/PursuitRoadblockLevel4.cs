@@ -29,9 +29,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         #region Methods
 
-        public override void Spawn()
+        public override bool Spawn()
         {
-            base.Spawn();
+            var result = base.Spawn();
             var vehicle = Instances
                 .Where(x => x.Type == EntityType.CopVehicle)
                 .Select(x => x.Instance)
@@ -46,6 +46,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 .Select(x => x.GameInstance)
                 .ToList()
                 .ForEach(x => x.WarpIntoVehicle(vehicle, (int)VehicleSeat.Any));
+            return result;
         }
 
         #endregion

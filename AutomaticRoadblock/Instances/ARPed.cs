@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutomaticRoadblocks.Utils;
+using AutomaticRoadblocks.Utils.Type;
 using JetBrains.Annotations;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -39,7 +40,7 @@ namespace AutomaticRoadblocks.Instances
         /// Get the primary weapon of this ped.
         /// </summary>
         public WeaponDescriptor PrimaryWeapon { get; private set; }
-        
+
         /// <inheritdoc />
         public bool IsInvalid => GameInstance == null ||
                                  !GameInstance.IsValid();
@@ -181,7 +182,7 @@ namespace AutomaticRoadblocks.Instances
         {
             if (IsInvalid)
                 return;
-            
+
             foreach (var attachment in _attachments.Where(x => x.IsValid()))
             {
                 EntityUtils.DetachEntity(attachment);
@@ -190,6 +191,15 @@ namespace AutomaticRoadblocks.Instances
             }
 
             _attachments.Clear();
+        }
+
+        public void WarpIntoVehicle(Vehicle vehicle, VehicleSeat seat)
+        {
+            Assert.NotNull(vehicle, "vehicle cannot be null");
+            if (IsInvalid || !vehicle.IsValid())
+                return;
+
+            GameInstance?.WarpIntoVehicle(vehicle, (int)seat);
         }
 
         #endregion

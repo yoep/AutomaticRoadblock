@@ -63,10 +63,10 @@ namespace AutomaticRoadblocks.Instances
         /// <summary>
         /// Spawn the entity if it's not already spawned.
         /// </summary>
-        public void Spawn()
+        public bool Spawn()
         {
             if (Instance != null)
-                return;
+                return !Instance.IsInvalid;
 
             State = InstanceState.Spawning;
 
@@ -78,7 +78,7 @@ namespace AutomaticRoadblocks.Instances
                 if (instance != null)
                 {
                     Instance = instance;
-                    return;
+                    return Instance.GameInstance.IsValid();
                 }
             }
             catch (Exception ex)
@@ -88,6 +88,7 @@ namespace AutomaticRoadblocks.Instances
             }
 
             _logger.Warn($"Created a 'null' instance for {GetType().FullName}: {this}");
+            return false;
         }
 
         public override string ToString()

@@ -14,8 +14,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
     {
         private const float MinimumVehicleSpeed = 20f;
         private const float MinimumRoadblockPlacementDistance = 175f;
-        private const int AutoCleanRoadblockAfterSeconds = 60;
-        private const float RoadblockCleanupDistanceFromPlayer = 75f;
+        private const int AutoCleanRoadblockAfterSeconds = 30;
+        private const float RoadblockCleanupDistanceFromPlayer = 100f;
         private const float MinimumDistanceBetweenRoadblocks = 10f;
         private const string AudioRequestDenied = "ROADBLOCK_REQUEST_DENIED";
         private const string AudioRequestConfirmed = "ROADBLOCK_REQUEST_CONFIRMED";
@@ -107,6 +107,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// <inheritdoc />
         public void DismissActiveRoadblocks()
         {
+            _logger.Debug("Dismissing any active roadblocks");
             List<IRoadblock> roadblocksToRelease;
 
             lock (_roadblocks)
@@ -114,12 +115,10 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 roadblocksToRelease = _roadblocks
                     .Where(x => x.State == RoadblockState.Active)
                     .ToList();
-
-                _roadblocks.RemoveAll(x => roadblocksToRelease.Contains(x));
             }
 
             roadblocksToRelease.ForEach(x => x.Release());
-            _logger.Debug($"Dismissed a total of {roadblocksToRelease.Count} roadblocks which were still active");
+            _logger.Info($"Dismissed a total of {roadblocksToRelease.Count} roadblocks which were still active");
         }
 
         #endregion
@@ -191,7 +190,10 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     roadblock.RoadblockCopsJoiningPursuit += InternalRoadblockCopsJoiningThePursuit;
 
                     _logger.Trace($"Distance between vehicle and roadblock before spawn {road.Position.DistanceTo(vehicle.Position)}");
-                    roadblock.Spawn();
+                    var result = roadblock.Spawn();
+                    if (!result)
+                        _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
+                    
                     _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
                     _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(road.Position)]);
                     _logger.Info($"Roadblock has been dispatched, {roadblock}");

@@ -14,7 +14,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private readonly ISettingsManager _settingsManager;
 
         private float _coneDistance = 2f;
-        private VehicleType _vehicleType = VehicleType.Locale;
+        private VehicleType _vehicleType = VehicleType.Local;
         private BarrierType _coneType = BarrierType.SmallCone;
         private RedirectTrafficType _type = RedirectTrafficType.Lane;
         private bool _enableRedirectionArrow = true;

@@ -95,7 +95,7 @@ namespace AutomaticRoadblocks.Localization
 
         #region VehicleType
 
-        public static readonly LocalizationKey VehicleTypeLocale = new(nameof(VehicleTypeLocale), "Locale");
+        public static readonly LocalizationKey VehicleTypeLocal = new(nameof(VehicleTypeLocal), "Local");
         public static readonly LocalizationKey VehicleTypeState = new(nameof(VehicleTypeState), "State");
         public static readonly LocalizationKey VehicleTypeFbi = new(nameof(VehicleTypeFbi), "FBI");
         public static readonly LocalizationKey VehicleTypeSwat = new(nameof(VehicleTypeSwat), "Swat");
@@ -183,7 +183,7 @@ namespace AutomaticRoadblocks.Localization
             Vehicle,
             VehicleDescription,
             VehicleTypeFbi,
-            VehicleTypeLocale,
+            VehicleTypeLocal,
             VehicleTypeNone,
             VehicleTypeState,
             VehicleTypeSwat,

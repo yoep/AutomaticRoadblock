@@ -52,7 +52,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
             {
                 0 => VehicleType.Transporter,
                 1 => VehicleType.State,
-                _ => VehicleType.Locale
+                _ => VehicleType.Local
             };
         }
     }

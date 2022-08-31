@@ -19,6 +19,10 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         Hit,
         /// <summary>
+        /// Indicates that the cop instances of the roadblock have been released to LSPDFR.
+        /// </summary>
+        Released,
+        /// <summary>
         /// Indicates that an error occurred when processing the roadblock.
         /// </summary>
         Error,

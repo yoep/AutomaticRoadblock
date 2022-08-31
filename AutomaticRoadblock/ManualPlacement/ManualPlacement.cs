@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private readonly ISettingsManager _settingsManager;
 
         private BarrierType _barrier = BarrierType.SmallCone;
-        private VehicleType _vehicleType = VehicleType.Locale;
+        private VehicleType _vehicleType = VehicleType.Local;
         private LightSourceType _lightSourceType = LightSourceType.Flares;
         private PlacementType _placementType = PlacementType.All;
         private bool _copsEnabled;

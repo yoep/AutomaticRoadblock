@@ -50,7 +50,8 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Spawn the roadblock in the world.
         /// </summary>
-        void Spawn();
+        /// <returns>Returns true when all instances could be spawned with success, else false.</returns>
+        bool Spawn();
 
         /// <summary>
         /// Release the roadblock instance back to the world.
