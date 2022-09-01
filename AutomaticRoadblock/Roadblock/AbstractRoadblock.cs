@@ -23,7 +23,7 @@ namespace AutomaticRoadblocks.Roadblock
     {
         protected const float SpeedLimit = 5f;
         protected const float LaneHeadingTolerance = 40f;
-        protected const int BlipFlashDuration = 3000;
+        protected const int BlipFlashDuration = 3500;
         protected const float AdditionalClippingSpace = 0.5f;
 
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
