@@ -177,8 +177,9 @@ namespace AutomaticRoadblocks
             logger.Debug("Registering debug menu components");
             IoC.Instance
                 .Register<IMenuSwitchItem>(typeof(DebugMenuSwitchItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(StartPursuitComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(EndCalloutComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitToggleComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitForceOnFootComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(CalloutEndComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ZoneInfoComponent))

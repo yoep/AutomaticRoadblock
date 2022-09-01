@@ -21,6 +21,8 @@ namespace AutomaticRoadblocks
         public const string DispatchSpawnDescription = "Dispatch a roadblock";
         public const string CleanAllRoadblocks = "Clean all roadblocks" + DebugIndicatorText;
         public const string StartPursuit = "Start pursuit now" + DebugIndicatorText;
+        public const string ForcePursuitOnFoot = "Force On-Foot" + DebugIndicatorText;
+        public const string ForcePursuitOnFootDescription = "Force the suspects in the pursuit to leave the vehicle";
         public const string EndPursuit = "End pursuit now" + DebugIndicatorText;
 
         private const string DebugIndicatorText = " [DEBUG]";

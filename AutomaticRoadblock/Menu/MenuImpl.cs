@@ -126,7 +126,10 @@ namespace AutomaticRoadblocks.Menu
                 if (menuComponent == null)
                     throw new MenuException("No menu item action found for the selected menu item", selectedItem);
 
-                menuComponent.OnMenuActivation(this);
+                // verify if the menu item is enabled
+                // if not, the invocation on the item will be ignored
+                if (menuComponent.MenuItem.Enabled)
+                    menuComponent.OnMenuActivation(this);
 
                 if (menuComponent.IsAutoClosed)
                     CloseMenu();
@@ -189,7 +192,7 @@ namespace AutomaticRoadblocks.Menu
                 {
                     _game.FiberYield();
                     MenuPool.ProcessMenus();
-                    
+
                     try
                     {
                         if (IsMenuKeyPressed())
@@ -204,6 +207,7 @@ namespace AutomaticRoadblocks.Menu
                         _game.DisplayPluginNotification("an unexpected error occurred");
                     }
                 }
+
                 _logger.Debug("Menu key listener has been stopped");
             }, "MenuImpl.KeyListener");
         }

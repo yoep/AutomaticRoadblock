@@ -65,10 +65,11 @@
         <Compile Include="Barriers\BarrierFactory.cs" />
         <Compile Include="Barriers\BarrierType.cs" />
         <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
-        <Compile Include="Debug\Menu\EndCalloutComponent.cs" />
+        <Compile Include="Debug\Menu\CalloutEndComponent.cs" />
+        <Compile Include="Debug\Menu\PursuitForceOnFootComponent.cs" />
         <Compile Include="Debug\Menu\RoadInfoComponent.cs" />
         <Compile Include="Debug\Menu\RoadPreviewComponent.cs" />
-        <Compile Include="Debug\Menu\StartPursuitComponent.cs" />
+        <Compile Include="Debug\Menu\PursuitToggleComponent.cs" />
         <Compile Include="Debug\Menu\ZoneInfoComponent.cs" />
         <Compile Include="Instances\AbstractInstancePlacementManager.cs" />
         <Compile Include="Instances\IARInstance.cs" />

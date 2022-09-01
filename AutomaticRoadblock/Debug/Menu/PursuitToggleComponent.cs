@@ -12,14 +12,14 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class StartPursuitComponent : IMenuComponent<UIMenuItem>
+    public class PursuitToggleComponent : IMenuComponent<UIMenuItem>
     {
         private readonly IGame _game;
         private readonly Random _random = new();
 
         private LHandle _currentPursuit;
 
-        public StartPursuitComponent(IGame game)
+        public PursuitToggleComponent(IGame game)
         {
             _game = game;
             Events.OnPursuitEnded += OnPursuitEnded;
