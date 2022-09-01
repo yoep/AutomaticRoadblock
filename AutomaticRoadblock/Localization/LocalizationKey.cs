@@ -6,6 +6,7 @@ namespace AutomaticRoadblocks.Localization
     {
         #region Menu
 
+        public static readonly LocalizationKey MenuMode = new(nameof(MenuMode), "MenuMode");
         public static readonly LocalizationKey MenuTitle = new(nameof(MenuTitle), "Automatic Roadblocks");
         public static readonly LocalizationKey MenuSubtitle = new(nameof(MenuSubtitle), "Dispatch roadblocks");
         public static readonly LocalizationKey MenuPursuit = new(nameof(MenuPursuit), "Pursuit");
@@ -155,6 +156,7 @@ namespace AutomaticRoadblocks.Localization
             LightSource,
             LightSourceDescription,
             MenuManualPlacement,
+            MenuMode,
             MenuPursuit,
             MenuRedirectTraffic,
             MenuSubtitle,
