@@ -71,7 +71,7 @@ namespace AutomaticRoadblocks.Settings
             {
                 OpenMenuKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuKey", "X")),
                 OpenMenuModifierKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuModifierKey", "ShiftKey")),
-                LogLevel = file.ReadEnum(GeneralSection, "Logging", LogLevel.Info)
+                LogLevel = file.ReadEnum(GeneralSection, "Logging", ELogLevel.Info)
             };
         }
 

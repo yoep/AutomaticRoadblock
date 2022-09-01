@@ -10,7 +10,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         /// <param name="roadblock">The roadblock of which the state changed.</param>
         /// <param name="newState">The new state of the roadblock.</param>
-        public delegate void RoadblockStateChanged(IRoadblock roadblock, RoadblockState newState);
+        public delegate void RoadblockStateChanged(IRoadblock roadblock, ERoadblockState newState);
 
         /// <summary>
         /// Invoked when the suspect has killed a cop from the roadblock.

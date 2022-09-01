@@ -51,7 +51,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         /// <summary>
         /// Dismiss any currently active roadblocks.
-        /// This is most of the time used when a pursuit had ended.
+        /// This is most of the time used when a pursuit has ended or has changed to an on-foot chase.
         /// </summary>
         void DismissActiveRoadblocks();
     }

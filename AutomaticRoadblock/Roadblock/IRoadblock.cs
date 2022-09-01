@@ -30,7 +30,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Get the state of the roadblock.
         /// </summary>
-        RoadblockState State { get; }
+        ERoadblockState State { get; }
 
         /// <summary>
         /// Invoked when the roadblock state changes.
@@ -55,7 +55,7 @@ namespace AutomaticRoadblocks.Roadblock
 
         /// <summary>
         /// Release the roadblock instance back to the world.
-        /// This can only be used when the <see cref="State"/> is <see cref="RoadblockState.Active"/>.
+        /// This can only be used when the <see cref="State"/> is <see cref="ERoadblockState.Active"/>.
         /// </summary>
         void Release();
     }

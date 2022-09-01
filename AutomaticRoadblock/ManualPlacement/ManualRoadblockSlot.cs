@@ -55,10 +55,10 @@ namespace AutomaticRoadblocks.ManualPlacement
             if (!CopsEnabled || VehicleType == VehicleType.None)
                 return;
 
-            Instances.Add(new InstanceSlot(EntityType.CopPed, Position, 0f, (position, heading) =>
+            Instances.Add(new InstanceSlot(EEntityType.CopPed, Position, 0f, (position, heading) =>
             {
                 var cop = PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading));
-                cop.GameInstance?.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Driver);
+                cop.GameInstance?.WarpIntoVehicle(Vehicle, (int)EVehicleSeat.Driver);
                 return cop;
             }));
         }

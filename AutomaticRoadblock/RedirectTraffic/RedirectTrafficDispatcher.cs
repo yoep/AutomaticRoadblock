@@ -149,7 +149,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private bool ShouldAddLights()
         {
             return _settingsManager.RedirectTrafficSettings.EnableLights &&
-                   GameUtils.TimePeriod is TimePeriod.Evening or TimePeriod.Night;
+                   GameUtils.TimePeriod is ETimePeriod.Evening or ETimePeriod.Night;
         }
 
         private void UpdateConeDistance(float newDistance)

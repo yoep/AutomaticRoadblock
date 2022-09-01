@@ -3,7 +3,7 @@ using System;
 namespace AutomaticRoadblocks.AbstractionLayer
 {
     [Flags]
-    public enum LogLevel
+    public enum ELogLevel
     {
         // 0001 1111
         Trace = 31,

@@ -10,7 +10,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.EndCallout);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.Debug;
+        public EMenuType Type => EMenuType.Debug;
 
         /// <inheritdoc />
         public bool IsAutoClosed => true;

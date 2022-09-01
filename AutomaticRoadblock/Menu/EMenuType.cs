@@ -1,6 +1,6 @@
 namespace AutomaticRoadblocks.Menu
 {
-    public enum MenuType 
+    public enum EMenuType 
     {
         Pursuit,
         ManualPlacement,

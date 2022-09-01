@@ -136,7 +136,7 @@ namespace AutomaticRoadblocks.Utils
         /// </summary>
         /// <param name="vehicle">The vehicle to modify.</param>
         /// <param name="state">The state of the vehicle lights.</param>
-        public static void VehicleLights(Vehicle vehicle, VehicleLightState state)
+        public static void VehicleLights(Vehicle vehicle, EVehicleLightState state)
         {
             Assert.NotNull(vehicle, "vehicle cannot be null");
             NativeFunction.Natives.SET_VEHICLE_LIGHTS(vehicle, (int)state);

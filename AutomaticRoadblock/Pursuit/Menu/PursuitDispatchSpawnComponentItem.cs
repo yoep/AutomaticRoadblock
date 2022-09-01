@@ -30,7 +30,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
             });
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.Pursuit;
+        public EMenuType Type => EMenuType.Pursuit;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;

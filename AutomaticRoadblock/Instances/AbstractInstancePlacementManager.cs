@@ -157,7 +157,7 @@ namespace AutomaticRoadblocks.Instances
         {
             var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
 
-            return RoadUtils.FindClosestRoad(position, RoadType.All);
+            return RoadUtils.FindClosestRoad(position, ERoadType.All);
         }
 
         private void DoHologramPreviewCreation(Road road, bool force)
@@ -205,7 +205,7 @@ namespace AutomaticRoadblocks.Instances
 
         private static void CreatePreviewMarker(Road road)
         {
-            GameUtils.CreateMarker(road.Position, MarkerType.MarkerTypeVerticalCylinder, Color.White, 2.5f, false);
+            GameUtils.CreateMarker(road.Position, EMarkerType.MarkerTypeVerticalCylinder, Color.White, 2.5f, false);
         }
 
         #endregion

@@ -30,7 +30,7 @@ namespace AutomaticRoadblocks.Roadblock.Menu
         public UIMenu Menu { get; }
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.Pursuit;
+        public EMenuType Type => EMenuType.Pursuit;
 
         /// <inheritdoc />
         public string DisplayText => _localizer[LocalizationKey.MenuPursuit];

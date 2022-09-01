@@ -13,6 +13,6 @@ namespace AutomaticRoadblocks.Settings
         /// The log level of the plugin
         /// This will decide the log verbosity of the plugin to the log file RagePluginHook.log
         /// </summary>
-        public LogLevel LogLevel { get; internal set; }
+        public ELogLevel LogLevel { get; internal set; }
     }
 }

@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.StartPursuit);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.Debug;
+        public EMenuType Type => EMenuType.Debug;
 
         /// <inheritdoc />
         public bool IsAutoClosed => true;
@@ -54,7 +54,7 @@ namespace AutomaticRoadblocks.Debug.Menu
             {
                 _currentPursuit = Functions.CreatePursuit();
 
-                var road = RoadUtils.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, RoadType.All);
+                var road = RoadUtils.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, ERoadType.All);
                 var lane = road.Lanes.First();
                 var driver = new Ped(road.Position);
                 var passenger = new Ped(road.Position);
@@ -65,8 +65,8 @@ namespace AutomaticRoadblocks.Debug.Menu
 
                 AddWeaponsToPed(driver);
                 AddWeaponsToPed(passenger);
-                driver.WarpIntoVehicle(vehicle, (int)VehicleSeat.Driver);
-                passenger.WarpIntoVehicle(vehicle, (int)VehicleSeat.RightFront);
+                driver.WarpIntoVehicle(vehicle, (int)EVehicleSeat.Driver);
+                passenger.WarpIntoVehicle(vehicle, (int)EVehicleSeat.RightFront);
 
                 Game.SetRelationshipBetweenRelationshipGroups(RelationshipGroup.Gang1.Name, RelationshipGroup.Cop.Name, Relationship.Hate);
                 Game.SetRelationshipBetweenRelationshipGroups(RelationshipGroup.Cop.Name, RelationshipGroup.Gang1.Name, Relationship.Hate);

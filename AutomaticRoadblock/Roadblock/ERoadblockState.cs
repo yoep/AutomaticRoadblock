@@ -1,6 +1,6 @@
 namespace AutomaticRoadblocks.Roadblock
 {
-    public enum RoadblockState
+    public enum ERoadblockState
     {
         /// <summary>
         /// Indicates that the roadblock is being prepared.
