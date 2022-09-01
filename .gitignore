@@ -3,3 +3,7 @@ bin/
 obj/
 
 **/*.iml
+
+Build/Grand Theft Auto V/plugins/LSPDFR/AutomaticRoadblocks.dll
+Build/Grand Theft Auto V/plugins/LSPDFR/AutomaticRoadblocks.ini
+Build/Grand Theft Auto V/plugins/LSPDFR/AutomaticRoadblocks.pdb
