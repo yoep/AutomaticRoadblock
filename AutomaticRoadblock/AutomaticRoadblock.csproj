@@ -103,7 +103,7 @@
         <Compile Include="ManualPlacement\ManualRoadblockSlot.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\PlacementTypeComponentItem.cs" />
-        <Compile Include="ManualPlacement\Menu\LightComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualPlacementLightTypeComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementMenuSwitchItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualRoadblockPlaceComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementVehicleTypeComponentItem.cs" />

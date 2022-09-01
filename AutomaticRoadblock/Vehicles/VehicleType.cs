@@ -10,7 +10,7 @@ namespace AutomaticRoadblocks.Vehicles
         public static readonly VehicleType Fbi = new(LocalizationKey.VehicleTypeFbi);
         public static readonly VehicleType Swat = new(LocalizationKey.VehicleTypeSwat);
         public static readonly VehicleType Transporter = new(LocalizationKey.VehicleTypeTransporter);
-        public static readonly VehicleType None = new(LocalizationKey.VehicleTypeNone);
+        public static readonly VehicleType None = new(LocalizationKey.None);
 
         public static readonly IEnumerable<VehicleType> Values = new[]
         {
