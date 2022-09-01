@@ -10,10 +10,10 @@ namespace AutomaticRoadblocks.Localization
 {
     public class Localizer : ILocalizer
     {
-        private const string LocaleFile = @"./Plugins/LSPDFR/Automatic Roadblocks/Localization.{0}.ini";
+        private const string LocaleFile = @"./plugins/LSPDFR/Automatic Roadblocks/Localization.{0}.ini";
         private const string DefaultLang = "en";
         private const string Section = "Messages";
-        private static readonly string Lang = CultureInfo.CurrentCulture.TwoLetterISOLanguageName.ToLower();
+        private static readonly string Lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToLower();
 
         private readonly ILogger _logger;
         private readonly IDictionary<LocalizationKey, string> _messages = new Dictionary<LocalizationKey, string>();
@@ -38,7 +38,7 @@ namespace AutomaticRoadblocks.Localization
                 var localizationFileLocation = string.Format(LocaleFile, Lang);
                 if (!File.Exists(localizationFileLocation))
                 {
-                    _logger.Warn($"Localization data not found for '{Lang}', using fallback '{DefaultLang}' language instead");
+                    _logger.Warn($"Localization data file not found for '{Lang}', using fallback '{DefaultLang}' language instead");
                     localizationFileLocation = string.Format(LocaleFile, DefaultLang);
                 }
 
