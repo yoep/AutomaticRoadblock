@@ -228,6 +228,7 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void PursuitEnded(LHandle handle)
         {
+            _logger.Debug("Pursuit has ended, cleaning up any remaining pursuit roadblocks");
             PursuitHandle = null;
             _roadblockDispatcher.RoadblockCopKilled -= RoadblockCopKilled;
             _roadblockDispatcher.DismissActiveRoadblocks();

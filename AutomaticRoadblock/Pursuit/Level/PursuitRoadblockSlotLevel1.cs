@@ -14,17 +14,15 @@ namespace AutomaticRoadblocks.Pursuit.Level
     public class PursuitRoadblockSlotLevel1 : AbstractPursuitRoadblockSlot
     {
         internal PursuitRoadblockSlotLevel1(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
-            : base(lane, barrierType, VehicleType.Locale, heading, targetVehicle, shouldAddLights)
+            : base(lane, barrierType, VehicleType.Local, heading, targetVehicle, shouldAddLights)
         {
         }
 
         public override void Spawn()
         {
             base.Spawn();
-            CopInstances
-                .Select(x => x.GameInstance)
-                .ToList()
-                .ForEach(x => x.WarpIntoVehicle(Vehicle, (int)VehicleSeat.Driver));
+            CopInstances.ToList()
+                .ForEach(x => x.WarpIntoVehicle(Vehicle, VehicleSeat.Driver));
         }
 
         protected override void InitializeCops()

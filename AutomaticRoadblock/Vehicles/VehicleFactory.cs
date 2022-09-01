@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.Vehicles
             // a null model is not allowed as Rage will always try to load in a model
             // so we use a placeholder instead
             { VehicleType.None, _ => ModelUtils.Vehicles.GetStatePoliceVehicle() },
-            { VehicleType.Locale, ModelUtils.Vehicles.GetLocalPoliceVehicle },
+            { VehicleType.Local, ModelUtils.Vehicles.GetLocalPoliceVehicle },
             { VehicleType.Transporter, _ => ModelUtils.Vehicles.GetTransporterPoliceVehicle() },
             { VehicleType.State, _ => ModelUtils.Vehicles.GetStatePoliceVehicle() },
             { VehicleType.Fbi, _ => ModelUtils.Vehicles.GetFbiPoliceVehicle() },
@@ -27,9 +27,9 @@ namespace AutomaticRoadblocks.Vehicles
                 // so we use a placeholder instead
                 { VehicleType.None, (_, _, _) => null },
                 {
-                    VehicleType.Locale,
+                    VehicleType.Local,
                     (position, heading, recordCollisions) =>
-                        DoInternalVehicleCreation(CreateModel(VehicleType.Locale, position), position, heading, recordCollisions)
+                        DoInternalVehicleCreation(CreateModel(VehicleType.Local, position), position, heading, recordCollisions)
                 },
                 {
                     VehicleType.Transporter,

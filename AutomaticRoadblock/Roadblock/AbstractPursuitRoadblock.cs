@@ -50,10 +50,12 @@ namespace AutomaticRoadblocks.Roadblock
         #region Methods
 
         /// <inheritdoc />
-        public override void Spawn()
+        public override bool Spawn()
         {
-            base.Spawn();
+            var result = base.Spawn();
             Monitor();
+            
+            return result;
         }
 
         #endregion
@@ -205,6 +207,9 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void BlipFlashNewState(Color color)
         {
+            if (Blip == null)
+                return;
+
             Blip.Color = color;
             Blip.Flash(500, BlipFlashDuration);
         }

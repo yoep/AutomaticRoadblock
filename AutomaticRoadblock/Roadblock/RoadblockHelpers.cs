@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instances;
-using AutomaticRoadblocks.Utils;
+using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
@@ -12,8 +12,16 @@ namespace AutomaticRoadblocks.Roadblock
     {
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
+        public static void ReleaseInstancesToLspdfr(IRoadblockSlot slot)
+        {
+            Assert.NotNull(slot, "slot cannot be null");
+            ReleaseInstancesToLspdfr(slot.Instances, slot.Vehicle);
+        }
+
         internal static void ReleaseInstancesToLspdfr(List<InstanceSlot> instances, Vehicle vehicle)
         {
+            Assert.NotNull(instances, "instances cannot be null");
+            Assert.NotNull(vehicle, "vehicle cannot be null");
             var copPeds = instances
                 .Where(x => x.Type == EntityType.CopPed)
                 .Select(x => x.Instance)

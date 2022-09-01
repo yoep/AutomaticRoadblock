@@ -158,14 +158,15 @@ namespace AutomaticRoadblocks.RedirectTraffic
         #region IRedirectTraffic
 
         /// <inheritdoc />
-        public void Spawn()
+        public bool Spawn()
         {
             CreateBlip();
-            _instances.ForEach(x => x.Spawn());
+            var result = _instances.All(x => x.Spawn());
 
             Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
             Cop.Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
             AnimationUtils.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
+            return result;
         }
 
         #endregion
@@ -329,7 +330,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             if (_blip != null)
                 return;
 
-            Logger.Trace("Creating roadblock blip");
+            Logger.Trace($"Creating redirect traffic blip at {OffsetPosition}");
             _blip = new Blip(OffsetPosition)
             {
                 IsRouteEnabled = false,

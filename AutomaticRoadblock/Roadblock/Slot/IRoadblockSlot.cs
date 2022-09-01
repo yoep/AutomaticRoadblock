@@ -53,6 +53,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The cop instances of this roadblock slot.
         /// </summary>
         IEnumerable<ARPed> Cops { get; }
+        
+        /// <summary>
+        /// The game instances of this slot.
+        /// </summary>
+        List<InstanceSlot> Instances { get; }
 
         /// <summary>
         /// Spawn the slot entities into the world.

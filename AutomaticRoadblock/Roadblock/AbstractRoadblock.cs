@@ -193,14 +193,16 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Spawn the roadblock in the world.
         /// </summary>
-        public virtual void Spawn()
+        public virtual bool Spawn()
         {
+            var result = false;
+            
             try
             {
                 Logger.Trace("Spawning roadblock");
 
                 Slots.ToList().ForEach(x => x.Spawn());
-                Instances.ForEach(x => x.Spawn());
+                result = Instances.All(x => x.Spawn());
                 UpdateState(RoadblockState.Active);
 
                 CreateBlip();
@@ -210,6 +212,8 @@ namespace AutomaticRoadblocks.Roadblock
                 Logger.Error("Failed to spawn roadblock", ex);
                 UpdateState(RoadblockState.Error);
             }
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -222,6 +226,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             InvokeCopsJoiningPursuit();
             ReleaseEntitiesToLspdfr();
+            UpdateState(RoadblockState.Released);
         }
 
         /// <inheritdoc />
@@ -399,7 +404,7 @@ namespace AutomaticRoadblocks.Roadblock
             if (Blip != null)
                 return;
 
-            Logger.Trace("Creating roadblock blip");
+            Logger.Trace($"Creating roadblock blip at {OffsetPosition}");
             Blip = new Blip(OffsetPosition)
             {
                 IsRouteEnabled = false,
