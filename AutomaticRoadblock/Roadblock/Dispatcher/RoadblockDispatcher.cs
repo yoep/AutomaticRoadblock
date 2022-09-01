@@ -117,8 +117,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     .ToList();
             }
 
+            // only release the roadblock and don't remove it yet
+            // this will change the state of the roadblock to released state allowing
+            // it to be picked up by the cleanup thread which will dispose the roadblock correctly
             roadblocksToRelease.ForEach(x => x.Release());
-            _logger.Info($"Dismissed a total of {roadblocksToRelease.Count} roadblocks which were still active");
+            _logger.Info($"Released a total of {roadblocksToRelease.Count} roadblocks which were still active");
         }
 
         #endregion
@@ -306,16 +309,22 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 _logger.Info("Roadblock dispatch cleaner started");
                 while (_cleanerRunning)
                 {
+                    _logger.Trace($"Roadblock cleanup will check a total of {_roadblocks.Count} roadblocks");
                     _roadblocks
                         .Where(x => !x.IsPreviewActive && x.State is not RoadblockState.Active or RoadblockState.Preparing or RoadblockState.Disposing)
                         // verify if the player if far enough away for the roadblock to be cleaned
                         // if not, we auto clean roadblocks after AutoCleanRoadblockAfterSeconds
                         .Where(x => IsPlayerFarAwayFromRoadblock(x) || IsAutoRoadblockCleaningAllowed(x))
                         .ToList()
-                        .ForEach(x => x.Dispose());
+                        .ForEach(x =>
+                        {
+                            x.Dispose();
+                            _logger.Debug($"Roadblock cleanup has disposed roadblock {x}");
+                        });
                     GameFiber.Wait(10 * 1000);
                 }
-            }, "RoadblockDispatcher.StartCleaner");
+                _logger.Debug("Roadblock dispatch cleaner stopped");
+            }, "RoadblockDispatcher.Cleaner");
         }
 
         private bool IsPlayerFarAwayFromRoadblock(IRoadblock roadblock)
