@@ -12,6 +12,7 @@
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <LangVersion>9</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
       <DebugType>pdbonly</DebugType>
@@ -90,6 +91,7 @@
         <Compile Include="Localization\LocalizationNotFound.cs" />
         <Compile Include="Localization\Localizer.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementRemoveComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableCopsComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableSpeedLimitComponentItem.cs" />
@@ -135,9 +137,11 @@
         <Compile Include="Pursuit\PursuitLevel.cs" />
         <Compile Include="Pursuit\PursuitManager.cs" />
         <Compile Include="RedirectTraffic\IRedirectTrafficDispatcher.cs" />
+        <Compile Include="RedirectTraffic\Menu\EnableRedirectArrowComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficConeDistanceComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficConeTypeComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficLaneTypeComponentItem.cs" />
+        <Compile Include="RedirectTraffic\Menu\RedirectTrafficOffsetComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficPlaceComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficMenuSwitchItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficRemoveComponentItem.cs" />

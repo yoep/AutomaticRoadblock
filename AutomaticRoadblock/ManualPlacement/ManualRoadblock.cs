@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.ManualPlacement
     public class ManualRoadblock : AbstractRoadblock, IPlaceableInstance
     {
         internal ManualRoadblock(Request request)
-            : base(request.Road, request.BarrierType, request.TargetHeading, request.LimitSpeed, request.AddLights)
+            : base(request.Road, request.BarrierType, request.TargetHeading, request.LimitSpeed, request.AddLights, request.Offset)
         {
             Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
             Assert.NotNull(request.LightSourceType, "lightSourceType cannot be null");
@@ -84,7 +84,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
 
             return lanesToBlock
-                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, VehicleType, LightSourceType, TargetHeading, IsLightsEnabled, CopsEnabled))
+                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, VehicleType, LightSourceType, TargetHeading, IsLightsEnabled, CopsEnabled, Offset))
                 .ToList();
         }
 
@@ -120,6 +120,8 @@ namespace AutomaticRoadblocks.ManualPlacement
             public bool LimitSpeed { get; set; }
             public bool AddLights { get; set; }
             public bool CopsEnabled { get; set; }
+            
+            public float Offset { get; set; }
 
             public override string ToString()
             {

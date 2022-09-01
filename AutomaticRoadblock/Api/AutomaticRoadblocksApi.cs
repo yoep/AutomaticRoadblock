@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.Pursuit;
+using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 
 namespace AutomaticRoadblocks.Api
@@ -23,5 +24,10 @@ namespace AutomaticRoadblocks.Api
         /// Get the manual placement instance.
         /// </summary>
         public static IManualPlacement ManualPlacement => IoC.Instance.GetInstance<IManualPlacement>();
+
+        /// <summary>
+        /// Get the traffic redirection dispatcher.
+        /// </summary>
+        public static IRedirectTrafficDispatcher RedirectTrafficDispatcher => IoC.Instance.GetInstance<IRedirectTrafficDispatcher>();
     }
 }
