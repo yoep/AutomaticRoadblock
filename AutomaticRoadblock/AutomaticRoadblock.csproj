@@ -152,6 +152,7 @@
         <Compile Include="Roadblock\AbstractPursuitRoadblock.cs" />
         <Compile Include="Roadblock\Dispatcher\IRoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockDispatcher.cs" />
+        <Compile Include="Roadblock\Dispatcher\RoadblockInfo.cs" />
         <Compile Include="Roadblock\IRoadblock.cs" />
         <Compile Include="Roadblock\Menu\CleanRoadblocksComponent.cs" />
         <Compile Include="Roadblock\AbstractRoadblock.cs" />
