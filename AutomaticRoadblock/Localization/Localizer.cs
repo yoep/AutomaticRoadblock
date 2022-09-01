@@ -41,30 +41,33 @@ namespace AutomaticRoadblocks.Localization
                     _logger.Warn($"Localization data not found for '{Lang}', using fallback '{DefaultLang}' language instead");
                     localizationFileLocation = string.Format(LocaleFile, DefaultLang);
                 }
-                
+
                 _logger.Trace($"Trying to load localization file {localizationFileLocation}");
                 var localeFile = new InitializationFile(localizationFileLocation);
                 _logger.Info($"Loaded localization file {localizationFileLocation}");
 
                 var missingDataKeys = 0;
 
-                // try to find all keys in the file
+                // try to find all keys in the file and load them into memory
+                // also try to detect any potential missing keys
                 foreach (var key in LocalizationKey.Values)
                 {
                     if (localeFile.DoesKeyExist(Section, key.Identifier))
                     {
-                        _logger.Trace($"Loading localization key {key.Identifier} from ini");
+                        _logger.Trace($"Loading localization key {key.Identifier} from Localization ini");
                     }
                     else
                     {
                         missingDataKeys++;
-                        _logger.Warn($"Missing localization key {key.Identifier} in ini");
+                        _logger.Warn($"Missing localization key {key.Identifier} in Localization ini");
                     }
 
                     _messages[key] = localeFile.ReadString(Section, key.Identifier, key.DefaultText);
                 }
-                
-                _logger.Info($"Localization data has been loaded from {localizationFileLocation}, detected {missingDataKeys} missing data keys");
+
+                _logger.Info($"Localization data has been loaded from {localizationFileLocation}");
+                if (missingDataKeys > 0)
+                    _logger.Warn($"Detected {missingDataKeys} missing data keys in the {localizationFileLocation}");
             }
             catch (Exception ex)
             {

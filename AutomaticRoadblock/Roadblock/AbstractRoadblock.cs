@@ -404,7 +404,7 @@ namespace AutomaticRoadblocks.Roadblock
             if (Blip != null)
                 return;
 
-            Logger.Trace("Creating roadblock blip");
+            Logger.Trace($"Creating roadblock blip at {OffsetPosition}");
             Blip = new Blip(OffsetPosition)
             {
                 IsRouteEnabled = false,

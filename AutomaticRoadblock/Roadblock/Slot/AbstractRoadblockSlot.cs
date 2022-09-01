@@ -63,10 +63,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public VehicleType VehicleType { get; }
 
-        /// <summary>
-        /// The game instances of this slot.
-        /// </summary>
-        protected List<InstanceSlot> Instances { get; } = new();
+        /// <inheritdoc />
+        public List<InstanceSlot> Instances { get; } = new();
 
         /// <inheritdoc />
         public Vehicle Vehicle => VehicleInstance?.GameInstance;
@@ -198,7 +196,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public void Release()
         {
-            RoadblockHelpers.ReleaseInstancesToLspdfr(Instances, Vehicle);
+            RoadblockHelpers.ReleaseInstancesToLspdfr(this);
         }
 
         #endregion

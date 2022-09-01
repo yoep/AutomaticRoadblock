@@ -330,7 +330,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             if (_blip != null)
                 return;
 
-            Logger.Trace("Creating roadblock blip");
+            Logger.Trace($"Creating redirect traffic blip at {OffsetPosition}");
             _blip = new Blip(OffsetPosition)
             {
                 IsRouteEnabled = false,
