@@ -1,6 +1,6 @@
 namespace AutomaticRoadblocks.Utils
 {
-    public enum TimePeriod
+    public enum ETimePeriod
     {
         Morning,
         Forenoon,

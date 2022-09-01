@@ -5,15 +5,9 @@ namespace AutomaticRoadblocks.Pursuit
     public interface IPursuitManager
     {
         /// <summary>
-        /// Verify if there is currently an active pursuit.
+        /// Verify if there is currently an active pursuit which is tracked by this manager.
         /// </summary>
         bool IsPursuitActive { get; }
-
-        /// <summary>
-        /// Verify if the pursuit is on foot and not anymore in vehicles.
-        /// </summary>
-        /// <exception cref="NoPursuitActiveException">Is thrown when this property is called and <see cref="IsPursuitActive"/> is false.</exception>
-        bool IsPursuitOnFoot { get; }
 
         /// <summary>
         /// Enable automatic dispatching of roadblocks during a pursuit.
@@ -24,6 +18,11 @@ namespace AutomaticRoadblocks.Pursuit
         /// Enable automatic level increases during a pursuit.
         /// </summary>
         bool EnableAutomaticLevelIncreases { get; set; }
+        
+        /// <summary>
+        /// The current state of the pursuit.
+        /// </summary>
+        EPursuitState State { get; }
 
         /// <summary>
         /// Retrieve the current pursuit level.
@@ -40,8 +39,14 @@ namespace AutomaticRoadblocks.Pursuit
         /// </summary>
         event PursuitEvents.PursuitLevelChangedEventHandler PursuitLevelChanged;
 
+        /// <summary>
+        /// Start listening for pursuits on the LSPDFR api.
+        /// </summary>
         void StartListener();
 
+        /// <summary>
+        /// Stop listening for pursuits on the LSPDFR api.
+        /// </summary>
         void StopListener();
 
         /// <summary>

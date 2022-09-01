@@ -77,7 +77,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         /// <inheritdoc />
         public IEnumerable<ARPed> Cops => Instances
-            .Where(x => x.Type == EntityType.CopPed)
+            .Where(x => x.Type == EEntityType.CopPed)
             .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .ToList();
@@ -101,7 +101,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Get the AR vehicle instance of this slot.
         /// </summary>
         protected ARVehicle VehicleInstance => Instances
-            .Where(x => x.Type == EntityType.CopVehicle)
+            .Where(x => x.Type == EEntityType.CopVehicle)
             .Select(x => x.Instance)
             .Select(x => (ARVehicle)x)
             .FirstOrDefault();
@@ -114,7 +114,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             get
             {
                 return Instances
-                    .Where(x => x.Type == EntityType.CopPed)
+                    .Where(x => x.Type == EEntityType.CopPed)
                     .Select(x => x.Instance)
                     .Select(x => (ARPed)x);
             }
@@ -134,7 +134,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             Logger.Trace($"Roadblock slot instances: \n{string.Join("\n", Instances.Select(x => x.ToString()).ToList())}");
             Instances.ForEach(x => DoSafeOperation(x.CreatePreview, $"create instance slot {x} preview"));
 
-            if (Instances.Any(x => x.State == InstanceState.Error))
+            if (Instances.Any(x => x.State == EInstanceState.Error))
                 Game.DisplayNotification(IoC.Instance.GetInstance<ILocalizer>()[LocalizationKey.RoadblockInstanceCreationFailed]);
 
             DrawRoadblockDebugInfo();
@@ -189,7 +189,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public void ModifyVehiclePosition(Vector3 newPosition)
         {
             Assert.NotNull(newPosition, "newPosition cannot be null");
-            var vehicleSlot = Instances.First(x => x.Type == EntityType.CopVehicle);
+            var vehicleSlot = Instances.First(x => x.Type == EEntityType.CopVehicle);
             vehicleSlot.Position = newPosition;
         }
 
@@ -268,7 +268,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 VehicleModel.LoadAndWait();
             }
 
-            Instances.Add(new InstanceSlot(EntityType.CopVehicle, OffsetPosition, CalculateVehicleHeading(),
+            Instances.Add(new InstanceSlot(EEntityType.CopVehicle, OffsetPosition, CalculateVehicleHeading(),
                 (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading, RecordVehicleCollisions)));
         }
 
@@ -289,7 +289,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             Logger.Debug($"Creating a total of {totalBarriers} barriers with type {BarrierType} for the roadblock slot");
             for (var i = 0; i < totalBarriers; i++)
             {
-                Instances.Add(new InstanceSlot(EntityType.Barrier, startPosition, Heading, CreateBarrier));
+                Instances.Add(new InstanceSlot(EEntityType.Barrier, startPosition, Heading, CreateBarrier));
                 startPosition += direction * barrierTotalWidth;
             }
         }

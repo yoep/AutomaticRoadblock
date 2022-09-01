@@ -30,7 +30,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         public UIMenu Menu { get; }
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.RedirectTraffic;
+        public EMenuType Type => EMenuType.RedirectTraffic;
 
         /// <inheritdoc />
         public string DisplayText => _localizer[LocalizationKey.MenuRedirectTraffic];

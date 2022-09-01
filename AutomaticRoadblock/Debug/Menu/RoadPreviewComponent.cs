@@ -26,11 +26,11 @@ namespace AutomaticRoadblocks.Debug.Menu
 
         /// <inheritdoc />
         public UIMenuListItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.RoadPreview, AutomaticRoadblocksPlugin.RoadPreviewDescription,
-            new DisplayItem(RoadPreviewType.Closest, AutomaticRoadblocksPlugin.RoadPreviewClosest),
-            new DisplayItem(RoadPreviewType.Nearby, AutomaticRoadblocksPlugin.RoadPreviewNearby));
+            new DisplayItem(ERoadPreviewType.Closest, AutomaticRoadblocksPlugin.RoadPreviewClosest),
+            new DisplayItem(ERoadPreviewType.Nearby, AutomaticRoadblocksPlugin.RoadPreviewNearby));
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.Debug;
+        public EMenuType Type => EMenuType.Debug;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;
@@ -56,10 +56,10 @@ namespace AutomaticRoadblocks.Debug.Menu
             _game.NewSafeFiber(() =>
             {
                 MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreviewRemove;
-                var type = (RoadPreviewType)MenuItem.SelectedValue;
-                _roads = type == RoadPreviewType.Closest
-                    ? new List<Road> { RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, RoadType.All) }
-                    : RoadUtils.FindNearbyRoads(Game.LocalPlayer.Character.Position, RoadType.All).ToList();
+                var type = (ERoadPreviewType)MenuItem.SelectedValue;
+                _roads = type == ERoadPreviewType.Closest
+                    ? new List<Road> { RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, ERoadType.All) }
+                    : RoadUtils.FindNearbyRoads(Game.LocalPlayer.Character.Position, ERoadType.All).ToList();
 
                 _logger.Debug("Nearest road info: " + string.Join("---\n", _roads));
                 _roads.ForEach(x => x.CreatePreview());
@@ -77,7 +77,7 @@ namespace AutomaticRoadblocks.Debug.Menu
             }, "RoadPreview");
         }
 
-        public enum RoadPreviewType
+        public enum ERoadPreviewType
         {
             Closest,
             Nearby

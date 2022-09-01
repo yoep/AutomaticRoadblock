@@ -30,7 +30,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         public UIMenu Menu { get; }
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.ManualPlacement;
+        public EMenuType Type => EMenuType.ManualPlacement;
 
         /// <inheritdoc />
         public string DisplayText => _localizer[LocalizationKey.MenuManualPlacement];

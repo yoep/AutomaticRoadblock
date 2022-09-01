@@ -14,7 +14,7 @@ namespace AutomaticRoadblocks.Roadblock
 {
     /// <summary>
     /// This abstract implementation of <see cref="IRoadblock"/> verifies certain states such
-    /// as <see cref="RoadblockState.Hit"/> or <see cref="RoadblockState.Bypassed"/>.
+    /// as <see cref="ERoadblockState.Hit"/> or <see cref="ERoadblockState.Bypassed"/>.
     /// </summary>
     internal abstract class AbstractPursuitRoadblock : AbstractRoadblock
     {
@@ -91,9 +91,9 @@ namespace AutomaticRoadblocks.Roadblock
 
             Instances.AddRange(new[]
             {
-                new InstanceSlot(EntityType.CopVehicle, roadPosition, TargetHeading + 25,
+                new InstanceSlot(EEntityType.CopVehicle, roadPosition, TargetHeading + 25,
                     (position, heading) => VehicleFactory.CreateWithModel(vehicleModel, position, heading)),
-                new InstanceSlot(EntityType.CopPed, roadPosition, TargetHeading,
+                new InstanceSlot(EEntityType.CopPed, roadPosition, TargetHeading,
                     (position, heading) =>
                         PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(vehicleModel, position, heading)))
             });
@@ -111,7 +111,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             for (var i = 0; i < 5; i++)
             {
-                Instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, TargetHeading,
+                Instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, TargetHeading,
                     (position, heading) => BarrierFactory.Create(BarrierType.BarrelTrafficCatcher, position, heading)));
                 startPosition += nextPositionDirection * nextPositionDistance;
             }
@@ -127,7 +127,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             Game.NewSafeFiber(() =>
             {
-                while (State == RoadblockState.Active)
+                while (State == ERoadblockState.Active)
                 {
                     VerifyIfRoadblockIsBypassed();
                     VerifyIfRoadblockIsHit();
@@ -155,7 +155,7 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 BlipFlashNewState(Color.LightGray);
                 Release();
-                UpdateState(RoadblockState.Bypassed);
+                UpdateState(ERoadblockState.Bypassed);
                 Logger.Info("Roadblock has been bypassed");
             }
         }
@@ -177,7 +177,7 @@ namespace AutomaticRoadblocks.Roadblock
                 Logger.Debug("Determined that the collision must have been against a roadblock slot");
                 BlipFlashNewState(Color.Green);
                 Release();
-                UpdateState(RoadblockState.Hit);
+                UpdateState(ERoadblockState.Hit);
                 Logger.Info("Roadblock has been hit by the suspect");
             }
             else
@@ -220,7 +220,7 @@ namespace AutomaticRoadblocks.Roadblock
             // invalidate the roadblock so it can be cleaned up
             // this will also stop the monitor from running as we're not able
             // to determine any status anymore
-            UpdateState(RoadblockState.Invalid);
+            UpdateState(ERoadblockState.Invalid);
         }
 
         #endregion

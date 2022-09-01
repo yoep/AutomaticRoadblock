@@ -42,7 +42,7 @@ namespace AutomaticRoadblocks.LightSources
 
             for (var i = 0; i < totalWarning; i++)
             {
-                instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, roadblockSlot.Heading,
+                instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, roadblockSlot.Heading,
                     (position, heading) => new ARScenery(propFactory.Invoke(position, heading + Random.Next(360)))));
                 startPosition += direction * spacing;
             }

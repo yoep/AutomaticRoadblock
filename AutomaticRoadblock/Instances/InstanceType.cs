@@ -1,6 +1,6 @@
 namespace AutomaticRoadblocks.Instances
 {
-    public enum EntityType
+    public enum EEntityType
     {
         Scenery,
         Barrier,

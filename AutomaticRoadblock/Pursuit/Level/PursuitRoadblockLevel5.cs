@@ -32,7 +32,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 2f;
 
-            Instances.Add(new InstanceSlot(EntityType.Scenery, position, 0f,
+            Instances.Add(new InstanceSlot(EEntityType.Scenery, position, 0f,
                 (conePosition, _) => BarrierFactory.Create(BarrierType.BigCone, conePosition)));
         }
 
@@ -60,7 +60,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             // only the chase vehicle will join the pursuit
             return Instances
-                .Where(x => x.Type == EntityType.CopPed)
+                .Where(x => x.Type == EEntityType.CopPed)
                 .Select(x => x.Instance)
                 .Select(x => (ARPed)x)
                 .Select(x => x.GameInstance)

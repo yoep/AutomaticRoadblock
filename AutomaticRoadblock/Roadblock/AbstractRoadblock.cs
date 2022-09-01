@@ -66,7 +66,7 @@ namespace AutomaticRoadblocks.Roadblock
         public abstract RoadblockLevel Level { get; }
 
         /// <inheritdoc />
-        public RoadblockState State { get; private set; } = RoadblockState.Preparing;
+        public ERoadblockState State { get; private set; } = ERoadblockState.Preparing;
 
         /// <inheritdoc />
         public Vector3 Position => Road.Position;
@@ -149,7 +149,7 @@ namespace AutomaticRoadblocks.Roadblock
                 {
                     foreach (var ped in RetrieveCopsJoiningThePursuit())
                     {
-                        GameUtils.CreateMarker(ped.Position, MarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, false);
+                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, false);
                     }
 
                     Game.FiberYield();
@@ -173,7 +173,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public void Dispose()
         {
-            UpdateState(RoadblockState.Disposing);
+            UpdateState(ERoadblockState.Disposing);
 
             if (IsPreviewActive)
                 DeletePreview();
@@ -183,7 +183,7 @@ namespace AutomaticRoadblocks.Roadblock
             Slots.ToList().ForEach(x => x.Dispose());
             Instances.ForEach(x => x.Dispose());
 
-            UpdateState(RoadblockState.Disposed);
+            UpdateState(ERoadblockState.Disposed);
         }
 
         #endregion
@@ -203,14 +203,14 @@ namespace AutomaticRoadblocks.Roadblock
 
                 Slots.ToList().ForEach(x => x.Spawn());
                 result = Instances.All(x => x.Spawn());
-                UpdateState(RoadblockState.Active);
+                UpdateState(ERoadblockState.Active);
 
                 CreateBlip();
             }
             catch (Exception ex)
             {
                 Logger.Error("Failed to spawn roadblock", ex);
-                UpdateState(RoadblockState.Error);
+                UpdateState(ERoadblockState.Error);
             }
 
             return result;
@@ -221,12 +221,12 @@ namespace AutomaticRoadblocks.Roadblock
         {
             // verify if the roadblock is still active
             // otherwise, we cannot release the entities
-            if (State != RoadblockState.Active)
+            if (State != ERoadblockState.Active)
                 return;
 
             InvokeCopsJoiningPursuit();
             ReleaseEntitiesToLspdfr();
-            UpdateState(RoadblockState.Released);
+            UpdateState(ERoadblockState.Released);
         }
 
         /// <inheritdoc />
@@ -288,7 +288,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// Update the state of the roadblock.
         /// </summary>
         /// <param name="state">The new state of the roadblock.</param>
-        protected void UpdateState(RoadblockState state)
+        protected void UpdateState(ERoadblockState state)
         {
             if (State == state)
                 return;

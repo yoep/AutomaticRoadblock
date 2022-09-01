@@ -193,7 +193,7 @@ namespace AutomaticRoadblocks.Instances
             _attachments.Clear();
         }
 
-        public void WarpIntoVehicle(Vehicle vehicle, VehicleSeat seat)
+        public void WarpIntoVehicle(Vehicle vehicle, EVehicleSeat seat)
         {
             Assert.NotNull(vehicle, "vehicle cannot be null");
             if (IsInvalid || !vehicle.IsValid())

@@ -22,12 +22,12 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             base.Spawn();
             CopInstances.ToList()
-                .ForEach(x => x.WarpIntoVehicle(Vehicle, VehicleSeat.Driver));
+                .ForEach(x => x.WarpIntoVehicle(Vehicle, EVehicleSeat.Driver));
         }
 
         protected override void InitializeCops()
         {
-            Instances.Add(new InstanceSlot(EntityType.CopPed, GameUtils.GetOnTheGroundPosition(Position), 0f, (position, heading) =>
+            Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(Position), 0f, (position, heading) =>
                 PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading))));
         }
 

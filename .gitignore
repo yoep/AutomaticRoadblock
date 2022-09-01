@@ -1,8 +1,11 @@
 ﻿.idea/
 bin/
 obj/
+packages/
+Media/
 
 **/*.iml
+**/*.DotSettings.user
 
 Build/*.zip
 Build/Grand Theft Auto V/plugins/LSPDFR/AutomaticRoadblocks.dll

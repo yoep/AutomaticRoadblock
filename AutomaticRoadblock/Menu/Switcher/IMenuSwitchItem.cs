@@ -12,7 +12,7 @@ namespace AutomaticRoadblocks.Menu.Switcher
         /// <summary>
         /// Get the type of this menu switcher.
         /// </summary>
-        MenuType Type { get; }
+        EMenuType Type { get; }
         
         /// <summary>
         /// Get the text which needs to be displayed for this item.

@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         public UIMenuCheckboxItem MenuItem { get; }
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.Pursuit;
+        public EMenuType Type => EMenuType.Pursuit;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;

@@ -116,7 +116,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// The cop instance of this redirect traffic instance.
         /// </summary>
         private ARPed Cop => _instances
-            .Where(x => x.Type == EntityType.CopPed)
+            .Where(x => x.Type == EEntityType.CopPed)
             .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .First();
@@ -125,7 +125,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// The vehicle instance of this redirect traffic instance.
         /// </summary>
         private ARVehicle Vehicle => _instances
-            .Where(x => x.Type == EntityType.CopVehicle)
+            .Where(x => x.Type == EEntityType.CopVehicle)
             .Select(x => x.Instance)
             .Select(x => (ARVehicle)x)
             .First();
@@ -213,7 +213,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var rotation = IsLeftSideOfLanes ? -35 : 35;
             VehicleModel = VehicleFactory.CreateModel(VehicleType, OffsetPosition);
 
-            _instances.Add(new InstanceSlot(EntityType.CopVehicle, OffsetPosition, Lane.Heading + rotation,
+            _instances.Add(new InstanceSlot(EEntityType.CopVehicle, OffsetPosition, Lane.Heading + rotation,
                 (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading)));
         }
 
@@ -223,7 +223,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var copPedHeading = Lane.Heading - 180;
             var positionBehindVehicle = OffsetPosition + MathHelper.ConvertHeadingToDirection(copPedHeading) * distanceBehindVehicle;
 
-            _instances.Add(new InstanceSlot(EntityType.CopPed, positionBehindVehicle, copPedHeading,
+            _instances.Add(new InstanceSlot(EEntityType.CopPed, positionBehindVehicle, copPedHeading,
                 (position, heading) => CreateCop(position, heading)));
         }
 
@@ -259,7 +259,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 $"Creating a total of {totalCones} cones along the road with type {ConeType} for a length of {coneDistance} (ConeTypeWidth: {ConeType.Width}, ConeTypeSpacing: {ConeType.Spacing})");
             for (var i = 0; i < totalCones; i++)
             {
-                _instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, ConeHeading(),
+                _instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, ConeHeading(),
                     (position, heading) => BarrierFactory.Create(ConeType, position, heading)));
                 startPosition += placementDirection * actualConeLength;
             }
@@ -277,7 +277,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             Logger.Trace($"Creating a total of {totalCones} cones behind the vehicle for a lane width of {Lane.Width}");
             for (var i = 0; i < totalCones; i++)
             {
-                _instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, ConeHeading(),
+                _instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, ConeHeading(),
                     (position, heading) => BarrierFactory.Create(ConeType, position, heading)));
                 startPosition += placementDirection * coneDistance;
             }
@@ -289,7 +289,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             var signPosition = VehicleStoppedSignPosition(coneEndPosition);
 
-            _instances.Add(new InstanceSlot(EntityType.Scenery, signPosition, Lane.Heading,
+            _instances.Add(new InstanceSlot(EEntityType.Scenery, signPosition, Lane.Heading,
                 (position, heading) => new ARScenery(PropUtils.StoppedVehiclesSign(position, heading))));
         }
 
@@ -300,7 +300,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
                                + MathHelper.ConvertHeadingToDirection(sideDirection) * 1.5f
                                + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 1f;
 
-            _instances.Add(new InstanceSlot(EntityType.Scenery, signPosition, Lane.Heading,
+            _instances.Add(new InstanceSlot(EEntityType.Scenery, signPosition, Lane.Heading,
                 (position, heading) => new ARScenery(IsLeftSideOfLanes
                     ? PropUtils.CreateWorkerBarrierArrowRight(position, heading)
                     : PropUtils.RedirectTrafficArrowLeft(position, heading))));
@@ -321,7 +321,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var groundLightPosition = VehicleStoppedSignPosition(coneEndPosition) +
                                       MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 1.5f;
 
-            _instances.Add(new InstanceSlot(EntityType.Scenery, groundLightPosition, Lane.Heading - 180,
+            _instances.Add(new InstanceSlot(EEntityType.Scenery, groundLightPosition, Lane.Heading - 180,
                 (position, heading) => new ARScenery(PropUtils.CreateGroundFloodLight(position, heading))));
         }
 

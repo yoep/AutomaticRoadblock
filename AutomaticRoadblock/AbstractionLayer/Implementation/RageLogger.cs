@@ -9,54 +9,54 @@ namespace AutomaticRoadblocks.AbstractionLayer.Implementation
         private const string LevelError = "ERROR";
 
         /// <inheritdoc />
-        public LogLevel LogLevel { get; set; } = LogLevel.Trace;
+        public ELogLevel LogLevel { get; set; } = ELogLevel.Trace;
 
         /// <inheritdoc />
         public void Trace(string message)
         {
-            if (LogLevel.HasFlag(LogLevel.Trace))
+            if (LogLevel.HasFlag(ELogLevel.Trace))
                 Game.LogTrivial(BuildMessage("TRACE", message));
         }
 
         /// <inheritdoc />
         public void Debug(string message)
         {
-            if (LogLevel.HasFlag(LogLevel.Debug))
+            if (LogLevel.HasFlag(ELogLevel.Debug))
                 Game.LogTrivial(BuildMessage("DEBUG", message));
         }
 
         /// <inheritdoc />
         public void Info(string message)
         {
-            if (LogLevel.HasFlag(LogLevel.Info))
+            if (LogLevel.HasFlag(ELogLevel.Info))
                 Game.LogTrivial(BuildMessage("INFO", message));
         }
 
         /// <inheritdoc />
         public void Warn(string message)
         {
-            if (LogLevel.HasFlag(LogLevel.Warn))
+            if (LogLevel.HasFlag(ELogLevel.Warn))
                 Game.LogTrivial(BuildMessage(LevelWarn, message));
         }
 
         /// <inheritdoc />
         public void Warn(string message, Exception exception)
         {
-            if (LogLevel.HasFlag(LogLevel.Warn))
+            if (LogLevel.HasFlag(ELogLevel.Warn))
                 Game.LogTrivial(BuildMessage(LevelWarn, message, exception));
         }
 
         /// <inheritdoc />
         public void Error(string message)
         {
-            if (LogLevel.HasFlag(LogLevel.Error))
+            if (LogLevel.HasFlag(ELogLevel.Error))
                 Game.LogTrivial(BuildMessage(LevelError, message));
         }
 
         /// <inheritdoc />
         public void Error(string message, Exception exception)
         {
-            if (LogLevel.HasFlag(LogLevel.Error))
+            if (LogLevel.HasFlag(ELogLevel.Error))
                 Game.LogTrivial(BuildMessage(LevelError, message, exception));
         }
 

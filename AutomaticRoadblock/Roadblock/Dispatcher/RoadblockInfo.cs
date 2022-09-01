@@ -24,7 +24,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// <summary>
         /// The state of the <see cref="Roadblock"/>
         /// </summary>
-        public RoadblockState State => Roadblock.State;
+        public ERoadblockState State => Roadblock.State;
 
         /// <summary>
         /// The last known distance of the <see cref="Roadblock"/> in regards to the player.
