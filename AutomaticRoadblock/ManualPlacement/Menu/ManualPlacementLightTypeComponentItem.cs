@@ -6,11 +6,11 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class LightComponentItem : IMenuComponent<UIMenuListScrollerItem<LightSourceType>>
+    public class ManualPlacementLightTypeComponentItem : IMenuComponent<UIMenuListScrollerItem<LightSourceType>>
     {
         private readonly IManualPlacement _manualPlacement;
 
-        public LightComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
+        public ManualPlacementLightTypeComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _manualPlacement = manualPlacement;
 

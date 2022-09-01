@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Forms;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu.Switcher;
 using AutomaticRoadblocks.Settings;
 using Rage;
@@ -18,6 +19,7 @@ namespace AutomaticRoadblocks.Menu
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly ICollection<IMenuSwitchItem> _menuSwitchItems;
+        private readonly ILocalizer _localizer;
 
         private static readonly MenuPool MenuPool = new();
         private static readonly List<IMenuComponent<UIMenuItem>> MenuItems = new();
@@ -25,12 +27,13 @@ namespace AutomaticRoadblocks.Menu
         private UIMenuSwitchMenusItem _menuSwitcher;
         private bool _menuRunning;
 
-        public MenuImpl(ILogger logger, IGame game, ISettingsManager settingsManager, ICollection<IMenuSwitchItem> menuSwitchItems)
+        public MenuImpl(ILogger logger, IGame game, ISettingsManager settingsManager, ICollection<IMenuSwitchItem> menuSwitchItems, ILocalizer localizer)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
             _menuSwitchItems = menuSwitchItems;
+            _localizer = localizer;
         }
 
         #region Properties
@@ -179,7 +182,7 @@ namespace AutomaticRoadblocks.Menu
                 .Select(x => new DisplayItem(x.Menu, x.DisplayText))
                 .ToList();
 
-            _menuSwitcher = new UIMenuSwitchMenusItem("Mode", null, displayItems);
+            _menuSwitcher = new UIMenuSwitchMenusItem(_localizer[LocalizationKey.MenuMode], null, displayItems);
         }
 
         private void StartKeyListener()

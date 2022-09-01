@@ -7,7 +7,7 @@ namespace AutomaticRoadblocks.Barriers
 {
     public class BarrierType
     {
-        public static readonly BarrierType None = new(LocalizationKey.BarrierTypeNone, 1f, 1f);
+        public static readonly BarrierType None = new(LocalizationKey.None, 1f, 1f);
         public static readonly BarrierType SmallCone = new(LocalizationKey.BarrierTypeSmallCone, DimensionOf(PropUtils.Models.SmallCone), 0.4f);
         public static readonly BarrierType SmallConeStriped = new(LocalizationKey.BarrierTypeSmallConeStriped, DimensionOf(PropUtils.Models.SmallConeWithStrips), 0.4f);
         public static readonly BarrierType BigCone = new(LocalizationKey.BarrierTypeBigCone, DimensionOf(PropUtils.Models.BigCone), 0.5f);

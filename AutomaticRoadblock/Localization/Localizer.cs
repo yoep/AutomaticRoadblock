@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.Localization
         private const string LocaleFile = @"./plugins/LSPDFR/Automatic Roadblocks/Localization.{0}.ini";
         private const string DefaultLang = "en";
         private const string Section = "Messages";
-        private static readonly string Lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToLower();
+        private static readonly string Lang = CultureInfo.InstalledUICulture.TwoLetterISOLanguageName.ToLower();
 
         private readonly ILogger _logger;
         private readonly IDictionary<LocalizationKey, string> _messages = new Dictionary<LocalizationKey, string>();
