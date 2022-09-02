@@ -177,12 +177,12 @@ namespace AutomaticRoadblocks
             logger.Debug("Registering debug menu components");
             IoC.Instance
                 .Register<IMenuSwitchItem>(typeof(DebugMenuSwitchItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitToggleComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitForceOnFootComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(CalloutEndComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RoadInfoComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RoadPreviewComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ZoneInfoComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitToggleComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitForceOnFootComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugEndCurrentCalloutComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadInfoComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadPreviewComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugZoneInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent));

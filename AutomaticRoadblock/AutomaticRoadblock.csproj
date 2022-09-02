@@ -65,12 +65,12 @@
         <Compile Include="Barriers\BarrierFactory.cs" />
         <Compile Include="Barriers\BarrierType.cs" />
         <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
-        <Compile Include="Debug\Menu\CalloutEndComponent.cs" />
-        <Compile Include="Debug\Menu\PursuitForceOnFootComponent.cs" />
-        <Compile Include="Debug\Menu\RoadInfoComponent.cs" />
-        <Compile Include="Debug\Menu\RoadPreviewComponent.cs" />
-        <Compile Include="Debug\Menu\PursuitToggleComponent.cs" />
-        <Compile Include="Debug\Menu\ZoneInfoComponent.cs" />
+        <Compile Include="Debug\Menu\DebugEndCurrentCalloutComponent.cs" />
+        <Compile Include="Debug\Menu\DebugPursuitForceOnFootComponent.cs" />
+        <Compile Include="Debug\Menu\DebugRoadInfoComponent.cs" />
+        <Compile Include="Debug\Menu\DebugRoadPreviewComponent.cs" />
+        <Compile Include="Debug\Menu\DebugPursuitToggleComponent.cs" />
+        <Compile Include="Debug\Menu\DebugZoneInfoComponent.cs" />
         <Compile Include="Instances\AbstractInstancePlacementManager.cs" />
         <Compile Include="Instances\IARInstance.cs" />
         <Compile Include="Instances\ARPed.cs" />
@@ -180,6 +180,8 @@
         <Compile Include="Utils\ModelUtils.cs" />
         <Compile Include="Utils\PreviewUtils.cs" />
         <Compile Include="Utils\PropUtils.cs" />
+        <Compile Include="Utils\Road\ENodeType.cs" />
+        <Compile Include="Utils\Road\ETraceFlags.cs" />
         <Compile Include="Utils\Road\Road.cs" />
         <Compile Include="Utils\Road\ERoadType.cs" />
         <Compile Include="Utils\Road\RoadUtils.cs" />

@@ -9,14 +9,14 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class PursuitForceOnFootComponent : IMenuComponent<UIMenuItem>, IDisposable
+    public class DebugPursuitForceOnFootComponent : IMenuComponent<UIMenuItem>, IDisposable
     {
         private readonly ILogger _logger;
         private readonly IGame _game;
 
         private bool _active = true;
 
-        public PursuitForceOnFootComponent(ILogger logger, IGame game)
+        public DebugPursuitForceOnFootComponent(ILogger logger, IGame game)
         {
             _logger = logger;
             _game = game;

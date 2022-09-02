@@ -12,14 +12,14 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class PursuitToggleComponent : IMenuComponent<UIMenuItem>
+    public class DebugPursuitToggleComponent : IMenuComponent<UIMenuItem>
     {
         private readonly IGame _game;
         private readonly Random _random = new();
 
         private LHandle _currentPursuit;
 
-        public PursuitToggleComponent(IGame game)
+        public DebugPursuitToggleComponent(IGame game)
         {
             _game = game;
             Events.OnPursuitEnded += OnPursuitEnded;
@@ -54,7 +54,7 @@ namespace AutomaticRoadblocks.Debug.Menu
             {
                 _currentPursuit = Functions.CreatePursuit();
 
-                var road = RoadUtils.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, ERoadType.All);
+                var road = RoadUtils.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, EVehicleNodeType.AllNodes);
                 var lane = road.Lanes.First();
                 var driver = new Ped(road.Position);
                 var passenger = new Ped(road.Position);

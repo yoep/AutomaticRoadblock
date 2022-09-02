@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Preview;
+using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
 namespace AutomaticRoadblocks.Utils.Road
@@ -12,33 +14,16 @@ namespace AutomaticRoadblocks.Utils.Road
     {
         private const float LaneHeadingTolerance = 15f;
 
-        #region Constructors
-
         internal Road()
         {
         }
-
-        internal Road(Vector3 position, Vector3 rightSide, Vector3 leftSide, IReadOnlyList<Lane> lanes, VehicleNode node, int numberOfLanes1,
-            int numberOfLanes2, int junctionIndicator)
-        {
-            Position = position;
-            RightSide = rightSide;
-            LeftSide = leftSide;
-            Lanes = lanes;
-            Node = node;
-            NumberOfLanes1 = numberOfLanes1;
-            NumberOfLanes2 = numberOfLanes2;
-            JunctionIndicator = junctionIndicator;
-        }
-
-        #endregion
 
         #region Properties
 
         /// <summary>
         /// Get the center position of the road.
         /// </summary>
-        public Vector3 Position { get; internal set; }
+        public Vector3 Position => Node.Position;
 
         /// <summary>
         /// Get the right side position of the road.
@@ -56,9 +41,9 @@ namespace AutomaticRoadblocks.Utils.Road
         public IReadOnlyList<Lane> Lanes { get; internal set; }
 
         /// <summary>
-        /// Get the vehicle node that was used to determine this road.
+        /// The vehicle node info on which this road is based.
         /// </summary>
-        public VehicleNode Node { get; internal set; }
+        public NodeInfo Node { get; internal set; }
 
         /// <summary>
         /// Get the total number of lanes.
@@ -95,7 +80,7 @@ namespace AutomaticRoadblocks.Utils.Road
 
         #endregion
 
-        #region IPreviewSupport implementation
+        #region IPreviewSupport
 
         /// <inheritdoc />
         public bool IsPreviewActive { get; private set; }
@@ -106,25 +91,7 @@ namespace AutomaticRoadblocks.Utils.Road
             if (IsPreviewActive)
                 return;
 
-            IsPreviewActive = true;
-            GameFiber.StartNew(() =>
-            {
-                var game = IoC.Instance.GetInstance<IGame>();
-
-                while (IsPreviewActive)
-                {
-                    game.DrawSphere(Position, 1f, Color.White);
-                    game.DrawSphere(RightSide, 1f, Color.Blue);
-                    game.DrawSphere(LeftSide, 1f, Color.Green);
-                    game.FiberYield();
-                }
-            });
-            foreach (var lane in Lanes)
-            {
-                lane.CreatePreview();
-            }
-
-            Node.CreatePreview();
+            DoInternalPreviewCreation();
         }
 
         /// <inheritdoc />
@@ -194,12 +161,11 @@ namespace AutomaticRoadblocks.Utils.Road
                    "\n---";
         }
 
-        private bool Equals(Road other)
+        protected bool Equals(Road other)
         {
-            return Position.Equals(other.Position) && Equals(Node, other.Node);
+            return Equals(Node, other.Node);
         }
 
-        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -208,13 +174,9 @@ namespace AutomaticRoadblocks.Utils.Road
             return Equals((Road)obj);
         }
 
-        /// <inheritdoc />
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return (Position.GetHashCode() * 397) ^ (Node != null ? Node.GetHashCode() : 0);
-            }
+            return (Node != null ? Node.GetHashCode() : 0);
         }
 
         #endregion
@@ -226,6 +188,30 @@ namespace AutomaticRoadblocks.Utils.Road
             return NumberOfLanes1 == 0 || NumberOfLanes2 == 0;
         }
 
+        [Conditional("DEBUG")]
+        private void DoInternalPreviewCreation()
+        {
+            IsPreviewActive = true;
+            GameFiber.StartNew(() =>
+            {
+                var game = IoC.Instance.GetInstance<IGame>();
+
+                while (IsPreviewActive)
+                {
+                    game.DrawSphere(Position, 0.5f, Color.White);
+                    GameUtils.CreateMarker(LeftSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Blue, 0.5f, 1.5f, false);
+                    GameUtils.CreateMarker(RightSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Green, 0.5f, 1.5f, false);
+                    game.FiberYield();
+                }
+            });
+            foreach (var lane in Lanes)
+            {
+                lane.CreatePreview();
+            }
+
+            Node.CreatePreview();
+        }
+
         #endregion
 
         /// <inheritdoc />
@@ -234,24 +220,9 @@ namespace AutomaticRoadblocks.Utils.Road
         /// </summary>
         public record Lane : IPreviewSupport
         {
-            #region Constructors
-            
             internal Lane()
             {
             }
-            
-            internal Lane(int number, float heading, Vector3 rightSide, Vector3 leftSide, Vector3 nodePosition, float width, bool isOppositeDirectionOfRoad)
-            {
-                Number = number;
-                Heading = heading;
-                RightSide = rightSide;
-                LeftSide = leftSide;
-                NodePosition = nodePosition;
-                Width = width;
-                IsOppositeDirectionOfRoad = isOppositeDirectionOfRoad;
-            }
-
-            #endregion
 
             #region Properties
 
@@ -259,11 +230,6 @@ namespace AutomaticRoadblocks.Utils.Road
             /// Get the middle position of the lane.
             /// </summary>
             public Vector3 Position => CalculatePosition();
-
-            /// <summary>
-            /// Get the unique lane number.
-            /// </summary>
-            public int Number { get; internal set; }
 
             /// <summary>
             /// Get the heading of the lane.
@@ -289,11 +255,11 @@ namespace AutomaticRoadblocks.Utils.Road
             /// Get the width of the lane.
             /// </summary>
             public float Width { get; internal set; }
-            
+
             /// <summary>
             /// Verify if this lane heading is the opposite of the road it belongs to.
             /// </summary>
-            public bool IsOppositeDirectionOfRoad { get; internal set; }
+            public bool IsOppositeHeadingOfRoadNodeHeading { get; internal set; }
 
             #endregion
 
@@ -308,25 +274,7 @@ namespace AutomaticRoadblocks.Utils.Road
                 if (IsPreviewActive)
                     return;
 
-                var game = IoC.Instance.GetInstance<IGame>();
-
-                IsPreviewActive = true;
-                game.NewSafeFiber(() =>
-                {
-                    var direction = MathHelper.ConvertHeadingToDirection(Heading);
-                    var rightSideStart = FloatAboveGround(RightSide + direction * (2f * Number));
-                    var rightSideEnd = FloatAboveGround(RightSide + direction * (2f * Number + 2f));
-                    var leftSideStart = FloatAboveGround(LeftSide + direction * (2f * Number));
-                    var leftSideEnd = FloatAboveGround(LeftSide + direction * (2f * Number + 2f));
-
-                    while (IsPreviewActive)
-                    {
-                        game.DrawArrow(FloatAboveGround(Position), direction, Rotator.Zero, Width, Color.Red);
-                        game.DrawLine(rightSideStart, rightSideEnd, Color.Blue);
-                        game.DrawLine(leftSideStart, leftSideEnd, Color.Green);
-                        game.FiberYield();
-                    }
-                }, "Road.Lane.CreatePreview");
+                DoInternalPreviewCreation();
             }
 
             /// <inheritdoc />
@@ -349,15 +297,44 @@ namespace AutomaticRoadblocks.Utils.Road
             public Lane MoveTo(Vector3 direction)
             {
                 Assert.NotNull(direction, "direction cannot be null");
-                return new Lane(Number, Heading, RightSide + direction, LeftSide + direction, NodePosition + direction, Width, IsOppositeDirectionOfRoad);
+                return new Lane
+                {
+                    Heading = Heading,
+                    RightSide = RightSide + direction,
+                    LeftSide = LeftSide + direction,
+                    NodePosition = NodePosition + direction,
+                    Width = Width,
+                    IsOppositeHeadingOfRoadNodeHeading = IsOppositeHeadingOfRoadNodeHeading
+                };
             }
 
             public override string ToString()
             {
                 return "{" +
-                       $"{nameof(Number)}: {Number}, {nameof(Heading)}: {Heading}, {nameof(RightSide)}: {RightSide}, {nameof(LeftSide)}: {LeftSide}, " +
-                       $"{nameof(NodePosition)}: {NodePosition}, {nameof(Width)}: {Width}, {nameof(IsPreviewActive)}: {IsPreviewActive}" +
+                       $"{nameof(NodePosition)}: {NodePosition}, {nameof(Heading)}: {Heading}, {nameof(RightSide)}: {RightSide}, {nameof(LeftSide)}: {LeftSide}, " +
+                       $"{nameof(Width)}: {Width}, {nameof(IsPreviewActive)}: {IsPreviewActive}" +
                        "}";
+            }
+
+            [Conditional("DEBUG")]
+            private void DoInternalPreviewCreation()
+            {
+                var game = IoC.Instance.GetInstance<IGame>();
+
+                IsPreviewActive = true;
+                game.NewSafeFiber(() =>
+                {
+                    var rightSideDirection = MathHelper.ConvertHeadingToDirection(Heading) * 1f;
+                    var leftSideDirection = MathHelper.ConvertHeadingToDirection(Heading) * 1.15f;
+
+                    while (IsPreviewActive)
+                    {
+                        game.DrawArrow(FloatAboveGround(Position), rightSideDirection, Rotator.Zero, Width - 1f, Color.Red);
+                        GameUtils.CreateMarker(RightSide + rightSideDirection, EMarkerType.MarkerTypeVerticalCylinder, Color.Yellow, 0.5f, 2f, false);
+                        GameUtils.CreateMarker(LeftSide + leftSideDirection, EMarkerType.MarkerTypeVerticalCylinder, Color.DarkViolet, 0.5f, 2f, false);
+                        game.FiberYield();
+                    }
+                }, "Road.Lane.CreatePreview");
             }
 
             private Vector3 CalculatePosition()
@@ -377,17 +354,86 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <summary>
         /// The vehicle node that was used to determine the road/lane.
         /// </summary>
-        public class VehicleNode : IPreviewSupport
+        public class NodeInfo : IPreviewSupport
         {
-            /// <summary>
-            /// The position of the vehicle node.
-            /// </summary>
-            public Vector3 Position { get; internal set; }
+            internal NodeInfo(Vector3 position, float heading, int numberOfLanes1, int numberOfLanes2, float atJunction)
+            {
+                Position = position;
+                Heading = heading;
+                NumberOfLanes1 = numberOfLanes1;
+                NumberOfLanes2 = numberOfLanes2;
+                AtJunction = atJunction;
+            }
+
+            #region Properties
 
             /// <summary>
-            /// The heading of the vehicle node.
+            /// The position of the node.
             /// </summary>
-            public float Heading { get; internal set; }
+            public Vector3 Position { get; }
+
+            /// <summary>
+            /// The heading of the node.
+            /// </summary>
+            public float Heading { get; }
+
+            /// <summary>
+            /// The right side number of lanes for the node.
+            /// </summary>
+            public int NumberOfLanes1 { get; }
+
+            /// <summary>
+            /// The left side number of lanes for the node.
+            /// </summary>
+            public int NumberOfLanes2 { get; }
+
+            /// <summary>
+            /// Indicates if this node is at a junction.
+            /// </summary>
+            public float AtJunction { get; }
+
+            /// <summary>
+            /// The traffic density of the node.
+            /// </summary>
+            public int Density { get; internal set; }
+
+            /// <summary>
+            /// The flags of the node.
+            /// </summary>
+            public ENodeType Flags { get; internal set; }
+
+            #endregion
+
+            #region Methods
+
+            public override string ToString()
+            {
+                return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}, {nameof(NumberOfLanes1)}: {NumberOfLanes1}, " +
+                       $"{nameof(NumberOfLanes2)}: {NumberOfLanes2}, {nameof(AtJunction)}: {AtJunction}, {nameof(Density)}: {Density}, {nameof(Flags)}: {Flags} ({(int)Flags})";
+            }
+
+            protected bool Equals(NodeInfo other)
+            {
+                return Position.Equals(other.Position) && Heading.Equals(other.Heading);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((NodeInfo)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (Position.GetHashCode() * 397) ^ Heading.GetHashCode();
+                }
+            }
+
+            #endregion
 
             #region IPreviewSupport
 
@@ -425,36 +471,14 @@ namespace AutomaticRoadblocks.Utils.Road
 
             #endregion
 
-            public override string ToString()
-            {
-                return "{" + $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}" + "}";
-            }
-
-            protected bool Equals(VehicleNode other)
-            {
-                return Position.Equals(other.Position) && Heading.Equals(other.Heading);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((VehicleNode)obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (Position.GetHashCode() * 397) ^ Heading.GetHashCode();
-                }
-            }
-
+            #region Functions
+            
             private static Vector3 FloatAboveGround(Vector3 position)
             {
                 return position + Vector3.WorldUp * 1f;
             }
+
+            #endregion
         }
     }
 }

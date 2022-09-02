@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -142,19 +143,7 @@ namespace AutomaticRoadblocks.Roadblock
             Logger.Trace($"Creating roadblock road preview");
             Road.CreatePreview();
             Instances.ForEach(x => x.CreatePreview());
-
-            Game.NewSafeFiber(() =>
-            {
-                while (IsPreviewActive)
-                {
-                    foreach (var ped in RetrieveCopsJoiningThePursuit())
-                    {
-                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, false);
-                    }
-
-                    Game.FiberYield();
-                }
-            }, "Roadblock.Preview");
+            DoInternalDebugPreviewCreation();
         }
 
         /// <inheritdoc />
@@ -498,6 +487,23 @@ namespace AutomaticRoadblocks.Roadblock
                 GameFiber.Wait(BlipFlashDuration);
                 DeleteBlip();
             }, "Roadblock.ReleaseEntitiesToLspdfr");
+        }
+
+        [Conditional("DEBUG")]
+        private void DoInternalDebugPreviewCreation()
+        {
+            Game.NewSafeFiber(() =>
+            {
+                while (IsPreviewActive)
+                {
+                    foreach (var ped in RetrieveCopsJoiningThePursuit())
+                    {
+                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, 1f, false);
+                    }
+
+                    Game.FiberYield();
+                }
+            }, "Roadblock.Preview");
         }
 
         #endregion

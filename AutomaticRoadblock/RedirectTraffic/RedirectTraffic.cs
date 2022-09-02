@@ -443,10 +443,10 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             Logger.Debug($"Left side closer: {distanceToLeftSide < distanceToRightSide}\n" +
                          $"Right side closer: {distanceToRightSide < distanceToLeftSide}\n" +
-                         $"Is lane opposite: {Lane.IsOppositeDirectionOfRoad}");
+                         $"Is lane opposite: {Lane.IsOppositeHeadingOfRoadNodeHeading}");
             var isLeftSideCloser = distanceToLeftSide < distanceToRightSide;
 
-            if (Lane.IsOppositeDirectionOfRoad)
+            if (Lane.IsOppositeHeadingOfRoadNodeHeading)
                 isLeftSideCloser = !isLeftSideCloser;
 
             return isLeftSideCloser;

@@ -4,10 +4,10 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class CalloutEndComponent : IMenuComponent<UIMenuItem>
+    public class DebugEndCurrentCalloutComponent : IMenuComponent<UIMenuItem>
     {
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.EndCallout);
+        public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.EndCallout);
 
         /// <inheritdoc />
         public EMenuType Type => EMenuType.Debug;

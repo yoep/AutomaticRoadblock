@@ -266,12 +266,20 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private RoadblockLevel DetermineRoadblockLevelBasedOnTheRoadLocation(RoadblockLevel level, Road road)
         {
             var actualLevelToUse = level;
-            var isDirtOrOffroad = RoadUtils.IsDirtOrOffroad(road.Position);
+            var isNonConcreteRoad = IsNonConcreteRoad(road);
+
+            // check if big vehicles is not allowed on the node
+            // if so reduce level 5 to level 4
+            if (level == RoadblockLevel.Level5 && road.Node.Flags.HasFlag(ENodeType.NoBigVehicles))
+            {
+                level = RoadblockLevel.Level4;
+                _logger.Debug($"Road disallows big vehicles, downgraded roadblock level to {level}");
+            }
 
             // if we're not a dirt/offroad road
             // all levels are allowed
-            _logger.Trace($"Roadblock placement is on dirt/offroad road: {isDirtOrOffroad}");
-            if (!isDirtOrOffroad)
+            _logger.Trace($"Roadblock placement is on dirt/offroad road: {isNonConcreteRoad}");
+            if (!isNonConcreteRoad)
                 return actualLevelToUse;
 
             // otherwise, we're going to reduce the level for simplification
@@ -400,6 +408,13 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return false;
         }
 
+        private static bool IsNonConcreteRoad(Road road)
+        {
+            return road.Node.Flags.HasFlag(ENodeType.IsBackroad)
+                   || road.Node.Flags.HasFlag(ENodeType.IsGravelRoad)
+                   || road.Node.Flags.HasFlag(ENodeType.IsOffRoad);
+        }
+
         private static float CalculateRoadblockDistance(Vehicle vehicle, bool atCurrentLocation)
         {
             return atCurrentLocation ? 2.5f : DetermineRoadblockDistanceFor(vehicle);
@@ -418,9 +433,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         private EVehicleNodeType DetermineAllowedRoadTypes(Vehicle vehicle, RoadblockLevel level)
         {
+            var road = RoadUtils.FindClosestRoad(vehicle.Position, EVehicleNodeType.AllNodes);
+
             // verify the current road type
             // if we're already at a dirt/offroad road, all road types for the trajectory calculation are allowed
-            if (RoadUtils.IsDirtOrOffroad(vehicle.Position))
+            if (IsNonConcreteRoad(road))
             {
                 _logger.Debug("Following the current dirt/offroad road for the roadblock placement");
                 return EVehicleNodeType.AllRoadNoJunctions;

@@ -19,14 +19,14 @@ namespace AutomaticRoadblocks.Utils.Road
         /// Get the closest road near the given position.
         /// </summary>
         /// <param name="position">Set the position to use as reference.</param>
-        /// <param name="roadType">Set the road type.</param>
+        /// <param name="nodeType">Set the road type.</param>
         /// <returns>Returns the position of the closest road.</returns>
-        public static Road FindClosestRoad(Vector3 position, ERoadType roadType)
+        public static Road FindClosestRoad(Vector3 position, EVehicleNodeType nodeType)
         {
             Road closestRoad = null;
             var closestRoadDistance = 99999f;
 
-            foreach (var road in FindNearbyRoads(position, roadType))
+            foreach (var road in FindNearbyRoads(position, nodeType, 2.5f))
             {
                 var roadDistanceToPosition = Vector3.Distance2D(road.Position, position);
 
@@ -51,7 +51,7 @@ namespace AutomaticRoadblocks.Utils.Road
         public static Road FindRoadTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType)
         {
             FindVehicleNodesWhileTraversing(position, heading, distance, roadType, out var lastFoundNode);
-            return DiscoverRoad(lastFoundNode);
+            return DiscoverRoadForVehicleNode(lastFoundNode);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace AutomaticRoadblocks.Utils.Road
             var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, out _);
 
             return nodeInfos
-                .Select(DiscoverRoad)
+                .Select(DiscoverRoadForVehicleNode)
                 .ToList();
         }
 
@@ -75,31 +75,18 @@ namespace AutomaticRoadblocks.Utils.Road
         /// Get nearby roads near the given position.
         /// </summary>
         /// <param name="position">Set the position to use as reference.</param>
-        /// <param name="roadType">Set the road type.</param>
+        /// <param name="nodeType">The allowed node types to return.</param>
+        /// <param name="radius">The radius to search for nearby roads.</param>
         /// <returns>Returns the position of the closest road.</returns>
-        public static IEnumerable<Road> FindNearbyRoads(Vector3 position, ERoadType roadType)
+        public static IEnumerable<Road> FindNearbyRoads(Vector3 position, EVehicleNodeType nodeType, float radius)
         {
             Assert.NotNull(position, "position cannot be null");
-            Assert.NotNull(roadType, "roadType cannot be null");
-            var vehicleNodeType = Convert(roadType);
+            Assert.NotNull(nodeType, "nodeType cannot be null");
+            var nodes = FindNearbyVehicleNodes(position, nodeType, radius);
 
-            FindVehicleNodes(position, vehicleNodeType, roadType, out var node1, out var node2);
-
-            return new List<Road>
-            {
-                DiscoverRoad(node1),
-                DiscoverRoad(node2)
-            };
-        }
-
-        /// <summary>
-        /// Get the opposite heading of the given heading.
-        /// </summary>
-        /// <param name="heading">Set the heading.</param>
-        /// <returns>Returns the opposite heading of the given heading.</returns>
-        public static float OppositeHeading(float heading)
-        {
-            return (heading + 180) % 360;
+            return nodes
+                .Select(DiscoverRoadForVehicleNode)
+                .ToList();
         }
 
         /// <summary>
@@ -112,6 +99,7 @@ namespace AutomaticRoadblocks.Utils.Road
         public static int CreateSpeedZone(Vector3 position, float radius, float speed)
         {
             Assert.NotNull(position, "position cannot be null");
+            //VEHICLE::_ADD_SPEED_ZONE_FOR_COORD
             return NativeFunction.CallByHash<int>(0x2CE544C68FB812A0, position.X, position.Y, position.Z, radius, speed, false);
         }
 
@@ -135,200 +123,163 @@ namespace AutomaticRoadblocks.Utils.Road
             return NativeFunction.Natives.IS_POINT_ON_ROAD<bool>(position.X, position.Y, position.Z);
         }
 
-        /// <summary>
-        /// Verify if the given position is a dirt/offroad location.
-        /// </summary>
-        /// <param name="position">The position to check.</param>
-        /// <returns>Returns true when the position is a dirt/offroad, else false.</returns>
-        public static bool IsDirtOrOffroad(Vector3 position)
-        {
-            var nodeId = GetClosestNodeId(position);
-            return IsSlowRoad(nodeId);
-        }
-
         #endregion
 
         #region Functions
 
-        private static EVehicleNodeType Convert(ERoadType roadType)
-        {
-            return roadType switch
-            {
-                ERoadType.MajorRoads => EVehicleNodeType.MainRoads,
-                ERoadType.MajorRoadsNoJunction => EVehicleNodeType.AllRoadNoJunctions,
-                _ => EVehicleNodeType.AllNodes
-            };
-        }
-
-        private static ERoadType Convert(EVehicleNodeType nodeType)
-        {
-            return nodeType switch
-            {
-                EVehicleNodeType.MainRoads => ERoadType.MajorRoadsNoJunction,
-                EVehicleNodeType.MainRoadsWithJunctions => ERoadType.MajorRoads,
-                _ => ERoadType.All
-            };
-        }
-
-        private static NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, EVehicleNodeType nodeType, ERoadType roadType)
+        private static Road.NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, EVehicleNodeType nodeType)
         {
             Logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading}");
-            FindVehicleNodes(position, nodeType, roadType, out var node1, out var node2);
-            Logger.Trace($"Found vehicles nodes: {node1.Position} with heading {node1.Heading}, {node2.Position} with heading {node2.Heading}");
+            var nodes = FindNearbyVehicleNodes(position, nodeType, 2f);
+            var closestNodeDistance = 9999f;
+            var closestNode = (Road.NodeInfo)null;
 
-            var nodeMatchingClosestToHeading = Math.Abs(node1.Heading - heading) % 360 < Math.Abs(node2.Heading - heading) % 360 ? node1 : node2;
-            Logger.Debug($"Using node {nodeMatchingClosestToHeading} as closest matching");
-
-            if (Math.Abs(nodeMatchingClosestToHeading.Heading - heading) % 360 > 45)
+            foreach (var node in nodes)
             {
-                Logger.Warn(
-                    $"Closest matching node {nodeMatchingClosestToHeading} is exceeding the heading tolerance, using the original heading of {heading} instead");
-                nodeMatchingClosestToHeading = new NodeInfo(nodeMatchingClosestToHeading.Position, heading, nodeMatchingClosestToHeading.NumberOfLanes1,
-                    nodeMatchingClosestToHeading.NumberOfLanes2, nodeMatchingClosestToHeading.AtJunction);
+                var distance = position.DistanceTo(node.Position);
+
+                if (distance > closestNodeDistance && Math.Abs(node.Heading - heading) % 360 < 25f)
+                    continue;
+
+                closestNodeDistance = distance;
+                closestNode = node;
             }
 
-            return nodeMatchingClosestToHeading;
+            Logger.Debug($"Using node {closestNode} as closest matching");
+            return closestNode;
         }
 
-        private static List<NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, EVehicleNodeType nodeType,
-            out NodeInfo lastFoundNode)
+        private static IEnumerable<Road.NodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType, float radius)
+        {
+            var nodes = new List<Road.NodeInfo>();
+
+            for (var rad = 1; rad <= radius; rad++)
+            {
+                for (var rot = 0; rot < 360; rot += 5)
+                {
+                    var x = (float)(position.X + rad * Math.Sin(rot));
+                    var y = (float)(position.Y + rad * Math.Cos(rot));
+
+                    var node = FindVehicleNode(new Vector3(x, y, position.Z + 5f), nodeType);
+
+                    if (nodes.Contains(node))
+                        continue;
+
+                    Logger.Trace($"Discovered new vehicle node, {node}");
+                    nodes.Add(node);
+                }
+            }
+
+            return nodes;
+        }
+
+        private static List<Road.NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, EVehicleNodeType nodeType,
+            out Road.NodeInfo lastFoundNodeInfo)
         {
             var startedAt = DateTime.Now.Ticks;
             var distanceTraversed = 0f;
             var distanceToMove = 5f;
             var findNodeAttempt = 0;
-            var roadType = Convert(nodeType);
-            var nodeInfos = new List<NodeInfo>();
+            var nodeInfos = new List<Road.NodeInfo>();
 
-            lastFoundNode = new NodeInfo(position, heading, -1, -1, -1f);
+            lastFoundNodeInfo = new Road.NodeInfo(position, heading, -1, -1, -1f);
 
             while (distanceTraversed < distance)
             {
                 if (findNodeAttempt == 10)
                 {
-                    Logger.Warn($"Failed to traverse road, unable to find next node after {lastFoundNode} (tried {findNodeAttempt} times)");
+                    Logger.Warn($"Failed to traverse road, unable to find next node after {lastFoundNodeInfo} (tried {findNodeAttempt} times)");
                     break;
                 }
 
-                var findNodeAt = lastFoundNode.Position + MathHelper.ConvertHeadingToDirection(lastFoundNode.Heading) * distanceToMove;
-                var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNode.Heading, nodeType, roadType);
+                var findNodeAt = lastFoundNodeInfo.Position + MathHelper.ConvertHeadingToDirection(lastFoundNodeInfo.Heading) * distanceToMove;
+                var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNodeInfo.Heading, nodeType);
 
-                if (nodeTowardsHeading.Position.Equals(lastFoundNode.Position) || nodeInfos.Any(x => x.Equals(nodeTowardsHeading)))
+                if (nodeTowardsHeading.Position.Equals(lastFoundNodeInfo.Position) || nodeInfos.Any(x => x.Equals(nodeTowardsHeading)))
                 {
                     distanceToMove *= 1.5f;
                     findNodeAttempt++;
                 }
                 else
                 {
-                    var additionalDistanceTraversed = lastFoundNode.Position.DistanceTo(nodeTowardsHeading.Position);
+                    var additionalDistanceTraversed = lastFoundNodeInfo.Position.DistanceTo(nodeTowardsHeading.Position);
                     nodeInfos.Add(nodeTowardsHeading);
                     distanceToMove = 5f;
                     findNodeAttempt = 0;
                     distanceTraversed += additionalDistanceTraversed;
-                    lastFoundNode = nodeTowardsHeading;
+                    lastFoundNodeInfo = nodeTowardsHeading;
                     Logger.Trace($"Traversed an additional {additionalDistanceTraversed} distance, new total traversed distance = {distanceTraversed}");
                 }
             }
 
             var calculationTime = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
             Logger.Debug(
-                $"Traversed a total of {position.DistanceTo(lastFoundNode.Position)} distance with expectation {distance} within {calculationTime} millis\n" +
-                $"origin: {position}, destination: {lastFoundNode.Position}");
+                $"Traversed a total of {position.DistanceTo(lastFoundNodeInfo.Position)} distance with expectation {distance} within {calculationTime} millis\n" +
+                $"origin: {position}, destination: {lastFoundNodeInfo.Position}");
             return nodeInfos;
         }
 
-        private static void FindVehicleNodes(Vector3 position, EVehicleNodeType nodeType, ERoadType roadType, out NodeInfo node1, out NodeInfo node2)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            Assert.NotNull(nodeType, "roadType cannot be null");
-            NativeFunction.Natives.GET_CLOSEST_ROAD(position.X, position.Y, position.Z, 1f, 1, out Vector3 roadPosition1, out Vector3 roadPosition2,
-                out int numberOfLanes1, out int numberOfLanes2, out float junctionIndication, (int)roadType);
-            Logger.Trace(
-                $"Found road with Position 1: {roadPosition1}, Position 2: {roadPosition2}, numberOfLanes1: {numberOfLanes1}, numberOfLanes2: {numberOfLanes2}, junctionIndication: {junctionIndication}\n" +
-                $"Based on Position: {position}, {nameof(ERoadType)}: {roadType}");
-
-            var vehicleNode1 = FindVehicleNode(roadPosition1, nodeType);
-            var vehicleNode2 = FindVehicleNode(roadPosition2, nodeType);
-
-            node1 = new NodeInfo(vehicleNode1.Position, vehicleNode1.Heading, numberOfLanes1, numberOfLanes2, junctionIndication);
-            node2 = new NodeInfo(vehicleNode2.Position, vehicleNode2.Heading, numberOfLanes2, numberOfLanes1, junctionIndication);
-        }
-
-        private static Road DiscoverRoad(NodeInfo nodeInfo)
+        private static Road DiscoverRoadForVehicleNode(Road.NodeInfo nodeInfo)
         {
             var rightSideHeading = nodeInfo.Heading;
-            var roadRightSide = GetLastPointOnTheLane(nodeInfo.Position, rightSideHeading - 90f, nodeInfo.NumberOfLanes1);
-            var roadLeftSide = GetLastPointOnTheLane(nodeInfo.Position, rightSideHeading + 90f, nodeInfo.NumberOfLanes2);
-
-            // Fix a side if it's the same as the middle of the road as GetLastPointOnTheLane probably failed to determine the last point
-            if (roadRightSide == nodeInfo.Position)
-                roadRightSide = FixFailedLastPointCalculation(nodeInfo.Position, roadLeftSide, rightSideHeading - 90f);
-            if (roadLeftSide == nodeInfo.Position)
-                roadLeftSide = FixFailedLastPointCalculation(nodeInfo.Position, roadRightSide, rightSideHeading + 90f);
+            var roadRightSide = GetLastPointOnRoad(nodeInfo.Position, rightSideHeading - 90f);
+            var roadLeftSide = GetLastPointOnRoad(nodeInfo.Position, rightSideHeading + 90f);
 
             return new Road
             {
-                Position = nodeInfo.Position,
                 RightSide = roadRightSide,
                 LeftSide = roadLeftSide,
                 NumberOfLanes1 = nodeInfo.NumberOfLanes1,
                 NumberOfLanes2 = nodeInfo.NumberOfLanes2,
                 JunctionIndicator = (int)nodeInfo.AtJunction,
-                Lanes = DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, rightSideHeading, nodeInfo.NumberOfLanes1, nodeInfo.NumberOfLanes2),
-                Node = new Road.VehicleNode
-                {
-                    Position = nodeInfo.Position,
-                    Heading = nodeInfo.Heading
-                },
+                Lanes = DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, rightSideHeading, nodeInfo.NumberOfLanes1,
+                    nodeInfo.NumberOfLanes2),
+                Node = nodeInfo,
             };
         }
 
         private static List<Road.Lane> DiscoverLanes(Vector3 roadRightSide, Vector3 roadLeftSide, Vector3 roadMiddle, float rightSideHeading,
             int numberOfLanes1, int numberOfLanes2)
         {
-            var singleDirection = IsSingleDirectionRoad(numberOfLanes1, numberOfLanes2);
             var lanes = new List<Road.Lane>();
 
-            if (singleDirection)
+            // verify if there is currently only one lane
+            // then calculate the lane from right to left
+            if (numberOfLanes1 == 0 || numberOfLanes2 == 0)
             {
                 var numberOfLanes = numberOfLanes1 == 0 ? numberOfLanes2 : numberOfLanes1;
-                var laneWidth = GetWidth(roadRightSide, roadLeftSide) / numberOfLanes;
-                lanes.AddRange(CreateLanes(roadRightSide, rightSideHeading, numberOfLanes, laneWidth, false));
+                lanes.AddRange(CreateLanes(roadRightSide, roadLeftSide, rightSideHeading, numberOfLanes, false));
             }
             else
             {
-                var laneWidthRight = GetWidth(roadRightSide, roadMiddle) / numberOfLanes1;
-                var laneWidthLeft = GetWidth(roadMiddle, roadLeftSide) / numberOfLanes2;
-
-                lanes.AddRange(CreateLanes(roadRightSide, rightSideHeading, numberOfLanes1, laneWidthRight, false));
-                lanes.AddRange(CreateLanes(roadMiddle, rightSideHeading, numberOfLanes2, laneWidthLeft, true));
+                lanes.AddRange(CreateLanes(roadRightSide, roadMiddle, rightSideHeading, numberOfLanes1, false));
+                lanes.AddRange(CreateLanes(roadLeftSide, roadMiddle, MathHelper.NormalizeHeading(rightSideHeading - 180), numberOfLanes2, true));
             }
 
             return lanes;
         }
 
-        private static IEnumerable<Road.Lane> CreateLanes(Vector3 roadRightSide, float rightSideHeading, int numberOfLanes, float laneWidth,
+        private static IEnumerable<Road.Lane> CreateLanes(Vector3 rightSidePosition, Vector3 leftSidePosition, float laneHeading, int numberOfLanes,
             bool isOpposite)
         {
-            var lastRightPosition = roadRightSide;
-            var moveDirection = MathHelper.ConvertHeadingToDirection(rightSideHeading + 90f);
+            var lastRightPosition = rightSidePosition;
+            var laneWidth = rightSidePosition.DistanceTo(leftSidePosition) / numberOfLanes;
+            var moveDirection = MathHelper.ConvertHeadingToDirection(laneHeading + 90f);
             var lanes = new List<Road.Lane>();
 
             for (var index = 1; index <= numberOfLanes; index++)
             {
                 var laneLeftPosition = lastRightPosition + moveDirection * laneWidth;
-                var vehicleNode = FindVehicleNode(lastRightPosition, EVehicleNodeType.AllNodes);
-                var heading = isOpposite ? OppositeHeading(rightSideHeading) : rightSideHeading;
+                var nodePosition = lastRightPosition + moveDirection * (laneWidth / 2);
 
                 lanes.Add(new Road.Lane
                 {
-                    Number = index,
-                    Heading = heading,
-                    RightSide = isOpposite ? laneLeftPosition : lastRightPosition,
-                    LeftSide = isOpposite ? lastRightPosition : laneLeftPosition,
-                    NodePosition = vehicleNode.Position,
+                    Heading = laneHeading,
+                    RightSide = lastRightPosition,
+                    LeftSide = laneLeftPosition,
+                    NodePosition = nodePosition,
                     Width = laneWidth,
-                    IsOppositeDirectionOfRoad = isOpposite
+                    IsOppositeHeadingOfRoadNodeHeading = isOpposite
                 });
                 lastRightPosition = laneLeftPosition;
             }
@@ -336,155 +287,85 @@ namespace AutomaticRoadblocks.Utils.Road
             return lanes;
         }
 
-        // This fix is a simple workaround if the last point detection failed with the native function of GTA
-
-        // It will assume that both sides have the same width and mirror the width to the other side to determine the point
-
-        private static Vector3 FixFailedLastPointCalculation(Vector3 roadPosition, Vector3 otherSidePosition, float heading)
-        {
-            var widthOtherSide = Vector3.Distance2D(roadPosition, otherSidePosition);
-            var directionOfTheSideToFix = MathHelper.ConvertHeadingToDirection(heading);
-            return roadPosition + directionOfTheSideToFix * widthOtherSide;
-        }
-
-        private static NodeInfo FindVehicleNode(Vector3 position, EVehicleNodeType type)
+        private static Road.NodeInfo FindVehicleNode(Vector3 position, EVehicleNodeType type)
         {
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(type, "type cannot be null");
+            int nodeNumberOfLanes1;
+            int nodeNumberOfLanes2;
+
             NativeFunction.Natives.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(position.X, position.Y, position.Z, out Vector3 nodePosition, out float nodeHeading,
-                1, 3, 0);
+                (int)type, 3, 0);
+            NativeFunction.Natives.GET_CLOSEST_ROAD(nodePosition.X, nodePosition.Y, nodePosition.Z, 1f, 1, out Vector3 roadPosition1, out Vector3 roadPosition2,
+                out int numberOfLanes1, out int numberOfLanes2, out float junctionIndication, (int)ERoadType.All);
+            NativeFunction.Natives.GET_VEHICLE_NODE_PROPERTIES<bool>(nodePosition.X, nodePosition.Y, nodePosition.Z, out int density, out int flags);
 
-            return new NodeInfo(nodePosition, MathHelper.NormalizeHeading(nodeHeading));
-        }
-
-        private static Vector3 GetLastPointOnTheLane(Vector3 position, float heading, int numberOfLanes)
-        {
-            var checkInterval = 0.5f;
-            var direction = MathHelper.ConvertHeadingToDirection(heading);
-            var lastPositionOnTheRoad = position;
-            var maxWidth = numberOfLanes != 0 ? numberOfLanes * MaxLaneWidth : 2 * MaxLaneWidth;
-
-            do
+            if (roadPosition1.Equals(nodePosition))
             {
-                var pointToCheck = lastPositionOnTheRoad + direction * checkInterval;
-                if (IsPointOnRoad(pointToCheck))
-                {
-                    checkInterval *= 2f;
-                    lastPositionOnTheRoad = pointToCheck;
-                }
-                else
-                {
-                    checkInterval /= 1.5f;
-                }
-            } while (checkInterval >= 0.25f && position.DistanceTo(lastPositionOnTheRoad) < maxWidth);
+                nodeNumberOfLanes1 = numberOfLanes1;
+                nodeNumberOfLanes2 = numberOfLanes2;
+            }
+            else if (roadPosition2.Equals(nodePosition))
+            {
+                nodeNumberOfLanes1 = numberOfLanes2;
+                nodeNumberOfLanes2 = numberOfLanes1;
+            }
+            else
+            {
+                Logger.Warn("No road position matched the vehicle node, using default lane numbers instead");
+                nodeNumberOfLanes1 = 1;
+                nodeNumberOfLanes2 = 0;
+            }
 
-            return lastPositionOnTheRoad;
-        }
-
-        private static float GetWidth(Vector3 point1, Vector3 point2)
-        {
-            return Vector3.Distance(point1, point2);
-        }
-
-        private static bool IsSingleDirectionRoad(int numberOfLanes1, int numberOfLanes2)
-        {
-            return numberOfLanes1 == 0 || numberOfLanes2 == 0;
-        }
-
-        private static int GetClosestNodeId(Vector3 position)
-        {
-            return NativeFunction.CallByName<int>("GET_NTH_CLOSEST_VEHICLE_NODE_ID", position.X, position.Y, position.Z, 1, 1, 1077936128, 0f);
-        }
-
-        public static NodeProperties GetVehicleNodeProperties(Vector3 position)
-        {
-            NativeFunction.Natives.GET_VEHICLE_NODE_PROPERTIES<bool>(position.X, position.Y, position.Z, out int density, out int flags);
-
-            return new NodeProperties
+            return new Road.NodeInfo(nodePosition, MathHelper.NormalizeHeading(nodeHeading), nodeNumberOfLanes1, nodeNumberOfLanes2, junctionIndication)
             {
                 Density = density,
-                Flags = flags
+                Flags = (ENodeType)flags
             };
         }
 
-        /// <summary>
-        /// Verify if the given node is is offroad.
-        /// </summary>
-        /// <param name="nodeId">The node id to check.</param>
-        /// <returns>Returns true when the node is an alley, dirt road or carpark.</returns>
-        private static bool IsSlowRoad(int nodeId)
+        private static Vector3 GetLastPointOnRoad(Vector3 position, float heading, float accuracy = 0.25f)
         {
-            // PATHFIND::_GET_IS_SLOW_ROAD_FLAG
-            return NativeFunction.CallByHash<bool>(0x4F5070AA58F69279, nodeId);
+            var direction = MathHelper.ConvertHeadingToDirection(heading) * accuracy;
+            var roadMaterial = 0U;
+            var positionToCheck = position;
+            var lastCheckedPositionOnRoad = position;
+            bool isPointOnRoad;
+
+            do
+            {
+                var positionOnTheGround = GameUtils.GetOnTheGroundPosition(positionToCheck);
+                uint materialHash;
+
+                unsafe
+                {
+                    bool hit;
+                    Vector3 worldHitPosition;
+                    Vector3 surfacePosition;
+                    uint hitEntity;
+
+                    // WORLDPROBE::_START_SHAPE_TEST_RAY
+                    var handle = NativeFunction.CallByHash<int>(0x377906D8A31E5586, positionOnTheGround.X, positionOnTheGround.Y, positionOnTheGround.Z + 0.5f,
+                        positionOnTheGround.X, positionOnTheGround.Y, positionOnTheGround.Z - 1f,
+                        (int)ETraceFlags.IntersectWorld, Game.LocalPlayer.Character, 7);
+
+                    // WORLDPROBE::_GET_SHAPE_TEST_RESULT_EX
+                    NativeFunction.CallByHash<int>(0x65287525D951F6BE, handle, &hit, &worldHitPosition, &surfacePosition, &materialHash, &hitEntity);
+                }
+
+                if (roadMaterial == 0U)
+                    roadMaterial = materialHash;
+
+                isPointOnRoad = roadMaterial == materialHash;
+                positionToCheck = lastCheckedPositionOnRoad + direction;
+
+                if (isPointOnRoad)
+                    lastCheckedPositionOnRoad = positionOnTheGround;
+            } while (isPointOnRoad && position.DistanceTo(lastCheckedPositionOnRoad) < MaxLaneWidth);
+
+            return lastCheckedPositionOnRoad;
         }
 
         #endregion
-    }
-
-    internal class NodeInfo
-    {
-        public NodeInfo(Vector3 position, float heading)
-        {
-            Position = position;
-            Heading = heading;
-        }
-
-        public NodeInfo(Vector3 position, float heading, int numberOfLanes1, int numberOfLanes2, float atJunction)
-        {
-            Position = position;
-            Heading = heading;
-            NumberOfLanes1 = numberOfLanes1;
-            NumberOfLanes2 = numberOfLanes2;
-            AtJunction = atJunction;
-        }
-
-        public Vector3 Position { get; }
-
-        public float Heading { get; }
-
-        public int NumberOfLanes1 { get; }
-
-        public int NumberOfLanes2 { get; }
-
-        public float AtJunction { get; }
-
-        public override string ToString()
-        {
-            return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}";
-        }
-
-        protected bool Equals(NodeInfo other)
-        {
-            return Position.Equals(other.Position) && Heading.Equals(other.Heading) && NumberOfLanes1 == other.NumberOfLanes1 &&
-                   NumberOfLanes2 == other.NumberOfLanes2 && AtJunction.Equals(other.AtJunction);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((NodeInfo)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Position.GetHashCode();
-                hashCode = (hashCode * 397) ^ Heading.GetHashCode();
-                hashCode = (hashCode * 397) ^ NumberOfLanes1;
-                hashCode = (hashCode * 397) ^ NumberOfLanes2;
-                hashCode = (hashCode * 397) ^ AtJunction.GetHashCode();
-                return hashCode;
-            }
-        }
-    }
-
-    public class NodeProperties
-    {
-        public int Density { get; internal set; }
-
-        public int Flags { get; internal set; }
     }
 }

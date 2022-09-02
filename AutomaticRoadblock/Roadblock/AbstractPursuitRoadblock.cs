@@ -216,7 +216,7 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void InvalidateTheRoadblock()
         {
-            Logger.Warn("Unable to verify of the roadblock status (bypass/hit), the vehicle instance is no longer valid");
+            Logger.Warn($"Unable to verify of the roadblock status (bypass/hit), the vehicle instance is no longer valid for {this}");
             // invalidate the roadblock so it can be cleaned up
             // this will also stop the monitor from running as we're not able
             // to determine any status anymore

@@ -10,13 +10,15 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class RoadPreviewComponent : IMenuComponent<UIMenuListItem>
+    public class DebugRoadPreviewComponent : IMenuComponent<UIMenuListItem>
     {
+        private const float SearchRadius = 15f;
+        
         private readonly ILogger _logger;
         private readonly IGame _game;
         private List<Road> _roads;
 
-        public RoadPreviewComponent(ILogger logger, IGame game)
+        public DebugRoadPreviewComponent(ILogger logger, IGame game)
         {
             _logger = logger;
             _game = game;
@@ -27,7 +29,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         /// <inheritdoc />
         public UIMenuListItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.RoadPreview, AutomaticRoadblocksPlugin.RoadPreviewDescription,
             new DisplayItem(ERoadPreviewType.Closest, AutomaticRoadblocksPlugin.RoadPreviewClosest),
-            new DisplayItem(ERoadPreviewType.Nearby, AutomaticRoadblocksPlugin.RoadPreviewNearby));
+            new DisplayItem(ERoadPreviewType.NearbyAll, AutomaticRoadblocksPlugin.RoadPreviewNearby));
 
         /// <inheritdoc />
         public EMenuType Type => EMenuType.Debug;
@@ -57,13 +59,25 @@ namespace AutomaticRoadblocks.Debug.Menu
             {
                 MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreviewRemove;
                 var type = (ERoadPreviewType)MenuItem.SelectedValue;
-                _roads = type == ERoadPreviewType.Closest
-                    ? new List<Road> { RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, ERoadType.All) }
-                    : RoadUtils.FindNearbyRoads(Game.LocalPlayer.Character.Position, ERoadType.All).ToList();
+
+                _roads = type switch
+                {
+                    ERoadPreviewType.Closest => new List<Road>
+                    {
+                        RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, EVehicleNodeType.AllRoadNoJunctions)
+                    },
+                    ERoadPreviewType.NearbyAll => RoadUtils
+                        .FindNearbyRoads(Game.LocalPlayer.Character.Position, EVehicleNodeType.AllNodes, SearchRadius)
+                        .ToList(),
+                    ERoadPreviewType.NearbyNoJunction => RoadUtils
+                        .FindNearbyRoads(Game.LocalPlayer.Character.Position, EVehicleNodeType.AllRoadNoJunctions, SearchRadius)
+                        .ToList(),
+                    _ => _roads
+                };
 
                 _logger.Debug("Nearest road info: " + string.Join("---\n", _roads));
                 _roads.ForEach(x => x.CreatePreview());
-            }, "RoadPreview");
+            }, "RoadPreviewComponent.Preview");
         }
 
         [Conditional("DEBUG")]
@@ -80,7 +94,8 @@ namespace AutomaticRoadblocks.Debug.Menu
         public enum ERoadPreviewType
         {
             Closest,
-            Nearby
+            NearbyAll,
+            NearbyNoJunction
         }
     }
 }
