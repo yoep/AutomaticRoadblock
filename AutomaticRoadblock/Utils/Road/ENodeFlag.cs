@@ -12,7 +12,8 @@ namespace AutomaticRoadblocks.Utils.Road
         None = 0,
         
         // 0000 0001
-        IsWaterNode = 1,
+        // not sure for what this bit stands 
+        Unknown = 1,
 
         // 0000 0010
         Unused = 2,
@@ -34,9 +35,6 @@ namespace AutomaticRoadblocks.Utils.Road
 
         // 1000 0000
         IsJunction = 128,
-        
-        LeftTurnNoReturn = 256,
-        RightTurnNoReturn = 512,
 
         // 0000 0001 0000 0000 0000
         IsOffRoad = 4096,

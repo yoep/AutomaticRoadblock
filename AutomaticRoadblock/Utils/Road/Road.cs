@@ -21,9 +21,14 @@ namespace AutomaticRoadblocks.Utils.Road
         #region Properties
 
         /// <summary>
-        /// Get the center position of the road.
+        /// The center position of the road.
         /// </summary>
         public Vector3 Position => Node.Position;
+
+        /// <summary>
+        /// The heading of the road.
+        /// </summary>
+        public float Heading => Node.Heading;
 
         /// <summary>
         /// Get the right side position of the road.
@@ -56,7 +61,7 @@ namespace AutomaticRoadblocks.Utils.Road
         public int NumberOfLanes2 { get; internal set; }
 
         /// <summary>
-        /// Get the junction indicator.
+        /// Get the junction indicator for the road.
         /// </summary>
         public int JunctionIndicator { get; internal set; }
 
@@ -195,6 +200,7 @@ namespace AutomaticRoadblocks.Utils.Road
             GameFiber.StartNew(() =>
             {
                 var game = IoC.Instance.GetInstance<IGame>();
+                var junctionMarkerPosition = Position + MathHelper.ConvertHeadingToDirection(Heading) * 2f;
                 var color = Color.LightGray;
 
                 if (Node.Flags.HasFlag(ENodeFlag.IsGravelRoad) || Node.Flags.HasFlag(ENodeFlag.IsOffRoad))
@@ -211,6 +217,10 @@ namespace AutomaticRoadblocks.Utils.Road
                     game.DrawSphere(Position, 0.5f, color);
                     GameUtils.CreateMarker(LeftSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Blue, 0.5f, 1.5f, false);
                     GameUtils.CreateMarker(RightSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Green, 0.5f, 1.5f, false);
+
+                    if (IsAtJunction)
+                        game.DrawSphere(junctionMarkerPosition, 0.5f, Color.Orange);
+
                     game.FiberYield();
                 }
             });

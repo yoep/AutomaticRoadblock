@@ -97,22 +97,18 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             {
                 _logger.Debug("Dispatching new roadblock preview");
                 var roads = DetermineRoadblockLocationPreview(level, vehicle, atCurrentLocation);
-                var road = roads.Last();
-                _logger.Trace($"Dispatching roadblock on {road}");
-
-                _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(road.Position)]);
-                var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-                var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
-                    ShouldAddLightsToRoadblock());
-
-                lock (_roadblocks)
+                if (roads == null || roads.Count == 0)
                 {
-                    _roadblocks.Add(new RoadblockInfo(roadblock));
+                    _game.DisplayNotification("~r~No applicable vehicle nodes could be found in the area");
+                    return;
                 }
 
-                _foundRoads.AddRange(roads);
+                var road = roads.Last();
+                _logger.Debug($"Dispatching roadblock preview on {road}");
+                _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(road.Position)]);
+                DoRoadblockCreation(vehicle, level, road, true, true);
 
-                roadblock.CreatePreview();
+                _foundRoads.AddRange(roads);
                 _foundRoads.ForEach(x => x.CreatePreview());
             }, "RoadblockDispatcher.DispatchPreview");
         }
@@ -189,42 +185,77 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             _logger.Debug($"Dispatching new roadblock with {nameof(userRequest)}: {userRequest}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
             // calculate the roadblock location
-            var road = DetermineRoadblockLocation(level, vehicle, atCurrentLocation);
+            var primaryRoadToBlock = DetermineRoadblockLocation(level, vehicle, atCurrentLocation);
 
             // verify if another roadblock is already present nearby
             // if so, deny the roadblock request
-            if (IsRoadblockNearby(road))
-                return DenyUserRequestForRoadblock(userRequest, $"a roadblock is already present in the vicinity for {road}");
+            if (IsRoadblockNearby(primaryRoadToBlock))
+                return DenyUserRequestForRoadblock(userRequest, $"a roadblock is already present in the vicinity for {primaryRoadToBlock}");
 
             _game.NewSafeFiber(() =>
                 {
-                    var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-                    var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
-                        ShouldAddLightsToRoadblock());
-                    _logger.Info($"Dispatching new roadblock\n{roadblock}");
-                    lock (_roadblocks)
-                    {
-                        _roadblocks.Add(new RoadblockInfo(roadblock));
-                    }
+                    DoRoadblockCreation(vehicle, level, primaryRoadToBlock, true);
 
-                    // subscribe to the roadblock events
-                    roadblock.RoadblockStateChanged += InternalRoadblockStateChanged;
-                    roadblock.RoadblockCopKilled += InternalRoadblockCopKilled;
-                    roadblock.RoadblockCopsJoiningPursuit += InternalRoadblockCopsJoiningThePursuit;
-
-                    _logger.Trace($"Distance between vehicle and roadblock before spawn {road.Position.DistanceTo(vehicle.Position)}");
-                    var result = roadblock.Spawn();
-                    if (!result)
-                        _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
-
-                    _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
-                    _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(road.Position)]);
-                    _logger.Info($"Roadblock has been dispatched, {roadblock}");
+                    _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(primaryRoadToBlock.Position)]);
                     LspdfrUtils.PlayScannerAudioNonBlocking("ROADBLOCK_DEPLOYED");
                     _userRequestedRoadblockDispatching = false;
                 },
                 "RoadblockDispatcher.Dispatch");
             return true;
+        }
+
+        private void DoRoadblockCreation(Vehicle vehicle, RoadblockLevel level, Road road, bool allowJunctionRoadblockCreation, bool createAsPreview = false)
+        {
+            // verify if roadblock is at junction
+            // if so, create a junction roadblock
+            if (allowJunctionRoadblockCreation && road.IsAtJunction)
+            {
+                _logger.Debug("Deploying additional junction roadblocks");
+                var junctionPosition = road.Position + MathHelper.ConvertHeadingToDirection(road.Heading) * 10f;
+                var junctionRoads = RoadUtils
+                    .FindNearbyRoads(junctionPosition, EVehicleNodeType.AllRoadNoJunctions, 15f)
+                    .Where(x => x.IsAtJunction)
+                    .Where(x => !road.Position.Equals(x.Position))
+                    .Where(x => road.Position.DistanceTo(x.Position) > 5f)
+                    .Where(x => IsRoadMovingAwayFrom(x, junctionPosition))
+                    .ToList();
+
+                junctionRoads.ForEach(x => DoRoadblockCreation(vehicle, level, x, false, createAsPreview));
+                _logger.Info($"Added an additional {junctionRoads.Count} roadblocks to the junction");
+            }
+
+            // as a junction might contain dirt roads
+            // we determine the actual roadblock for each individual road
+            // as it might be that we need to downgrade one, but not the others
+            var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
+            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
+                ShouldAddLightsToRoadblock());
+
+            _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
+            lock (_roadblocks)
+            {
+                _roadblocks.Add(new RoadblockInfo(roadblock));
+            }
+
+            // subscribe to the roadblock events
+            roadblock.RoadblockStateChanged += InternalRoadblockStateChanged;
+            roadblock.RoadblockCopKilled += InternalRoadblockCopKilled;
+            roadblock.RoadblockCopsJoiningPursuit += InternalRoadblockCopsJoiningThePursuit;
+
+            if (createAsPreview)
+            {
+                roadblock.CreatePreview();
+            }
+            else
+            {
+                _logger.Trace($"Distance between vehicle and roadblock before spawn {road.Position.DistanceTo(vehicle.Position)}");
+                var result = roadblock.Spawn();
+                if (!result)
+                    _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
+                _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
+            }
+
+            _logger.Info($"Roadblock has been dispatched, {roadblock}");
         }
 
         private bool IsRoadblockNearby(Road road)
@@ -438,12 +469,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             if (RoadUtils.IsSlowRoad(vehicle.Position))
             {
                 _logger.Debug("Following the current dirt/offroad road for the roadblock placement");
-                return EVehicleNodeType.AllNodes;
+                return EVehicleNodeType.AllRoadNoJunctions;
             }
 
             // otherwise, we're going to base the allowed road types for the trajectory based
             // on the current roadblock level
-            var vehicleNodeType = level.Level <= RoadblockLevel.Level2.Level ? EVehicleNodeType.AllNodes : EVehicleNodeType.MainRoadsWithJunctions;
+            var vehicleNodeType = level.Level <= RoadblockLevel.Level2.Level ? EVehicleNodeType.AllRoadNoJunctions : EVehicleNodeType.MainRoads;
             _logger.Debug($"Roadblock road traversal will use vehicle node type {vehicleNodeType}");
             return vehicleNodeType;
         }
@@ -471,6 +502,14 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     _logger.Warn($"Unable to remove roadblock from dispatcher, roadblock not found: {roadblock}");
                 }
             }
+        }
+
+        private static bool IsRoadMovingAwayFrom(Road road, Vector3 position)
+        {
+            var initialDistance = position.DistanceTo2D(road.Position);
+            var verifyRoadPositionAhead = road.Position + MathHelper.ConvertHeadingToDirection(road.Heading) * 10f;
+
+            return verifyRoadPositionAhead.DistanceTo(position) > initialDistance;
         }
 
         #endregion
