@@ -320,7 +320,7 @@ namespace AutomaticRoadblocks.Utils.Road
             return new Road.NodeInfo(nodePosition, MathHelper.NormalizeHeading(nodeHeading), nodeNumberOfLanes1, nodeNumberOfLanes2, junctionIndication)
             {
                 Density = density,
-                Flags = (ENodeType)flags
+                Flags = (ENodeFlag)flags
             };
         }
 

@@ -7,7 +7,7 @@ namespace AutomaticRoadblocks.Utils.Road
     /// </summary>
     /// <remarks>Info: https://gta.fandom.com/wiki/Paths_(GTA_V)#Analysis</remarks>
     [Flags]
-    public enum ENodeType
+    public enum ENodeFlag
     {
         // 0000 0001
         IsWaterNode = 1,

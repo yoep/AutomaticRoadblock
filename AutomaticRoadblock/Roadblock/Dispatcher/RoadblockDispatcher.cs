@@ -270,7 +270,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             // check if big vehicles is not allowed on the node
             // if so reduce level 5 to level 4
-            if (level == RoadblockLevel.Level5 && road.Node.Flags.HasFlag(ENodeType.NoBigVehicles))
+            if (level == RoadblockLevel.Level5 && road.Node.Flags.HasFlag(ENodeFlag.NoBigVehicles))
             {
                 level = RoadblockLevel.Level4;
                 _logger.Debug($"Road disallows big vehicles, downgraded roadblock level to {level}");
@@ -410,9 +410,9 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         private static bool IsNonConcreteRoad(Road road)
         {
-            return road.Node.Flags.HasFlag(ENodeType.IsBackroad)
-                   || road.Node.Flags.HasFlag(ENodeType.IsGravelRoad)
-                   || road.Node.Flags.HasFlag(ENodeType.IsOffRoad);
+            return road.Node.Flags.HasFlag(ENodeFlag.IsBackroad)
+                   || road.Node.Flags.HasFlag(ENodeFlag.IsGravelRoad)
+                   || road.Node.Flags.HasFlag(ENodeFlag.IsOffRoad);
         }
 
         private static float CalculateRoadblockDistance(Vehicle vehicle, bool atCurrentLocation)

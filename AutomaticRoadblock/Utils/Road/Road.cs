@@ -195,10 +195,20 @@ namespace AutomaticRoadblocks.Utils.Road
             GameFiber.StartNew(() =>
             {
                 var game = IoC.Instance.GetInstance<IGame>();
+                var color = Color.LightGray;
+
+                if (Node.Flags.HasFlag(ENodeFlag.IsGravelRoad) || Node.Flags.HasFlag(ENodeFlag.IsOffRoad))
+                {
+                    color = Color.SandyBrown;
+                }
+                else if (Node.Flags.HasFlag(ENodeFlag.IsBackroad))
+                {
+                    color = Color.DarkSlateGray;
+                }
 
                 while (IsPreviewActive)
                 {
-                    game.DrawSphere(Position, 0.5f, Color.White);
+                    game.DrawSphere(Position, 0.5f, color);
                     GameUtils.CreateMarker(LeftSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Blue, 0.5f, 1.5f, false);
                     GameUtils.CreateMarker(RightSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Green, 0.5f, 1.5f, false);
                     game.FiberYield();
@@ -400,7 +410,7 @@ namespace AutomaticRoadblocks.Utils.Road
             /// <summary>
             /// The flags of the node.
             /// </summary>
-            public ENodeType Flags { get; internal set; }
+            public ENodeFlag Flags { get; internal set; }
 
             #endregion
 
@@ -472,7 +482,7 @@ namespace AutomaticRoadblocks.Utils.Road
             #endregion
 
             #region Functions
-            
+
             private static Vector3 FloatAboveGround(Vector3 position)
             {
                 return position + Vector3.WorldUp * 1f;

@@ -180,7 +180,7 @@
         <Compile Include="Utils\ModelUtils.cs" />
         <Compile Include="Utils\PreviewUtils.cs" />
         <Compile Include="Utils\PropUtils.cs" />
-        <Compile Include="Utils\Road\ENodeType.cs" />
+        <Compile Include="Utils\Road\ENodeFlag.cs" />
         <Compile Include="Utils\Road\ETraceFlags.cs" />
         <Compile Include="Utils\Road\Road.cs" />
         <Compile Include="Utils\Road\ERoadType.cs" />
