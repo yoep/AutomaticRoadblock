@@ -128,6 +128,17 @@ namespace AutomaticRoadblocks.Utils.Road
         {
             return NativeFunction.Natives.IS_POINT_ON_ROAD<bool>(position.X, position.Y, position.Z);
         }
+        
+        /// <summary>
+        /// Verify if the given position is a dirt/offroad location based on the slow road flag.
+        /// </summary>
+        /// <param name="position">The position to check.</param>
+        /// <returns>Returns true when the position is a dirt/offroad, else false.</returns>
+        public static bool IsSlowRoad(Vector3 position)
+        {
+            var nodeId = GetClosestNodeId(position);
+            return IsSlowRoad(nodeId);
+        }
 
         #endregion
 
@@ -159,7 +170,7 @@ namespace AutomaticRoadblocks.Utils.Road
             return closestNode;
         }
 
-        private static IEnumerable<Road.NodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType, float radius, int rotationInterval = 5)
+        private static IEnumerable<Road.NodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType, float radius, int rotationInterval = 10)
         {
             var nodes = new List<Road.NodeInfo>();
 
@@ -388,6 +399,22 @@ namespace AutomaticRoadblocks.Utils.Road
             }
 
             return lastCheckedPositionOnRoad;
+        }
+        
+        private static int GetClosestNodeId(Vector3 position)
+        {
+            return NativeFunction.CallByName<int>("GET_NTH_CLOSEST_VEHICLE_NODE_ID", position.X, position.Y, position.Z, 1, 1, 1077936128, 0f);
+        }
+        
+        /// <summary>
+        /// Verify if the given node is is offroad.
+        /// </summary>
+        /// <param name="nodeId">The node id to check.</param>
+        /// <returns>Returns true when the node is an alley, dirt road or carpark.</returns>
+        private static bool IsSlowRoad(int nodeId)
+        {
+            // PATHFIND::_GET_IS_SLOW_ROAD_FLAG
+            return NativeFunction.CallByHash<bool>(0x4F5070AA58F69279, nodeId);
         }
 
         #endregion

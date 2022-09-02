@@ -441,8 +441,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var distanceToLeftSide = Lane.Position.DistanceTo(Road.LeftSide);
             var distanceToRightSide = Lane.Position.DistanceTo(Road.RightSide);
 
-            Logger.Debug($"Left side closer: {distanceToLeftSide < distanceToRightSide}\n" +
-                         $"Right side closer: {distanceToRightSide < distanceToLeftSide}\n" +
+            Logger.Debug($"Left side closer: {distanceToLeftSide < distanceToRightSide}, " +
+                         $"Right side closer: {distanceToRightSide < distanceToLeftSide}, " +
                          $"Is lane opposite: {Lane.IsOppositeHeadingOfRoadNodeHeading}");
             var isLeftSideCloser = distanceToLeftSide < distanceToRightSide;
 

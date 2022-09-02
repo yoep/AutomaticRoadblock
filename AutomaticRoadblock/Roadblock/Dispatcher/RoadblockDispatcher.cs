@@ -433,19 +433,17 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         private EVehicleNodeType DetermineAllowedRoadTypes(Vehicle vehicle, RoadblockLevel level)
         {
-            var road = RoadUtils.FindClosestRoad(vehicle.Position, EVehicleNodeType.AllNodes);
-
             // verify the current road type
             // if we're already at a dirt/offroad road, all road types for the trajectory calculation are allowed
-            if (IsNonConcreteRoad(road))
+            if (RoadUtils.IsSlowRoad(vehicle.Position))
             {
                 _logger.Debug("Following the current dirt/offroad road for the roadblock placement");
-                return EVehicleNodeType.AllRoadNoJunctions;
+                return EVehicleNodeType.AllNodes;
             }
 
             // otherwise, we're going to base the allowed road types for the trajectory based
             // on the current roadblock level
-            var vehicleNodeType = level.Level <= RoadblockLevel.Level2.Level ? EVehicleNodeType.AllRoadNoJunctions : EVehicleNodeType.MainRoads;
+            var vehicleNodeType = level.Level <= RoadblockLevel.Level2.Level ? EVehicleNodeType.AllNodes : EVehicleNodeType.MainRoadsWithJunctions;
             _logger.Debug($"Roadblock road traversal will use vehicle node type {vehicleNodeType}");
             return vehicleNodeType;
         }

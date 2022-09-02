@@ -33,7 +33,8 @@ namespace AutomaticRoadblocks.Utils.Road
         IsPedCrossway = 64,
 
         // 1000 0000
-        TrafficLightExists = 128,
+        IsJunction = 128,
+        
         LeftTurnNoReturn = 256,
         RightTurnNoReturn = 512,
 
