@@ -250,7 +250,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             _logger.Trace(
                 $"Determining roadblock location with Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(roadblockDistance)}: {roadblockDistance}, {nameof(roadType)}: {roadType}");
-            return RoadUtils.FindRoadTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType);
+            return RoadUtils.FindRoadTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType, DetermineBlacklistedFlagsForType(roadType));
         }
 
         private ICollection<Road> DetermineRoadblockLocationPreview(RoadblockLevel level, Vehicle vehicle, bool atCurrentLocation)
@@ -260,7 +260,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             _logger.Trace(
                 $"Determining roadblock location for the preview with Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(roadblockDistance)}: {roadblockDistance}, {nameof(roadType)}: {roadType}");
-            return RoadUtils.FindRoadsTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType);
+            return RoadUtils.FindRoadsTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType, DetermineBlacklistedFlagsForType(roadType));
         }
 
         private RoadblockLevel DetermineRoadblockLevelBasedOnTheRoadLocation(RoadblockLevel level, Road road)
@@ -448,6 +448,14 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             var vehicleNodeType = level.Level <= RoadblockLevel.Level2.Level ? EVehicleNodeType.AllRoadNoJunctions : EVehicleNodeType.MainRoads;
             _logger.Debug($"Roadblock road traversal will use vehicle node type {vehicleNodeType}");
             return vehicleNodeType;
+        }
+
+        private ENodeFlag DetermineBlacklistedFlagsForType(EVehicleNodeType vehicleNodeType)
+        {
+            if (vehicleNodeType == EVehicleNodeType.MainRoads)
+                return ENodeFlag.IsBackroad | ENodeFlag.IsGravelRoad | ENodeFlag.IsOffRoad;
+
+            return ENodeFlag.None;
         }
 
         private void RemoveRoadblock(IRoadblock roadblock)

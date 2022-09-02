@@ -9,6 +9,8 @@ namespace AutomaticRoadblocks.Utils.Road
     [Flags]
     public enum ENodeFlag
     {
+        None = 0,
+        
         // 0000 0001
         IsWaterNode = 1,
 

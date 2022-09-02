@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using JetBrains.Annotations;
 using Rage;
 using Rage.Native;
 
@@ -9,8 +10,6 @@ namespace AutomaticRoadblocks.Utils.Road
 {
     public static class RoadUtils
     {
-        private const float MaxLaneWidth = 10f;
-
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
         #region Methods
@@ -47,10 +46,11 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="heading">The heading to traverse the road from.</param>
         /// <param name="distance">The distance to traverse.</param>
         /// <param name="roadType">The road types to follow.</param>
+        /// <param name="blacklistedFlags">The flags of a node which should be ignored if present.</param>
         /// <returns>Returns the found round traversed from the start position.</returns>
-        public static Road FindRoadTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType)
+        public static Road FindRoadTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType, ENodeFlag blacklistedFlags)
         {
-            FindVehicleNodesWhileTraversing(position, heading, distance, roadType, out var lastFoundNode);
+            FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags, out var lastFoundNode);
             return DiscoverRoadForVehicleNode(lastFoundNode);
         }
 
@@ -61,14 +61,20 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="heading">The heading to traverse the road from.</param>
         /// <param name="distance">The distance to traverse.</param>
         /// <param name="roadType">The road types to follow.</param>
+        /// <param name="blacklistedFlags">The flags of a node which should be ignored if present.</param>
         /// <returns>Returns the roads found while traversing the distance.</returns>
-        public static ICollection<Road> FindRoadsTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType)
+        public static ICollection<Road> FindRoadsTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType,
+            ENodeFlag blacklistedFlags)
         {
-            var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, out _);
+            var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags, out _);
 
-            return nodeInfos
+            var startedAt = DateTime.Now.Ticks;
+            var roads = nodeInfos
                 .Select(DiscoverRoadForVehicleNode)
                 .ToList();
+            var calculationTime = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
+            Logger.Debug($"Discovered a total of {roads.Count} roads in {calculationTime} millis while traversing the road");
+            return roads;
         }
 
         /// <summary>
@@ -127,18 +133,22 @@ namespace AutomaticRoadblocks.Utils.Road
 
         #region Functions
 
-        private static Road.NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, EVehicleNodeType nodeType)
+        [CanBeNull]
+        private static Road.NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, EVehicleNodeType nodeType,
+            ENodeFlag blacklistedFlags = ENodeFlag.None)
         {
             Logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading}");
-            var nodes = FindNearbyVehicleNodes(position, nodeType, 2f);
+            var nodes = FindNearbyVehicleNodes(position, nodeType, 2f, 20);
             var closestNodeDistance = 9999f;
             var closestNode = (Road.NodeInfo)null;
 
-            foreach (var node in nodes)
+            // filter out any nodes which match one or more blacklisted conditions
+            foreach (var node in nodes.Where(x => (x.Flags & blacklistedFlags) == 0))
             {
                 var distance = position.DistanceTo(node.Position);
 
-                if (distance > closestNodeDistance && Math.Abs(node.Heading - heading) % 360 < 25f)
+                if (distance > closestNodeDistance ||
+                    Math.Abs(node.Heading - heading) % 360 > 45f)
                     continue;
 
                 closestNodeDistance = distance;
@@ -149,13 +159,13 @@ namespace AutomaticRoadblocks.Utils.Road
             return closestNode;
         }
 
-        private static IEnumerable<Road.NodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType, float radius)
+        private static IEnumerable<Road.NodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType, float radius, int rotationInterval = 5)
         {
             var nodes = new List<Road.NodeInfo>();
 
             for (var rad = 1; rad <= radius; rad++)
             {
-                for (var rot = 0; rot < 360; rot += 5)
+                for (var rot = 0; rot < 360; rot += rotationInterval)
                 {
                     var x = (float)(position.X + rad * Math.Sin(rot));
                     var y = (float)(position.Y + rad * Math.Cos(rot));
@@ -174,9 +184,10 @@ namespace AutomaticRoadblocks.Utils.Road
         }
 
         private static List<Road.NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, EVehicleNodeType nodeType,
-            out Road.NodeInfo lastFoundNodeInfo)
+            ENodeFlag blacklistedFlags, out Road.NodeInfo lastFoundNodeInfo)
         {
             var startedAt = DateTime.Now.Ticks;
+            var nextNodeCalculationStartedAt = DateTime.Now.Ticks;
             var distanceTraversed = 0f;
             var distanceToMove = 5f;
             var findNodeAttempt = 0;
@@ -193,9 +204,11 @@ namespace AutomaticRoadblocks.Utils.Road
                 }
 
                 var findNodeAt = lastFoundNodeInfo.Position + MathHelper.ConvertHeadingToDirection(lastFoundNodeInfo.Heading) * distanceToMove;
-                var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNodeInfo.Heading, nodeType);
+                var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNodeInfo.Heading, nodeType, blacklistedFlags);
 
-                if (nodeTowardsHeading.Position.Equals(lastFoundNodeInfo.Position) || nodeInfos.Any(x => x.Equals(nodeTowardsHeading)))
+                if (nodeTowardsHeading == null
+                    || nodeTowardsHeading.Position.Equals(lastFoundNodeInfo.Position)
+                    || nodeInfos.Any(x => x.Equals(nodeTowardsHeading)))
                 {
                     distanceToMove *= 1.5f;
                     findNodeAttempt++;
@@ -203,19 +216,21 @@ namespace AutomaticRoadblocks.Utils.Road
                 else
                 {
                     var additionalDistanceTraversed = lastFoundNodeInfo.Position.DistanceTo(nodeTowardsHeading.Position);
+                    var nextNodeCalculationDuration = (DateTime.Now.Ticks - nextNodeCalculationStartedAt) / TimeSpan.TicksPerMillisecond;
                     nodeInfos.Add(nodeTowardsHeading);
                     distanceToMove = 5f;
                     findNodeAttempt = 0;
                     distanceTraversed += additionalDistanceTraversed;
                     lastFoundNodeInfo = nodeTowardsHeading;
-                    Logger.Trace($"Traversed an additional {additionalDistanceTraversed} distance, new total traversed distance = {distanceTraversed}");
+                    Logger.Trace(
+                        $"Traversed an additional {additionalDistanceTraversed} distance in {nextNodeCalculationDuration} millis, new total traversed distance = {distanceTraversed}");
+                    nextNodeCalculationStartedAt = DateTime.Now.Ticks;
                 }
             }
 
             var calculationTime = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
-            Logger.Debug(
-                $"Traversed a total of {position.DistanceTo(lastFoundNodeInfo.Position)} distance with expectation {distance} within {calculationTime} millis\n" +
-                $"origin: {position}, destination: {lastFoundNodeInfo.Position}");
+            Logger.Debug($"Traversed a total of {position.DistanceTo(lastFoundNodeInfo.Position)} distance with expectation {distance} within {calculationTime} millis\n" +
+                         $"origin: {position}, destination: {lastFoundNodeInfo.Position}");
             return nodeInfos;
         }
 
@@ -324,15 +339,16 @@ namespace AutomaticRoadblocks.Utils.Road
             };
         }
 
-        private static Vector3 GetLastPointOnRoad(Vector3 position, float heading, float accuracy = 0.25f)
+        private static Vector3 GetLastPointOnRoad(Vector3 position, float heading)
         {
-            var direction = MathHelper.ConvertHeadingToDirection(heading) * accuracy;
+            const float stopAtMinimumInterval = 0.2f;
+            var intervalCheck = 1f;
+            var direction = MathHelper.ConvertHeadingToDirection(heading);
             var roadMaterial = 0U;
             var positionToCheck = position;
             var lastCheckedPositionOnRoad = position;
-            bool isPointOnRoad;
 
-            do
+            while (intervalCheck > stopAtMinimumInterval)
             {
                 var positionOnTheGround = GameUtils.GetOnTheGroundPosition(positionToCheck);
                 uint materialHash;
@@ -356,12 +372,20 @@ namespace AutomaticRoadblocks.Utils.Road
                 if (roadMaterial == 0U)
                     roadMaterial = materialHash;
 
-                isPointOnRoad = roadMaterial == materialHash;
-                positionToCheck = lastCheckedPositionOnRoad + direction;
-
-                if (isPointOnRoad)
+                // verify if positionOnTheGround is still on the road
+                if (roadMaterial == materialHash)
+                {
+                    // store the last known position
                     lastCheckedPositionOnRoad = positionOnTheGround;
-            } while (isPointOnRoad && position.DistanceTo(lastCheckedPositionOnRoad) < MaxLaneWidth);
+                }
+                else
+                {
+                    // reduce the check distance as we're over the road
+                    intervalCheck /= 2;
+                }
+
+                positionToCheck = lastCheckedPositionOnRoad + direction * intervalCheck;
+            }
 
             return lastCheckedPositionOnRoad;
         }
