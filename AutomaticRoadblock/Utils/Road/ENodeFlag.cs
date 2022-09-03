@@ -35,6 +35,12 @@ namespace AutomaticRoadblocks.Utils.Road
 
         // 1000 0000
         IsJunction = 128,
+        
+        // 0001 0000 0000
+        LeftTurnNoReturn = 256,
+        
+        // 0010 0000 0000
+        RightTurnNoReturn = 512,
 
         // 0000 0001 0000 0000 0000
         IsOffRoad = 4096,
@@ -44,14 +50,5 @@ namespace AutomaticRoadblocks.Utils.Road
 
         // 0000 0100 0000 0000 0000
         NoBigVehicles = 16384,
-
-        // 0000 1000 0000 0000 0000
-        IsKeepLeft = 32768,
-
-        // 0001 0000 0000 0000 0000
-        IsKeepRight = 65536,
-
-        // 0010 0000 0000 0000 0000
-        IsSLipLane = 131072
     }
 }

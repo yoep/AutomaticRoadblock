@@ -6,6 +6,8 @@ using AutomaticRoadblocks.Pursuit.Factory;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
+using LSPD_First_Response.Engine.Scripting;
+using LSPD_First_Response.Mod.API;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Dispatcher
@@ -208,12 +210,16 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         {
             // verify if roadblock is at junction
             // if so, create a junction roadblock
-            if (allowJunctionRoadblockCreation && road.IsAtJunction)
+            if (allowJunctionRoadblockCreation && IsAtJunction(road))
             {
                 _logger.Debug("Deploying additional junction roadblocks");
                 var junctionPosition = road.Position + MathHelper.ConvertHeadingToDirection(road.Heading) * 10f;
+                // if we're in the city, don't return any gravel/dirt roads
+                var nodeType = Functions.GetZoneAtPosition(road.Position).County == EWorldZoneCounty.LosSantos
+                    ? EVehicleNodeType.MainRoads
+                    : EVehicleNodeType.AllRoadNoJunctions;
                 var junctionRoads = RoadUtils
-                    .FindNearbyRoads(junctionPosition, EVehicleNodeType.AllRoadNoJunctions, 15f)
+                    .FindNearbyRoads(junctionPosition, nodeType, 15f)
                     .Where(x => x.IsAtJunction)
                     .Where(x => !road.Position.Equals(x.Position))
                     .Where(x => road.Position.DistanceTo(x.Position) > 5f)
@@ -256,6 +262,13 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             _logger.Info($"Roadblock has been dispatched, {roadblock}");
+        }
+
+        private bool IsAtJunction(Road road)
+        {
+            return road.IsAtJunction ||
+                   RoadUtils.FindNearbyRoads(road.Position, EVehicleNodeType.AllNodes, 10f)
+                       .Any(x => x.IsAtJunction);
         }
 
         private bool IsRoadblockNearby(Road road)

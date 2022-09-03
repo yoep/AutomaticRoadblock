@@ -345,7 +345,7 @@ namespace AutomaticRoadblocks.Utils.Road
                 game.NewSafeFiber(() =>
                 {
                     var rightSideDirection = MathHelper.ConvertHeadingToDirection(Heading) * 1f;
-                    var leftSideDirection = MathHelper.ConvertHeadingToDirection(Heading) * 1.15f;
+                    var leftSideDirection = MathHelper.ConvertHeadingToDirection(Heading) * 1.25f;
 
                     while (IsPreviewActive)
                     {
