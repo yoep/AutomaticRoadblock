@@ -23,6 +23,9 @@ namespace AutomaticRoadblocks.Utils
             public static Model WorkBarrierHigh => new("prop_mp_barrier_02b");
             public static Model WorkBarrierLarge => new("prop_barrier_work06a");
             public static Model WorkBarrierSmall => new("prop_barrier_work01a");
+            public static Model WorkBarrierSmallWithLight => new("prop_barrier_work02a");
+            public static Model TrafficArrowLeft => new("prop_trafficdiv_01");
+            public static Model TrafficArrowBoth => new("prop_trafficdiv_01");
         }
 
         #endregion
@@ -160,7 +163,7 @@ namespace AutomaticRoadblocks.Utils
 
         public static Object CreateBarrierWorkWithLight(Vector3 position, float heading = 0f)
         {
-            var instance = new Object(new Model("prop_barrier_work02a"), position, heading);
+            var instance = new Object(Models.WorkBarrierSmallWithLight, position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
@@ -170,21 +173,21 @@ namespace AutomaticRoadblocks.Utils
             return PlaceCorrectlyOnGround(instance);
         }
 
-        public static Object CreateWorkerBarrierArrowRight(Vector3 position)
+        public static Object CreateWorkerBarrierArrowRight(Vector3 position, float heading)
         {
-            var instance = new Object(new Model("prop_mp_arrow_barrier_01"), position);
+            var instance = new Object(new Model("prop_mp_arrow_barrier_01"), position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
         public static Object RedirectTrafficArrowLeft(Vector3 position, float heading)
         {
-            var instance = new Object(new Model("prop_trafficdiv_01"), position, heading);
+            var instance = new Object(Models.TrafficArrowLeft, position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 
         public static Object RedirectTrafficArrowBoth(Vector3 position, float heading)
         {
-            var instance = new Object(new Model("prop_trafficdiv_02"), position, heading);
+            var instance = new Object(Models.TrafficArrowBoth, position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 

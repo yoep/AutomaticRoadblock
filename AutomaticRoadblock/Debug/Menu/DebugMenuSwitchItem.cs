@@ -12,7 +12,7 @@ namespace AutomaticRoadblocks.Debug.Menu
             "~b~" + IoC.Instance.GetInstance<ILocalizer>()[LocalizationKey.MenuSubtitle]);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.Debug;
+        public EMenuType Type => EMenuType.Debug;
 
         /// <inheritdoc />
         public string DisplayText => AutomaticRoadblocksPlugin.MenuDebug;

@@ -1,6 +1,6 @@
 namespace AutomaticRoadblocks.Utils.Type
 {
-    public enum MarkerType
+    public enum EMarkerType
     {
         MarkerTypeUpsideDownCone = 0,
         MarkerTypeVerticalCylinder = 1,

@@ -1,4 +1,4 @@
-.PHONY: git build
+.PHONY: git python bumpversion dotnet
 
 bump-dependencies: # Install required dependencies
 	@python.exe -m pip install --upgrade pip

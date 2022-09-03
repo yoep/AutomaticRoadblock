@@ -1,6 +1,6 @@
 namespace AutomaticRoadblocks.Utils.Type
 {
-    public enum VehicleSeat
+    public enum EVehicleSeat
     {
         Any = -2,
         Driver = -1,

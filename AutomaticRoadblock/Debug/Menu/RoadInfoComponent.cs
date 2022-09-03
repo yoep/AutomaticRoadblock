@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.RoadInfo);
         
         /// <inheritdoc />
-        public MenuType Type => MenuType.Debug;
+        public EMenuType Type => EMenuType.Debug;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;
@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            var road = RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, RoadType.All);
+            var road = RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, ERoadType.All);
             _logger.Info("Nearest road info: " + road);
             _game.DisplayPluginNotification("see console or log file for info about the closest road");
         }

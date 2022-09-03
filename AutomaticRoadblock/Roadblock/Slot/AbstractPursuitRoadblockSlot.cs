@@ -9,7 +9,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot, IPursuitRoadblockSlot
     {
-        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, float heading, Vehicle targetVehicle, bool shouldAddLights)
+        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, float heading, Vehicle targetVehicle,
+            bool shouldAddLights)
             : base(lane, barrierType, vehicleType, heading, shouldAddLights, true)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
@@ -30,9 +31,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         #region IPursuitRoadblockSlot
 
         /// <inheritdoc />
-        public bool HasCopBeenKilledByTarget => Instances.Where(x => x.Type == EntityType.CopPed)
+        public bool HasCopBeenKilledByTarget => Instances.Where(x => x.Type == EEntityType.CopPed)
             .Select(x => (ARPed)x.Instance)
-            .Where(IsGameInstanceValid)
+            .Where(x => !x.IsInvalid)
             .Select(x => x.GameInstance)
             .Where(x => x.IsDead)
             .Where(HasCopReceivedDamageFromVehicleOrSuspects)
@@ -44,12 +45,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private bool HasCopBeenKilledBySuspects(Entity cop)
         {
-            return cop.HasBeenDamagedBy(TargetVehicle) || TargetVehicle.Occupants.Any(cop.HasBeenDamagedBy);
-        }
+            if (TargetVehicle == null || !TargetVehicle.IsValid())
+                return false;
 
-        private static bool IsGameInstanceValid(ARPed entity)
-        {
-            return entity.GameInstance != null && entity.GameInstance.IsValid();
+            return cop.HasBeenDamagedBy(TargetVehicle) || TargetVehicle.Occupants.Any(cop.HasBeenDamagedBy);
         }
 
         private static bool HasCopReceivedDamageFromVehicleOrSuspects(Entity x)

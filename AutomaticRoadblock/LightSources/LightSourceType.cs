@@ -1,15 +1,16 @@
 using System.Collections.Generic;
+using AutomaticRoadblocks.Localization;
 
 namespace AutomaticRoadblocks.LightSources
 {
     public class LightSourceType
     {
-        public static readonly LightSourceType None = new("None", 0f);
-        public static readonly LightSourceType Flares = new("Flares", 1f);
-        public static readonly LightSourceType Spots = new("Spots", 2f);
-        public static readonly LightSourceType Warning = new("Warning", 1f);
-        public static readonly LightSourceType BlueStanding = new("Blue", 2f);
-        public static readonly LightSourceType RedStanding = new("Red", 2f);
+        public static readonly LightSourceType None = new(LocalizationKey.None, 0f);
+        public static readonly LightSourceType Flares = new(LocalizationKey.Flares, 1f);
+        public static readonly LightSourceType Spots = new(LocalizationKey.Spots, 2f);
+        public static readonly LightSourceType Warning = new(LocalizationKey.Warning, 1f);
+        public static readonly LightSourceType BlueStanding = new(LocalizationKey.Blue, 2f);
+        public static readonly LightSourceType RedStanding = new(LocalizationKey.Red, 2f);
 
         public static readonly IEnumerable<LightSourceType> Values = new[]
         {
@@ -21,16 +22,16 @@ namespace AutomaticRoadblocks.LightSources
             RedStanding,
         };
 
-        private LightSourceType(string displayText, float spacing)
+        private LightSourceType(LocalizationKey localizationKey, float spacing)
         {
-            DisplayText = displayText;
+            LocalizationKey = localizationKey;
             Spacing = spacing;
         }
 
         /// <summary>
-        /// Get the display text of the light source.
+        /// The key to use for displaying the text.
         /// </summary>
-        public string DisplayText { get; }
+        public LocalizationKey LocalizationKey { get; }
         
         /// <summary>
         /// The spacing which should be applied to the light source.
@@ -40,7 +41,7 @@ namespace AutomaticRoadblocks.LightSources
         /// <inheritdoc />
         public override string ToString()
         {
-            return DisplayText;
+            return LocalizationKey.DefaultText;
         }
     }
 }

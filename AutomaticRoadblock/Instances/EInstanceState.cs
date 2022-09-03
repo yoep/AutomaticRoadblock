@@ -1,6 +1,6 @@
 namespace AutomaticRoadblocks.Instances
 {
-    public enum InstanceState
+    public enum EInstanceState
     {
         /// <summary>
         /// Indicates that the instance is being prepared and is not yet spawned.

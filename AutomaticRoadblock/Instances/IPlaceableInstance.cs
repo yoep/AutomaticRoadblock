@@ -14,6 +14,7 @@ namespace AutomaticRoadblocks.Instances
         /// <summary>
         /// Spawn the instance.
         /// </summary>
-        void Spawn();
+        /// <returns>Returns true when all instances spawned with success, else false.</returns>
+        bool Spawn();
     }
 }

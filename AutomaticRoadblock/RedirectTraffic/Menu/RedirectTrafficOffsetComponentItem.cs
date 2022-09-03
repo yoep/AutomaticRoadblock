@@ -5,16 +5,16 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.RedirectTraffic.Menu
 {
-    public class RedirectTrafficConeDistanceComponentItem : IMenuComponent<UIMenuNumericScrollerItem<double>>
+    public class RedirectTrafficOffsetComponentItem : IMenuComponent<UIMenuNumericScrollerItem<double>>
     {
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
 
-        public RedirectTrafficConeDistanceComponentItem(IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
+        public RedirectTrafficOffsetComponentItem(IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
 
             MenuItem = new UIMenuNumericScrollerItem<double>(
-                localizer[LocalizationKey.RedirectTrafficConeDistance], localizer[LocalizationKey.RedirectTrafficConeDistanceDescription], 0.5f, 30f, 0.5f);
+                localizer[LocalizationKey.Offset], localizer[LocalizationKey.OffsetDescription], -10f, 10f, 0.1f);
         }
 
         /// <inheritdoc />
@@ -36,13 +36,13 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            MenuItem.Value = _redirectTrafficDispatcher.ConeDistance;
+            MenuItem.Value = _redirectTrafficDispatcher.Offset;
             MenuItem.IndexChanged += ValueChanged;
         }
 
         private void ValueChanged(UIMenuScrollerItem sender, int oldIndex, int newIndex)
         {
-            _redirectTrafficDispatcher.ConeDistance = (float)MenuItem.Value;
+            _redirectTrafficDispatcher.Offset = (float)MenuItem.Value;
         }
     }
 }

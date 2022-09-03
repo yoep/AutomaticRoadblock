@@ -3,25 +3,24 @@ using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
-namespace AutomaticRoadblocks.Pursuit.Menu
+namespace AutomaticRoadblocks.RedirectTraffic.Menu
 {
-    public class PursuitEnableDuringPursuitComponentItem : IMenuComponent<UIMenuCheckboxItem>
+    public class EnableRedirectArrowComponentItem: IMenuComponent<UIMenuCheckboxItem>
     {
-        private readonly IPursuitManager _pursuitManager;
+        private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
 
-        public PursuitEnableDuringPursuitComponentItem(IPursuitManager pursuitManager, ILocalizer localizer)
+        public EnableRedirectArrowComponentItem(IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
-            _pursuitManager = pursuitManager;
+            _redirectTrafficDispatcher = redirectTrafficDispatcher;
 
-            MenuItem = new UIMenuCheckboxItem(localizer[LocalizationKey.EnableDuringPursuit], true,
-                localizer[LocalizationKey.EnableDuringPursuitDescription]);
+            MenuItem = new UIMenuCheckboxItem(localizer[LocalizationKey.RedirectTrafficEnableRedirectionArrow], true);
         }
 
         /// <inheritdoc />
         public UIMenuCheckboxItem MenuItem { get; }
 
         /// <inheritdoc />
-        public EMenuType Type => EMenuType.Pursuit;
+        public EMenuType Type => EMenuType.RedirectTraffic;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;
@@ -36,13 +35,13 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            MenuItem.Checked = _pursuitManager.EnableAutomaticDispatching;
+            MenuItem.Checked = _redirectTrafficDispatcher.EnableRedirectionArrow;
             MenuItem.CheckboxEvent += CheckedStateChanged;
         }
 
         private void CheckedStateChanged(UIMenuCheckboxItem sender, bool @checked)
         {
-            _pursuitManager.EnableAutomaticDispatching = MenuItem.Checked;
+            _redirectTrafficDispatcher.EnableRedirectionArrow = MenuItem.Checked;
         }
     }
 }

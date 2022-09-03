@@ -129,15 +129,18 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableCopsComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableSpeedLimitComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementBarrierComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(LightComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementLightTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementVehicleTypeComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementOffsetComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementRemoveComponentItem))
                 // redirect traffic components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficPlaceComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficLaneTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeDistanceComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficOffsetComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficVehicleTypeComponentType))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableRedirectArrowComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficRemoveComponentItem));
         }
 
@@ -176,8 +179,9 @@ namespace AutomaticRoadblocks
             logger.Debug("Registering debug menu components");
             IoC.Instance
                 .Register<IMenuSwitchItem>(typeof(DebugMenuSwitchItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(StartPursuitComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(EndCalloutComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitToggleComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitForceOnFootComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(CalloutEndComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RoadPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ZoneInfoComponent))

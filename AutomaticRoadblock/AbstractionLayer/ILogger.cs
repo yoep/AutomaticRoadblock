@@ -7,7 +7,7 @@ namespace AutomaticRoadblocks.AbstractionLayer
         /// <summary>
         /// The log level of the logger.
         /// </summary>
-        LogLevel LogLevel { get; set; }
+        ELogLevel LogLevel { get; set; }
         
         void Trace(string message);
         

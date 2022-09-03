@@ -3,6 +3,7 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
 
@@ -13,9 +14,11 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private readonly ISettingsManager _settingsManager;
 
         private float _coneDistance = 2f;
-        private VehicleType _vehicleType = VehicleType.Locale;
+        private VehicleType _vehicleType = VehicleType.Local;
         private BarrierType _coneType = BarrierType.SmallCone;
         private RedirectTrafficType _type = RedirectTrafficType.Lane;
+        private bool _enableRedirectionArrow = true;
+        private float _offset;
 
         public RedirectTrafficDispatcher(IGame game, ILogger logger, ISettingsManager settingsManager)
             : base(game, logger)
@@ -54,6 +57,20 @@ namespace AutomaticRoadblocks.RedirectTraffic
         }
 
         /// <inheritdoc />
+        public bool EnableRedirectionArrow
+        {
+            get => _enableRedirectionArrow;
+            set => UpdateRedirectArrow(value);
+        }
+
+        /// <inheritdoc />
+        public float Offset
+        {
+            get => _offset;
+            set => UpdateOffset(value);
+        }
+
+        /// <inheritdoc />
         protected override bool IsHologramPreviewEnabled => _settingsManager.RedirectTrafficSettings.EnablePreview;
 
         /// <inheritdoc />
@@ -77,7 +94,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
             if (redirectTraffic == null)
             {
                 redirectTraffic = CreateInstance(LastDeterminedRoad ?? CalculateNewLocationForInstance());
-                Logger.Info($"Created redirect traffic {redirectTraffic}");
 
                 lock (Instances)
                 {
@@ -85,7 +101,20 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 }
             }
 
-            Game.NewSafeFiber(() => { redirectTraffic.Spawn(); }, "RedirectTrafficDispatcher.DispatchRedirection");
+            Game.NewSafeFiber(() =>
+            {
+                Logger.Trace($"Spawning traffic redirection {redirectTraffic}");
+                var success = redirectTraffic.Spawn();
+
+                if (success)
+                {
+                    Logger.Info($"Traffic redirection has been spawned with success, {redirectTraffic}");
+                }
+                else
+                {
+                    Logger.Warn($"Traffic redirection was unable to be spawned correctly, {redirectTraffic}");
+                }
+            }, "RedirectTrafficDispatcher.DispatchRedirection");
         }
 
         /// <inheritdoc />
@@ -100,9 +129,27 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         protected override RedirectTraffic CreateInstance(Road road)
         {
-            Logger.Debug(
+            Logger.Trace(
                 $"Creating a redirect traffic instance for {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(Type)}: {Type}, {nameof(ConeDistance)}: {ConeDistance}");
-            return new RedirectTraffic(road, VehicleType, ConeType, Type, ConeDistance);
+            var redirectTraffic = new RedirectTraffic(new RedirectTraffic.Request
+            {
+                Road = road,
+                VehicleType = VehicleType,
+                ConeType = ConeType,
+                Type = Type,
+                ConeDistance = ConeDistance,
+                EnableRedirectionArrow = EnableRedirectionArrow,
+                EnableLights = ShouldAddLights(),
+                Offset = Offset
+            });
+            Logger.Debug($"Created redirect traffic {redirectTraffic}");
+            return redirectTraffic;
+        }
+
+        private bool ShouldAddLights()
+        {
+            return _settingsManager.RedirectTrafficSettings.EnableLights &&
+                   GameUtils.TimePeriod is ETimePeriod.Evening or ETimePeriod.Night;
         }
 
         private void UpdateConeDistance(float newDistance)
@@ -126,6 +173,19 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private void UpdateType(RedirectTrafficType value)
         {
             _type = value;
+            DoInternalPreviewCreation(true);
+        }
+
+
+        private void UpdateRedirectArrow(bool value)
+        {
+            _enableRedirectionArrow = value;
+            DoInternalPreviewCreation(true);
+        }
+
+        private void UpdateOffset(float offset)
+        {
+            _offset = offset;
             DoInternalPreviewCreation(true);
         }
 

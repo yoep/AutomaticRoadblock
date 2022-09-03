@@ -11,7 +11,7 @@ namespace AutomaticRoadblocks.Instances
         private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
         private readonly Func<Vector3, float, IARInstance<Entity>> _factory;
 
-        public InstanceSlot(EntityType type, Vector3 position, float heading, Func<Vector3, float, IARInstance<Entity>> factory)
+        public InstanceSlot(EEntityType type, Vector3 position, float heading, Func<Vector3, float, IARInstance<Entity>> factory)
         {
             Assert.NotNull(type, "type cannot be null");
             Assert.NotNull(position, "position cannot be null");
@@ -27,7 +27,7 @@ namespace AutomaticRoadblocks.Instances
         /// <summary>
         /// Get the slot entity type.
         /// </summary>
-        public EntityType Type { get; }
+        public EEntityType Type { get; }
 
         /// <summary>
         /// The position of the entity.
@@ -48,7 +48,7 @@ namespace AutomaticRoadblocks.Instances
         /// <summary>
         /// The state of the instance slot.
         /// </summary>
-        public InstanceState State { get; private set; } = InstanceState.Inactive;
+        public EInstanceState State { get; private set; } = EInstanceState.Inactive;
 
         /// <summary>
         /// Verify if the slot instance is invalidated by the game engine.
@@ -63,31 +63,32 @@ namespace AutomaticRoadblocks.Instances
         /// <summary>
         /// Spawn the entity if it's not already spawned.
         /// </summary>
-        public void Spawn()
+        public bool Spawn()
         {
             if (Instance != null)
-                return;
+                return !Instance.IsInvalid;
 
-            State = InstanceState.Spawning;
+            State = EInstanceState.Spawning;
 
             try
             {
                 var instance = _factory.Invoke(Position, Heading);
-                State = InstanceState.Spawned;
+                State = EInstanceState.Spawned;
 
                 if (instance != null)
                 {
                     Instance = instance;
-                    return;
+                    return Instance.GameInstance.IsValid();
                 }
             }
             catch (Exception ex)
             {
                 _logger.Error($"Failed to create instance slot, {ex.Message}", ex);
-                State = InstanceState.Error;
+                State = EInstanceState.Error;
             }
 
             _logger.Warn($"Created a 'null' instance for {GetType().FullName}: {this}");
+            return false;
         }
 
         public override string ToString()

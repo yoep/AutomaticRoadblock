@@ -6,7 +6,7 @@ namespace AutomaticRoadblocks.Utils.Road
     /// Defines the road types on which can be searched.
     /// </summary>
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public enum RoadType
+    public enum ERoadType
     {
         All = 0,
         MajorRoads = 1,

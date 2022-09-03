@@ -23,7 +23,7 @@ namespace AutomaticRoadblocks.Roadblock
     {
         protected const float SpeedLimit = 5f;
         protected const float LaneHeadingTolerance = 40f;
-        protected const int BlipFlashDuration = 3000;
+        protected const int BlipFlashDuration = 3500;
         protected const float AdditionalClippingSpace = 0.5f;
 
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
@@ -42,13 +42,15 @@ namespace AutomaticRoadblocks.Roadblock
         /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
         /// <param name="limitSpeed">Indicates if a speed limit should be added.</param>
         /// <param name="addLights">Indicates if light props should be added.</param>
-        internal AbstractRoadblock(Road road, BarrierType mainBarrierType, float targetHeading, bool limitSpeed, bool addLights)
+        /// <param name="offset">The offset placement in regards to the road node.</param>
+        internal AbstractRoadblock(Road road, BarrierType mainBarrierType, float targetHeading, bool limitSpeed, bool addLights, float offset = 0f)
         {
             Assert.NotNull(road, "road cannot be null");
             Assert.NotNull(mainBarrierType, "mainBarrierType cannot be null");
             Road = road;
             MainBarrierType = mainBarrierType;
             TargetHeading = targetHeading;
+            Offset = offset;
             IsSpeedLimitEnabled = limitSpeed;
             IsLightsEnabled = addLights;
         }
@@ -64,10 +66,15 @@ namespace AutomaticRoadblocks.Roadblock
         public abstract RoadblockLevel Level { get; }
 
         /// <inheritdoc />
-        public RoadblockState State { get; private set; } = RoadblockState.Preparing;
+        public ERoadblockState State { get; private set; } = ERoadblockState.Preparing;
 
         /// <inheritdoc />
         public Vector3 Position => Road.Position;
+        
+        /// <summary>
+        /// The offset position for the roadblock.
+        /// </summary>
+        public Vector3 OffsetPosition => Road.Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading) * Offset;
 
         /// <inheritdoc />
         public float Heading { get; private set; }
@@ -84,6 +91,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// Get the target heading of the roadblock.
         /// </summary>
         protected float TargetHeading { get; }
+
+        /// <summary>
+        /// The placement offset in regards to the node.
+        /// </summary>
+        public float Offset { get; }
 
         /// <summary>
         /// Get the generated slots for this roadblock.
@@ -137,7 +149,7 @@ namespace AutomaticRoadblocks.Roadblock
                 {
                     foreach (var ped in RetrieveCopsJoiningThePursuit())
                     {
-                        GameUtils.CreateMarker(ped.Position, MarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, false);
+                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, false);
                     }
 
                     Game.FiberYield();
@@ -161,7 +173,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public void Dispose()
         {
-            UpdateState(RoadblockState.Disposing);
+            UpdateState(ERoadblockState.Disposing);
 
             if (IsPreviewActive)
                 DeletePreview();
@@ -171,7 +183,7 @@ namespace AutomaticRoadblocks.Roadblock
             Slots.ToList().ForEach(x => x.Dispose());
             Instances.ForEach(x => x.Dispose());
 
-            UpdateState(RoadblockState.Disposed);
+            UpdateState(ERoadblockState.Disposed);
         }
 
         #endregion
@@ -181,23 +193,27 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Spawn the roadblock in the world.
         /// </summary>
-        public virtual void Spawn()
+        public virtual bool Spawn()
         {
+            var result = false;
+            
             try
             {
                 Logger.Trace("Spawning roadblock");
 
                 Slots.ToList().ForEach(x => x.Spawn());
-                Instances.ForEach(x => x.Spawn());
-                UpdateState(RoadblockState.Active);
+                result = Instances.All(x => x.Spawn());
+                UpdateState(ERoadblockState.Active);
 
                 CreateBlip();
             }
             catch (Exception ex)
             {
                 Logger.Error("Failed to spawn roadblock", ex);
-                UpdateState(RoadblockState.Error);
+                UpdateState(ERoadblockState.Error);
             }
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -205,11 +221,12 @@ namespace AutomaticRoadblocks.Roadblock
         {
             // verify if the roadblock is still active
             // otherwise, we cannot release the entities
-            if (State != RoadblockState.Active)
+            if (State != ERoadblockState.Active)
                 return;
 
             InvokeCopsJoiningPursuit();
             ReleaseEntitiesToLspdfr();
+            UpdateState(ERoadblockState.Released);
         }
 
         /// <inheritdoc />
@@ -271,7 +288,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// Update the state of the roadblock.
         /// </summary>
         /// <param name="state">The new state of the roadblock.</param>
-        protected void UpdateState(RoadblockState state)
+        protected void UpdateState(ERoadblockState state)
         {
             if (State == state)
                 return;
@@ -368,7 +385,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             try
             {
-                _speedZoneId = RoadUtils.CreateSpeedZone(Position, 10f, SpeedLimit);
+                _speedZoneId = RoadUtils.CreateSpeedZone(OffsetPosition, 10f, SpeedLimit);
             }
             catch (Exception ex)
             {
@@ -387,8 +404,8 @@ namespace AutomaticRoadblocks.Roadblock
             if (Blip != null)
                 return;
 
-            Logger.Trace("Creating roadblock blip");
-            Blip = new Blip(Position)
+            Logger.Trace($"Creating roadblock blip at {OffsetPosition}");
+            Blip = new Blip(OffsetPosition)
             {
                 IsRouteEnabled = false,
                 IsFriendly = true,
@@ -452,10 +469,10 @@ namespace AutomaticRoadblocks.Roadblock
                 }
 
                 // move the current slot vehicle position by the difference
-                var newPosition = currentSlot.Position + MathHelper.ConvertHeadingToDirection(Heading - 90) *
+                var newPosition = currentSlot.OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading - 90) *
                     (Math.Abs(currentSlotDifference) + AdditionalClippingSpace);
                 Logger.Debug(
-                    $"Slot vehicle is clipping into next slot by ({currentSlotDifference}), old position {currentSlot.Position}, new position {newPosition}");
+                    $"Slot vehicle is clipping into next slot by ({currentSlotDifference}), old position {currentSlot.OffsetPosition}, new position {newPosition}");
                 currentSlot.ModifyVehiclePosition(newPosition);
             }
         }

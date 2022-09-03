@@ -42,7 +42,7 @@ namespace AutomaticRoadblocks.LightSources
 
             for (var i = 0; i < totalWarning; i++)
             {
-                instances.Add(new InstanceSlot(EntityType.Scenery, startPosition, roadblockSlot.Heading,
+                instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, roadblockSlot.Heading,
                     (position, heading) => new ARScenery(propFactory.Invoke(position, heading + Random.Next(360)))));
                 startPosition += direction * spacing;
             }
@@ -62,7 +62,7 @@ namespace AutomaticRoadblocks.LightSources
 
         private static Vector3 CalculateRowPosition(IRoadblockSlot roadblockSlot)
         {
-            return roadblockSlot.Position + MathHelper.ConvertHeadingToDirection(roadblockSlot.Heading - 180) * 2f;
+            return roadblockSlot.OffsetPosition + MathHelper.ConvertHeadingToDirection(roadblockSlot.Heading - 180) * 2f;
         }
     }
 }

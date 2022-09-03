@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
     public class PursuitRoadblockSlotLevel2 : AbstractPursuitRoadblockSlot
     {
         internal PursuitRoadblockSlotLevel2(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
-            : base(lane, barrierType, VehicleType.Locale, heading, targetVehicle, shouldAddLights)
+            : base(lane, barrierType, VehicleType.Local, heading, targetVehicle, shouldAddLights)
         {
         }
 
@@ -33,7 +33,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
             for (var i = 0; i < totalOccupants; i++)
             {
-                Instances.Add(new InstanceSlot(EntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), Heading - 180,
+                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), Heading - 180,
                     (position, heading) => PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading))));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }

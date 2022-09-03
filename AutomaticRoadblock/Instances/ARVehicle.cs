@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.Instances
             GameInstance.IsRecordingCollisions = recordCollisions;
             GameInstance.IsEngineOn = true;
             GameInstance.IsSirenOn = true;
-            EntityUtils.VehicleLights(GameInstance, VehicleLightState.AlwaysOn);
+            EntityUtils.VehicleLights(GameInstance, EVehicleLightState.AlwaysOn);
         }
         
         #region Properties

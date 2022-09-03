@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Roadblock.Menu
         public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.CleanAllRoadblocks);
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.Pursuit;
+        public EMenuType Type => EMenuType.Pursuit;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;

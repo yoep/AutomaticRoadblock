@@ -18,6 +18,7 @@ namespace AutomaticRoadblocks.Pursuit
     public class PursuitManager : IPursuitManager
     {
         private const int TimeBetweenLevelIncreaseShotsFired = 20 * 1000;
+        private const int TimeAfterLastDeploymentBeforeIncreasingLevel = 10 * 1000;
 
         private readonly ILogger _logger;
         private readonly IGame _game;
@@ -65,7 +66,26 @@ namespace AutomaticRoadblocks.Pursuit
         public bool IsPursuitActive => PursuitHandle != null && Functions.IsPursuitStillRunning(PursuitHandle);
 
         /// <inheritdoc />
-        public bool IsPursuitOnFoot
+        public EPursuitState State { get; private set; } = EPursuitState.Inactive;
+
+        /// <inheritdoc />
+        public PursuitLevel PursuitLevel
+        {
+            get => _pursuitLevel;
+            set
+            {
+                _pursuitLevel = value;
+                _timeLastLevelChanged = _game.GameTime;
+                _logger.Debug($"Pursuit level has changed to {value}");
+            }
+        }
+
+        /// <summary>
+        /// Verify if the pursuit is on foot and not anymore in vehicles.
+        /// This means that all of the suspects are not in a vehicle anymore.
+        /// </summary>
+        /// <exception cref="NoPursuitActiveException">Is thrown when this property is called and <see cref="IsPursuitActive"/> is false.</exception>
+        private bool IsPursuitOnFoot
         {
             get
             {
@@ -79,15 +99,21 @@ namespace AutomaticRoadblocks.Pursuit
             }
         }
 
-        /// <inheritdoc />
-        public PursuitLevel PursuitLevel
+        /// <summary>
+        /// Verify if the visual on all suspects has been lost.
+        /// </summary>
+        /// <exception cref="NoPursuitActiveException">Is thrown when this property is called and <see cref="IsPursuitActive"/> is false.</exception>
+        private bool IsPursuitVisualLost
         {
-            get => _pursuitLevel;
-            set
+            get
             {
-                _pursuitLevel = value;
-                _timeLastLevelChanged = _game.GameTime;
-                _logger.Debug($"Pursuit level has changed to {value}");
+                if (!IsPursuitActive)
+                {
+                    throw new NoPursuitActiveException();
+                }
+
+                return Functions.GetPursuitPeds(PursuitHandle)
+                    .All(Functions.IsPedVisualLost);
             }
         }
 
@@ -216,6 +242,9 @@ namespace AutomaticRoadblocks.Pursuit
             _roadblockDispatcher.RoadblockCopsJoiningPursuit += RoadblockCopsJoiningPursuit;
             PursuitHandle = pursuitHandle;
 
+            // check in which state the pursuit is started
+            UpdateState(IsPursuitOnFoot ? EPursuitState.ActiveOnFoot : EPursuitState.ActiveChase);
+
             // only reset the pursuit level if automatic level increases is enabled
             // otherwise, leave it at the current level
             if (EnableAutomaticLevelIncreases)
@@ -228,7 +257,9 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void PursuitEnded(LHandle handle)
         {
+            _logger.Debug("Pursuit has ended, cleaning up any remaining pursuit roadblocks");
             PursuitHandle = null;
+            UpdateState(EPursuitState.Inactive);
             _roadblockDispatcher.RoadblockCopKilled -= RoadblockCopKilled;
             _roadblockDispatcher.DismissActiveRoadblocks();
 
@@ -241,8 +272,8 @@ namespace AutomaticRoadblocks.Pursuit
             {
                 while (IsPursuitActive)
                 {
+                    DoStateVerificationTick();
                     DoAutoLevelIncrementTick();
-                    DoLevelIncreaseTick();
                     DoDispatchTick();
 
                     _game.FiberYield();
@@ -250,15 +281,37 @@ namespace AutomaticRoadblocks.Pursuit
             }, "PursuitManager.PursuitMonitor");
         }
 
+        private void DoStateVerificationTick()
+        {
+            if (!IsPursuitActive)
+            {
+                UpdateState(EPursuitState.Inactive);
+            }
+            else if (IsPursuitOnFoot)
+            {
+                UpdateState(EPursuitState.ActiveOnFoot);
+            }
+            else if (IsPursuitVisualLost)
+            {
+                UpdateState(EPursuitState.ActiveVisualLost);
+            }
+            else
+            {
+                UpdateState(EPursuitState.ActiveChase);
+            }
+        }
+
         private void DoAutoLevelIncrementTick()
         {
-            // verify if automatic level increases is allowed
-            // if not, we're not going to check any conditions
-            if (!EnableAutomaticLevelIncreases)
+            // verify if automatic level increases is disabled
+            // or the pursuit is not anymore in the preferred state
+            // if so, skip the condition checking
+            if (!EnableAutomaticLevelIncreases || State != EPursuitState.ActiveChase)
                 return;
 
             VerifyPursuitLethalForce();
             VerifyShotsFired();
+            DoLevelIncreaseTick();
         }
 
         private void VerifyPursuitLethalForce()
@@ -281,7 +334,7 @@ namespace AutomaticRoadblocks.Pursuit
         {
             if (!IsPursuitActive)
                 return;
-            
+
             if (IsAnySuspectAimingOrShooting() && IsAutomaticLevelIncreaseForShotsFiredAllowed())
             {
                 _logger.Debug("Suspect is shooting/aiming, increasing level");
@@ -329,10 +382,9 @@ namespace AutomaticRoadblocks.Pursuit
 
         private bool IsAutomaticLevelIncreaseAllowed()
         {
-            return EnableAutomaticLevelIncreases &&
-                   HasAtLeastDeployedXRoadblocks() &&
+            return HasAtLeastDeployedXRoadblocks() &&
                    HasEnoughTimePassedBetweenLastLevelIncrease() &&
-                   !IsPursuitOnFoot;
+                   HasEnoughTimePassedAfterLastDeployment();
         }
 
         private bool DoDispatch(Vehicle vehicle, bool userRequested, bool force, bool atCurrentLocation)
@@ -390,9 +442,9 @@ namespace AutomaticRoadblocks.Pursuit
                    Functions.GetPursuitPeds(PursuitHandle).Any(x => !Functions.IsPedVisualLost(x));
         }
 
-        private void RoadblockStateChanged(IRoadblock roadblock, RoadblockState newState)
+        private void RoadblockStateChanged(IRoadblock roadblock, ERoadblockState newState)
         {
-            if (newState == RoadblockState.Active)
+            if (newState == ERoadblockState.Active)
                 _timeLastRoadblockActive = _game.GameTime;
         }
 
@@ -425,9 +477,23 @@ namespace AutomaticRoadblocks.Pursuit
 
         private bool HasEnoughTimePassedBetweenLastLevelIncrease()
         {
-            var gameTime = _game.GameTime;
+            return _game.GameTime - _timeLastLevelChanged > _settingsManager.AutomaticRoadblocksSettings.TimeBetweenAutoLevelIncrements * 1000;
+        }
 
-            return gameTime - _timeLastLevelChanged > _settingsManager.AutomaticRoadblocksSettings.TimeBetweenAutoLevelIncrements * 1000;
+        private bool HasEnoughTimePassedAfterLastDeployment()
+        {
+            // this check should prevent the level from being increased directly after a roadblock has been spawned
+            return _game.GameTime - _timeLastDispatchedRoadblock > TimeAfterLastDeploymentBeforeIncreasingLevel;
+        }
+
+        private void OnStateChanged()
+        {
+            // verify if the state changed to on foot
+            // if not, ignore the state change as nothing is applied
+            if (State != EPursuitState.ActiveOnFoot)
+                return;
+            
+            _roadblockDispatcher.DismissActiveRoadblocks();
         }
 
         private void StartKeyListener()
@@ -453,8 +519,19 @@ namespace AutomaticRoadblocks.Pursuit
                         _logger.Error($"An error occurred while processing the pursuit manager key listener, {ex.Message}", ex);
                     }
                 }
+
                 _logger.Debug("Pursuit manager key listener has been stopped");
             }, "PursuitManager.KeyListener");
+        }
+
+        private void UpdateState(EPursuitState newState)
+        {
+            if (State == newState)
+                return;
+
+            State = newState;
+            _logger.Info($"Pursuit state has changed to {State}");
+            OnStateChanged();
         }
 
         [Conditional("DEBUG")]

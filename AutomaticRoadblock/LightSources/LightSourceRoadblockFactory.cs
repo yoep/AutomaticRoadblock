@@ -20,9 +20,9 @@ namespace AutomaticRoadblocks.LightSources
 
             return new List<InstanceSlot>
             {
-                new(EntityType.Scenery, roadRightSidePosition, MathHelper.ConvertDirectionToHeading(targetPosition - roadRightSidePosition),
+                new(EEntityType.Scenery, roadRightSidePosition, MathHelper.ConvertDirectionToHeading(targetPosition - roadRightSidePosition),
                     (position, heading) => new ARScenery(PropUtils.CreateGeneratorWithLights(position, heading))),
-                new(EntityType.Scenery, roadLeftSidePosition, MathHelper.ConvertDirectionToHeading(targetPosition - roadLeftSidePosition),
+                new(EEntityType.Scenery, roadLeftSidePosition, MathHelper.ConvertDirectionToHeading(targetPosition - roadLeftSidePosition),
                     (position, heading) => new ARScenery(PropUtils.CreateGeneratorWithLights(position, heading)))
             };
         }
@@ -44,10 +44,10 @@ namespace AutomaticRoadblocks.LightSources
 
                 instances.AddRange(new List<InstanceSlot>
                 {
-                    new(EntityType.Scenery, roadRightSidePosition, roadblock.Heading,
+                    new(EEntityType.Scenery, roadRightSidePosition, roadblock.Heading,
                         (position, _) =>
                             new ARScenery(unmodifiedCount % 2 == 0 ? PropUtils.CreateBlueStandingGroundLight(position) : PropUtils.CreateRedStandingGroundLight(position))),
-                    new(EntityType.Scenery, roadLeftSidePosition, roadblock.Heading,
+                    new(EEntityType.Scenery, roadLeftSidePosition, roadblock.Heading,
                         (position, _) =>
                             new ARScenery(unmodifiedCount % 2 == 0 ? PropUtils.CreateBlueStandingGroundLight(position) : PropUtils.CreateRedStandingGroundLight(position)))
                 });
@@ -74,9 +74,9 @@ namespace AutomaticRoadblocks.LightSources
 
                 instances.AddRange(new List<InstanceSlot>
                 {
-                    new(EntityType.Scenery, roadRightSidePosition, roadblock.Heading,
+                    new(EEntityType.Scenery, roadRightSidePosition, roadblock.Heading,
                         (position, heading) => new ARScenery(PropUtils.CreateConeWithLight(position, heading + 25))),
-                    new(EntityType.Scenery, roadLeftSidePosition, roadblock.Heading,
+                    new(EEntityType.Scenery, roadLeftSidePosition, roadblock.Heading,
                         (position, heading) => new ARScenery(PropUtils.CreateConeWithLight(position, heading - 25)))
                 });
 

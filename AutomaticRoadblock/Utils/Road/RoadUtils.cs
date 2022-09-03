@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="position">Set the position to use as reference.</param>
         /// <param name="roadType">Set the road type.</param>
         /// <returns>Returns the position of the closest road.</returns>
-        public static Road FindClosestRoad(Vector3 position, RoadType roadType)
+        public static Road FindClosestRoad(Vector3 position, ERoadType roadType)
         {
             Road closestRoad = null;
             var closestRoadDistance = 99999f;
@@ -48,7 +48,7 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="distance">The distance to traverse.</param>
         /// <param name="roadType">The road types to follow.</param>
         /// <returns>Returns the found round traversed from the start position.</returns>
-        public static Road FindRoadTraversing(Vector3 position, float heading, float distance, VehicleNodeType roadType)
+        public static Road FindRoadTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType)
         {
             FindVehicleNodesWhileTraversing(position, heading, distance, roadType, out var lastFoundNode);
             return DiscoverRoad(lastFoundNode);
@@ -62,7 +62,7 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="distance">The distance to traverse.</param>
         /// <param name="roadType">The road types to follow.</param>
         /// <returns>Returns the roads found while traversing the distance.</returns>
-        public static ICollection<Road> FindRoadsTraversing(Vector3 position, float heading, float distance, VehicleNodeType roadType)
+        public static ICollection<Road> FindRoadsTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType)
         {
             var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, out _);
 
@@ -77,7 +77,7 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <param name="position">Set the position to use as reference.</param>
         /// <param name="roadType">Set the road type.</param>
         /// <returns>Returns the position of the closest road.</returns>
-        public static IEnumerable<Road> FindNearbyRoads(Vector3 position, RoadType roadType)
+        public static IEnumerable<Road> FindNearbyRoads(Vector3 position, ERoadType roadType)
         {
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(roadType, "roadType cannot be null");
@@ -150,27 +150,27 @@ namespace AutomaticRoadblocks.Utils.Road
 
         #region Functions
 
-        private static VehicleNodeType Convert(RoadType roadType)
+        private static EVehicleNodeType Convert(ERoadType roadType)
         {
             return roadType switch
             {
-                RoadType.MajorRoads => VehicleNodeType.MainRoads,
-                RoadType.MajorRoadsNoJunction => VehicleNodeType.AllRoadNoJunctions,
-                _ => VehicleNodeType.AllNodes
+                ERoadType.MajorRoads => EVehicleNodeType.MainRoads,
+                ERoadType.MajorRoadsNoJunction => EVehicleNodeType.AllRoadNoJunctions,
+                _ => EVehicleNodeType.AllNodes
             };
         }
 
-        private static RoadType Convert(VehicleNodeType nodeType)
+        private static ERoadType Convert(EVehicleNodeType nodeType)
         {
             return nodeType switch
             {
-                VehicleNodeType.MainRoads => RoadType.MajorRoadsNoJunction,
-                VehicleNodeType.MainRoadsWithJunctions => RoadType.MajorRoads,
-                _ => RoadType.All
+                EVehicleNodeType.MainRoads => ERoadType.MajorRoadsNoJunction,
+                EVehicleNodeType.MainRoadsWithJunctions => ERoadType.MajorRoads,
+                _ => ERoadType.All
             };
         }
 
-        private static NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, VehicleNodeType nodeType, RoadType roadType)
+        private static NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, EVehicleNodeType nodeType, ERoadType roadType)
         {
             Logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading}");
             FindVehicleNodes(position, nodeType, roadType, out var node1, out var node2);
@@ -190,7 +190,7 @@ namespace AutomaticRoadblocks.Utils.Road
             return nodeMatchingClosestToHeading;
         }
 
-        private static List<NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, VehicleNodeType nodeType,
+        private static List<NodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float distance, EVehicleNodeType nodeType,
             out NodeInfo lastFoundNode)
         {
             var startedAt = DateTime.Now.Ticks;
@@ -237,7 +237,7 @@ namespace AutomaticRoadblocks.Utils.Road
             return nodeInfos;
         }
 
-        private static void FindVehicleNodes(Vector3 position, VehicleNodeType nodeType, RoadType roadType, out NodeInfo node1, out NodeInfo node2)
+        private static void FindVehicleNodes(Vector3 position, EVehicleNodeType nodeType, ERoadType roadType, out NodeInfo node1, out NodeInfo node2)
         {
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(nodeType, "roadType cannot be null");
@@ -245,7 +245,7 @@ namespace AutomaticRoadblocks.Utils.Road
                 out int numberOfLanes1, out int numberOfLanes2, out float junctionIndication, (int)roadType);
             Logger.Trace(
                 $"Found road with Position 1: {roadPosition1}, Position 2: {roadPosition2}, numberOfLanes1: {numberOfLanes1}, numberOfLanes2: {numberOfLanes2}, junctionIndication: {junctionIndication}\n" +
-                $"Based on Position: {position}, {nameof(RoadType)}: {roadType}");
+                $"Based on Position: {position}, {nameof(ERoadType)}: {roadType}");
 
             var vehicleNode1 = FindVehicleNode(roadPosition1, nodeType);
             var vehicleNode2 = FindVehicleNode(roadPosition2, nodeType);
@@ -317,7 +317,7 @@ namespace AutomaticRoadblocks.Utils.Road
             for (var index = 1; index <= numberOfLanes; index++)
             {
                 var laneLeftPosition = lastRightPosition + moveDirection * laneWidth;
-                var vehicleNode = FindVehicleNode(lastRightPosition, VehicleNodeType.AllNodes);
+                var vehicleNode = FindVehicleNode(lastRightPosition, EVehicleNodeType.AllNodes);
                 var heading = isOpposite ? OppositeHeading(rightSideHeading) : rightSideHeading;
 
                 lanes.Add(new Road.Lane
@@ -347,7 +347,7 @@ namespace AutomaticRoadblocks.Utils.Road
             return roadPosition + directionOfTheSideToFix * widthOtherSide;
         }
 
-        private static NodeInfo FindVehicleNode(Vector3 position, VehicleNodeType type)
+        private static NodeInfo FindVehicleNode(Vector3 position, EVehicleNodeType type)
         {
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(type, "type cannot be null");

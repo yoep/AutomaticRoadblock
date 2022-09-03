@@ -27,7 +27,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         public UIMenuItem MenuItem { get; }
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.Pursuit;
+        public EMenuType Type => EMenuType.Pursuit;
 
         /// <inheritdoc />
         public bool IsAutoClosed => true;

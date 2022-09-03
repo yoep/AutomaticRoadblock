@@ -29,23 +29,24 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         #region Methods
 
-        public override void Spawn()
+        public override bool Spawn()
         {
-            base.Spawn();
+            var result = base.Spawn();
             var vehicle = Instances
-                .Where(x => x.Type == EntityType.CopVehicle)
+                .Where(x => x.Type == EEntityType.CopVehicle)
                 .Select(x => x.Instance)
                 .Select(x => (ARVehicle)x)
                 .Select(x => x.GameInstance)
                 .First();
 
             Instances
-                .Where(x => x.Type == EntityType.CopPed)
+                .Where(x => x.Type == EEntityType.CopPed)
                 .Select(x => x.Instance)
                 .Select(x => (ARPed)x)
                 .Select(x => x.GameInstance)
                 .ToList()
                 .ForEach(x => x.WarpIntoVehicle(vehicle, (int)VehicleSeat.Any));
+            return result;
         }
 
         #endregion
@@ -79,7 +80,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 2f;
 
-            Instances.Add(new InstanceSlot(EntityType.Scenery, position, 0f,
+            Instances.Add(new InstanceSlot(EEntityType.Scenery, position, 0f,
                 (conePosition, _) => BarrierFactory.Create(BarrierType.BigCone, conePosition)));
         }
 
@@ -107,16 +108,16 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             // only the chase vehicle will join the pursuit
             return Instances
-                .Where(x => x.Type == EntityType.CopPed)
+                .Where(x => x.Type == EEntityType.CopPed)
                 .Select(x => x.Instance)
                 .Select(x => (ARPed)x)
                 .Select(x => x.GameInstance)
                 .ToList();
         }
 
-        private void StateChanged(IRoadblock roadblock, RoadblockState newState)
+        private void StateChanged(IRoadblock roadblock, ERoadblockState newState)
         {
-            if (newState is RoadblockState.Bypassed or RoadblockState.Hit)
+            if (newState is ERoadblockState.Bypassed or ERoadblockState.Hit)
                 RoadblockHelpers.ReleaseInstancesToLspdfr(Instances, Vehicle);
         }
 

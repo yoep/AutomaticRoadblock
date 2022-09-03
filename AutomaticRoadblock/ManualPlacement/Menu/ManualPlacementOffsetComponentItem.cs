@@ -3,25 +3,25 @@ using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using RAGENativeUI.Elements;
 
-namespace AutomaticRoadblocks.RedirectTraffic.Menu
+namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class RedirectTrafficConeDistanceComponentItem : IMenuComponent<UIMenuNumericScrollerItem<double>>
+    public class ManualPlacementOffsetComponentItem : IMenuComponent<UIMenuNumericScrollerItem<double>>
     {
-        private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
+        private readonly IManualPlacement _manualPlacement;
 
-        public RedirectTrafficConeDistanceComponentItem(IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
+        public ManualPlacementOffsetComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
         {
-            _redirectTrafficDispatcher = redirectTrafficDispatcher;
+            _manualPlacement = manualPlacement;
 
             MenuItem = new UIMenuNumericScrollerItem<double>(
-                localizer[LocalizationKey.RedirectTrafficConeDistance], localizer[LocalizationKey.RedirectTrafficConeDistanceDescription], 0.5f, 30f, 0.5f);
+                localizer[LocalizationKey.Offset], localizer[LocalizationKey.OffsetDescription], -10f, 10f, 0.1f);
         }
 
         /// <inheritdoc />
         public UIMenuNumericScrollerItem<double> MenuItem { get; }
 
         /// <inheritdoc />
-        public EMenuType Type => EMenuType.RedirectTraffic;
+        public EMenuType Type => EMenuType.ManualPlacement;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;
@@ -36,13 +36,13 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            MenuItem.Value = _redirectTrafficDispatcher.ConeDistance;
+            MenuItem.Value = _manualPlacement.Offset;
             MenuItem.IndexChanged += ValueChanged;
         }
 
         private void ValueChanged(UIMenuScrollerItem sender, int oldIndex, int newIndex)
         {
-            _redirectTrafficDispatcher.ConeDistance = (float)MenuItem.Value;
+            _manualPlacement.Offset = (float)MenuItem.Value;
         }
     }
 }

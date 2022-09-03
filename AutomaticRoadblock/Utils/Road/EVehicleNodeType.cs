@@ -1,6 +1,6 @@
 namespace AutomaticRoadblocks.Utils.Road
 {
-    public enum VehicleNodeType
+    public enum EVehicleNodeType
     {
         /// <summary>
         /// Main roads, include junctions

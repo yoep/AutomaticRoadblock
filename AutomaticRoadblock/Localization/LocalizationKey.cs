@@ -6,6 +6,7 @@ namespace AutomaticRoadblocks.Localization
     {
         #region Menu
 
+        public static readonly LocalizationKey MenuMode = new(nameof(MenuMode), "MenuMode");
         public static readonly LocalizationKey MenuTitle = new(nameof(MenuTitle), "Automatic Roadblocks");
         public static readonly LocalizationKey MenuSubtitle = new(nameof(MenuSubtitle), "Dispatch roadblocks");
         public static readonly LocalizationKey MenuPursuit = new(nameof(MenuPursuit), "Pursuit");
@@ -57,6 +58,9 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey CleanRoadblockPlacementDescription =
             new(nameof(CleanRoadblockPlacementDescription), "Remove one or more placed roadblocks based on the selected criteria");
 
+        public static readonly LocalizationKey Offset = new(nameof(Offset), "Offset");
+        public static readonly LocalizationKey OffsetDescription = new(nameof(OffsetDescription), "The offset of the placement in regards to the vehicle node");
+
         #endregion
 
         #region Redirect traffic
@@ -73,6 +77,7 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly LocalizationKey RedirectTrafficType = new(nameof(RedirectTrafficType), "Redirect");
         public static readonly LocalizationKey RedirectTrafficTypeDescription = new(nameof(RedirectTrafficTypeDescription), "Place a traffic redirection on");
+        public static readonly LocalizationKey RedirectTrafficEnableRedirectionArrow = new(nameof(RedirectTrafficEnableRedirectionArrow), "Redirect arrow");
 
         #endregion
 
@@ -92,18 +97,17 @@ namespace AutomaticRoadblocks.Localization
 
         #region VehicleType
 
-        public static readonly LocalizationKey VehicleTypeLocale = new(nameof(VehicleTypeLocale), "Locale");
+        public static readonly LocalizationKey VehicleTypeLocal = new(nameof(VehicleTypeLocal), "Local");
         public static readonly LocalizationKey VehicleTypeState = new(nameof(VehicleTypeState), "State");
         public static readonly LocalizationKey VehicleTypeFbi = new(nameof(VehicleTypeFbi), "FBI");
         public static readonly LocalizationKey VehicleTypeSwat = new(nameof(VehicleTypeSwat), "Swat");
         public static readonly LocalizationKey VehicleTypeTransporter = new(nameof(VehicleTypeTransporter), "Transporter");
-        public static readonly LocalizationKey VehicleTypeNone = new(nameof(VehicleTypeNone), "None");
 
         #endregion
 
         #region BarrierType
-        
-        public static readonly LocalizationKey BarrierTypeNone = new(nameof(BarrierTypeNone), "None");
+
+        public static readonly LocalizationKey None = new(nameof(None), "None");
         public static readonly LocalizationKey BarrierTypeSmallCone = new(nameof(BarrierTypeSmallCone), "Small cone");
         public static readonly LocalizationKey BarrierTypeSmallConeStriped = new(nameof(BarrierTypeSmallConeStriped), "Small cone striped");
         public static readonly LocalizationKey BarrierTypeBigCone = new(nameof(BarrierTypeBigCone), "Big cone");
@@ -111,6 +115,10 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey BarrierTypePoliceDoNotCross = new(nameof(BarrierTypePoliceDoNotCross), "Police do not cross");
         public static readonly LocalizationKey BarrierTypeWorkBarrierLarge = new(nameof(BarrierTypeWorkBarrierLarge), "Work barrier large");
         public static readonly LocalizationKey BarrierTypeWorkBarrierSmall = new(nameof(BarrierTypeWorkBarrierSmall), "Work barrier small");
+
+        public static readonly LocalizationKey BarrierTypeWorkBarrierSmallWithLight =
+            new(nameof(BarrierTypeWorkBarrierSmallWithLight), "Work barrier small light");
+
         public static readonly LocalizationKey BarrierTypeWorkBarrierWithSign = new(nameof(BarrierTypeWorkBarrierWithSign), "Work ahead sign");
         public static readonly LocalizationKey BarrierTypeWorkBarrierWithSignLight = new(nameof(BarrierTypeWorkBarrierWithSignLight), "Work ahead sign lights");
         public static readonly LocalizationKey BarrierTypeWorkBarrierHigh = new(nameof(BarrierTypeWorkBarrierHigh), "High barrier");
@@ -119,68 +127,86 @@ namespace AutomaticRoadblocks.Localization
 
         #endregion
 
+        #region LightType
+
+        public static readonly LocalizationKey Flares = new(nameof(Flares), "Flares");
+        public static readonly LocalizationKey Spots = new(nameof(Spots), "Spots");
+        public static readonly LocalizationKey Warning = new(nameof(Warning), "Warning");
+        public static readonly LocalizationKey Blue = new(nameof(Blue), "Blue");
+        public static readonly LocalizationKey Red = new(nameof(Red), "Red");
+
+        #endregion
+
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {
-            MenuTitle,
-            MenuSubtitle,
-            MenuPursuit,
-            MenuManualPlacement,
-            MenuRedirectTraffic,
-            EnableDuringPursuit,
-            EnableDuringPursuitDescription,
-            EnableAutoPursuitLevelIncrease,
-            EnableAutoPursuitLevelIncreaseDescription,
-            DispatchNow,
-            DispatchNowDescription,
-            PursuitLevel,
-            PursuitLevelDescription,
-            Place,
-            PlaceDescription,
             Barrier,
             BarrierDescription,
-            EnableCops,
-            EnableCopsDescription,
-            SpeedLimit,
-            SpeedLimitDescription,
-            Vehicle,
-            VehicleDescription,
-            LightSource,
-            LightSourceDescription,
-            BlockLanes,
-            BlockLanesDescription,
-            CleanRoadblockPlacement,
-            CleanRoadblockPlacementDescription,
-            RedirectTraffic,
-            RedirectTrafficDescription,
-            RedirectTrafficConeDistance,
-            RedirectTrafficConeDistanceDescription,
-            RedirectTrafficType,
-            RedirectTrafficTypeDescription,
-            RoadblockDispatchedAt,
-            RoadblockDispatchedAt,
-            RoadblockHasBeenHit,
-            RoadblockHasBeenBypassed,
-            RoadblockNoPursuitActive,
-            RoadblockInstanceCreationFailed,
-            VehicleTypeLocale,
-            VehicleTypeState,
-            VehicleTypeFbi,
-            VehicleTypeSwat,
-            VehicleTypeTransporter,
-            VehicleTypeNone,
-            BarrierTypeNone,
-            BarrierTypeSmallCone,
-            BarrierTypeSmallConeStriped,
+            BarrierTypeBarrelTrafficCatcher,
             BarrierTypeBigCone,
             BarrierTypeBigConeStriped,
+            BarrierTypeConeWithLight,
             BarrierTypePoliceDoNotCross,
+            BarrierTypeSmallCone,
+            BarrierTypeSmallConeStriped,
+            BarrierTypeWorkBarrierHigh,
             BarrierTypeWorkBarrierLarge,
             BarrierTypeWorkBarrierSmall,
             BarrierTypeWorkBarrierWithSign,
             BarrierTypeWorkBarrierWithSignLight,
-            BarrierTypeWorkBarrierHigh,
-            BarrierTypeBarrelTrafficCatcher,
-            BarrierTypeConeWithLight,
+            BlockLanes,
+            BlockLanesDescription,
+            Blue,
+            CleanRoadblockPlacement,
+            CleanRoadblockPlacementDescription,
+            DispatchNow,
+            DispatchNowDescription,
+            EnableAutoPursuitLevelIncrease,
+            EnableAutoPursuitLevelIncreaseDescription,
+            EnableCops,
+            EnableCopsDescription,
+            EnableDuringPursuit,
+            EnableDuringPursuitDescription,
+            Flares,
+            LightSource,
+            LightSourceDescription,
+            MenuManualPlacement,
+            MenuMode,
+            MenuPursuit,
+            MenuRedirectTraffic,
+            MenuSubtitle,
+            MenuTitle,
+            None,
+            Offset,
+            OffsetDescription,
+            Place,
+            PlaceDescription,
+            PursuitLevel,
+            PursuitLevelDescription,
+            Red,
+            RedirectTraffic,
+            RedirectTrafficConeDistance,
+            RedirectTrafficConeDistanceDescription,
+            RedirectTrafficDescription,
+            RedirectTrafficEnableRedirectionArrow,
+            RedirectTrafficType,
+            RedirectTrafficTypeDescription,
+            RoadblockDispatchedAt,
+            RoadblockDispatchedAt,
+            RoadblockHasBeenBypassed,
+            RoadblockHasBeenHit,
+            RoadblockInstanceCreationFailed,
+            RoadblockNoPursuitActive,
+            SpeedLimit,
+            SpeedLimitDescription,
+            Spots,
+            Vehicle,
+            VehicleDescription,
+            VehicleTypeFbi,
+            VehicleTypeLocal,
+            VehicleTypeState,
+            VehicleTypeSwat,
+            VehicleTypeTransporter,
+            Warning,
         };
 
         private LocalizationKey(string identifier, string defaultText)

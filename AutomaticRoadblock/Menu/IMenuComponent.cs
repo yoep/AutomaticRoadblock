@@ -12,7 +12,7 @@ namespace AutomaticRoadblocks.Menu
         /// <summary>
         /// Get the type of the menu item.
         /// </summary>
-        MenuType Type { get; }
+        EMenuType Type { get; }
 
         /// <summary>
         /// Get if the menu component is automatically closed when selected in the menu.

@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         public UIMenuItem MenuItem { get; }
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.ManualPlacement;
+        public EMenuType Type => EMenuType.ManualPlacement;
 
         /// <inheritdoc />
         public bool IsAutoClosed => true;

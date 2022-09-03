@@ -31,7 +31,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         public UIMenuListScrollerItem<BarrierType> MenuItem { get; }
 
         /// <inheritdoc />
-        public MenuType Type => MenuType.RedirectTraffic;
+        public EMenuType Type => EMenuType.RedirectTraffic;
 
         /// <inheritdoc />
         public bool IsAutoClosed => false;

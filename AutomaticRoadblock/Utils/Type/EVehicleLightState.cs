@@ -1,6 +1,6 @@
 namespace AutomaticRoadblocks.Utils.Type
 {
-    public enum VehicleLightState
+    public enum EVehicleLightState
     {
         NormalLights = 0,
         AlwaysOff = 1,

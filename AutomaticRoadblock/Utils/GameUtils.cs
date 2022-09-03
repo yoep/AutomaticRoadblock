@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.Utils
         /// <summary>
         /// Get the current time period of the game.
         /// </summary>
-        public static TimePeriod TimePeriod
+        public static ETimePeriod TimePeriod
         {
             get
             {
@@ -27,11 +27,11 @@ namespace AutomaticRoadblocks.Utils
 
                 return hour switch
                 {
-                    >= 6 and < 8 => TimePeriod.Morning,
-                    >= 8 and < 12 => TimePeriod.Forenoon,
-                    >= 12 and < 18 => TimePeriod.Afternoon,
-                    >= 18 and < 20 => TimePeriod.Evening,
-                    _ => TimePeriod.Night
+                    >= 6 and < 8 => ETimePeriod.Morning,
+                    >= 8 and < 12 => ETimePeriod.Forenoon,
+                    >= 12 and < 18 => ETimePeriod.Afternoon,
+                    >= 18 and < 20 => ETimePeriod.Evening,
+                    _ => ETimePeriod.Night
                 };
 
                 // otherwise, it's night
@@ -64,7 +64,7 @@ namespace AutomaticRoadblocks.Utils
         /// <param name="color">The color of the marker.</param>
         /// <param name="size">The size of the marker.</param>
         /// <param name="rotate">Set if the marker should be rotating or not.</param>
-        public static void CreateMarker(Vector3 position, MarkerType markerType, Color color, float size = 1f, bool rotate = true)
+        public static void CreateMarker(Vector3 position, EMarkerType markerType, Color color, float size = 1f, bool rotate = true)
         {
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(markerType, "markerType cannot be null");

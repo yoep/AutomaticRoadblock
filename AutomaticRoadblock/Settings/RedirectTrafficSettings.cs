@@ -13,5 +13,10 @@ namespace AutomaticRoadblocks.Settings
         /// This distance is used to find the road closest in front of the player
         /// </summary>
         public float DistanceFromPlayer { get; internal set; }
+        
+        /// <summary>
+        /// Set if lights should be added to the traffic redirection during evening/night time
+        /// </summary>
+        public bool EnableLights { get; internal set; }
     }
 }
