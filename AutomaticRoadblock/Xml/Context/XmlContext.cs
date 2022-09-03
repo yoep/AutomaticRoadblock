@@ -1,6 +1,6 @@
 using System.Xml.XPath;
 
-namespace RazerPoliceLights.Xml.Context
+namespace AutomaticRoadblocks.Xml.Context
 {
     public abstract class XmlContext
     {

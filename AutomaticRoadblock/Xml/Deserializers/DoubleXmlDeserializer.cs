@@ -1,10 +1,9 @@
 using System;
 using System.Globalization;
-using RazerPoliceLights.Xml.Context;
-using AutomaticRoadblocks.Xml;
+using AutomaticRoadblocks.Xml.Context;
 using AutomaticRoadblocks.Xml.Parser;
 
-namespace RazerPoliceLights.Xml.Deserializers
+namespace AutomaticRoadblocks.Xml.Deserializers
 {
     public class DoubleXmlDeserializer : IXmlDeserializer
     {

@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomaticRoadblock", "AutomaticRoadblock\AutomaticRoadblock.csproj", "{A869776E-0E1D-4A25-A9B8-C5CE060BF760}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomaticRoadblocksTests", "AutomaticRoadblocksTests\AutomaticRoadblocksTests.csproj", "{073FED96-79B0-4239-917A-889EF11CC00F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -12,5 +14,9 @@ Global
 		{A869776E-0E1D-4A25-A9B8-C5CE060BF760}.Release|x64.Build.0 = Release|x64
 		{A869776E-0E1D-4A25-A9B8-C5CE060BF760}.Debug|x64.ActiveCfg = Debug|x64
 		{A869776E-0E1D-4A25-A9B8-C5CE060BF760}.Debug|x64.Build.0 = Debug|x64
+		{073FED96-79B0-4239-917A-889EF11CC00F}.Release|x64.ActiveCfg = Release|Any CPU
+		{073FED96-79B0-4239-917A-889EF11CC00F}.Release|x64.Build.0 = Release|Any CPU
+		{073FED96-79B0-4239-917A-889EF11CC00F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{073FED96-79B0-4239-917A-889EF11CC00F}.Debug|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

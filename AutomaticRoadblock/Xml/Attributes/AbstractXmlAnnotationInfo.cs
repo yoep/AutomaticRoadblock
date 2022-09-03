@@ -1,6 +1,6 @@
 using System;
 
-namespace RazerPoliceLights.Xml.Attributes
+namespace AutomaticRoadblocks.Xml.Attributes
 {
     /// <inheritdoc />
     /// <summary>

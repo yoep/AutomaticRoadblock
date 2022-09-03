@@ -3,12 +3,13 @@ using System.Collections;
 using System.Reflection;
 using System.Xml;
 using System.Xml.XPath;
-using RazerPoliceLights.Xml.Attributes;
-using RazerPoliceLights.Xml.Context;
-using AutomaticRoadblocks.Xml;
+using AutomaticRoadblocks.Xml.Attributes;
+using AutomaticRoadblocks.Xml.Context;
 using AutomaticRoadblocks.Xml.Parser;
+using XmlAttribute = AutomaticRoadblocks.Xml.Attributes.XmlAttribute;
+using XmlElement = AutomaticRoadblocks.Xml.Attributes.XmlElement;
 
-namespace RazerPoliceLights.Xml.Deserializers
+namespace AutomaticRoadblocks.Xml.Deserializers
 {
     public class ObjectXmlDeserializer : IXmlDeserializer
     {
@@ -23,7 +24,7 @@ namespace RazerPoliceLights.Xml.Deserializers
 
                 if (GetElementAnnotation(property) != null && GetAttributeAnnotation(property) != null)
                     throw new XmlException("Property " + property.Name + " cannot be annotated with both " +
-                                           typeof(Attributes.XmlElement).FullName + " and " + typeof(Attributes.XmlAttribute).FullName);
+                                           typeof(XmlElement).FullName + " and " + typeof(XmlAttribute).FullName);
 
                 var value = IsXmlElement(property)
                     ? ProcessElement(parser, deserializationContext, property)
@@ -57,14 +58,18 @@ namespace RazerPoliceLights.Xml.Deserializers
             {
                 node = parser.FetchNodeForMember(deserializationContext, property);
 
-                if (node == null && IsRequiredMember(property))
-                    throw new XmlException("Missing xml node for " + parser.GetXmlLookupName(property));
+                switch (node)
+                {
+                    case null when IsRequiredMember(property):
+                        throw new XmlException("Missing xml node for " + parser.GetXmlLookupName(property));
+                    case null:
+                        return null;
+                }
             }
             else
             {
                 node = deserializationContext.CurrentNode;
             }
-
 
             return deserializationContext.Deserialize(parser, node, property.PropertyType);
         }
@@ -72,7 +77,7 @@ namespace RazerPoliceLights.Xml.Deserializers
         private static object ProcessAttribute(XmlParser parser, XmlDeserializationContext deserializationContext,
             PropertyInfo property)
         {
-            var xmlAttribute = property.GetCustomAttribute<Attributes.XmlAttribute>();
+            var xmlAttribute = property.GetCustomAttribute<XmlAttribute>();
             var value = parser.FetchAttributeValue(deserializationContext, property);
             var type = property.PropertyType;
 
@@ -106,7 +111,7 @@ namespace RazerPoliceLights.Xml.Deserializers
 
         private static bool IsRequiredMember(MemberInfo member)
         {
-            var xmlProperty = member.GetCustomAttribute<Attributes.XmlElement>();
+            var xmlProperty = member.GetCustomAttribute<XmlElement>();
 
             return xmlProperty == null || !xmlProperty.IsOptional;
         }
@@ -136,14 +141,14 @@ namespace RazerPoliceLights.Xml.Deserializers
                    && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type));
         }
 
-        private static Attributes.XmlAttribute GetAttributeAnnotation(MemberInfo member)
+        private static XmlAttribute GetAttributeAnnotation(MemberInfo member)
         {
-            return member.GetCustomAttribute<Attributes.XmlAttribute>();
+            return member.GetCustomAttribute<XmlAttribute>();
         }
 
-        private static Attributes.XmlElement GetElementAnnotation(MemberInfo member)
+        private static XmlElement GetElementAnnotation(MemberInfo member)
         {
-            return member.GetCustomAttribute<Attributes.XmlElement>();
+            return member.GetCustomAttribute<XmlElement>();
         }
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.Reflection;
 using System.Xml.XPath;
-using RazerPoliceLights.Xml.Attributes;
-using RazerPoliceLights.Xml.Context;
+using AutomaticRoadblocks.Xml.Attributes;
+using AutomaticRoadblocks.Xml.Context;
 
 namespace AutomaticRoadblocks.Xml.Parser
 {
@@ -20,10 +20,18 @@ namespace AutomaticRoadblocks.Xml.Parser
         {
             Assert.NotNull(context, "context cannot be null");
             Assert.NotNull(member, "member cannot be null");
+            return FetchNodesForMember(context, member, GetXmlLookupName(member));
+        }
 
+        public XPathNodeIterator FetchNodesForMember(XmlContext context, MemberInfo member, string lookupName)
+        {
+            Assert.NotNull(context, "context cannot be null");
+            Assert.NotNull(member, "member cannot be null");
+            Assert.NotNull(lookupName, "lookupName cannot be null");
             var currentNode = context.CurrentNode;
-            var lookupName = GetXmlLookupName(member);
-            var filteredChildNodes = currentNode.Select(lookupName);
+            var filteredChildNodes = currentNode.Name.Equals(lookupName)
+                ? currentNode.SelectChildren(XPathNodeType.Element)
+                : currentNode.Select(lookupName);
 
             return filteredChildNodes.Count > 1 ? filteredChildNodes : currentNode.SelectSingleNode(lookupName)?.SelectChildren(XPathNodeType.Element);
         }

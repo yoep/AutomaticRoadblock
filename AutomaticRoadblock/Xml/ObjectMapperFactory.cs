@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using RazerPoliceLights.Xml.Deserializers;
 using AutomaticRoadblocks.Xml.Deserializers;
 
 namespace AutomaticRoadblocks.Xml
 {
     public class ObjectMapperFactory
     {
-        private readonly List<IXmlDeserializer> _deserializers = new List<IXmlDeserializer>
+        private readonly List<IXmlDeserializer> _deserializers = new()
         {
+            new UnwrapXmlDeserializer(), //the unwrap deserializer
             new CollectionXmlDeserializer(), //register generic collection handler before object deserializer
             new ObjectXmlDeserializer() //object deserializer should always be registered as it can handle everything
         };
@@ -41,7 +41,7 @@ namespace AutomaticRoadblocks.Xml
 
         public ObjectMapperFactory RegisterAutomaticRoadblockSerializers()
         {
-            //insert the additions before the object serializer (because everything is an object)
+            // insert the additions before the object serializer (because everything is an object)
             _deserializers.InsertRange(0, new List<IXmlDeserializer>
             {
             });

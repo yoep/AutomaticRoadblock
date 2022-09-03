@@ -2,18 +2,17 @@ using System;
 using System.Collections;
 using System.Xml;
 using System.Xml.XPath;
-using RazerPoliceLights.Xml.Context;
-using AutomaticRoadblocks.Xml;
+using AutomaticRoadblocks.Xml.Context;
 using AutomaticRoadblocks.Xml.Parser;
 
-namespace RazerPoliceLights.Xml.Deserializers
+namespace AutomaticRoadblocks.Xml.Deserializers
 {
     public class CollectionXmlDeserializer : IXmlDeserializer
     {
         public object Deserialize(XmlParser parser, XmlDeserializationContext deserializationContext)
         {
             var type = deserializationContext.DeserializationType;
-            var genericType = type.GetGenericArguments()[0]; //IEnumerable only has 1 generic argument type
+            var genericType = type.GetGenericArguments()[0]; // IEnumerable only has 1 generic argument type
             var values = (IList) Activator.CreateInstance(type);
             var deserializer = deserializationContext.Deserializers.Find(e => e.CanHandle(genericType));
 

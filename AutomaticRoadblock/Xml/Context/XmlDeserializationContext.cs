@@ -3,10 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.XPath;
-using AutomaticRoadblocks.Xml;
 using AutomaticRoadblocks.Xml.Parser;
 
-namespace RazerPoliceLights.Xml.Context
+namespace AutomaticRoadblocks.Xml.Context
 {
     public class XmlDeserializationContext : XmlContext
     {

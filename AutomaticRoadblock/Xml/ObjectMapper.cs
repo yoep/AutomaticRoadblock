@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.XPath;
-using RazerPoliceLights.Xml.Context;
+using AutomaticRoadblocks.Xml.Context;
 using AutomaticRoadblocks.Xml.Parser;
 
 namespace AutomaticRoadblocks.Xml
@@ -13,6 +13,9 @@ namespace AutomaticRoadblocks.Xml
             Deserializers = deserializers;
         }
 
+        /// <summary>
+        /// The deserializers of this object mapper.
+        /// </summary>
         public List<IXmlDeserializer> Deserializers { get; }
 
         public T ReadValue<T>(string uri) where T : class
@@ -31,7 +34,7 @@ namespace AutomaticRoadblocks.Xml
             var deserializationContext = new XmlDeserializationContext(document, rootNode, clazz, Deserializers);
             var xmlDeserializer = Deserializers.Find(e => e.CanHandle(clazz));
 
-            return (T) xmlDeserializer.Deserialize(xmlParser, deserializationContext);
+            return (T)xmlDeserializer.Deserialize(xmlParser, deserializationContext);
         }
     }
 }
