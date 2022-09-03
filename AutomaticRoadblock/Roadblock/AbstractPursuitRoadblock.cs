@@ -129,9 +129,17 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 while (State == ERoadblockState.Active)
                 {
-                    VerifyIfRoadblockIsBypassed();
-                    VerifyIfRoadblockIsHit();
-                    VerifyRoadblockCopKilled();
+                    try
+                    {
+                        VerifyIfRoadblockIsBypassed();
+                        VerifyIfRoadblockIsHit();
+                        VerifyRoadblockCopKilled();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"An error occurred while monitoring the roadblock, {ex.Message}", ex);
+                    }
+
                     Game.FiberYield();
                 }
             }, "PursuitRoadblock.Monitor");
