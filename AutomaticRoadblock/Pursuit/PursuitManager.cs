@@ -18,7 +18,7 @@ namespace AutomaticRoadblocks.Pursuit
     public class PursuitManager : IPursuitManager
     {
         private const int TimeBetweenLevelIncreaseShotsFired = 20 * 1000;
-        private const int TimeAfterLastDeploymentBeforeIncreasingLevel = 5 * 1000;
+        private const int TimeAfterLastDeploymentBeforeIncreasingLevel = 10 * 1000;
 
         private readonly ILogger _logger;
         private readonly IGame _game;

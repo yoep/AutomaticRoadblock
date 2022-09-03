@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -250,6 +251,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private void DoRoadblockJunctionCreation(Vehicle vehicle, RoadblockLevel level, Road road, bool createAsPreview)
         {
             _logger.Debug("Deploying additional junction roadblocks");
+            var startedAt = DateTime.Now.Ticks;
             var junctionPosition = road.Position + MathHelper.ConvertHeadingToDirection(road.Heading) * 10f;
             // if we're in the city, don't return any gravel/dirt roads
             var nodeType = Functions.GetZoneAtPosition(road.Position).County == EWorldZoneCounty.LosSantos
@@ -265,7 +267,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 .ToList();
 
             junctionRoads.ForEach(x => DoRoadblockCreation(vehicle, level, x, false, createAsPreview));
-            _logger.Info($"Added an additional {junctionRoads.Count} roadblocks to the junction");
+            var timeTaken = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
+            _logger.Info($"Added an additional {junctionRoads.Count} roadblocks to the junction in {timeTaken} millis");
         }
 
         private bool IsAtJunction(Road road)

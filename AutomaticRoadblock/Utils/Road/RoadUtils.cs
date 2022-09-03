@@ -51,7 +51,11 @@ namespace AutomaticRoadblocks.Utils.Road
         public static Road FindRoadTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType, ENodeFlag blacklistedFlags)
         {
             FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags, out var lastFoundNode);
-            return DiscoverRoadForVehicleNode(lastFoundNode);
+            var startedAt = DateTime.Now.Ticks;
+            var road = DiscoverRoadForVehicleNode(lastFoundNode);
+            var calculationTime = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
+            Logger.Debug($"Converted the vehicle node into a road in {calculationTime} millis");
+            return road;
         }
 
         /// <summary>
@@ -402,7 +406,7 @@ namespace AutomaticRoadblocks.Utils.Road
         private static bool LastPointOnRoadUsingRaytracing(Vector3 position, float heading, out Vector3 lastPointOnRoad)
         {
             const float stopAtMinimumInterval = 0.2f;
-            const float maxLaneWidth = 15f;
+            const float maxLaneWidth = 25f;
             var intervalCheck = 2f;
             var direction = MathHelper.ConvertHeadingToDirection(heading);
             var roadMaterial = 0U;
