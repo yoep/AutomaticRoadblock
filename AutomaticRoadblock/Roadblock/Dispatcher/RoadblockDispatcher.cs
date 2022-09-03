@@ -211,24 +211,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // verify if roadblock is at junction
             // if so, create a junction roadblock
             if (allowJunctionRoadblockCreation && IsAtJunction(road))
-            {
-                _logger.Debug("Deploying additional junction roadblocks");
-                var junctionPosition = road.Position + MathHelper.ConvertHeadingToDirection(road.Heading) * 10f;
-                // if we're in the city, don't return any gravel/dirt roads
-                var nodeType = Functions.GetZoneAtPosition(road.Position).County == EWorldZoneCounty.LosSantos
-                    ? EVehicleNodeType.MainRoads
-                    : EVehicleNodeType.AllRoadNoJunctions;
-                var junctionRoads = RoadUtils
-                    .FindNearbyRoads(junctionPosition, nodeType, 15f)
-                    .Where(x => x.IsAtJunction)
-                    .Where(x => !road.Position.Equals(x.Position))
-                    .Where(x => road.Position.DistanceTo(x.Position) > 5f)
-                    .Where(x => IsRoadMovingAwayFrom(x, junctionPosition))
-                    .ToList();
-
-                junctionRoads.ForEach(x => DoRoadblockCreation(vehicle, level, x, false, createAsPreview));
-                _logger.Info($"Added an additional {junctionRoads.Count} roadblocks to the junction");
-            }
+                DoRoadblockJunctionCreation(vehicle, level, road, createAsPreview);
 
             // as a junction might contain dirt roads
             // we determine the actual roadblock for each individual road
@@ -262,6 +245,27 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             _logger.Info($"Roadblock has been dispatched, {roadblock}");
+        }
+
+        private void DoRoadblockJunctionCreation(Vehicle vehicle, RoadblockLevel level, Road road, bool createAsPreview)
+        {
+            _logger.Debug("Deploying additional junction roadblocks");
+            var junctionPosition = road.Position + MathHelper.ConvertHeadingToDirection(road.Heading) * 10f;
+            // if we're in the city, don't return any gravel/dirt roads
+            var nodeType = Functions.GetZoneAtPosition(road.Position).County == EWorldZoneCounty.LosSantos
+                ? EVehicleNodeType.MainRoads
+                : EVehicleNodeType.AllRoadNoJunctions;
+            
+            var junctionRoads = RoadUtils
+                .FindNearbyRoads(junctionPosition, nodeType, 15f)
+                .Where(x => x.IsAtJunction)
+                .Where(x => !road.Position.Equals(x.Position))
+                .Where(x => road.Position.DistanceTo(x.Position) > 5f)
+                .Where(x => IsRoadMovingAwayFrom(x, junctionPosition))
+                .ToList();
+
+            junctionRoads.ForEach(x => DoRoadblockCreation(vehicle, level, x, false, createAsPreview));
+            _logger.Info($"Added an additional {junctionRoads.Count} roadblocks to the junction");
         }
 
         private bool IsAtJunction(Road road)
