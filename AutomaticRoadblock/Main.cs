@@ -18,6 +18,7 @@ using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
 using LSPD_First_Response.Mod.API;
+using Rage;
 using RAGENativeUI.Elements;
 
 // Source code: https://github.com/yoep/AutomaticRoadblock
@@ -155,7 +156,11 @@ namespace AutomaticRoadblocks
 
                 var game = ioC.GetInstance<IGame>();
                 ioC.GetInstance<IMenu>().Activate();
-                game.DisplayPluginNotification($"{Assembly.GetExecutingAssembly().GetName().Version}, by ~b~yoep~s~, has been loaded");
+                game.NewSafeFiber(() =>
+                {
+                    GameFiber.Wait(2 * 1000);
+                    game.DisplayPluginNotification($"{Assembly.GetExecutingAssembly().GetName().Version}, by ~b~yoep~s~, has been loaded");
+                }, "Main.DisplayPluginNotification");
             }
             else
             {
