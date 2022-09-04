@@ -46,6 +46,7 @@ namespace AutomaticRoadblocks.Pursuit
             _localizer = localizer;
             EnableAutomaticDispatching = settingsManager.AutomaticRoadblocksSettings.EnableDuringPursuits;
             EnableAutomaticLevelIncreases = true;
+            EnableSpikeStrips = settingsManager.AutomaticRoadblocksSettings.EnableSpikeStrips;
         }
 
         #region Properties
@@ -61,6 +62,9 @@ namespace AutomaticRoadblocks.Pursuit
 
         /// <inheritdoc />
         public bool EnableAutomaticLevelIncreases { get; set; }
+
+        /// <inheritdoc />
+        public bool EnableSpikeStrips { get; set; }
 
         /// <inheritdoc />
         public bool IsPursuitActive => PursuitHandle != null && Functions.IsPursuitStillRunning(PursuitHandle);

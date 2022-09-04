@@ -4,6 +4,7 @@ using System.Linq;
 using LSPD_First_Response.Engine.Scripting;
 using LSPD_First_Response.Mod.API;
 using Rage;
+using Rage.Native;
 
 namespace AutomaticRoadblocks.Utils
 {
@@ -294,9 +295,16 @@ namespace AutomaticRoadblocks.Utils
             return new Model("FIRETRUK");
         }
 
+        public static void GetDimensions(Model model, out Vector3 minimum, out Vector3 maximum)
+        {
+            Assert.NotNull(model, "model cannot be null");
+            // MISC::GET_MODEL_DIMENSIONS
+            NativeFunction.Natives.GET_MODEL_DIMENSIONS(model.Hash, out minimum, out maximum);
+        }
+
         private static bool IsCountyZone(WorldZone zone)
         {
-            return zone.County == EWorldZoneCounty.BlaineCounty || zone.County == EWorldZoneCounty.LosSantosCounty;
+            return zone.County is EWorldZoneCounty.BlaineCounty or EWorldZoneCounty.LosSantosCounty;
         }
 
         private static WorldZone GetZone(Vector3 position)

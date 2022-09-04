@@ -5,11 +5,11 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
 {
-    public class EnableAutomaticLevelIncreaseComponent : IMenuComponent<UIMenuCheckboxItem>
+    public class PursuitEnableAutomaticLevelIncreaseComponent : IMenuComponent<UIMenuCheckboxItem>
     {
         private readonly IPursuitManager _pursuitManager;
 
-        public EnableAutomaticLevelIncreaseComponent(IPursuitManager pursuitManager, ILocalizer localizer)
+        public PursuitEnableAutomaticLevelIncreaseComponent(IPursuitManager pursuitManager, ILocalizer localizer)
         {
             _pursuitManager = pursuitManager;
 
