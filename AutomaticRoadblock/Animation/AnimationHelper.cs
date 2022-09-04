@@ -36,8 +36,15 @@ namespace AutomaticRoadblocks.Animation
             var success = NativeFunction.Natives.PLAY_ENTITY_ANIM<bool>(entity, animationName, animationDictionary.Name, 1000f,
                 animationFlags.HasFlag(AnimationFlags.Loop),
                 animationFlags.HasFlag(AnimationFlags.StayInEndFrame), false, 0.0f, 0U);
-            if (!success)
+            
+            if (success)
+            {
+                Logger.Trace($"Started playing animation {animationDictionary.Name}: {animationName}");
+            }
+            else
+            {
                 Logger.Warn($"Failed to start animation {animationDictionary.Name}: {animationName}");
+            }
 
             return new AnimationExecutor(entity, animationDictionary, animationName);
         }
@@ -55,7 +62,17 @@ namespace AutomaticRoadblocks.Animation
             Assert.NotNull(entity, "entity cannot be null");
             Assert.HasText(animationDictionary, "animationDictionary cannot be empty");
             Assert.HasText(animationName, "animationName cannot be empty");
+            // ENTITY::STOP_ENTITY_ANIM
             NativeFunction.CallByHash<int>(0x28004F88151E03E0, entity, animationDictionary.Name, animationName, 3);
+        }
+
+        public static void SetAnimationSpeed(Entity entity, AnimationDictionary animationDictionary, string animationName, float speed)
+        {
+            Assert.NotNull(entity, "entity cannot be null");
+            Assert.HasText(animationDictionary, "animationDictionary cannot be empty");
+            Assert.HasText(animationName, "animationName cannot be empty");
+            // ENTITY::SET_ENTITY_ANIM_SPEED
+            NativeFunction.CallByHash<uint>(0x28D1A16553C51776, entity, animationDictionary.Name, animationName, speed);
         }
     }
 }

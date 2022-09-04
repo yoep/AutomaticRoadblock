@@ -4,6 +4,8 @@ namespace AutomaticRoadblocks.Animation
 {
     public class AnimationExecutor
     {
+        private float _speed = 1f;
+        
         internal AnimationExecutor(Entity entity, AnimationDictionary dictionary, string animation)
         {
             Entity = entity;
@@ -32,6 +34,15 @@ namespace AutomaticRoadblocks.Animation
         /// Verify if the animation is still playing.
         /// </summary>
         public bool IsPlaying => AnimationHelper.IsAnimationPlaying(Entity, Dictionary, Animation);
+        
+        /// <summary>
+        /// The animation speed of this task.
+        /// </summary>
+        public float Speed
+        {
+            get => _speed;
+            set => UpdateAnimationSpeed(value);
+        }
 
         #endregion
 
@@ -58,6 +69,12 @@ namespace AutomaticRoadblocks.Animation
             AnimationHelper.StopAnimation(Entity, Dictionary, Animation);
 
             return this;
+        }
+
+        private void UpdateAnimationSpeed(float value)
+        {
+            _speed = value;
+            AnimationHelper.SetAnimationSpeed(Entity, Dictionary, Animation, value);
         }
 
         #endregion

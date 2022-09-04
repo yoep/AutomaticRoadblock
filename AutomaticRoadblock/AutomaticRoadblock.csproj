@@ -178,6 +178,8 @@
         <Compile Include="Settings\ManualPlacementSettings.cs" />
         <Compile Include="Settings\RedirectTrafficSettings.cs" />
         <Compile Include="Settings\SettingsManager.cs" />
+        <Compile Include="Sound\SoundHelper.cs" />
+        <Compile Include="Sound\Sounds.cs" />
         <Compile Include="Spikestrip\Dispatcher\ISpikeStripDispatcher.cs" />
         <Compile Include="Spikestrip\Dispatcher\SpikeStripDispatcher.cs" />
         <Compile Include="Spikestrip\ESpikeStripLocation.cs" />

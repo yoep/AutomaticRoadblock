@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Animation;
+using AutomaticRoadblocks.Sound;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
@@ -103,10 +104,8 @@ namespace AutomaticRoadblocks.SpikeStrip
             Game.NewSafeFiber(() =>
             {
                 UpdateState(ESpikeStripState.Deploying);
-                _animation.Stop();
-                _animation = AnimationHelper
-                    .PlayAnimation(Instance, Animations.SpikeStripDeploy, Animations.Dictionaries.StingerDictionary, AnimationFlags.StayInEndFrame)
-                    .WaitForCompletion();
+                StopCurrentAnimation();
+                DoDeployAnimation();
                 StartMonitor();
                 UpdateState(ESpikeStripState.Deployed);
             }, "SpikeStrip.Deploy");
@@ -160,17 +159,12 @@ namespace AutomaticRoadblocks.SpikeStrip
             }, "SpikeStrip.Monitor");
         }
 
-        #endregion
-
-        #region Functions
-
-        private List<Vehicle> NearbyVehicles()
+        private IEnumerable<Vehicle> NearbyVehicles()
         {
             return World
                 .GetEntities(Position, PropUtils.Models.SpikeStrip.Dimensions.Y, GetEntitiesFlags.ConsiderGroundVehicles)
                 .OfType<Vehicle>()
-                .Where(x => x.IsValid())
-                .ToList();
+                .Where(x => x.IsValid());
         }
 
         private void UpdateState(ESpikeStripState state)
@@ -179,7 +173,7 @@ namespace AutomaticRoadblocks.SpikeStrip
             StateChanged?.Invoke(this, state);
         }
 
-        // Credits to PNWParksFan
+        // Credits to PNWParksFan (see discord knowledge base)
         private bool IsTouchingTheInstance(Vector3 position)
         {
             var instancePosition = Instance.Position;
@@ -195,6 +189,19 @@ namespace AutomaticRoadblocks.SpikeStrip
             return px * 2 < size.X &&
                    py * 2 < size.Y &&
                    pz * 2 < size.Z;
+        }
+
+        private void StopCurrentAnimation()
+        {
+            _animation?.Stop();
+        }
+        
+        private void DoDeployAnimation()
+        {
+            SoundHelper.PlaySound(Instance, Sounds.StingerDrop, Sounds.StingerDropRef);
+            _animation = AnimationHelper.PlayAnimation(Instance, Animations.SpikeStripDeploy, Animations.Dictionaries.StingerDictionary, AnimationFlags.StayInEndFrame);
+            _animation.Speed = 1.2f;
+            _animation.WaitForCompletion();
         }
 
         private static bool IsVehicleTireBurst(Vehicle vehicle, EVehicleWheel wheel, bool onRim)
