@@ -84,6 +84,7 @@ namespace AutomaticRoadblocks.Settings
                 EnableDuringPursuits = file.ReadBoolean(AutomaticRoadblocksSection, "EnableDuringPursuits", true),
                 EnableAutoLevelIncrements = file.ReadBoolean(AutomaticRoadblocksSection, "EnableAutoLevelIncrements", true),
                 EnableLights = file.ReadBoolean(AutomaticRoadblocksSection, "EnableLights", true),
+                EnableJunctionRoadblocks = file.ReadBoolean(AutomaticRoadblocksSection, "EnableJunctionRoadblocks", true),
                 DispatchAllowedAfter = file.ReadUInt32(AutomaticRoadblocksSection, "DispatchAllowedAfter", 90),
                 DispatchInterval = file.ReadUInt32(AutomaticRoadblocksSection, "DispatchAllowedAfter", 45),
                 TimeBetweenAutoLevelIncrements = file.ReadUInt32(AutomaticRoadblocksSection, "TimeBetweenAutoLevelIncrements", 90),

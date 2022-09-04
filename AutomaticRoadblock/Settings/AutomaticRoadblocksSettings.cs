@@ -28,6 +28,11 @@ namespace AutomaticRoadblocks.Settings
         /// Verify if lights should be used within the roadblocks during nighttime
         /// </summary>
         public bool EnableLights { get; internal set; }
+        
+        /// <summary>
+        /// Verify if junction roadblocks should be enabled.
+        /// </summary>
+        public bool EnableJunctionRoadblocks { get; internal set; }
 
         /// <summary>
         /// The minimum wait time in seconds before the first roadblock may be dispatched when a pursuit is started

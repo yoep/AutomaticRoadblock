@@ -58,6 +58,16 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
         }
 
+        /// <summary>
+        /// The roadblock settings of the plugin.
+        /// </summary>
+        private AutomaticRoadblocksSettings Settings => _settingsManager.AutomaticRoadblocksSettings;
+
+        /// <summary>
+        /// Verify if junction roadblocks are enabled.
+        /// </summary>
+        private bool IsJunctionRoadblockEnabled => Settings.EnableJunctionRoadblocks;
+
         #endregion
 
         #region Events
@@ -167,7 +177,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         private bool ShouldAddLightsToRoadblock()
         {
-            return _settingsManager.AutomaticRoadblocksSettings.EnableLights &&
+            return Settings.EnableLights &&
                    GameUtils.TimePeriod is ETimePeriod.Evening or ETimePeriod.Night;
         }
 
@@ -211,14 +221,16 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         {
             // verify if roadblock is at junction
             // if so, create a junction roadblock
-            if (allowJunctionRoadblockCreation && IsAtJunction(road))
+            if (IsJunctionRoadblockEnabled && allowJunctionRoadblockCreation && IsAtJunction(road))
+            {
                 DoRoadblockJunctionCreation(vehicle, level, road, createAsPreview);
+            }
 
             // as a junction might contain dirt roads
             // we determine the actual roadblock for each individual road
             // as it might be that we need to downgrade one, but not the others
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
+            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, vehicle, Settings.SlowTraffic,
                 ShouldAddLightsToRoadblock());
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
@@ -257,7 +269,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             var nodeType = Functions.GetZoneAtPosition(road.Position).County == EWorldZoneCounty.LosSantos
                 ? EVehicleNodeType.MainRoads
                 : EVehicleNodeType.AllRoadNoJunctions;
-            
+
             var junctionRoads = RoadUtils
                 .FindNearbyRoads(junctionPosition, nodeType, 15f)
                 .Where(x => x.IsAtJunction)
