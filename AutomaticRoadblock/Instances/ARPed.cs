@@ -67,6 +67,7 @@ namespace AutomaticRoadblocks.Instances
                 return;
 
             DeleteAttachments();
+            ClearAllTasks();
             GameInstance.KeepTasks = false;
             GameInstance.IsPersistent = false;
             Functions.SetPedAsCop(GameInstance);
