@@ -10,10 +10,21 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         /// Spawn a spike strip on the given road.
         /// This will spawn an undeployed spike strip.
         /// </summary>
-        /// <param name="road"></param>
-        /// <param name="stripLocation"></param>
-        /// <returns></returns>
+        /// <param name="road">The road the spike strip should be placed on.</param>
+        /// <param name="stripLocation">The location of the spike strip.</param>
+        /// <returns>Returns the spike strip instance when spawned, else null.</returns>
         ISpikeStrip Spawn(Road road, ESpikeStripLocation stripLocation);
+
+        /// <summary>
+        /// Spawn a spike strip on the given lane.
+        /// This will spawn an undeployed spike strip.
+        /// </summary>
+        /// <param name="road">The road to which the lane belongs.</param>
+        /// <param name="lane">The lane the spike strip should be placed on.</param>
+        /// <param name="stripLocation">The location of the spike strip.</param>
+        /// <param name="targetVehicle">The vehicle to monitor.</param>
+        /// <returns>Returns the spike strip instance when spawned, else null.</returns>
+        ISpikeStrip Spawn(Road road, Road.Lane lane, ESpikeStripLocation stripLocation, Vehicle targetVehicle);
         
         /// <summary>
         /// Deploy a spike strip on the nearby road for the given location.

@@ -20,7 +20,14 @@ namespace AutomaticRoadblocks.SpikeStrip
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
         }
-        
+
+        internal PursuitSpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle) 
+            : base(road, lane, location)
+        {
+            Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
+            TargetVehicle = targetVehicle;
+        }
+
         #region Properties
     
         /// <summary>

@@ -22,10 +22,20 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         private AnimationExecutor _animation;
 
-        public SpikeStrip(Road road, ESpikeStripLocation location)
+        internal SpikeStrip(Road road, ESpikeStripLocation location)
         {
             Assert.NotNull(road, "road cannot be null");
             Road = road;
+            Location = location;
+            Lane = CalculatePlacementLane();
+        }
+        
+        internal SpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location)
+        {
+            Assert.NotNull(road, "road cannot be null");
+            Assert.NotNull(lane, "lane cannot be null");
+            Road = road;
+            Lane = lane;
             Location = location;
         }
 
@@ -52,8 +62,8 @@ namespace AutomaticRoadblocks.SpikeStrip
             {
                 return Location switch
                 {
-                    ESpikeStripLocation.Left => Road.Node.Heading + 90,
-                    _ => Road.Node.Heading - 90
+                    ESpikeStripLocation.Left => Road.Node.Heading - 90,
+                    _ => Road.Node.Heading + 90
                 };
             }
         }
@@ -71,6 +81,11 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// The road this spike strip is deployed on.
         /// </summary>
         private Road Road { get; }
+
+        /// <summary>
+        /// The lane on which the spike strip is placed.
+        /// </summary>
+        private Road.Lane Lane { get; }
 
         /// <summary>
         /// The spike strip instance.
@@ -135,6 +150,12 @@ namespace AutomaticRoadblocks.SpikeStrip
         public void Deploy()
         {
             Game.NewSafeFiber(DoInternalDeploy, "SpikeStrip.Deploy");
+        }
+
+        /// <inheritdoc />
+        public void Undeploy()
+        {
+            Game.NewSafeFiber(DoInternalUndeploy, "SpikeStrip.Undeploy");
         }
 
         public override string ToString()
@@ -216,6 +237,17 @@ namespace AutomaticRoadblocks.SpikeStrip
             StartMonitor();
         }
 
+        private void DoInternalUndeploy()
+        {
+            if (IsInvalid || State != ESpikeStripState.Deployed)
+                return;
+
+            Logger.Trace($"Undeploying spike strip {this}");
+            StopCurrentAnimation();
+            DoUndeployAnimation();
+            UpdateState(ESpikeStripState.Undeployed);
+        }
+
         private void DoInternalCleanup()
         {
             if (Instance == null)
@@ -295,6 +327,29 @@ namespace AutomaticRoadblocks.SpikeStrip
             _animation = AnimationHelper.PlayAnimation(Instance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
                 AnimationFlags.StayInEndFrame);
             _animation.WaitForCompletion();
+        }
+
+        private void DoUndeployAnimation()
+        {
+            if (IsInvalid)
+                return;
+
+            SoundHelper.PlaySound(Instance, Sounds.StingerDrop, Sounds.StingerDropRef);
+            _animation = AnimationHelper.PlayAnimation(Instance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripIdleUndeployed,
+                AnimationFlags.StayInEndFrame);
+            _animation.WaitForCompletion();
+        }
+
+        private Road.Lane CalculatePlacementLane()
+        {
+            var positionToMatch = Location switch
+            {
+                ESpikeStripLocation.Left => Road.LeftSide,
+                ESpikeStripLocation.Middle => Road.Position,
+                _ => Road.RightSide
+            };
+
+            return Road.LaneClosestTo(positionToMatch);
         }
 
         private static bool IsVehicleTireBurst(Vehicle vehicle, EVehicleWheel wheel, bool onRim)

@@ -88,7 +88,8 @@ namespace AutomaticRoadblocks.Settings
                 DispatchAllowedAfter = file.ReadUInt32(AutomaticRoadblocksSection, "DispatchAllowedAfter", 90),
                 DispatchInterval = file.ReadUInt32(AutomaticRoadblocksSection, "DispatchAllowedAfter", 45),
                 TimeBetweenAutoLevelIncrements = file.ReadUInt32(AutomaticRoadblocksSection, "TimeBetweenAutoLevelIncrements", 90),
-                SlowTraffic = file.ReadBoolean(AutomaticRoadblocksSection, "SlowTraffic", true)
+                SlowTraffic = file.ReadBoolean(AutomaticRoadblocksSection, "SlowTraffic", true),
+                SpikeStripChance = file.ReadDouble(AutomaticRoadblocksSection, "SpikeStripChance", 0.4),
             };
         }
 

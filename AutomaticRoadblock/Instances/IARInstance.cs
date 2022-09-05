@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using AutomaticRoadblocks.Preview;
 using Rage;
 
 namespace AutomaticRoadblocks.Instances
@@ -10,7 +11,7 @@ namespace AutomaticRoadblocks.Instances
     /// </summary>
     /// <typeparam name="TType"></typeparam>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public interface IARInstance<out TType> : IDisposable where TType : Entity
+    public interface IARInstance<out TType> : IPreviewSupport, IDisposable where TType : Entity
     {
         /// <summary>
         /// Get the game instance of this ARInstance.

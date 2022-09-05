@@ -53,5 +53,11 @@ namespace AutomaticRoadblocks.Settings
         /// Verify if the traffic needs to be slowed down at the roadblock
         /// </summary>
         public bool SlowTraffic { get; internal set; }
+        
+        /// <summary>
+        /// The chance factor that a spike strip is included in the roadblock.
+        /// This is a value between 1 and 0 where 1 = always, 0 = never
+        /// </summary>
+        public double SpikeStripChance { get; internal set; }
     }
 }

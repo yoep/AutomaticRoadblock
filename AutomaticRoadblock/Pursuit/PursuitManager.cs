@@ -400,7 +400,7 @@ namespace AutomaticRoadblocks.Pursuit
             _logger.Debug(
                 $"Dispatching roadblock for pursuit with {nameof(PursuitLevel)}: {PursuitLevel}, {nameof(userRequested)}: {userRequested}, " +
                 $"{nameof(force)}: {force}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
-            var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, new DispatchOptions
+            var roadblock = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, new DispatchOptions
             {
                 EnableSpikeStrips = EnableSpikeStrips,
                 IsUserRequested = userRequested,
@@ -408,14 +408,16 @@ namespace AutomaticRoadblocks.Pursuit
                 AtCurrentLocation = atCurrentLocation
             });
 
-            if (dispatched)
+            if (roadblock == null)
             {
-                _timeLastDispatchedRoadblock = _game.GameTime;
-                _totalRoadblocksDeployed++;
-                _logger.Info("Pursuit roadblock has been dispatched");
+                _logger.Warn("Pursuit roadblock was not dispatched");
+                return false;
             }
 
-            return dispatched;
+            _timeLastDispatchedRoadblock = _game.GameTime;
+            _totalRoadblocksDeployed++;
+            _logger.Info("Pursuit roadblock has been dispatched");
+            return true;
         }
 
         private void DoDispatchTick()

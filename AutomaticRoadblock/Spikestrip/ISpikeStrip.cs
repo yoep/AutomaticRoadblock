@@ -38,9 +38,15 @@ namespace AutomaticRoadblocks.SpikeStrip
         void Spawn();
         
         /// <summary>
-        /// Deploy the spike strip.
+        /// Deploy this spike strip.
         /// This action is ignored if the state is <see cref="ESpikeStripState.Deploying"/> or <see cref="ESpikeStripState.Deployed"/>.
         /// </summary>
         void Deploy();
+
+        /// <summary>
+        /// Undeploy this spike strip.
+        /// This action is ignored if the state is not <see cref="ESpikeStripState.Deployed"/>.
+        /// </summary>
+        void Undeploy();
     }
 }

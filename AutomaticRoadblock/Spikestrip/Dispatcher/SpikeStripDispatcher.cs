@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
+using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
@@ -28,6 +29,12 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         public ISpikeStrip Spawn(Road road, ESpikeStripLocation stripLocation)
         {
             return DoInternalSpikeStripCreation(road, stripLocation, DeploymentType.Spawn);
+        }
+
+        /// <inheritdoc />
+        public ISpikeStrip Spawn(Road road, Road.Lane lane, ESpikeStripLocation stripLocation, Vehicle targetVehicle)
+        {
+            return DoInternalSpikeStripCreation(road, stripLocation, DeploymentType.Spawn, targetVehicle);
         }
 
         /// <inheritdoc />
@@ -85,13 +92,19 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
 
         private ISpikeStrip DoInternalSpikeStripCreation(Road road, ESpikeStripLocation stripLocation, DeploymentType type, Vehicle targetVehicle = null)
         {
+            return DoInternalSpikeStripCreation(road, null, stripLocation, type, targetVehicle);
+        }
+
+        private ISpikeStrip DoInternalSpikeStripCreation(Road road, [CanBeNull] Road.Lane lane, ESpikeStripLocation stripLocation, DeploymentType type,
+            Vehicle targetVehicle = null)
+        {
             ISpikeStrip spikeStrip;
 
             lock (_spikeStrips)
             {
                 spikeStrip = targetVehicle == null
-                    ? new SpikeStrip(road, stripLocation)
-                    : new PursuitSpikeStrip(road, stripLocation, targetVehicle);
+                    ? DoSpikeStripCreation(road, stripLocation)
+                    : DoPursuitSpikeStripCreation(road, lane, stripLocation, targetVehicle);
                 _spikeStrips.Add(spikeStrip);
             }
 
@@ -139,6 +152,19 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
                 ESpikeStripLocation.Middle => AudioSpikeStripDeployedMiddle,
                 _ => AudioSpikeStripDeployedRight
             };
+        }
+
+        private static SpikeStrip DoSpikeStripCreation(Road road, ESpikeStripLocation stripLocation)
+        {
+            return new SpikeStrip(road, stripLocation);
+        }
+
+        private static PursuitSpikeStrip DoPursuitSpikeStripCreation(Road road, [CanBeNull] Road.Lane lane, ESpikeStripLocation stripLocation,
+            Vehicle targetVehicle)
+        {
+            return lane == null
+                ? new PursuitSpikeStrip(road, stripLocation, targetVehicle)
+                : new PursuitSpikeStrip(road, lane, stripLocation, targetVehicle);
         }
 
         #endregion
