@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Animation;
@@ -80,6 +81,45 @@ namespace AutomaticRoadblocks.SpikeStrip
         private bool IsInvalid => Instance == null || !Instance.IsValid();
 
         #endregion
+        
+        #region IPreviewSupport
+
+        /// <inheritdoc />
+        public bool IsPreviewActive => Road.IsPreviewActive;
+        
+        /// <inheritdoc />
+        public void CreatePreview()
+        {
+            if (IsPreviewActive)
+                return;
+            
+            Game.NewSafeFiber(() =>
+            {
+                Road.CreatePreview();
+                DoInternalSpawn();
+                
+                if (!IsInvalid)
+                    PreviewUtils.TransformToPreview(Instance);
+
+                while (IsPreviewActive)
+                {
+                    Game.DrawSphere(Position, 0.2f, Color.Red);
+                    Game.FiberYield();
+                }
+            }, "SpikeStrip.Preview");
+        }
+
+        /// <inheritdoc />
+        public void DeletePreview()
+        {
+            if (!IsPreviewActive)
+                return;
+            
+            Road.DeletePreview();
+            DoInternalCleanup();
+        }
+
+        #endregion
 
         #region Methods
 
@@ -108,12 +148,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// <inheritdoc />
         public void Dispose()
         {
-            _deployed = false;
-            if (Instance == null)
-                return;
-
-            EntityUtils.Remove(Instance);
-            UpdateState(ESpikeStripState.Disposed);
+            DoInternalCleanup();
         }
 
         #endregion
@@ -149,6 +184,16 @@ namespace AutomaticRoadblocks.SpikeStrip
             DoDeployAnimation();
             StartMonitor();
             UpdateState(ESpikeStripState.Deployed);
+        }
+
+        private void DoInternalCleanup()
+        {
+            _deployed = false;
+            if (Instance == null)
+                return;
+
+            EntityUtils.Remove(Instance);
+            UpdateState(ESpikeStripState.Disposed);
         }
 
         private void StartMonitor()

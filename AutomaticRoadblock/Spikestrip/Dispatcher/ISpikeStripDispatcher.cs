@@ -34,6 +34,14 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         ISpikeStrip Deploy(Road road, ESpikeStripLocation stripLocation);
 
         /// <summary>
+        /// Create a spike strip preview on the nearby road for the given position.
+        /// </summary>
+        /// <param name="position">The position to create the spike strip on.</param>
+        /// <param name="stripLocation">The placement location of the spike strip.</param>
+        /// <returns></returns>
+        ISpikeStrip CreatePreview(Vector3 position, ESpikeStripLocation stripLocation);
+
+        /// <summary>
         /// Remove all spike strips.
         /// </summary>
         void RemoveAll();

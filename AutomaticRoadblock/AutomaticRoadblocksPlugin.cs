@@ -27,6 +27,9 @@ namespace AutomaticRoadblocks
         public const string DeploySpikeStrip = "Deploy spike strip " + DebugIndicatorText;
         public const string DeploySpikeStripDescription = "Deploy a spike strip on the nearby road";
         public const string RemoveSpikeStrip = "Remove spike strip " + DebugIndicatorText;
+        public const string PreviewSpikeStrip = "Preview spike strip " + DebugIndicatorText;
+        public const string PreviewSpikeStripDescription = "Create a preview of the spike strip on the nearby road";
+        public const string RemoveSpikeStripPreview = "Remove spike strip preview " + DebugIndicatorText;
 
         private const string DebugIndicatorText = " [DEBUG]";
     }

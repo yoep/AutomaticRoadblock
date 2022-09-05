@@ -27,20 +27,27 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         /// <inheritdoc />
         public ISpikeStrip Spawn(Road road, ESpikeStripLocation stripLocation)
         {
-            return DoInternalSpikeStripCreation(road, stripLocation, false);
+            return DoInternalSpikeStripCreation(road, stripLocation, DeploymentType.Spawn);
         }
 
         /// <inheritdoc />
         public ISpikeStrip Deploy(Vector3 position, ESpikeStripLocation stripLocation)
         {
             var road = RoadUtils.FindClosestRoad(position, ERoadType.All);
-            return DoInternalSpikeStripCreation(road, stripLocation, true);
+            return DoInternalSpikeStripCreation(road, stripLocation, DeploymentType.Deploy);
         }
 
         /// <inheritdoc />
         public ISpikeStrip Deploy(Road road, ESpikeStripLocation stripLocation)
         {
-            return DoInternalSpikeStripCreation(road, stripLocation, true);
+            return DoInternalSpikeStripCreation(road, stripLocation, DeploymentType.Deploy);
+        }
+
+        /// <inheritdoc />
+        public ISpikeStrip CreatePreview(Vector3 position, ESpikeStripLocation stripLocation)
+        {
+            var road = RoadUtils.FindClosestRoad(position, ERoadType.All);
+            return DoInternalSpikeStripCreation(road, stripLocation, DeploymentType.Preview);
         }
 
         /// <inheritdoc />
@@ -58,7 +65,11 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         {
             lock (_spikeStrips)
             {
-                _spikeStrips.ForEach(x => x.Dispose());
+                _spikeStrips.ForEach(x =>
+                {
+                    x.DeletePreview();
+                    x.Dispose();
+                });
                 _spikeStrips.Clear();
             }
         }
@@ -67,7 +78,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
 
         #region Functions
 
-        private ISpikeStrip DoInternalSpikeStripCreation(Road road, ESpikeStripLocation stripLocation, bool deploy)
+        private ISpikeStrip DoInternalSpikeStripCreation(Road road, ESpikeStripLocation stripLocation, DeploymentType type)
         {
             ISpikeStrip spikeStrip;
 
@@ -78,15 +89,18 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
             }
 
             spikeStrip.StateChanged += SpikeStripStateChanged;
-            
-            // verify the way the spike strip should be created
-            if (deploy)
+
+            switch (type)
             {
-                spikeStrip.Deploy();
-            }
-            else
-            {
-                spikeStrip.Spawn();
+                case DeploymentType.Deploy:
+                    spikeStrip.Deploy();
+                    break;
+                case DeploymentType.Spawn:
+                    spikeStrip.Spawn();
+                    break;
+                case DeploymentType.Preview:
+                    spikeStrip.CreatePreview();
+                    break;
             }
 
             _logger.Info($"Spawned spike strip {spikeStrip}");
@@ -113,5 +127,12 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         }
 
         #endregion
+
+        private enum DeploymentType
+        {
+            Spawn,
+            Deploy,
+            Preview
+        }
     }
 }

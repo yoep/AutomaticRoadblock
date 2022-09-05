@@ -70,6 +70,7 @@
         <Compile Include="Debug\Menu\DebugDeploySpikeStripComponent.cs" />
         <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
         <Compile Include="Debug\Menu\CalloutEndComponent.cs" />
+        <Compile Include="Debug\Menu\DebugPreviewSpikeStripComponent.cs" />
         <Compile Include="Debug\Menu\PursuitForceOnFootComponent.cs" />
         <Compile Include="Debug\Menu\RoadInfoComponent.cs" />
         <Compile Include="Debug\Menu\RoadPreviewComponent.cs" />

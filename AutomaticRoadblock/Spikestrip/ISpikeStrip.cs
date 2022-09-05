@@ -1,9 +1,10 @@
 using System;
+using AutomaticRoadblocks.Preview;
 using Rage;
 
 namespace AutomaticRoadblocks.SpikeStrip
 {
-    public interface ISpikeStrip : IDisposable
+    public interface ISpikeStrip : IPreviewSupport, IDisposable
     {
         /// <summary>
         /// The position of the spike strip.
