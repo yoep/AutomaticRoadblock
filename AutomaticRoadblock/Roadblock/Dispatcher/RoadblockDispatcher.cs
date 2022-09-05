@@ -4,6 +4,7 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Pursuit.Factory;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
@@ -26,6 +27,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly ILocalizer _localizer;
+        private readonly ISpikeStripDispatcher _spikeStripDispatcher;
 
         private readonly List<RoadblockInfo> _roadblocks = new();
         private readonly List<Road> _foundRoads = new();
@@ -33,12 +35,14 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private bool _cleanerRunning;
         private bool _userRequestedRoadblockDispatching;
 
-        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer)
+        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer,
+            ISpikeStripDispatcher spikeStripDispatcher)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
             _localizer = localizer;
+            _spikeStripDispatcher = spikeStripDispatcher;
         }
 
         #region Properties
@@ -73,22 +77,22 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         #region IRoadblockDispatcher
 
         /// <inheritdoc />
-        public bool Dispatch(RoadblockLevel level, Vehicle vehicle, bool userRequested, bool force, bool atCurrentLocation = false)
+        public bool Dispatch(RoadblockLevel level, Vehicle vehicle, DispatchOptions options)
         {
             Assert.NotNull(level, "level cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
 
             _logger.Trace(
-                $"Starting roadblock dispatching with {nameof(level)}: {level}, {nameof(userRequested)}: {userRequested}, {nameof(force)}: {force}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
-            if (force || userRequested || IsRoadblockDispatchingAllowed(vehicle))
-                return DoInternalDispatch(level, vehicle, userRequested, atCurrentLocation);
+                $"Starting roadblock dispatching with {nameof(level)}: {level}, {nameof(options)}: {options}");
+            if (options.Force || options.IsUserRequested || IsRoadblockDispatchingAllowed(vehicle))
+                return DoInternalDispatch(level, vehicle, options);
 
-            _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
+            _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(options)}: {options}");
             return false;
         }
 
         /// <inheritdoc />
-        public void DispatchPreview(RoadblockLevel level, Vehicle vehicle, bool atCurrentLocation)
+        public void DispatchPreview(RoadblockLevel level, Vehicle vehicle, DispatchOptions options)
         {
             Assert.NotNull(level, "level cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
@@ -96,7 +100,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             _game.NewSafeFiber(() =>
             {
                 _logger.Debug("Dispatching new roadblock preview");
-                var roads = DetermineRoadblockLocationPreview(level, vehicle, atCurrentLocation);
+                var roads = DetermineRoadblockLocationPreview(level, vehicle, options.AtCurrentLocation);
                 var road = roads.Last();
                 _logger.Trace($"Dispatching roadblock on {road}");
 
@@ -172,7 +176,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                    GameUtils.TimePeriod is ETimePeriod.Evening or ETimePeriod.Night;
         }
 
-        private bool DoInternalDispatch(RoadblockLevel level, Vehicle vehicle, bool userRequest, bool atCurrentLocation)
+        private bool DoInternalDispatch(RoadblockLevel level, Vehicle vehicle, DispatchOptions options)
         {
             // start the cleaner if it's not yet running
             if (!_cleanerRunning)
@@ -182,19 +186,19 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // because of the fact that a user requested roadblock plays blocking audio,
             // the roadblock might still not have been deployed when a new one is requested
             if (_userRequestedRoadblockDispatching)
-                return DenyUserRequestForRoadblock(userRequest, "user requested roadblock is currently being dispatched");
+                return DenyUserRequestForRoadblock(options.IsUserRequested, "user requested roadblock is currently being dispatched");
 
-            if (userRequest)
+            if (options.IsUserRequested)
                 AllowUserRequestForRoadblock();
 
-            _logger.Debug($"Dispatching new roadblock with {nameof(userRequest)}: {userRequest}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
+            _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
             // calculate the roadblock location
-            var road = DetermineRoadblockLocation(level, vehicle, atCurrentLocation);
+            var road = DetermineRoadblockLocation(level, vehicle, options.AtCurrentLocation);
 
             // verify if another roadblock is already present nearby
             // if so, deny the roadblock request
             if (IsRoadblockNearby(road))
-                return DenyUserRequestForRoadblock(userRequest, $"a roadblock is already present in the vicinity for {road}");
+                return DenyUserRequestForRoadblock(options.IsUserRequested, $"a roadblock is already present in the vicinity for {road}");
 
             _game.NewSafeFiber(() =>
                 {

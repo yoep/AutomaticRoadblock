@@ -74,6 +74,11 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// </summary>
         private Object Instance { get; set; }
 
+        /// <summary>
+        /// Verify if the instance has been invalidated.
+        /// </summary>
+        private bool IsInvalid => Instance == null || !Instance.IsValid();
+
         #endregion
 
         #region Methods
@@ -81,34 +86,13 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// <inheritdoc />
         public void Spawn()
         {
-            if (Instance != null)
-                return;
-
-            Game.NewSafeFiber(() =>
-            {
-                Logger.Trace($"Spawning spike strip {this}");
-                Instance = PropUtils.CreateSpikeStrip(Position, Heading);
-                _animation = AnimationHelper.PlayAnimation(Instance, Animations.SpikeStripIdleUndeployed, Animations.Dictionaries.StingerDictionary,
-                    AnimationFlags.StayInEndFrame);
-                UpdateState(ESpikeStripState.Undeployed);
-            }, "SpikeStrip.Spawn");
+            Game.NewSafeFiber(DoInternalSpawn, "SpikeStrip.Spawn");
         }
 
         /// <inheritdoc />
         public void Deploy()
         {
-            // check if the instance exists, if not spawn it first
-            if (Instance == null)
-                Spawn();
-
-            Game.NewSafeFiber(() =>
-            {
-                UpdateState(ESpikeStripState.Deploying);
-                StopCurrentAnimation();
-                DoDeployAnimation();
-                StartMonitor();
-                UpdateState(ESpikeStripState.Deployed);
-            }, "SpikeStrip.Deploy");
+            Game.NewSafeFiber(DoInternalDeploy, "SpikeStrip.Deploy");
         }
 
         public override string ToString()
@@ -135,6 +119,37 @@ namespace AutomaticRoadblocks.SpikeStrip
         #endregion
 
         #region Functions
+
+        private void DoInternalSpawn()
+        {
+            if (!IsInvalid)
+                return;
+            
+            Logger.Trace($"Spawning spike strip {this}");
+            Instance = PropUtils.CreateSpikeStrip(Position, Heading);
+            _animation = AnimationHelper.PlayAnimation(Instance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripIdleUndeployed,
+                AnimationFlags.StayInEndFrame);
+            UpdateState(ESpikeStripState.Undeployed);
+        }
+
+        private void DoInternalDeploy()
+        {
+            if (IsInvalid)
+                DoInternalSpawn();
+
+            // wait for the spike strip to become available
+            while (State != ESpikeStripState.Undeployed)
+            {
+                Game.FiberYield();
+            }
+
+            Logger.Trace($"Deploying spike strip {this}");
+            UpdateState(ESpikeStripState.Deploying);
+            StopCurrentAnimation();
+            DoDeployAnimation();
+            StartMonitor();
+            UpdateState(ESpikeStripState.Deployed);
+        }
 
         private void StartMonitor()
         {
@@ -195,12 +210,15 @@ namespace AutomaticRoadblocks.SpikeStrip
         {
             _animation?.Stop();
         }
-        
+
         private void DoDeployAnimation()
         {
+            if (IsInvalid)
+                return;
+
             SoundHelper.PlaySound(Instance, Sounds.StingerDrop, Sounds.StingerDropRef);
-            _animation = AnimationHelper.PlayAnimation(Instance, Animations.SpikeStripDeploy, Animations.Dictionaries.StingerDictionary, AnimationFlags.StayInEndFrame);
-            _animation.Speed = 1.2f;
+            _animation = AnimationHelper.PlayAnimation(Instance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
+                AnimationFlags.StayInEndFrame);
             _animation.WaitForCompletion();
         }
 

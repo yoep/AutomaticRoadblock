@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
@@ -24,20 +25,22 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         #region ISpikeStripDispatcher
 
         /// <inheritdoc />
-        public void Deploy(Vector3 position)
+        public ISpikeStrip Spawn(Road road, ESpikeStripLocation stripLocation)
+        {
+            return DoInternalSpikeStripCreation(road, stripLocation, false);
+        }
+
+        /// <inheritdoc />
+        public ISpikeStrip Deploy(Vector3 position, ESpikeStripLocation stripLocation)
         {
             var road = RoadUtils.FindClosestRoad(position, ERoadType.All);
+            return DoInternalSpikeStripCreation(road, stripLocation, true);
+        }
 
-            lock (_spikeStrips)
-            {
-                var spikeStrip = new SpikeStrip(road, ESpikeStripLocation.Right);
-                
-                spikeStrip.StateChanged += SpikeStripStateChanged;
-                spikeStrip.Deploy();
-                
-                _spikeStrips.Add(spikeStrip);
-                _logger.Info($"Spawned spike strip {spikeStrip}");
-            }
+        /// <inheritdoc />
+        public ISpikeStrip Deploy(Road road, ESpikeStripLocation stripLocation)
+        {
+            return DoInternalSpikeStripCreation(road, stripLocation, true);
         }
 
         /// <inheritdoc />
@@ -55,20 +58,60 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         {
             lock (_spikeStrips)
             {
-                _spikeStrips.ForEach(x=>x.Dispose());
+                _spikeStrips.ForEach(x => x.Dispose());
                 _spikeStrips.Clear();
             }
         }
 
         #endregion
-        
+
         #region Functions
+
+        private ISpikeStrip DoInternalSpikeStripCreation(Road road, ESpikeStripLocation stripLocation, bool deploy)
+        {
+            ISpikeStrip spikeStrip;
+
+            lock (_spikeStrips)
+            {
+                spikeStrip = new SpikeStrip(road, stripLocation);
+                _spikeStrips.Add(spikeStrip);
+            }
+
+            spikeStrip.StateChanged += SpikeStripStateChanged;
+            
+            // verify the way the spike strip should be created
+            if (deploy)
+            {
+                spikeStrip.Deploy();
+            }
+            else
+            {
+                spikeStrip.Spawn();
+            }
+
+            _logger.Info($"Spawned spike strip {spikeStrip}");
+            return spikeStrip;
+        }
 
         private void SpikeStripStateChanged(ISpikeStrip spikeStrip, ESpikeStripState state)
         {
             _logger.Debug($"Spike strip state changed to {state} for {spikeStrip}");
+            if (state == ESpikeStripState.Deploying)
+            {
+                LspdfrUtils.PlayScannerAudio(GetAudioName(spikeStrip.Location));
+            }
         }
-        
+
+        private static string GetAudioName(ESpikeStripLocation stripLocation)
+        {
+            return stripLocation switch
+            {
+                ESpikeStripLocation.Left => AudioSpikeStripDeployedLeft,
+                ESpikeStripLocation.Middle => AudioSpikeStripDeployedMiddle,
+                _ => AudioSpikeStripDeployedRight
+            };
+        }
+
         #endregion
     }
 }

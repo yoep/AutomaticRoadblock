@@ -157,6 +157,7 @@
         <Compile Include="RedirectTraffic\RedirectTrafficDispatcher.cs" />
         <Compile Include="RedirectTraffic\RedirectTrafficType.cs" />
         <Compile Include="Roadblock\AbstractPursuitRoadblock.cs" />
+        <Compile Include="Roadblock\Dispatcher\DispatchOptions.cs" />
         <Compile Include="Roadblock\Dispatcher\IRoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockInfo.cs" />

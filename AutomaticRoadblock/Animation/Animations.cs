@@ -15,6 +15,7 @@ namespace AutomaticRoadblocks.Animation
             static Dictionaries()
             {
                 StingerDictionary = new AnimationDictionary("p_ld_stinger_s");
+                StingerDictionary.LoadAndWait();
             }
         }
     }

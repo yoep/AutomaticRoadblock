@@ -191,7 +191,11 @@ namespace AutomaticRoadblocks.Pursuit
             }
 
             _logger.Trace("Creating pursuit roadblock preview");
-            _roadblockDispatcher.DispatchPreview(ToRoadblockLevel(PursuitLevel), vehicle, currentLocation);
+            _roadblockDispatcher.DispatchPreview(ToRoadblockLevel(PursuitLevel), vehicle, new DispatchOptions
+            {
+                EnableSpikeStrips = EnableSpikeStrips,
+                AtCurrentLocation = currentLocation
+            });
         }
 
         #endregion
@@ -396,7 +400,13 @@ namespace AutomaticRoadblocks.Pursuit
             _logger.Debug(
                 $"Dispatching roadblock for pursuit with {nameof(PursuitLevel)}: {PursuitLevel}, {nameof(userRequested)}: {userRequested}, " +
                 $"{nameof(force)}: {force}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
-            var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, userRequested, force, atCurrentLocation);
+            var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, new DispatchOptions
+            {
+                EnableSpikeStrips = EnableSpikeStrips,
+                IsUserRequested = userRequested,
+                Force = force,
+                AtCurrentLocation = atCurrentLocation
+            });
 
             if (dispatched)
             {
@@ -496,7 +506,7 @@ namespace AutomaticRoadblocks.Pursuit
             // if not, ignore the state change as nothing is applied
             if (State != EPursuitState.ActiveOnFoot)
                 return;
-            
+
             _roadblockDispatcher.DismissActiveRoadblocks();
         }
 
