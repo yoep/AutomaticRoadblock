@@ -187,6 +187,7 @@
         <Compile Include="Spikestrip\ESpikeStripLocation.cs" />
         <Compile Include="Spikestrip\ESpikeStripState.cs" />
         <Compile Include="Spikestrip\ISpikeStrip.cs" />
+        <Compile Include="Spikestrip\PursuitSpikeStrip.cs" />
         <Compile Include="Spikestrip\SpikeStrip.cs" />
         <Compile Include="Spikestrip\SpikeStripEvents.cs" />
         <Compile Include="Utils\EntityUtils.cs" />

@@ -8,7 +8,6 @@ namespace AutomaticRoadblocks.SpikeStrip
         Deployed,
         Bypassed,
         Hit,
-        Error,
         Disposed
     }
 }

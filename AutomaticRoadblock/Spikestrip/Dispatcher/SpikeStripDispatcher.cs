@@ -43,6 +43,11 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
             return DoInternalSpikeStripCreation(road, stripLocation, DeploymentType.Deploy);
         }
 
+        public ISpikeStrip Deploy(Road road, ESpikeStripLocation stripLocation, Vehicle targetVehicle)
+        {
+            return DoInternalSpikeStripCreation(road, stripLocation, DeploymentType.Deploy, targetVehicle);
+        }
+
         /// <inheritdoc />
         public ISpikeStrip CreatePreview(Vector3 position, ESpikeStripLocation stripLocation)
         {
@@ -78,13 +83,15 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
 
         #region Functions
 
-        private ISpikeStrip DoInternalSpikeStripCreation(Road road, ESpikeStripLocation stripLocation, DeploymentType type)
+        private ISpikeStrip DoInternalSpikeStripCreation(Road road, ESpikeStripLocation stripLocation, DeploymentType type, Vehicle targetVehicle = null)
         {
             ISpikeStrip spikeStrip;
 
             lock (_spikeStrips)
             {
-                spikeStrip = new SpikeStrip(road, stripLocation);
+                spikeStrip = targetVehicle == null
+                    ? new SpikeStrip(road, stripLocation)
+                    : new PursuitSpikeStrip(road, stripLocation, targetVehicle);
                 _spikeStrips.Add(spikeStrip);
             }
 
@@ -110,9 +117,17 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         private void SpikeStripStateChanged(ISpikeStrip spikeStrip, ESpikeStripState state)
         {
             _logger.Debug($"Spike strip state changed to {state} for {spikeStrip}");
-            if (state == ESpikeStripState.Deploying)
+            switch (state)
             {
-                LspdfrUtils.PlayScannerAudio(GetAudioName(spikeStrip.Location));
+                case ESpikeStripState.Deploying:
+                    LspdfrUtils.PlayScannerAudio(GetAudioName(spikeStrip.Location));
+                    break;
+                case ESpikeStripState.Hit:
+                    LspdfrUtils.PlayScannerAudio(AudioSpikeStripHit);
+                    break;
+                case ESpikeStripState.Bypassed:
+                    LspdfrUtils.PlayScannerAudio(AudioSpikeStripBypassed);
+                    break;
             }
         }
 

@@ -12,12 +12,14 @@ using Rage.Native;
 
 namespace AutomaticRoadblocks.SpikeStrip
 {
+    /// <summary>
+    /// A basic spike strip implementation which implements the <see cref="ISpikeStrip"/>.
+    /// </summary>
     public class SpikeStrip : ISpikeStrip
     {
-        private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
+        protected static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+        protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
-        private bool _deployed;
         private AnimationExecutor _animation;
 
         public SpikeStrip(Road road, ESpikeStripLocation location)
@@ -81,23 +83,23 @@ namespace AutomaticRoadblocks.SpikeStrip
         private bool IsInvalid => Instance == null || !Instance.IsValid();
 
         #endregion
-        
+
         #region IPreviewSupport
 
         /// <inheritdoc />
         public bool IsPreviewActive => Road.IsPreviewActive;
-        
+
         /// <inheritdoc />
         public void CreatePreview()
         {
             if (IsPreviewActive)
                 return;
-            
+
             Game.NewSafeFiber(() =>
             {
                 Road.CreatePreview();
                 DoInternalSpawn();
-                
+
                 if (!IsInvalid)
                     PreviewUtils.TransformToPreview(Instance);
 
@@ -114,7 +116,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         {
             if (!IsPreviewActive)
                 return;
-            
+
             Road.DeletePreview();
             DoInternalCleanup();
         }
@@ -155,11 +157,39 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         #region Functions
 
+        /// <summary>
+        /// Invoked when the given vehicle has hit this spike strip.
+        /// </summary>
+        /// <param name="vehicle">The vehicle that hit the spike strip.</param>
+        /// <param name="wheel">The vehicle's wheel that hit it.</param>
+        protected virtual void VehicleHitSpikeStrip(Vehicle vehicle, VehicleWheel wheel)
+        {
+            wheel.BurstTire();
+        }
+
+        /// <summary>
+        /// Process additional verifications while the spike strip is active.
+        /// </summary>
+        protected virtual void DoAdditionalVerifications()
+        {
+            // no-op
+        }
+
+        /// <summary>
+        /// Update the state of the spike strip.
+        /// </summary>
+        /// <param name="state">The new state of this spike strip.</param>
+        protected void UpdateState(ESpikeStripState state)
+        {
+            State = state;
+            StateChanged?.Invoke(this, state);
+        }
+
         private void DoInternalSpawn()
         {
             if (!IsInvalid)
                 return;
-            
+
             Logger.Trace($"Spawning spike strip {this}");
             Instance = PropUtils.CreateSpikeStrip(Position, Heading);
             _animation = AnimationHelper.PlayAnimation(Instance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripIdleUndeployed,
@@ -182,41 +212,47 @@ namespace AutomaticRoadblocks.SpikeStrip
             UpdateState(ESpikeStripState.Deploying);
             StopCurrentAnimation();
             DoDeployAnimation();
-            StartMonitor();
             UpdateState(ESpikeStripState.Deployed);
+            StartMonitor();
         }
 
         private void DoInternalCleanup()
         {
-            _deployed = false;
             if (Instance == null)
                 return;
 
-            EntityUtils.Remove(Instance);
             UpdateState(ESpikeStripState.Disposed);
+            EntityUtils.Remove(Instance);
         }
 
         private void StartMonitor()
         {
-            _deployed = true;
             Game.NewSafeFiber(() =>
             {
-                while (_deployed)
+                while (State is not ESpikeStripState.Preparing or ESpikeStripState.Undeployed or ESpikeStripState.Disposed)
                 {
-                    foreach (var wheel in from vehicle in NearbyVehicles()
-                             from wheelIndex in AllWheels()
-                             where vehicle.HasBone(wheelIndex.BoneName) && !IsVehicleTireBurst(vehicle, wheelIndex, false)
-                             select vehicle.Wheels[wheelIndex.Index]
-                             into wheel
-                             where IsTouchingTheInstance(wheel.LastContactPoint)
-                             select wheel)
-                    {
-                        wheel.BurstTire();
-                    }
-
+                    DoNearbyVehiclesCheck();
+                    DoAdditionalVerifications();
                     Game.FiberYield();
                 }
             }, "SpikeStrip.Monitor");
+        }
+
+        private void DoNearbyVehiclesCheck()
+        {
+            foreach (var vehicle in NearbyVehicles())
+            {
+                foreach (var wheelIndex in AllWheels())
+                {
+                    if (!vehicle.HasBone(wheelIndex.BoneName) || IsVehicleTireBurst(vehicle, wheelIndex, false))
+                        continue;
+
+                    var wheel = vehicle.Wheels[wheelIndex.Index];
+
+                    if (IsTouchingTheInstance(wheel.LastContactPoint))
+                        VehicleHitSpikeStrip(vehicle, wheel);
+                }
+            }
         }
 
         private IEnumerable<Vehicle> NearbyVehicles()
@@ -225,12 +261,6 @@ namespace AutomaticRoadblocks.SpikeStrip
                 .GetEntities(Position, PropUtils.Models.SpikeStrip.Dimensions.Y, GetEntitiesFlags.ConsiderGroundVehicles)
                 .OfType<Vehicle>()
                 .Where(x => x.IsValid());
-        }
-
-        private void UpdateState(ESpikeStripState state)
-        {
-            State = state;
-            StateChanged?.Invoke(this, state);
         }
 
         // Credits to PNWParksFan (see discord knowledge base)

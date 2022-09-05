@@ -34,6 +34,16 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         ISpikeStrip Deploy(Road road, ESpikeStripLocation stripLocation);
 
         /// <summary>
+        /// Deploy a spike strip on the given road for the target vehicle.
+        /// This spike strip will monitor if the spike strip is hit/bypassed by the target vehicle.
+        /// </summary>
+        /// <param name="road">The road to deploy a spike strip at.</param>
+        /// <param name="stripLocation">The location of the spike strip on the road.</param>
+        /// <param name="targetVehicle">The vehicle to monitor.</param>
+        /// <returns>Returns the deployed spike strip.</returns>
+        ISpikeStrip Deploy(Road road, ESpikeStripLocation stripLocation, Vehicle targetVehicle);
+
+        /// <summary>
         /// Create a spike strip preview on the nearby road for the given position.
         /// </summary>
         /// <param name="position">The position to create the spike strip on.</param>
