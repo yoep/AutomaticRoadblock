@@ -57,6 +57,14 @@ namespace AutomaticRoadblocks.Animation
             return NativeFunction.Natives.IS_ENTITY_PLAYING_ANIM<bool>(entity, animationDictionary.Name, animationName, 3);
         }
 
+        public static float GetAnimationCurrentTime(Entity entity, AnimationDictionary animationDictionary, string animationName)
+        {
+            Assert.NotNull(entity, "entity cannot be null");
+            Assert.HasText(animationDictionary, "animationDictionary cannot be empty");
+            Assert.HasText(animationName, "animationName cannot be empty");
+            return NativeFunction.Natives.GET_ENTITY_ANIM_CURRENT_TIME<float>(entity, animationDictionary.Name, animationName);
+        }
+
         public static void StopAnimation(Entity entity, AnimationDictionary animationDictionary, string animationName)
         {
             Assert.NotNull(entity, "entity cannot be null");

@@ -14,6 +14,7 @@ namespace AutomaticRoadblocks.SpikeStrip
 {
     /// <summary>
     /// A basic spike strip implementation which implements the <see cref="ISpikeStrip"/>.
+    /// This spike strip implements the animations & logic for bursting tires when needed.
     /// </summary>
     public class SpikeStrip : ISpikeStrip
     {
@@ -73,6 +74,9 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         /// <inheritdoc />
         public ESpikeStripState State { get; private set; } = ESpikeStripState.Preparing;
+        
+        /// <inheritdoc />
+        public Object GameInstance { get; private set; }
 
         /// <inheritdoc />
         public event SpikeStripEvents.SpikeStripStateChanged StateChanged;
@@ -88,14 +92,9 @@ namespace AutomaticRoadblocks.SpikeStrip
         private Road.Lane Lane { get; }
 
         /// <summary>
-        /// The spike strip instance.
-        /// </summary>
-        private Object Instance { get; set; }
-
-        /// <summary>
         /// Verify if the instance has been invalidated.
         /// </summary>
-        private bool IsInvalid => Instance == null || !Instance.IsValid();
+        private bool IsInvalid => GameInstance == null || !GameInstance.IsValid();
 
         #endregion
 
@@ -112,11 +111,15 @@ namespace AutomaticRoadblocks.SpikeStrip
 
             Game.NewSafeFiber(() =>
             {
+                Logger.Trace($"Creating spike strip preview for {this}");
                 Road.CreatePreview();
                 DoInternalSpawn();
 
                 if (!IsInvalid)
-                    PreviewUtils.TransformToPreview(Instance);
+                {
+                    PreviewUtils.TransformToPreview(GameInstance);
+                    Logger.Debug($"Created spike strip preview for {this}");
+                }
 
                 while (IsPreviewActive)
                 {
@@ -212,9 +215,8 @@ namespace AutomaticRoadblocks.SpikeStrip
                 return;
 
             Logger.Trace($"Spawning spike strip {this}");
-            Instance = PropUtils.CreateSpikeStrip(Position, Heading);
-            _animation = AnimationHelper.PlayAnimation(Instance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripIdleUndeployed,
-                AnimationFlags.StayInEndFrame);
+            GameInstance = PropUtils.CreateSpikeStrip(Position, Heading);
+            DoUndeployAnimation();
             UpdateState(ESpikeStripState.Undeployed);
         }
 
@@ -250,11 +252,11 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         private void DoInternalCleanup()
         {
-            if (Instance == null)
+            if (GameInstance == null)
                 return;
 
             UpdateState(ESpikeStripState.Disposed);
-            EntityUtils.Remove(Instance);
+            EntityUtils.Remove(GameInstance);
         }
 
         private void StartMonitor()
@@ -298,8 +300,8 @@ namespace AutomaticRoadblocks.SpikeStrip
         // Credits to PNWParksFan (see discord knowledge base)
         private bool IsTouchingTheInstance(Vector3 position)
         {
-            var instancePosition = Instance.Position;
-            var orientation = Instance.Orientation;
+            var instancePosition = GameInstance.Position;
+            var orientation = GameInstance.Orientation;
             var size = PropUtils.Models.SpikeStrip.Dimensions;
             var compareAgainst = position - instancePosition;
             orientation.GetAxes(right: out var xRot, out var yRot, out var zRot);
@@ -323,8 +325,8 @@ namespace AutomaticRoadblocks.SpikeStrip
             if (IsInvalid)
                 return;
 
-            SoundHelper.PlaySound(Instance, Sounds.StingerDrop, Sounds.StingerDropRef);
-            _animation = AnimationHelper.PlayAnimation(Instance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
+            SoundHelper.PlaySound(GameInstance, Sounds.StingerDrop, Sounds.StingerDropRef);
+            _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
                 AnimationFlags.StayInEndFrame);
             _animation.WaitForCompletion();
         }
@@ -334,9 +336,10 @@ namespace AutomaticRoadblocks.SpikeStrip
             if (IsInvalid)
                 return;
 
-            SoundHelper.PlaySound(Instance, Sounds.StingerDrop, Sounds.StingerDropRef);
-            _animation = AnimationHelper.PlayAnimation(Instance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripIdleUndeployed,
+            SoundHelper.PlaySound(GameInstance, Sounds.StingerDrop, Sounds.StingerDropRef);
+            _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripIdleUndeployed,
                 AnimationFlags.StayInEndFrame);
+            PropUtils.PlaceCorrectlyOnGround(GameInstance);
             _animation.WaitForCompletion();
         }
 

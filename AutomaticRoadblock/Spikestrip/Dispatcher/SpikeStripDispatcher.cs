@@ -9,12 +9,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
 {
     public class SpikeStripDispatcher : ISpikeStripDispatcher
     {
-        private const string AudioSpikeStripBypassed = "ROADBLOCK_SPIKESTRIP_BYPASSED";
-        private const string AudioSpikeStripHit = "ROADBLOCK_SPIKESTRIP_HIT";
-        private const string AudioSpikeStripDeployedLeft = "ROADBLOCK_SPIKESTRIP_DEPLOYED_LEFT";
-        private const string AudioSpikeStripDeployedMiddle = "ROADBLOCK_SPIKESTRIP_DEPLOYED_MIDDLE";
-        private const string AudioSpikeStripDeployedRight = "ROADBLOCK_SPIKESTRIP_DEPLOYED_RIGHT";
-
         private readonly ILogger _logger;
         private readonly List<ISpikeStrip> _spikeStrips = new();
 
@@ -34,7 +28,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         /// <inheritdoc />
         public ISpikeStrip Spawn(Road road, Road.Lane lane, ESpikeStripLocation stripLocation, Vehicle targetVehicle)
         {
-            return DoInternalSpikeStripCreation(road, stripLocation, DeploymentType.Spawn, targetVehicle);
+            return DoInternalSpikeStripCreation(road, lane, stripLocation, DeploymentType.Spawn, targetVehicle);
         }
 
         /// <inheritdoc />
@@ -130,28 +124,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         private void SpikeStripStateChanged(ISpikeStrip spikeStrip, ESpikeStripState state)
         {
             _logger.Debug($"Spike strip state changed to {state} for {spikeStrip}");
-            switch (state)
-            {
-                case ESpikeStripState.Deploying:
-                    LspdfrUtils.PlayScannerAudio(GetAudioName(spikeStrip.Location));
-                    break;
-                case ESpikeStripState.Hit:
-                    LspdfrUtils.PlayScannerAudio(AudioSpikeStripHit);
-                    break;
-                case ESpikeStripState.Bypassed:
-                    LspdfrUtils.PlayScannerAudio(AudioSpikeStripBypassed);
-                    break;
-            }
-        }
-
-        private static string GetAudioName(ESpikeStripLocation stripLocation)
-        {
-            return stripLocation switch
-            {
-                ESpikeStripLocation.Left => AudioSpikeStripDeployedLeft,
-                ESpikeStripLocation.Middle => AudioSpikeStripDeployedMiddle,
-                _ => AudioSpikeStripDeployedRight
-            };
         }
 
         private static SpikeStrip DoSpikeStripCreation(Road road, ESpikeStripLocation stripLocation)

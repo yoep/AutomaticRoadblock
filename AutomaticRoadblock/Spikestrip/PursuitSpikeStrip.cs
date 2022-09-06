@@ -1,4 +1,5 @@
 using System;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
@@ -6,11 +7,17 @@ namespace AutomaticRoadblocks.SpikeStrip
 {
     /// <summary>
     /// The pursuit spike strip is responsible for detecting if the target vehicle has been hit with the spike strip.
+    /// Next to the detection system, it will also play the audio effects for the spike strip during a pursuit.
     /// It extends upon the basic functionality of <see cref="SpikeStrip"/>.
     /// </summary>
     public class PursuitSpikeStrip : SpikeStrip
     {
         private const float BypassTolerance = 20f;
+        private const string AudioSpikeStripBypassed = "ROADBLOCK_SPIKESTRIP_BYPASSED";
+        private const string AudioSpikeStripHit = "ROADBLOCK_SPIKESTRIP_HIT";
+        private const string AudioSpikeStripDeployedLeft = "ROADBLOCK_SPIKESTRIP_DEPLOYED_LEFT";
+        private const string AudioSpikeStripDeployedMiddle = "ROADBLOCK_SPIKESTRIP_DEPLOYED_MIDDLE";
+        private const string AudioSpikeStripDeployedRight = "ROADBLOCK_SPIKESTRIP_DEPLOYED_RIGHT";
         
         private float _lastKnownDistanceToSpikeStrip = 9999f;
         
@@ -19,6 +26,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
+            StateChanged += SpikeStripStateChanged;
         }
 
         internal PursuitSpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle) 
@@ -38,7 +46,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         private bool IsVehicleInstanceInvalid => TargetVehicle == null || !TargetVehicle.IsValid();
             
         #endregion
-        
+
         #region Functions
 
         /// <inheritdoc />
@@ -70,6 +78,32 @@ namespace AutomaticRoadblocks.SpikeStrip
                 UpdateState(ESpikeStripState.Bypassed);
                 Logger.Info("Spike strip has been bypassed");
             }
+        }
+        
+        private static void SpikeStripStateChanged(ISpikeStrip spikeStrip, ESpikeStripState state)
+        {
+            switch (state)
+            {
+                case ESpikeStripState.Deploying:
+                    LspdfrUtils.PlayScannerAudio(GetAudioName(spikeStrip.Location));
+                    break;
+                case ESpikeStripState.Hit:
+                    LspdfrUtils.PlayScannerAudio(AudioSpikeStripHit);
+                    break;
+                case ESpikeStripState.Bypassed:
+                    LspdfrUtils.PlayScannerAudio(AudioSpikeStripBypassed);
+                    break;
+            }
+        }
+        
+        private static string GetAudioName(ESpikeStripLocation stripLocation)
+        {
+            return stripLocation switch
+            {
+                ESpikeStripLocation.Left => AudioSpikeStripDeployedLeft,
+                ESpikeStripLocation.Middle => AudioSpikeStripDeployedMiddle,
+                _ => AudioSpikeStripDeployedRight
+            };
         }
 
         #endregion

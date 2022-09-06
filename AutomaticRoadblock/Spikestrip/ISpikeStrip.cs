@@ -1,6 +1,7 @@
 using System;
 using AutomaticRoadblocks.Preview;
 using Rage;
+using Object = Rage.Object;
 
 namespace AutomaticRoadblocks.SpikeStrip
 {
@@ -25,6 +26,11 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// The state of the spike strip.
         /// </summary>
         ESpikeStripState State { get; }
+        
+        /// <summary>
+        /// The spike strip game instance.
+        /// </summary>
+        Object GameInstance { get; }
         
         /// <summary>
         /// Invoked when the state is changed.

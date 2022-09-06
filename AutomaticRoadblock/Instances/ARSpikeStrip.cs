@@ -13,22 +13,22 @@ namespace AutomaticRoadblocks.Instances
         #region Properties
 
         /// <inheritdoc />
-        public Object GameInstance => null;
+        public Object GameInstance => SpikeStrip?.GameInstance;
 
         /// <inheritdoc />
-        public bool IsInvalid => SpikeStrip.State == ESpikeStripState.Disposed;
+        public bool IsInvalid => SpikeStrip.State is ESpikeStripState.Preparing or ESpikeStripState.Disposed;
 
         /// <summary>
         /// The spike strip instance.
         /// </summary>
-        private ISpikeStrip SpikeStrip { get; }
+        public ISpikeStrip SpikeStrip { get; }
 
         #endregion
 
         /// <inheritdoc />
         public void Release()
         {
-            // retract
+            // retract the spike strip
             SpikeStrip.Undeploy();
         }
 

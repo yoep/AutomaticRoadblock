@@ -26,7 +26,8 @@ namespace AutomaticRoadblocks.Roadblock
 
         private float _lastKnownDistanceToRoadblock = 9999f;
 
-        protected AbstractPursuitRoadblock(ISpikeStripDispatcher spikeStripDispatcher, Road road, BarrierType mainBarrierType, Vehicle targetVehicle, bool limitSpeed, bool addLights,
+        protected AbstractPursuitRoadblock(ISpikeStripDispatcher spikeStripDispatcher, Road road, BarrierType mainBarrierType, Vehicle targetVehicle,
+            bool limitSpeed, bool addLights,
             bool spikeStripEnabled)
             : base(road, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, limitSpeed, addLights)
         {
@@ -57,7 +58,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// This might be the case by the pursuit suddenly being (forcefully) ended.
         /// </summary>
         private bool IsVehicleInstanceInvalid => TargetVehicle == null || !TargetVehicle.IsValid();
-        
+
         /// <summary>
         /// The spike strip dispatcher to use for deploying spike strip slots.
         /// </summary>
@@ -107,8 +108,8 @@ namespace AutomaticRoadblocks.Roadblock
             }
 
             return lanesToBlock
-                .Select(lane => lane == spikeStripLane 
-                    ? CreateSpikeStripSlot(lane, Heading, TargetVehicle, IsLightsEnabled) 
+                .Select(lane => lane == spikeStripLane
+                    ? CreateSpikeStripSlot(lane, Heading, TargetVehicle, IsLightsEnabled)
                     : CreateSlot(lane, Heading, TargetVehicle, IsLightsEnabled))
                 .ToList();
         }
@@ -230,7 +231,7 @@ namespace AutomaticRoadblocks.Roadblock
         private void VerifyRoadblockCopKilled()
         {
             var hasACopBeenKilled = Slots
-                .Select(x => (IPursuitRoadblockSlot)x)
+                .OfType<IPursuitRoadblockSlot>()
                 .Any(x => x.HasCopBeenKilledByTarget);
 
             if (hasACopBeenKilled)

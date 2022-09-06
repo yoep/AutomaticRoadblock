@@ -33,8 +33,8 @@ namespace AutomaticRoadblocks.Animation
         /// <summary>
         /// Verify if the animation is still playing.
         /// </summary>
-        public bool IsPlaying => AnimationHelper.IsAnimationPlaying(Entity, Dictionary, Animation);
-        
+        public bool IsPlaying => IsAnimationPlaying();
+
         /// <summary>
         /// The animation speed of this task.
         /// </summary>
@@ -75,6 +75,12 @@ namespace AutomaticRoadblocks.Animation
         {
             _speed = value;
             AnimationHelper.SetAnimationSpeed(Entity, Dictionary, Animation, value);
+        }
+        
+        private bool IsAnimationPlaying()
+        {
+            return AnimationHelper.GetAnimationCurrentTime(Entity, Dictionary, Animation) < 1.0f 
+                   || AnimationHelper.IsAnimationPlaying(Entity, Dictionary, Animation);
         }
 
         #endregion

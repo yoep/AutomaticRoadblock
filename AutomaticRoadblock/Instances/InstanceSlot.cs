@@ -77,7 +77,7 @@ namespace AutomaticRoadblocks.Instances
                 if (instance != null)
                 {
                     Instance = instance;
-                    return Instance.GameInstance.IsValid();
+                    return Instance.GameInstance != null && Instance.GameInstance.IsValid();
                 }
             }
             catch (Exception ex)
