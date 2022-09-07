@@ -6,12 +6,12 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class ZoneInfoComponent : IMenuComponent<UIMenuItem>
+    public class DebugZoneInfoComponent : IMenuComponent<UIMenuItem>
     {
         private readonly ILogger _logger;
         private readonly IGame _game;
 
-        public ZoneInfoComponent(ILogger logger,IGame game)
+        public DebugZoneInfoComponent(ILogger logger,IGame game)
         {
             _logger = logger;
             _game = game;

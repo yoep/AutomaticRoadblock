@@ -6,8 +6,9 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
@@ -442,12 +443,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var distanceToLeftSide = Lane.Position.DistanceTo(Road.LeftSide);
             var distanceToRightSide = Lane.Position.DistanceTo(Road.RightSide);
 
-            Logger.Debug($"Left side closer: {distanceToLeftSide < distanceToRightSide}\n" +
-                         $"Right side closer: {distanceToRightSide < distanceToLeftSide}\n" +
-                         $"Is lane opposite: {Lane.IsOppositeDirectionOfRoad}");
+            Logger.Debug($"Left side closer: {distanceToLeftSide < distanceToRightSide}, " +
+                         $"Right side closer: {distanceToRightSide < distanceToLeftSide}, " +
+                         $"Is lane opposite: {Lane.IsOppositeHeadingOfRoadNodeHeading}");
             var isLeftSideCloser = distanceToLeftSide < distanceToRightSide;
 
-            if (Lane.IsOppositeDirectionOfRoad)
+            if (Lane.IsOppositeHeadingOfRoadNodeHeading)
                 isLeftSideCloser = !isLeftSideCloser;
 
             return isLeftSideCloser;

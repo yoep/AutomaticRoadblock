@@ -18,8 +18,6 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
             MenuItem = new UIMenuListScrollerItem<BarrierType>(localizer[LocalizationKey.Barrier], localizer[LocalizationKey.BarrierDescription],
                 new List<BarrierType>
                 {
-                    BarrierType.SmallCone,
-                    BarrierType.SmallConeStriped,
                     BarrierType.BigCone,
                     BarrierType.BigConeStriped,
                     BarrierType.WorkBarrierSmall,

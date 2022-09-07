@@ -3,23 +3,24 @@ using System.Diagnostics;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
-using AutomaticRoadblocks.Utils.Type;
+using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
 using Rage;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class PursuitToggleComponent : IMenuComponent<UIMenuItem>
+    public class DebugPursuitToggleComponent : IMenuComponent<UIMenuItem>
     {
         private readonly IGame _game;
         private readonly Random _random = new();
 
         private LHandle _currentPursuit;
 
-        public PursuitToggleComponent(IGame game)
+        public DebugPursuitToggleComponent(IGame game)
         {
             _game = game;
             Events.OnPursuitEnded += OnPursuitEnded;
@@ -54,7 +55,7 @@ namespace AutomaticRoadblocks.Debug.Menu
             {
                 _currentPursuit = Functions.CreatePursuit();
 
-                var road = RoadUtils.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, ERoadType.All);
+                var road = (Road)RoadQuery.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f, EVehicleNodeType.AllNodes);
                 var lane = road.Lanes.First();
                 var driver = new Ped(road.Position);
                 var passenger = new Ped(road.Position);

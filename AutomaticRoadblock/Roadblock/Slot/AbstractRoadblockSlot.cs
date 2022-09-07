@@ -7,7 +7,7 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Localization;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -197,6 +197,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public virtual void Release()
         {
             RoadblockHelpers.ReleaseInstancesToLspdfr(this);
+        }
+
+        /// <inheritdoc />
+        public void WarpInVehicle()
+        {
+            CopInstances.ToList()
+                .ForEach(x => x.WarpIntoVehicle(Vehicle, EVehicleSeat.Any));
         }
 
         #endregion

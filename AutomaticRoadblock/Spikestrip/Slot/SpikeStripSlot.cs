@@ -1,11 +1,10 @@
-using System;
 using System.Linq;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Street.Info;
 using JetBrains.Annotations;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
@@ -18,13 +17,14 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
     /// </summary>
     public class SpikeStripSlot : AbstractRoadblockSlot
     {
-        private const float DeploySpikeStripRange = 40f;
+        private const float DeploySpikeStripRange = 55f;
         private const int DelayBetweenStateChangeAndUndeploy = 2 * 1000;
         private const float PlacementInFrontOfVehicle = 0.1f;
 
         private bool _hasBeenDeployed;
 
-        public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road road, Road.Lane lane, Vehicle targetVehicle, float heading, bool shouldAddLights,
+        public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road street, Road.Lane lane, Vehicle targetVehicle, float heading,
+            bool shouldAddLights,
             float offset = 0)
             : base(lane, BarrierType.None, VehicleType.Local, heading, shouldAddLights, false, offset)
         {
@@ -32,7 +32,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             SpikeStripDispatcher = spikeStripDispatcher;
             TargetVehicle = targetVehicle;
-            Road = road;
+            Road = street;
             Location = DetermineLocation();
 
             Initialize();
@@ -88,14 +88,15 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// <inheritdoc />
         protected override void InitializeCops()
         {
-            var position = CalculateVehiclePositionOnSide() + CalculateDirectionInFrontOfVehicle(PlacementInFrontOfVehicle);
-            var heading = Location switch
+            var copPosition = CalculateVehiclePositionOnSide() + CalculateDirectionInFrontOfVehicle(PlacementInFrontOfVehicle);
+            var copHeading = Location switch
             {
                 ESpikeStripLocation.Right => Heading + 90,
                 _ => Heading - 90
             };
 
-            Instances.Add(new InstanceSlot(EEntityType.CopPed, position, heading, PedFactory.CreateLocaleCop));
+            Instances.Add(new InstanceSlot(EEntityType.CopPed, copPosition, copHeading,
+                (position, heading) => PedFactory.CreateBasicCopWeapons(PedFactory.CreateLocaleCop(position, heading))));
         }
 
         /// <inheritdoc />
@@ -218,14 +219,14 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             var distanceLeft = Road.LeftSide.DistanceTo2D(Lane.Position);
             var distanceMiddle = Road.Position.DistanceTo2D(Lane.Position);
             var distanceRight = Road.RightSide.DistanceTo2D(Lane.Position);
-            var totalLanes = Road.NumberOfLanes1 + Road.NumberOfLanes2;
+            var totalLanes = Road.NumberOfLanesSameDirection + Road.NumberOfLanesOppositeDirection;
 
             if (totalLanes > 2 && distanceMiddle < distanceRight && distanceMiddle < distanceLeft)
             {
                 return ESpikeStripLocation.Middle;
             }
 
-            if (Math.Abs(Road.Node.Heading - Heading) < 45)
+            if (!Lane.IsOppositeHeadingOfRoadNodeHeading)
             {
                 return distanceRight <= distanceLeft ? ESpikeStripLocation.Right : ESpikeStripLocation.Left;
             }

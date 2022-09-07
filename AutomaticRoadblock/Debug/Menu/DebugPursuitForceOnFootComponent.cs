@@ -9,14 +9,14 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class PursuitForceOnFootComponent : IMenuComponent<UIMenuItem>, IDisposable
+    public class DebugPursuitForceOnFootComponent : IMenuComponent<UIMenuItem>, IDisposable
     {
         private readonly ILogger _logger;
         private readonly IGame _game;
 
         private bool _active = true;
 
-        public PursuitForceOnFootComponent(ILogger logger, IGame game)
+        public DebugPursuitForceOnFootComponent(ILogger logger, IGame game)
         {
             _logger = logger;
             _game = game;
@@ -40,7 +40,7 @@ namespace AutomaticRoadblocks.Debug.Menu
                 Functions.GetPursuitPeds(handle)
                     .Where(x => x.CurrentVehicle != null)
                     .ToList()
-                    .ForEach(x => x.Tasks.LeaveVehicle(LeaveVehicleFlags.None));
+                    .ForEach(x => x.Tasks.LeaveVehicle(LeaveVehicleFlags.BailOut));
             }
             catch (Exception ex)
             {

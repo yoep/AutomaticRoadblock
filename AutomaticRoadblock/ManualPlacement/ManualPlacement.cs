@@ -5,7 +5,8 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Settings;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
@@ -114,7 +115,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
             else
             {
-                roadblockToSpawn = CreateInstance(LastDeterminedRoad ?? CalculateNewLocationForInstance());
+                roadblockToSpawn = CreateInstance(LastDeterminedStreet ?? CalculateNewLocationForInstance());
                 lock (Instances)
                 {
                     Instances.Add(roadblockToSpawn);
@@ -147,12 +148,12 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         #region Functions
 
-        protected override ManualRoadblock CreateInstance(Road road)
+        protected override ManualRoadblock CreateInstance(IVehicleNode street)
         {
-            Assert.NotNull(road, "road cannot be null");
+            Assert.NotNull(street, "road cannot be null");
             var roadblock = new ManualRoadblock(new ManualRoadblock.Request
             {
-                Road = road,
+                Road = (Road)street,
                 BarrierType = _barrier,
                 VehicleType = _vehicleType,
                 LightSourceType = _lightSourceType,

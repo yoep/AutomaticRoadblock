@@ -30,6 +30,11 @@ namespace AutomaticRoadblocks.Settings
         public bool EnableLights { get; internal set; }
         
         /// <summary>
+        /// Verify if junction roadblocks should be enabled.
+        /// </summary>
+        public bool EnableJunctionRoadblocks { get; internal set; }
+        
+        /// <summary>
         /// Verify if spike strips should be deployed along the roadblock
         /// </summary>
         public bool EnableSpikeStrips { get; internal set; }

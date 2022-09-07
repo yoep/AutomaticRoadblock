@@ -1,24 +1,24 @@
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Street;
 using Rage;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class RoadInfoComponent : IMenuComponent<UIMenuItem>
+    public class DebugRoadInfoComponent : IMenuComponent<UIMenuItem>
     {
         private readonly ILogger _logger;
         private readonly IGame _game;
 
-        public RoadInfoComponent(ILogger logger, IGame game)
+        public DebugRoadInfoComponent(ILogger logger, IGame game)
         {
             _logger = logger;
             _game = game;
         }
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } = new UIMenuItem(AutomaticRoadblocksPlugin.RoadInfo);
+        public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.RoadInfo);
         
         /// <inheritdoc />
         public EMenuType Type => EMenuType.Debug;
@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            var road = RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, ERoadType.All);
+            var road = RoadQuery.FindClosestRoad(Game.LocalPlayer.Character.Position, EVehicleNodeType.AllNodes);
             _logger.Info("Nearest road info: " + road);
             _game.DisplayPluginNotification("see console or log file for info about the closest road");
         }

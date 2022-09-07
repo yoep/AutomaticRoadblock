@@ -31,7 +31,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// <param name="options">The dispatching options for the roadblock.</param>
         /// <returns>Return the roadblock when dispatched, else null.</returns>
         /// <remarks>Call this method on a separate fiber.</remarks>
-        IRoadblock Dispatch(RoadblockLevel level, Vehicle vehicle, DispatchOptions options);
+        IRoadblock Dispatch(ERoadblockLevel level, Vehicle vehicle, DispatchOptions options);
 
         /// <summary>
         /// Dispatch a new roadblock preview for the given vehicle.
@@ -41,7 +41,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// <param name="options">The dispatching options for the roadblock.</param>
         /// <returns>Return the roadblock when dispatched, else null.</returns>
         /// <remarks>Call this method on a separate fiber.</remarks>
-        IRoadblock DispatchPreview(RoadblockLevel level, Vehicle vehicle, DispatchOptions options);
+        IRoadblock DispatchPreview(ERoadblockLevel level, Vehicle vehicle, DispatchOptions options);
 
         /// <summary>
         /// Dismiss any currently active roadblocks.

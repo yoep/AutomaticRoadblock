@@ -1,6 +1,7 @@
 using System;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
 namespace AutomaticRoadblocks.SpikeStrip
@@ -22,16 +23,16 @@ namespace AutomaticRoadblocks.SpikeStrip
         private float _lastKnownDistanceToSpikeStrip = 9999f;
         private bool _audioPlayed;
 
-        public PursuitSpikeStrip(Road road, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
-            : base(road, location, offset)
+        public PursuitSpikeStrip(Road street, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
+            : base(street, location, offset)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
             StateChanged += SpikeStripStateChanged;
         }
 
-        internal PursuitSpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
-            : base(road, lane, location, offset)
+        internal PursuitSpikeStrip(Road street, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
+            : base(street, lane, location, offset)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
@@ -46,6 +47,15 @@ namespace AutomaticRoadblocks.SpikeStrip
         private Vehicle TargetVehicle { get; }
 
         private bool IsVehicleInstanceInvalid => TargetVehicle == null || !TargetVehicle.IsValid();
+
+        #endregion
+
+        #region Methods
+
+        public override string ToString()
+        {
+            return $"Type: {nameof(PursuitSpikeStrip)}, {base.ToString()}";
+        }
 
         #endregion
 

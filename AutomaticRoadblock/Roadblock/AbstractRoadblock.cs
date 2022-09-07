@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
@@ -28,9 +30,6 @@ namespace AutomaticRoadblocks.Roadblock
 
         protected static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
-        
-        protected readonly bool IsSpeedLimitEnabled;
-        protected readonly bool IsLightsEnabled;
 
         protected Blip Blip;
         private int _speedZoneId;
@@ -38,22 +37,20 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Initialize a new roadblock instance.
         /// </summary>
-        /// <param name="road">The road of that the roadblock will block.</param>
+        /// <param name="street">The road of that the roadblock will block.</param>
         /// <param name="mainBarrierType">The main barrier used within the slots.</param>
         /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
-        /// <param name="limitSpeed">Indicates if a speed limit should be added.</param>
-        /// <param name="addLights">Indicates if light props should be added.</param>
+        /// <param name="flags">The roadblock configuration.</param>
         /// <param name="offset">The offset placement in regards to the road node.</param>
-        internal AbstractRoadblock(Road road, BarrierType mainBarrierType, float targetHeading, bool limitSpeed, bool addLights, float offset = 0f)
+        internal AbstractRoadblock(Road street, BarrierType mainBarrierType, float targetHeading, ERoadblockFlags flags, float offset = 0f)
         {
-            Assert.NotNull(road, "road cannot be null");
+            Assert.NotNull(street, "road cannot be null");
             Assert.NotNull(mainBarrierType, "mainBarrierType cannot be null");
-            Road = road;
+            Road = street;
             MainBarrierType = mainBarrierType;
             TargetHeading = targetHeading;
+            Flags = flags;
             Offset = offset;
-            IsSpeedLimitEnabled = limitSpeed;
-            IsLightsEnabled = addLights;
         }
 
         #region Properties
@@ -64,14 +61,17 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Get the level of the roadblock.
         /// </summary>
-        public abstract RoadblockLevel Level { get; }
+        public abstract ERoadblockLevel Level { get; }
 
         /// <inheritdoc />
         public ERoadblockState State { get; private set; } = ERoadblockState.Preparing;
 
         /// <inheritdoc />
+        public ERoadblockFlags Flags { get; }
+
+        /// <inheritdoc />
         public Vector3 Position => Road.Position;
-        
+
         /// <summary>
         /// The offset position for the roadblock.
         /// </summary>
@@ -143,19 +143,7 @@ namespace AutomaticRoadblocks.Roadblock
             Logger.Trace($"Creating roadblock road preview");
             Road.CreatePreview();
             Instances.ForEach(x => x.CreatePreview());
-
-            Game.NewSafeFiber(() =>
-            {
-                while (IsPreviewActive)
-                {
-                    foreach (var ped in RetrieveCopsJoiningThePursuit())
-                    {
-                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, false);
-                    }
-
-                    Game.FiberYield();
-                }
-            }, "Roadblock.Preview");
+            DoInternalDebugPreviewCreation();
         }
 
         /// <inheritdoc />
@@ -197,13 +185,15 @@ namespace AutomaticRoadblocks.Roadblock
         public virtual bool Spawn()
         {
             var result = false;
-            
+
             try
             {
                 Logger.Trace("Spawning roadblock");
 
-                Slots.ToList().ForEach(x => x.Spawn());
+                Slots.ToList().ForEach(x => { SpawnSlot(x); });
                 result = Instances.All(x => x.Spawn());
+
+                
                 UpdateState(ERoadblockState.Active);
 
                 CreateBlip();
@@ -233,7 +223,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Level)}: {Level}, {nameof(State)}: {State}, Number of {nameof(Slots)}: [{Slots.Count}]\n" +
+            return $"{nameof(Level)}: {Level}, {nameof(State)}: {State}, {nameof(Flags)}: {Flags} Number of {nameof(Slots)}: [{Slots.Count}]\n" +
                    $"--- {nameof(Slots)} ---\n" +
                    $"{string.Join("\n", Slots)}\n" +
                    $"--- {nameof(Road)} ---\n" +
@@ -315,9 +305,11 @@ namespace AutomaticRoadblocks.Roadblock
             InitializeRoadblockSlots();
             InitializeAdditionalVehicles();
             InitializeScenery();
-            InitializeSpeedLimit(IsSpeedLimitEnabled);
 
-            if (IsLightsEnabled)
+            if (Flags.HasFlag(ERoadblockFlags.LimitSpeed))
+                InitializeSpeedLimit();
+
+            if (Flags.HasFlag(ERoadblockFlags.EnableLights))
                 InitializeLights();
         }
 
@@ -373,11 +365,8 @@ namespace AutomaticRoadblocks.Roadblock
             PreventSlotVehiclesClipping();
         }
 
-        private void InitializeSpeedLimit(bool limitSpeed)
+        private void InitializeSpeedLimit()
         {
-            if (!limitSpeed)
-                return;
-
             Logger.Trace("Creating speed zone at roadblock");
             CreateSpeedZoneLimit();
         }
@@ -386,7 +375,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             try
             {
-                _speedZoneId = RoadUtils.CreateSpeedZone(OffsetPosition, 10f, SpeedLimit);
+                _speedZoneId = RoadQuery.CreateSpeedZone(OffsetPosition, 10f, SpeedLimit);
             }
             catch (Exception ex)
             {
@@ -397,7 +386,7 @@ namespace AutomaticRoadblocks.Roadblock
         private void DeleteSpeedZone()
         {
             if (_speedZoneId != 0)
-                RoadUtils.RemoveSpeedZone(_speedZoneId);
+                RoadQuery.RemoveSpeedZone(_speedZoneId);
         }
 
         private void CreateBlip()
@@ -499,6 +488,33 @@ namespace AutomaticRoadblocks.Roadblock
                 GameFiber.Wait(BlipFlashDuration);
                 DeleteBlip();
             }, "Roadblock.ReleaseEntitiesToLspdfr");
+        }
+
+        private void SpawnSlot(IRoadblockSlot slot)
+        {
+            slot.Spawn();
+            
+            if (Flags.HasFlag(ERoadblockFlags.ForceInVehicle))
+            {
+                slot.WarpInVehicle();
+            }
+        }
+
+        [Conditional("DEBUG")]
+        private void DoInternalDebugPreviewCreation()
+        {
+            Game.NewSafeFiber(() =>
+            {
+                while (IsPreviewActive)
+                {
+                    foreach (var ped in RetrieveCopsJoiningThePursuit())
+                    {
+                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, 1f, false);
+                    }
+
+                    Game.FiberYield();
+                }
+            }, "Roadblock.Preview");
         }
 
         #endregion

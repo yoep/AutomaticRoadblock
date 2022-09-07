@@ -4,8 +4,9 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Sound;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
 using Rage;
 using Rage.Native;
@@ -23,20 +24,20 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         private AnimationExecutor _animation;
 
-        internal SpikeStrip(Road road, ESpikeStripLocation location, float offset)
+        internal SpikeStrip(Road street, ESpikeStripLocation location, float offset)
         {
-            Assert.NotNull(road, "road cannot be null");
-            Road = road;
+            Assert.NotNull(street, "road cannot be null");
+            Road = street;
             Location = location;
             Lane = CalculatePlacementLane();
             Position = CalculateSpikeStripPosition(offset);
         }
 
-        internal SpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, float offset)
+        internal SpikeStrip(Road street, Road.Lane lane, ESpikeStripLocation location, float offset)
         {
-            Assert.NotNull(road, "road cannot be null");
+            Assert.NotNull(street, "road cannot be null");
             Assert.NotNull(lane, "lane cannot be null");
-            Road = road;
+            Road = street;
             Lane = lane;
             Location = location;
             Position = CalculateSpikeStripPosition(offset);
@@ -323,6 +324,7 @@ namespace AutomaticRoadblocks.SpikeStrip
             SoundHelper.PlaySound(GameInstance, Sounds.StingerDrop, Sounds.StingerDropRef);
             _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
                 AnimationFlags.None);
+            _animation.Speed = 1.5f;
             _animation.WaitForCompletion();
         }
 

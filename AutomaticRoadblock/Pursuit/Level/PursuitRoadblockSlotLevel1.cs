@@ -3,9 +3,9 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
-using AutomaticRoadblocks.Utils.Type;
+using AutomaticRoadblocks.Vehicles;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
@@ -21,8 +21,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         public override void Spawn()
         {
             base.Spawn();
-            CopInstances.ToList()
-                .ForEach(x => x.WarpIntoVehicle(Vehicle, EVehicleSeat.Driver));
+            WarpInVehicle();
         }
 
         protected override void InitializeCops()

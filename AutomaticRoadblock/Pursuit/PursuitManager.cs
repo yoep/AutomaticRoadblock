@@ -8,8 +8,8 @@ using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -483,7 +483,7 @@ namespace AutomaticRoadblocks.Pursuit
         {
             var vehicle = GetSuspectVehicle();
 
-            return vehicle != null && RoadUtils.IsPointOnRoad(vehicle.Position);
+            return vehicle != null && RoadQuery.IsPointOnRoad(vehicle.Position);
         }
 
         private bool HasAtLeastDeployedXRoadblocks()
@@ -562,9 +562,9 @@ namespace AutomaticRoadblocks.Pursuit
             _game.DisplayNotification($"Suspect killed a total of ~r~{_totalCopsKilled}~s~ cops");
         }
 
-        private static RoadblockLevel ToRoadblockLevel(PursuitLevel pursuitLevel)
+        private static ERoadblockLevel ToRoadblockLevel(PursuitLevel pursuitLevel)
         {
-            return RoadblockLevel.Levels
+            return ERoadblockLevel.Levels
                 .First(x => x.Level == pursuitLevel.Level);
         }
 

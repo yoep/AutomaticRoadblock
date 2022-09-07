@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Preview;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Street.Info;
 using JetBrains.Annotations;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
@@ -76,5 +76,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// This allows the cops to join the pursuit.
         /// </summary>
         void Release();
+
+        /// <summary>
+        /// Warp the cop peds in the slot vehicle.
+        /// </summary>
+        void WarpInVehicle();
     }
 }

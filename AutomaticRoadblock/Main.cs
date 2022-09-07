@@ -19,6 +19,7 @@ using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using LSPD_First_Response.Mod.API;
+using Rage;
 using RAGENativeUI.Elements;
 
 // Source code: https://github.com/yoep/AutomaticRoadblock
@@ -158,7 +159,11 @@ namespace AutomaticRoadblocks
 
                 var game = ioC.GetInstance<IGame>();
                 ioC.GetInstance<IMenu>().Activate();
-                game.DisplayPluginNotification($"{Assembly.GetExecutingAssembly().GetName().Version}, by ~b~yoep~s~, has been loaded");
+                game.NewSafeFiber(() =>
+                {
+                    GameFiber.Wait(2 * 1000);
+                    game.DisplayPluginNotification($"{Assembly.GetExecutingAssembly().GetName().Version}, by ~b~yoep~s~, has been loaded");
+                }, "Main.DisplayPluginNotification");
             }
             else
             {
@@ -180,14 +185,13 @@ namespace AutomaticRoadblocks
             logger.Debug("Registering debug menu components");
             IoC.Instance
                 .Register<IMenuSwitchItem>(typeof(DebugMenuSwitchItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitToggleComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitForceOnFootComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(CalloutEndComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RoadInfoComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RoadPreviewComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitToggleComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitForceOnFootComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadInfoComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugDeploySpikeStripComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPreviewSpikeStripComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ZoneInfoComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugZoneInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent));

@@ -4,23 +4,22 @@ using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Street.Info;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel3 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel3(ISpikeStripDispatcher spikeStripDispatcher, Road road, Vehicle targetVehicle, bool limitSpeed, bool addLights,
-            bool spikeStripEnabled)
-            : base(spikeStripDispatcher, road, BarrierType.PoliceDoNotCross, targetVehicle, limitSpeed, addLights, spikeStripEnabled)
+        public PursuitRoadblockLevel3(ISpikeStripDispatcher spikeStripDispatcher, Road street, Vehicle targetVehicle, ERoadblockFlags flags)
+            : base(spikeStripDispatcher, street, BarrierType.PoliceDoNotCross, targetVehicle, flags)
         {
         }
 
         #region Properties
 
         /// <inheritdoc />
-        public override RoadblockLevel Level => RoadblockLevel.Level3;
+        public override ERoadblockLevel Level => ERoadblockLevel.Level3;
 
         #endregion
 
