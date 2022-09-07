@@ -28,6 +28,16 @@ namespace AutomaticRoadblocks.Settings
         /// Verify if lights should be used within the roadblocks during nighttime
         /// </summary>
         public bool EnableLights { get; internal set; }
+        
+        /// <summary>
+        /// Verify if junction roadblocks should be enabled.
+        /// </summary>
+        public bool EnableJunctionRoadblocks { get; internal set; }
+        
+        /// <summary>
+        /// Verify if spike strips should be deployed along the roadblock
+        /// </summary>
+        public bool EnableSpikeStrips { get; internal set; }
 
         /// <summary>
         /// The minimum wait time in seconds before the first roadblock may be dispatched when a pursuit is started
@@ -48,5 +58,11 @@ namespace AutomaticRoadblocks.Settings
         /// Verify if the traffic needs to be slowed down at the roadblock
         /// </summary>
         public bool SlowTraffic { get; internal set; }
+        
+        /// <summary>
+        /// The chance factor that a spike strip is included in the roadblock.
+        /// This is a value between 1 and 0 where 1 = always, 0 = never
+        /// </summary>
+        public double SpikeStripChance { get; internal set; }
     }
 }

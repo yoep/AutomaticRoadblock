@@ -2,44 +2,52 @@ using System;
 using System.Collections.Generic;
 using AutomaticRoadblocks.Pursuit.Level;
 using AutomaticRoadblocks.Roadblock;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.SpikeStrip.Dispatcher;
+using AutomaticRoadblocks.Street.Info;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit.Factory
 {
-    public static class PursuitRoadblockFactory
+    internal static class PursuitRoadblockFactory
     {
-        private static readonly Dictionary<RoadblockLevel, Func<Road, Vehicle, bool, bool, IRoadblock>> Roadblocks =
+        private static readonly Dictionary<ERoadblockLevel, Func<ISpikeStripDispatcher, Road, Vehicle, ERoadblockFlags, IRoadblock>> Roadblocks =
             new()
             {
                 {
-                    RoadblockLevel.Level1,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel1(road, vehicle, limitSpeed, shouldAddLights)
+                    ERoadblockLevel.Level1,
+                    (spikeStripDispatcher, road, vehicle, flags) =>
+                        new PursuitRoadblockLevel1(spikeStripDispatcher, road, vehicle, flags)
                 },
                 {
-                    RoadblockLevel.Level2,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel2(road, vehicle, limitSpeed, shouldAddLights)
+                    ERoadblockLevel.Level2,
+                    (spikeStripDispatcher, road, vehicle, flags) =>
+                        new PursuitRoadblockLevel2(spikeStripDispatcher, road, vehicle, flags)
                 },
                 {
-                    RoadblockLevel.Level3,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel3(road, vehicle, limitSpeed, shouldAddLights)
+                    ERoadblockLevel.Level3,
+                    (spikeStripDispatcher, road, vehicle, flags) =>
+                        new PursuitRoadblockLevel3(spikeStripDispatcher, road, vehicle, flags)
                 },
                 {
-                    RoadblockLevel.Level4,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel4(road, vehicle, limitSpeed, shouldAddLights)
+                    ERoadblockLevel.Level4,
+                    (spikeStripDispatcher, road, vehicle, flags) =>
+                        new PursuitRoadblockLevel4(spikeStripDispatcher, road, vehicle, flags)
                 },
                 {
-                    RoadblockLevel.Level5,
-                    (road, vehicle, limitSpeed, shouldAddLights) => new PursuitRoadblockLevel5(road, vehicle, limitSpeed, shouldAddLights)
+                    ERoadblockLevel.Level5,
+                    (spikeStripDispatcher, road, vehicle, flags) =>
+                        new PursuitRoadblockLevel5(spikeStripDispatcher, road, vehicle, flags)
                 }
             };
 
-        public static IRoadblock Create(RoadblockLevel level, Road road, Vehicle vehicle, bool limitSpeed, bool shouldAddLights)
+        internal static IRoadblock Create(ISpikeStripDispatcher spikeStripDispatcher, ERoadblockLevel level, Road street, Vehicle vehicle,
+            ERoadblockFlags flags)
         {
+            Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
             Assert.NotNull(level, "level cannot be null");
-            Assert.NotNull(road, "road cannot be null");
+            Assert.NotNull(street, "road cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
-            return Roadblocks[level].Invoke(road, vehicle, limitSpeed, shouldAddLights);
+            return Roadblocks[level].Invoke(spikeStripDispatcher, street, vehicle, flags);
         }
     }
 }

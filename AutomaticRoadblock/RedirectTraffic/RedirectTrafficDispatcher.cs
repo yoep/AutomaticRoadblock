@@ -3,8 +3,9 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.RedirectTraffic
@@ -15,7 +16,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private float _coneDistance = 2f;
         private VehicleType _vehicleType = VehicleType.Local;
-        private BarrierType _coneType = BarrierType.SmallCone;
+        private BarrierType _coneType = BarrierType.BigConeStriped;
         private RedirectTrafficType _type = RedirectTrafficType.Lane;
         private bool _enableRedirectionArrow = true;
         private float _offset;
@@ -93,7 +94,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             if (redirectTraffic == null)
             {
-                redirectTraffic = CreateInstance(LastDeterminedRoad ?? CalculateNewLocationForInstance());
+                redirectTraffic = CreateInstance(LastDeterminedStreet ?? CalculateNewLocationForInstance());
 
                 lock (Instances)
                 {
@@ -127,13 +128,13 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         #region Function
 
-        protected override RedirectTraffic CreateInstance(Road road)
+        protected override RedirectTraffic CreateInstance(IVehicleNode street)
         {
             Logger.Trace(
                 $"Creating a redirect traffic instance for {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(Type)}: {Type}, {nameof(ConeDistance)}: {ConeDistance}");
             var redirectTraffic = new RedirectTraffic(new RedirectTraffic.Request
             {
-                Road = road,
+                Road = (Road)street,
                 VehicleType = VehicleType,
                 ConeType = ConeType,
                 Type = Type,

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Preview;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Street.Info;
 using JetBrains.Annotations;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
@@ -12,12 +12,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
     public interface IRoadblockSlot : IPreviewSupport, IDisposable
     {
         /// <summary>
-        /// Get the position of the roadblock slot.
+        /// Get the position of the roadblock slot on the road.
         /// </summary>
         Vector3 Position { get; }
 
         /// <summary>
-        /// The offset position of this roadblock slot.
+        /// The offset position of this roadblock slot in regards to the road.
         /// </summary>
         Vector3 OffsetPosition { get; }
 
@@ -76,5 +76,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// This allows the cops to join the pursuit.
         /// </summary>
         void Release();
+
+        /// <summary>
+        /// Warp the cop peds in the slot vehicle.
+        /// </summary>
+        void WarpInVehicle();
     }
 }

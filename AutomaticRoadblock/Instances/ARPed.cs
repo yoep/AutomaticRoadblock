@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
+using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -44,6 +45,33 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public bool IsInvalid => GameInstance == null ||
                                  !GameInstance.IsValid();
+
+        #endregion
+        
+        #region IPreviewSupport
+
+        /// <inheritdoc />
+        public bool IsPreviewActive { get; private set;  }
+
+        /// <inheritdoc />
+        public void CreatePreview()
+        {
+            if (IsPreviewActive || IsInvalid)
+                return;
+
+            IsPreviewActive = true;
+            PreviewUtils.TransformToPreview(GameInstance);
+        }
+
+        /// <inheritdoc />
+        public void DeletePreview()
+        {
+            if (!IsPreviewActive || IsInvalid)
+                return;
+
+            IsPreviewActive = false;
+            EntityUtils.Remove(GameInstance);
+        }
 
         #endregion
 

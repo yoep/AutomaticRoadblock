@@ -2,8 +2,8 @@ using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
@@ -44,7 +44,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         protected override void InitializeLights()
         {
         }
-        
+
         private static VehicleType DetermineVehicleType()
         {
             return Random.Next(4) switch

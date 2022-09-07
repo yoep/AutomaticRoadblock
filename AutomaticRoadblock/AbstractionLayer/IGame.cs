@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using Rage;
 
@@ -17,7 +16,7 @@ namespace AutomaticRoadblocks.AbstractionLayer
         /// Get the player's current position.
         /// </summary>
         Vector3 PlayerPosition { get; }
-        
+
         /// <summary>
         /// Get the heading of the player character.
         /// </summary>
@@ -56,7 +55,7 @@ namespace AutomaticRoadblocks.AbstractionLayer
         void DrawLine(Vector3 start, Vector3 end, Color color);
 
         void DrawArrow(Vector3 position, Vector3 direction, Rotator rotationOffset, float scale, Color color);
-        
+
         void DrawSphere(Vector3 position, float radius, Color color);
     }
 }
