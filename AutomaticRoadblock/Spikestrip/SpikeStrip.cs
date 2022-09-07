@@ -29,8 +29,9 @@ namespace AutomaticRoadblocks.SpikeStrip
             Road = road;
             Location = location;
             Lane = CalculatePlacementLane();
+            Position = CalculateSpikeStripPosition();
         }
-        
+
         internal SpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location)
         {
             Assert.NotNull(road, "road cannot be null");
@@ -38,23 +39,13 @@ namespace AutomaticRoadblocks.SpikeStrip
             Road = road;
             Lane = lane;
             Location = location;
+            Position = CalculateSpikeStripPosition();
         }
 
         #region Properties
 
         /// <inheritdoc />
-        public Vector3 Position
-        {
-            get
-            {
-                return Location switch
-                {
-                    ESpikeStripLocation.Left => Road.LeftSide,
-                    ESpikeStripLocation.Middle => Road.Position,
-                    _ => Road.RightSide
-                };
-            }
-        }
+        public Vector3 Position { get; }
 
         /// <inheritdoc />
         public float Heading
@@ -74,7 +65,7 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         /// <inheritdoc />
         public ESpikeStripState State { get; private set; } = ESpikeStripState.Preparing;
-        
+
         /// <inheritdoc />
         public Object GameInstance { get; private set; }
 
@@ -300,6 +291,9 @@ namespace AutomaticRoadblocks.SpikeStrip
         // Credits to PNWParksFan (see discord knowledge base)
         private bool IsTouchingTheInstance(Vector3 position)
         {
+            if (IsInvalid)
+                return false;
+            
             var instancePosition = GameInstance.Position;
             var orientation = GameInstance.Orientation;
             var size = PropUtils.Models.SpikeStrip.Dimensions;
@@ -327,7 +321,7 @@ namespace AutomaticRoadblocks.SpikeStrip
 
             SoundHelper.PlaySound(GameInstance, Sounds.StingerDrop, Sounds.StingerDropRef);
             _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
-                AnimationFlags.StayInEndFrame);
+                AnimationFlags.None);
             _animation.WaitForCompletion();
         }
 
@@ -340,7 +334,18 @@ namespace AutomaticRoadblocks.SpikeStrip
             _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripIdleUndeployed,
                 AnimationFlags.StayInEndFrame);
             PropUtils.PlaceCorrectlyOnGround(GameInstance);
-            _animation.WaitForCompletion();
+        }
+        
+        private Vector3 CalculateSpikeStripPosition()
+        {
+            var direction = MathHelper.ConvertHeadingToDirection(Heading);
+            var movementDistance = Lane.Width / 2;
+            return Location switch
+            {
+                ESpikeStripLocation.Left => Road.LeftSide + direction * movementDistance,
+                ESpikeStripLocation.Middle => Road.Position + direction * movementDistance,
+                _ => Road.RightSide + direction * movementDistance
+            };
         }
 
         private Road.Lane CalculatePlacementLane()

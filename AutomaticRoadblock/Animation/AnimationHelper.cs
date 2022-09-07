@@ -16,14 +16,12 @@ namespace AutomaticRoadblocks.Animation
         /// <param name="animationName">Set the animation name to play from the dictionary.</param>
         /// <param name="animationFlags">Set the animation flags to use on the animation playback.</param>
         /// <returns>Returns the animation task executor.</returns>
-        public static AnimationTask PlayAnimation(Ped ped, string animationDictionary, string animationName, AnimationFlags animationFlags)
+        public static AnimationTask PlayAnimation(Ped ped, AnimationDictionary animationDictionary, string animationName, AnimationFlags animationFlags)
         {
             Assert.NotNull(ped, "ped cannot be null");
             Assert.HasText(animationDictionary, "animationDictionary cannot be empty");
             Assert.HasText(animationName, "animationName cannot be empty");
-            var dictionary = new AnimationDictionary(animationDictionary);
-            dictionary.Load();
-            return ped.Tasks.PlayAnimation(dictionary, animationName, 1.5f, animationFlags);
+            return ped.Tasks.PlayAnimation(animationDictionary, animationName, 1.5f, animationFlags);
         }
 
         public static AnimationExecutor PlayAnimation(Entity entity, AnimationDictionary animationDictionary, string animationName,

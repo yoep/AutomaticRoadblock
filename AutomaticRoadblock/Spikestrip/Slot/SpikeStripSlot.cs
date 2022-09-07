@@ -1,9 +1,11 @@
 using System.Linq;
+using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Utils.Road;
+using JetBrains.Annotations;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
@@ -15,8 +17,11 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
     /// </summary>
     public class SpikeStripSlot : AbstractRoadblockSlot
     {
-        private const float DeploySpikeStripRange = 25f;
-        
+        private const float DeploySpikeStripRange = 40f;
+        private const int DelayBetweenStateChangeAndUndeploy = 2 * 1000;
+
+        private bool _hasBeenDeployed;
+
         public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road road, Road.Lane lane, Vehicle targetVehicle, float heading, bool shouldAddLights,
             float offset = 0)
             : base(lane, BarrierType.None, VehicleType.Local, heading, shouldAddLights, false, offset)
@@ -50,9 +55,11 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// <summary>
         /// Retrieve the spike strip instance of this slot.
         /// </summary>
+        [CanBeNull]
         private ISpikeStrip SpikeStrip => Instances
             .Where(x => x.Type == EEntityType.SpikeStrip)
-            .Select(x => (ARSpikeStrip) x.Instance)
+            .Select(x => (ARSpikeStrip)x.Instance)
+            .Where(x => x.SpikeStrip != null)
             .Select(x => x.SpikeStrip)
             .FirstOrDefault();
 
@@ -61,10 +68,9 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         #region Methods
 
         /// <inheritdoc />
-        public override void Spawn()
+        public override void Release()
         {
-            base.Spawn();
-            StartMonitor();
+            SpikeStrip?.Undeploy();
         }
 
         #endregion
@@ -74,8 +80,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// <inheritdoc />
         protected override void InitializeCops()
         {
-            var position = Position + MathHelper.ConvertHeadingToDirection(Heading + 90) * (Lane.Width / 2);
-            Instances.Add(new InstanceSlot(EEntityType.CopPed, position, Heading - 90, PedFactory.CreateLocaleCop));
+            Instances.Add(new InstanceSlot(EEntityType.CopPed, CalculateCopOrVehiclePosition(), Heading - 90, PedFactory.CreateLocaleCop));
         }
 
         /// <inheritdoc />
@@ -83,7 +88,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         {
             // create the spike strip
             Instances.Add(new InstanceSlot(EEntityType.SpikeStrip, Position, Heading,
-                (_, _) => new ARSpikeStrip(SpikeStripDispatcher.Spawn(Road, Lane, DetermineLocation(), TargetVehicle))));
+                (_, _) => new ARSpikeStrip(CreateSpikeStripInstance())));
         }
 
         /// <inheritdoc />
@@ -101,7 +106,9 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// <inheritdoc />
         protected override Vector3 CalculateVehiclePosition()
         {
-            return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading) * VehicleModel.Dimensions.Y;
+            return OffsetPosition
+                   + CalculateCopOrVehiclePosition()
+                   + MathHelper.ConvertHeadingToDirection(Heading) * VehicleModel.Dimensions.Y;
         }
 
         private ESpikeStripLocation DetermineLocation()
@@ -123,41 +130,73 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             return ESpikeStripLocation.Middle;
         }
 
+        private ISpikeStrip CreateSpikeStripInstance()
+        {
+            var spikeStrip = SpikeStripDispatcher.Spawn(Road, Lane, DetermineLocation(), TargetVehicle);
+            spikeStrip.StateChanged += SpikeStripStateChanged;
+            return spikeStrip;
+        }
+
+        private void SpikeStripStateChanged(ISpikeStrip spikeStrip, ESpikeStripState newState)
+        {
+            switch (newState)
+            {
+                case ESpikeStripState.Undeployed:
+                    StartMonitor();
+                    break;
+                case ESpikeStripState.Hit:
+                case ESpikeStripState.Bypassed:
+                    DoUndeploy();
+                    break;
+            }
+        }
+
         private void StartMonitor()
         {
+            if (_hasBeenDeployed)
+                return;
+
+            Logger.Trace("Starting spike strip slot monitor");
+            _hasBeenDeployed = true;
             Game.NewSafeFiber(() =>
             {
-                Logger.Trace("Starting spike strip slot monitor");
                 var spikeStrip = SpikeStrip;
-                
-                WaitForTheSpikeStripDeployment(spikeStrip);
-                WaitForSpikeStripStateToBeBypassedOrHit(spikeStrip);
-                
-                spikeStrip.Undeploy();
-                Logger.Debug($"Spike strip has been {spikeStrip.State}, undeploying the spike strip");
+                while (spikeStrip?.State == ESpikeStripState.Undeployed)
+                {
+                    var distanceToSlot = TargetVehicle.DistanceTo2D(Position);
+                    if (distanceToSlot <= DeploySpikeStripRange)
+                    {
+                        DoSpikeStripDeploy(distanceToSlot);
+                    }
+
+                    Game.FiberYield();
+                }
             }, "SpikeStripSlot.Monitor");
         }
 
-        private void WaitForTheSpikeStripDeployment(ISpikeStrip spikeStrip)
+        private void DoUndeploy()
         {
-            while (spikeStrip.State is ESpikeStripState.Preparing or ESpikeStripState.Undeployed)
+            Game.NewSafeFiber(() =>
             {
-                if (TargetVehicle.DistanceTo2D(Position) <= DeploySpikeStripRange)
-                {
-                    Logger.Trace($"Target vehicle is in range of spike strip, deploying spike strip {spikeStrip}");
-                    spikeStrip.Deploy();
-                }
-
-                Game.FiberYield();
-            }
+                GameFiber.Wait(DelayBetweenStateChangeAndUndeploy);
+                var cop = Cops.First();
+                AnimationHelper.PlayAnimation(cop.GameInstance, Animations.Dictionaries.ObjectDictionary, Animations.ObjectPickup, AnimationFlags.None);
+                SpikeStrip?.Undeploy();
+            }, "SpikeStripSlot.Undeploy");
         }
 
-        private void WaitForSpikeStripStateToBeBypassedOrHit(ISpikeStrip spikeStrip)
+        private void DoSpikeStripDeploy(float distanceToSlot)
         {
-            while (spikeStrip.State is ESpikeStripState.Deploying or ESpikeStripState.Deployed)
-            {
-                Game.FiberYield();
-            }
+            var spikeStrip = SpikeStrip;
+            Logger.Trace($"Target vehicle is in range of spike strip ({distanceToSlot}), deploying spike strip {spikeStrip}");
+            var cop = Cops.First();
+            AnimationHelper.PlayAnimation(cop.GameInstance, Animations.Dictionaries.GrenadeDictionary, Animations.ThrowShortLow, AnimationFlags.None);
+            spikeStrip?.Deploy();
+        }
+
+        private Vector3 CalculateCopOrVehiclePosition()
+        {
+            return Position + MathHelper.ConvertHeadingToDirection(Heading + 90) * (Lane.Width / 2);
         }
 
         #endregion

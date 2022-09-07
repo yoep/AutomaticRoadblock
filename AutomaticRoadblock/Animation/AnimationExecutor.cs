@@ -80,7 +80,7 @@ namespace AutomaticRoadblocks.Animation
         private bool IsAnimationPlaying()
         {
             return AnimationHelper.GetAnimationCurrentTime(Entity, Dictionary, Animation) < 1.0f 
-                   || AnimationHelper.IsAnimationPlaying(Entity, Dictionary, Animation);
+                   && AnimationHelper.IsAnimationPlaying(Entity, Dictionary, Animation);
         }
 
         #endregion

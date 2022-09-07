@@ -18,10 +18,11 @@ namespace AutomaticRoadblocks.SpikeStrip
         private const string AudioSpikeStripDeployedLeft = "ROADBLOCK_SPIKESTRIP_DEPLOYED_LEFT";
         private const string AudioSpikeStripDeployedMiddle = "ROADBLOCK_SPIKESTRIP_DEPLOYED_MIDDLE";
         private const string AudioSpikeStripDeployedRight = "ROADBLOCK_SPIKESTRIP_DEPLOYED_RIGHT";
-        
+
         private float _lastKnownDistanceToSpikeStrip = 9999f;
-        
-        public PursuitSpikeStrip(Road road, ESpikeStripLocation location, Vehicle targetVehicle) 
+        private bool _audioPlayed;
+
+        public PursuitSpikeStrip(Road road, ESpikeStripLocation location, Vehicle targetVehicle)
             : base(road, location)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
@@ -29,22 +30,23 @@ namespace AutomaticRoadblocks.SpikeStrip
             StateChanged += SpikeStripStateChanged;
         }
 
-        internal PursuitSpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle) 
+        internal PursuitSpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle)
             : base(road, lane, location)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
+            StateChanged += SpikeStripStateChanged;
         }
 
         #region Properties
-    
+
         /// <summary>
         /// The target vehicle this spike strip tries to target.
         /// </summary>
         private Vehicle TargetVehicle { get; }
 
         private bool IsVehicleInstanceInvalid => TargetVehicle == null || !TargetVehicle.IsValid();
-            
+
         #endregion
 
         #region Functions
@@ -64,11 +66,11 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// <inheritdoc />
         protected override void DoAdditionalVerifications()
         {
-            if (IsVehicleInstanceInvalid || State is ESpikeStripState.Hit or ESpikeStripState.Bypassed)
+            if (IsVehicleInstanceInvalid || State is not ESpikeStripState.Deploying or ESpikeStripState.Deployed)
                 return;
-            
+
             var currentDistance = TargetVehicle.DistanceTo(Position);
-            
+
             if (currentDistance < _lastKnownDistanceToSpikeStrip)
             {
                 _lastKnownDistanceToSpikeStrip = currentDistance;
@@ -79,8 +81,17 @@ namespace AutomaticRoadblocks.SpikeStrip
                 Logger.Info("Spike strip has been bypassed");
             }
         }
-        
-        private static void SpikeStripStateChanged(ISpikeStrip spikeStrip, ESpikeStripState state)
+
+        private void PlayPursuitAudio(string audioName)
+        {
+            if (_audioPlayed)
+                return;
+
+            _audioPlayed = true;
+            LspdfrUtils.PlayScannerAudio(audioName);
+        }
+
+        private void SpikeStripStateChanged(ISpikeStrip spikeStrip, ESpikeStripState state)
         {
             switch (state)
             {
@@ -88,14 +99,14 @@ namespace AutomaticRoadblocks.SpikeStrip
                     LspdfrUtils.PlayScannerAudio(GetAudioName(spikeStrip.Location));
                     break;
                 case ESpikeStripState.Hit:
-                    LspdfrUtils.PlayScannerAudio(AudioSpikeStripHit);
+                    PlayPursuitAudio(AudioSpikeStripHit);
                     break;
                 case ESpikeStripState.Bypassed:
-                    LspdfrUtils.PlayScannerAudio(AudioSpikeStripBypassed);
+                    PlayPursuitAudio(AudioSpikeStripBypassed);
                     break;
             }
         }
-        
+
         private static string GetAudioName(ESpikeStripLocation stripLocation)
         {
             return stripLocation switch

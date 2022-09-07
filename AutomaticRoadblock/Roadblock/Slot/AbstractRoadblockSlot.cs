@@ -194,7 +194,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         /// <inheritdoc />
-        public void Release()
+        public virtual void Release()
         {
             RoadblockHelpers.ReleaseInstancesToLspdfr(this);
         }
