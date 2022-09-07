@@ -4,7 +4,6 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using JetBrains.Annotations;
 using Rage;
@@ -24,7 +23,8 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         private bool _hasBeenDeployed;
 
-        public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road street, Road.Lane lane, Vehicle targetVehicle, float heading, bool shouldAddLights,
+        public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road street, Road.Lane lane, Vehicle targetVehicle, float heading,
+            bool shouldAddLights,
             float offset = 0)
             : base(lane, BarrierType.None, VehicleType.Local, heading, shouldAddLights, false, offset)
         {
@@ -88,14 +88,15 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// <inheritdoc />
         protected override void InitializeCops()
         {
-            var position = CalculateVehiclePositionOnSide() + CalculateDirectionInFrontOfVehicle(PlacementInFrontOfVehicle);
-            var heading = Location switch
+            var copPosition = CalculateVehiclePositionOnSide() + CalculateDirectionInFrontOfVehicle(PlacementInFrontOfVehicle);
+            var copHeading = Location switch
             {
                 ESpikeStripLocation.Right => Heading + 90,
                 _ => Heading - 90
             };
 
-            Instances.Add(new InstanceSlot(EEntityType.CopPed, position, heading, PedFactory.CreateLocaleCop));
+            Instances.Add(new InstanceSlot(EEntityType.CopPed, copPosition, copHeading,
+                (position, heading) => PedFactory.CreateBasicCopWeapons(PedFactory.CreateLocaleCop(position, heading))));
         }
 
         /// <inheritdoc />
@@ -224,7 +225,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             {
                 return ESpikeStripLocation.Middle;
             }
-            
+
             if (!Lane.IsOppositeHeadingOfRoadNodeHeading)
             {
                 return distanceRight <= distanceLeft ? ESpikeStripLocation.Right : ESpikeStripLocation.Left;
