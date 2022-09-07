@@ -33,7 +33,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         /// <inheritdoc />
         public ISpikeStrip Deploy(Vector3 position, ESpikeStripLocation stripLocation)
         {
-            var road = RoadUtils.FindClosestRoad(position, ERoadType.All);
+            var road = RoadUtils.FindClosestRoad(position, EVehicleNodeType.AllNodes);
             return DoInternalSpikeStripCreation(road, null, stripLocation, DeploymentType.Deploy, null, 0f);
         }
 
@@ -51,7 +51,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         /// <inheritdoc />
         public ISpikeStrip CreatePreview(Vector3 position, ESpikeStripLocation stripLocation)
         {
-            var road = RoadUtils.FindClosestRoad(position, ERoadType.All);
+            var road = RoadUtils.FindClosestRoad(position, EVehicleNodeType.AllNodes);
             return DoInternalSpikeStripCreation(road, null, stripLocation, DeploymentType.Preview, null, 0f);
         }
 

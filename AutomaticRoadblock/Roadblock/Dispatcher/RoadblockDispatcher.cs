@@ -52,18 +52,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         #region Properties
 
-        /// <inheritdoc />
-        public IEnumerable<IRoadblock> Roadblocks
-        {
-            get
-            {
-                lock (_roadblocks)
-                {
-                    return _roadblocks.Select(x => x.Roadblock);
-                }
-            }
-        }
-
         /// <summary>
         /// The roadblock settings of the plugin.
         /// </summary>
@@ -117,7 +105,15 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             _logger.Trace($"Dispatching roadblock on {road}");
 
             _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(road.Position)]);
-            return DoRoadblockCreation(vehicle, level, road, options);
+            _game.NewSafeFiber(() =>
+            {
+                lock (_foundRoads)
+                {
+                    _foundRoads.AddRange(roads);
+                    _foundRoads.ForEach(x => x.CreatePreview());
+                }
+            }, "RoadblockDispatcher.DispatchPreview");
+            return DoRoadblockCreation(vehicle, level, road, true, true, options);
         }
 
         /// <inheritdoc />
@@ -179,7 +175,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         {
             var spawnChance = _settingsManager.AutomaticRoadblocksSettings.SpikeStripChance * 100;
             var threshold = Random.Next(101);
-            
+
             return enableSpikeStrips && spawnChance >= threshold;
         }
 
@@ -209,12 +205,13 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // if so, deny the roadblock request
             if (IsRoadblockNearby(primaryRoadToBlock))
             {
-                DenyUserRequestForRoadblock(options.IsUserRequested, $"a roadblock is already present in the vicinity for {road}");
+                DenyUserRequestForRoadblock(options.IsUserRequested, $"a roadblock is already present in the vicinity for {primaryRoadToBlock}");
                 return null;
             }
-            
-            var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-            var roadblock = PursuitRoadblockFactory.Create(_spikeStripDispatcher, actualLevelToUse, road, vehicle, _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
+
+            var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, primaryRoadToBlock);
+            var roadblock = PursuitRoadblockFactory.Create(_spikeStripDispatcher, actualLevelToUse, primaryRoadToBlock, vehicle,
+                _settingsManager.AutomaticRoadblocksSettings.SlowTraffic,
                 ShouldAddLightsToRoadblock(), ShouldPlaceSpikeStripInRoadblock(options.EnableSpikeStrips));
 
             lock (_roadblocks)
@@ -224,31 +221,32 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             _game.NewSafeFiber(() =>
                 {
-                    DoRoadblockCreation(vehicle, level, primaryRoadToBlock, true);
+                    DoRoadblockCreation(vehicle, level, primaryRoadToBlock, true, false, options);
 
                     _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(primaryRoadToBlock.Position)]);
                     LspdfrUtils.PlayScannerAudioNonBlocking("ROADBLOCK_DEPLOYED");
                     _userRequestedRoadblockDispatching = false;
                 },
                 "RoadblockDispatcher.Dispatch");
-            return true;
+            return roadblock;
         }
 
-        private void DoRoadblockCreation(Vehicle vehicle, RoadblockLevel level, Road road, bool allowJunctionRoadblockCreation, bool createAsPreview = false)
+        private IRoadblock DoRoadblockCreation(Vehicle vehicle, RoadblockLevel level, Road road, bool allowJunctionRoadblockCreation, bool createAsPreview,
+            DispatchOptions options)
         {
             // verify if roadblock is at junction
             // if so, create a junction roadblock
             if (IsJunctionRoadblockEnabled && allowJunctionRoadblockCreation && IsAtJunction(road))
             {
-                DoRoadblockJunctionCreation(vehicle, level, road, createAsPreview);
+                DoRoadblockJunctionCreation(vehicle, level, road, createAsPreview, options);
             }
 
             // as a junction might contain dirt roads
             // we determine the actual roadblock for each individual road
             // as it might be that we need to downgrade one, but not the others
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-            var roadblock = PursuitRoadblockFactory.Create(_spikeStripDispatcher ,actualLevelToUse, road, vehicle, Settings.SlowTraffic,
-                ShouldAddLightsToRoadblock());
+            var roadblock = PursuitRoadblockFactory.Create(_spikeStripDispatcher, actualLevelToUse, road, vehicle, Settings.SlowTraffic,
+                ShouldAddLightsToRoadblock(), options.EnableSpikeStrips);
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
             lock (_roadblocks)
@@ -275,9 +273,10 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             _logger.Info($"Roadblock has been dispatched, {roadblock}");
+            return roadblock;
         }
 
-        private void DoRoadblockJunctionCreation(Vehicle vehicle, RoadblockLevel level, Road road, bool createAsPreview)
+        private void DoRoadblockJunctionCreation(Vehicle vehicle, RoadblockLevel level, Road road, bool createAsPreview, DispatchOptions options)
         {
             _logger.Debug("Deploying additional junction roadblocks");
             var startedAt = DateTime.Now.Ticks;
@@ -295,7 +294,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 .Where(x => IsRoadMovingAwayFrom(x, junctionPosition))
                 .ToList();
 
-            junctionRoads.ForEach(x => DoRoadblockCreation(vehicle, level, x, false, createAsPreview));
+            junctionRoads.ForEach(x => DoRoadblockCreation(vehicle, level, x, false, createAsPreview, options));
             var timeTaken = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
             _logger.Info($"Added an additional {junctionRoads.Count} roadblocks to the junction in {timeTaken} millis");
         }
