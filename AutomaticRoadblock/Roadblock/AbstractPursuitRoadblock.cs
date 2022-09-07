@@ -10,6 +10,7 @@ using AutomaticRoadblocks.SpikeStrip.Slot;
 using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
+using LSPD_First_Response.Engine.Scripting.Entities;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
@@ -136,6 +137,27 @@ namespace AutomaticRoadblocks.Roadblock
             CreateChaseVehicleBufferBarrels(roadPosition);
         }
 
+        /// <summary>
+        /// Execute the spawn actions for the chase vehicle.
+        /// </summary>
+        protected void SpawnChaseVehicleActions()
+        {
+            var vehicle = Instances
+                .Where(x => x.Type == EEntityType.CopVehicle)
+                .Select(x => x.Instance)
+                .Select(x => (ARVehicle)x)
+                .Select(x => x.GameInstance)
+                .First();
+
+            Instances
+                .Where(x => x.Type == EEntityType.CopPed)
+                .Select(x => x.Instance)
+                .Select(x => (ARPed)x)
+                .Select(x => x.GameInstance)
+                .ToList()
+                .ForEach(x => x.WarpIntoVehicle(vehicle, (int)VehicleSeat.Driver));
+        }
+
         private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
         {
             var rowPosition = chasePosition + MathHelper.ConvertHeadingToDirection(TargetHeading - 180) * 4f;
@@ -213,9 +235,9 @@ namespace AutomaticRoadblocks.Roadblock
             if (!TargetVehicle.HasBeenDamagedByAnyVehicle)
                 return;
 
-            if (!Slots.Any(HasBeenDamagedBy)) 
+            if (!Slots.Any(HasBeenDamagedBy))
                 return;
-            
+
             Logger.Debug("Determined that the collision must have been against a roadblock slot");
             BlipFlashNewState(Color.Green);
             Release();

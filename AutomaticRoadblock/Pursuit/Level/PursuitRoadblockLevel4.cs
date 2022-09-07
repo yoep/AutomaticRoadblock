@@ -31,23 +31,11 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         #region Methods
 
+        /// <inheritdoc />
         public override bool Spawn()
         {
             var result = base.Spawn();
-            var vehicle = Instances
-                .Where(x => x.Type == EEntityType.CopVehicle)
-                .Select(x => x.Instance)
-                .Select(x => (ARVehicle)x)
-                .Select(x => x.GameInstance)
-                .First();
-
-            Instances
-                .Where(x => x.Type == EEntityType.CopPed)
-                .Select(x => x.Instance)
-                .Select(x => (ARPed)x)
-                .Select(x => x.GameInstance)
-                .ToList()
-                .ForEach(x => x.WarpIntoVehicle(vehicle, (int)VehicleSeat.Any));
+            SpawnChaseVehicleActions();
             return result;
         }
 

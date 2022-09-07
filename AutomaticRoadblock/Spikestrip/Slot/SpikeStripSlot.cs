@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
@@ -19,7 +20,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
     {
         private const float DeploySpikeStripRange = 40f;
         private const int DelayBetweenStateChangeAndUndeploy = 2 * 1000;
-        private const float PlacementInFrontOfVehicle = 0.25f;
+        private const float PlacementInFrontOfVehicle = 0.1f;
 
         private bool _hasBeenDeployed;
 
@@ -219,17 +220,17 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             var distanceRight = Road.RightSide.DistanceTo2D(Lane.Position);
             var totalLanes = Road.NumberOfLanes1 + Road.NumberOfLanes2;
 
-            if (distanceRight <= distanceMiddle && distanceRight <= distanceLeft)
-            {
-                return ESpikeStripLocation.Right;
-            }
-
             if (totalLanes > 2 && distanceMiddle < distanceRight && distanceMiddle < distanceLeft)
             {
                 return ESpikeStripLocation.Middle;
             }
 
-            return ESpikeStripLocation.Left;
+            if (Math.Abs(Road.Node.Heading - Heading) < 45)
+            {
+                return distanceRight <= distanceLeft ? ESpikeStripLocation.Right : ESpikeStripLocation.Left;
+            }
+
+            return distanceRight <= distanceLeft ? ESpikeStripLocation.Left : ESpikeStripLocation.Right;
         }
 
         #endregion

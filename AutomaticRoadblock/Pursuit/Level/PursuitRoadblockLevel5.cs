@@ -26,6 +26,18 @@ namespace AutomaticRoadblocks.Pursuit.Level
         public override RoadblockLevel Level => RoadblockLevel.Level5;
 
         #endregion
+        
+        #region Methods
+
+        /// <inheritdoc />
+        public override bool Spawn()
+        {
+            var result = base.Spawn();
+            SpawnChaseVehicleActions();
+            return result;
+        }
+
+        #endregion
 
         #region Functions
 
