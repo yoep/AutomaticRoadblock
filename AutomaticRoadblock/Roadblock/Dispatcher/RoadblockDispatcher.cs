@@ -244,7 +244,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // as it might be that we need to downgrade one, but not the others
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
             var roadblock = PursuitRoadblockFactory.Create(_spikeStripDispatcher, actualLevelToUse, road, vehicle, Settings.SlowTraffic,
-                ShouldAddLightsToRoadblock(), options.EnableSpikeStrips);
+                ShouldAddLightsToRoadblock(), ShouldPlaceSpikeStripInRoadblock(options.EnableSpikeStrips));
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
             lock (_roadblocks)

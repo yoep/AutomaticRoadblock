@@ -28,8 +28,7 @@ namespace AutomaticRoadblocks.Roadblock
         private float _lastKnownDistanceToRoadblock = 9999f;
 
         protected AbstractPursuitRoadblock(ISpikeStripDispatcher spikeStripDispatcher, Road road, BarrierType mainBarrierType, Vehicle targetVehicle,
-            bool limitSpeed, bool addLights,
-            bool spikeStripEnabled)
+            bool limitSpeed, bool addLights, bool spikeStripEnabled)
             : base(road, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, limitSpeed, addLights)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
@@ -122,7 +121,7 @@ namespace AutomaticRoadblocks.Roadblock
         protected void CreateChaseVehicle(Model vehicleModel)
         {
             Assert.NotNull(vehicleModel, "vehicleModel cannot be null");
-            var roadPosition = Road.RightSide + ChaseVehiclePositionDirection();
+            var roadPosition = Road.RightSide + ChaseVehiclePositionDirection(vehicleModel);
 
             Instances.AddRange(new[]
             {
@@ -173,10 +172,10 @@ namespace AutomaticRoadblocks.Roadblock
             }
         }
 
-        private Vector3 ChaseVehiclePositionDirection()
+        private Vector3 ChaseVehiclePositionDirection(Model vehicleModel)
         {
             return MathHelper.ConvertHeadingToDirection(TargetHeading) * 15f +
-                   MathHelper.ConvertHeadingToDirection(TargetHeading - 90) * 1.5f;
+                   MathHelper.ConvertHeadingToDirection(Heading - 90) * (vehicleModel.Dimensions.X / 2);
         }
 
         private void Monitor()
