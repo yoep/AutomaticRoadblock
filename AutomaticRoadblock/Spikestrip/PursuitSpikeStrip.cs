@@ -1,6 +1,6 @@
 using System;
+using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
 namespace AutomaticRoadblocks.SpikeStrip
@@ -46,6 +46,15 @@ namespace AutomaticRoadblocks.SpikeStrip
         private Vehicle TargetVehicle { get; }
 
         private bool IsVehicleInstanceInvalid => TargetVehicle == null || !TargetVehicle.IsValid();
+
+        #endregion
+
+        #region Methods
+
+        public override string ToString()
+        {
+            return $"Type: {nameof(PursuitSpikeStrip)}, {base.ToString()}";
+        }
 
         #endregion
 

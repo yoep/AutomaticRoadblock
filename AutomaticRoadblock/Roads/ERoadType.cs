@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace AutomaticRoadblocks.Utils.Road
+namespace AutomaticRoadblocks.Roads
 {
     /// <summary>
     /// Defines the road types on which can be searched.

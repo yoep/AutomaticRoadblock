@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Roads;
 using JetBrains.Annotations;
 using Rage;
 
@@ -95,7 +95,8 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
                     : DoPursuitSpikeStripCreation(road, lane, stripLocation, targetVehicle, offset);
                 _spikeStrips.Add(spikeStrip);
             }
-
+            
+            _logger.Debug($"Created spike strip {spikeStrip}");
             spikeStrip.StateChanged += SpikeStripStateChanged;
 
             switch (type)

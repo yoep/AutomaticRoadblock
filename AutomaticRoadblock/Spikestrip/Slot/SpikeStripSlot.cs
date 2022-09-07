@@ -1,11 +1,10 @@
-using System;
 using System.Linq;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
-using AutomaticRoadblocks.Utils.Road;
 using JetBrains.Annotations;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
@@ -18,7 +17,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
     /// </summary>
     public class SpikeStripSlot : AbstractRoadblockSlot
     {
-        private const float DeploySpikeStripRange = 40f;
+        private const float DeploySpikeStripRange = 55f;
         private const int DelayBetweenStateChangeAndUndeploy = 2 * 1000;
         private const float PlacementInFrontOfVehicle = 0.1f;
 
@@ -218,14 +217,14 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             var distanceLeft = Road.LeftSide.DistanceTo2D(Lane.Position);
             var distanceMiddle = Road.Position.DistanceTo2D(Lane.Position);
             var distanceRight = Road.RightSide.DistanceTo2D(Lane.Position);
-            var totalLanes = Road.NumberOfLanes1 + Road.NumberOfLanes2;
+            var totalLanes = Road.NumberOfLanesSameDirection + Road.NumberOfLanesOppositeDirection;
 
             if (totalLanes > 2 && distanceMiddle < distanceRight && distanceMiddle < distanceLeft)
             {
                 return ESpikeStripLocation.Middle;
             }
-
-            if (Math.Abs(Road.Node.Heading - Heading) < 45)
+            
+            if (!Lane.IsOppositeHeadingOfRoadNodeHeading)
             {
                 return distanceRight <= distanceLeft ? ESpikeStripLocation.Right : ESpikeStripLocation.Left;
             }

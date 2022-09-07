@@ -1,5 +1,5 @@
 using System;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Roads;
 using Rage;
 
 namespace AutomaticRoadblocks.SpikeStrip.Dispatcher

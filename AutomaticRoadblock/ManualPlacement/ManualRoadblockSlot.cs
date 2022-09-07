@@ -2,7 +2,7 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.Utils.Type;
 using AutomaticRoadblocks.Vehicles;
 

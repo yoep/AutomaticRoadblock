@@ -1,4 +1,4 @@
-namespace AutomaticRoadblocks.Utils.Road
+namespace AutomaticRoadblocks.Roads
 {
     public enum ETraceFlags : uint
     {

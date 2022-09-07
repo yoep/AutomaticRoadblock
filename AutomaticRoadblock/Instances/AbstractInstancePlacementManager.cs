@@ -4,8 +4,8 @@ using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Preview;
+using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 

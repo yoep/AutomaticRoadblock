@@ -5,10 +5,11 @@ using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Preview;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
-namespace AutomaticRoadblocks.Utils.Road
+namespace AutomaticRoadblocks.Roads
 {
     public class Road : IPreviewSupport
     {
@@ -53,12 +54,12 @@ namespace AutomaticRoadblocks.Utils.Road
         /// <summary>
         /// Get the total number of lanes.
         /// </summary>
-        public int NumberOfLanes1 { get; internal set; }
+        public int NumberOfLanesSameDirection => Lanes.Count(x => !x.IsOppositeHeadingOfRoadNodeHeading);
 
         /// <summary>
         /// Get the total number of lanes.
         /// </summary>
-        public int NumberOfLanes2 { get; internal set; }
+        public int NumberOfLanesOppositeDirection => Lanes.Count(x => x.IsOppositeHeadingOfRoadNodeHeading);
 
         /// <summary>
         /// Get the junction indicator for the road.
@@ -158,7 +159,7 @@ namespace AutomaticRoadblocks.Utils.Road
         public override string ToString()
         {
             return $"{nameof(Position)}: {Position}, {nameof(Width)}: {Width}, {nameof(RightSide)}: {RightSide}, {nameof(LeftSide)}: {LeftSide}\n" +
-                   $"{nameof(NumberOfLanes1)}: {NumberOfLanes1}, {nameof(NumberOfLanes2)}: {NumberOfLanes2}, {nameof(JunctionIndicator)}: {JunctionIndicator}, " +
+                   $"{nameof(NumberOfLanesSameDirection)}: {NumberOfLanesSameDirection}, {nameof(NumberOfLanesOppositeDirection)}: {NumberOfLanesOppositeDirection}, {nameof(JunctionIndicator)}: {JunctionIndicator}, " +
                    $"{nameof(IsAtJunction)}: {IsAtJunction}, {nameof(IsSingleDirection)}: {IsSingleDirection}\n" +
                    $"{nameof(Node)}: {Node}" +
                    "\n--- Lanes ---" +
@@ -190,7 +191,7 @@ namespace AutomaticRoadblocks.Utils.Road
 
         private bool IsSingleDirectionRoad()
         {
-            return NumberOfLanes1 == 0 || NumberOfLanes2 == 0;
+            return NumberOfLanesSameDirection == 0 || NumberOfLanesOppositeDirection == 0;
         }
 
         [Conditional("DEBUG")]

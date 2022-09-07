@@ -1,7 +1,7 @@
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Roads;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 

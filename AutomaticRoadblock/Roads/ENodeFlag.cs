@@ -1,6 +1,6 @@
 using System;
 
-namespace AutomaticRoadblocks.Utils.Road
+namespace AutomaticRoadblocks.Roads
 {
     /// <summary>
     /// The node type flags.
@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.Utils.Road
         Unused = 2,
 
         // 0000 0100
-        IsFreeway = 4,
+        IsAlley = 4,
 
         // 0000 1000
         IsGravelRoad = 8,

@@ -7,7 +7,7 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Localization;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
 using Rage;

@@ -2,8 +2,8 @@ using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 

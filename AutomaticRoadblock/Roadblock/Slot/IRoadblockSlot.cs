@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Preview;
-using AutomaticRoadblocks.Utils.Road;
+using AutomaticRoadblocks.Roads;
 using JetBrains.Annotations;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;

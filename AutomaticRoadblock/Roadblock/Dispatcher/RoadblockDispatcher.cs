@@ -4,12 +4,10 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Pursuit.Factory;
+using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Road;
-using LSPD_First_Response.Engine.Scripting;
-using LSPD_First_Response.Mod.API;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Dispatcher
@@ -281,14 +279,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             _logger.Debug("Deploying additional junction roadblocks");
             var startedAt = DateTime.Now.Ticks;
             var junctionPosition = road.Position + MathHelper.ConvertHeadingToDirection(road.Heading) * 10f;
-            // if we're in the city, don't return any gravel/dirt roads
-            var nodeType = Functions.GetZoneAtPosition(road.Position).County == EWorldZoneCounty.LosSantos
-                ? EVehicleNodeType.MainRoads
-                : EVehicleNodeType.AllRoadNoJunctions;
-
             var junctionRoads = RoadUtils
-                .FindNearbyRoads(junctionPosition, nodeType, 15f)
+                .FindNearbyRoads(junctionPosition, EVehicleNodeType.MainRoads, 15f)
                 .Where(x => x.IsAtJunction)
+                // filter out any unwanted nodes
+                .Where(x => (x.Node.Flags & ENodeFlag.IsAlley) == 0)
                 .Where(x => !road.Position.Equals(x.Position))
                 .Where(x => road.Position.DistanceTo(x.Position) > 5f)
                 .Where(x => IsRoadMovingAwayFrom(x, junctionPosition))

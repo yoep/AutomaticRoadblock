@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Utils;
 using JetBrains.Annotations;
 using Rage;
 using Rage.Native;
 
-namespace AutomaticRoadblocks.Utils.Road
+namespace AutomaticRoadblocks.Roads
 {
     public static class RoadUtils
     {
@@ -183,7 +184,8 @@ namespace AutomaticRoadblocks.Utils.Road
 
             if (closestNode != null && ignoreHeading)
             {
-                closestNode = new Road.NodeInfo(closestNode.Position, heading, closestNode.NumberOfLanes1, closestNode.NumberOfLanes2, closestNode.AtJunction)
+                closestNode = new Road.NodeInfo(closestNode.Position, heading, closestNode.NumberOfLanes1, closestNode.NumberOfLanes2,
+                    closestNode.AtJunction)
                 {
                     Density = closestNode.Density,
                     Flags = closestNode.Flags
@@ -269,8 +271,6 @@ namespace AutomaticRoadblocks.Utils.Road
             {
                 RightSide = roadRightSide,
                 LeftSide = roadLeftSide,
-                NumberOfLanes1 = nodeInfo.NumberOfLanes1,
-                NumberOfLanes2 = nodeInfo.NumberOfLanes2,
                 JunctionIndicator = (int)nodeInfo.AtJunction,
                 Lanes = DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, nodeHeading, nodeInfo.NumberOfLanes1,
                     nodeInfo.NumberOfLanes2),
@@ -339,7 +339,8 @@ namespace AutomaticRoadblocks.Utils.Road
             };
         }
 
-        private static IEnumerable<Road.NodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType, float radius, int rotationInterval = 20)
+        private static IEnumerable<Road.NodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType, float radius,
+            int rotationInterval = 20)
         {
             const int radInterval = 2;
             var nodes = new List<Road.NodeInfo>();
@@ -386,7 +387,8 @@ namespace AutomaticRoadblocks.Utils.Road
                 : FindVehicleNode(roadPosition1, type, numberOfLanes2, numberOfLanes1, junctionIndication);
         }
 
-        private static Road.NodeInfo FindVehicleNode(Vector3 position, EVehicleNodeType type, int numberOfLanes1, int numberOfLanes2, float junctionIndication)
+        private static Road.NodeInfo FindVehicleNode(Vector3 position, EVehicleNodeType type, int numberOfLanes1, int numberOfLanes2,
+            float junctionIndication)
         {
             Assert.NotNull(position, "position cannot be null");
             Assert.NotNull(type, "type cannot be null");
