@@ -3,6 +3,7 @@ using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
+using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 
 namespace AutomaticRoadblocks.Api
 {
@@ -29,5 +30,10 @@ namespace AutomaticRoadblocks.Api
         /// Get the traffic redirection dispatcher.
         /// </summary>
         public static IRedirectTrafficDispatcher RedirectTrafficDispatcher => IoC.Instance.GetInstance<IRedirectTrafficDispatcher>();
+        
+        /// <summary>
+        /// Get the spike strip dispatcher instance.
+        /// </summary>
+        public static ISpikeStripDispatcher SpikeStripDispatcher => IoC.Instance.GetInstance<ISpikeStripDispatcher>();
     }
 }

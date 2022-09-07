@@ -46,6 +46,7 @@ namespace AutomaticRoadblocks.Pursuit
             _localizer = localizer;
             EnableAutomaticDispatching = settingsManager.AutomaticRoadblocksSettings.EnableDuringPursuits;
             EnableAutomaticLevelIncreases = true;
+            EnableSpikeStrips = settingsManager.AutomaticRoadblocksSettings.EnableSpikeStrips;
         }
 
         #region Properties
@@ -61,6 +62,9 @@ namespace AutomaticRoadblocks.Pursuit
 
         /// <inheritdoc />
         public bool EnableAutomaticLevelIncreases { get; set; }
+
+        /// <inheritdoc />
+        public bool EnableSpikeStrips { get; set; }
 
         /// <inheritdoc />
         public bool IsPursuitActive => PursuitHandle != null && Functions.IsPursuitStillRunning(PursuitHandle);
@@ -187,7 +191,11 @@ namespace AutomaticRoadblocks.Pursuit
             }
 
             _logger.Trace("Creating pursuit roadblock preview");
-            _roadblockDispatcher.DispatchPreview(ToRoadblockLevel(PursuitLevel), vehicle, currentLocation);
+            _roadblockDispatcher.DispatchPreview(ToRoadblockLevel(PursuitLevel), vehicle, new DispatchOptions
+            {
+                EnableSpikeStrips = EnableSpikeStrips,
+                AtCurrentLocation = currentLocation
+            });
         }
 
         #endregion
@@ -392,16 +400,24 @@ namespace AutomaticRoadblocks.Pursuit
             _logger.Debug(
                 $"Dispatching roadblock for pursuit with {nameof(PursuitLevel)}: {PursuitLevel}, {nameof(userRequested)}: {userRequested}, " +
                 $"{nameof(force)}: {force}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
-            var dispatched = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, userRequested, force, atCurrentLocation);
-
-            if (dispatched)
+            var roadblock = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, new DispatchOptions
             {
-                _timeLastDispatchedRoadblock = _game.GameTime;
-                _totalRoadblocksDeployed++;
-                _logger.Info("Pursuit roadblock has been dispatched");
+                EnableSpikeStrips = EnableSpikeStrips,
+                IsUserRequested = userRequested,
+                Force = force,
+                AtCurrentLocation = atCurrentLocation
+            });
+
+            if (roadblock == null)
+            {
+                _logger.Warn("Pursuit roadblock was not dispatched");
+                return false;
             }
 
-            return dispatched;
+            _timeLastDispatchedRoadblock = _game.GameTime;
+            _totalRoadblocksDeployed++;
+            _logger.Info("Pursuit roadblock has been dispatched");
+            return true;
         }
 
         private void DoDispatchTick()
@@ -492,7 +508,7 @@ namespace AutomaticRoadblocks.Pursuit
             // if not, ignore the state change as nothing is applied
             if (State != EPursuitState.ActiveOnFoot)
                 return;
-            
+
             _roadblockDispatcher.DismissActiveRoadblocks();
         }
 

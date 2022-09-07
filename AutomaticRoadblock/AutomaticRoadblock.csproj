@@ -59,11 +59,15 @@
         <Compile Include="AbstractionLayer\Implementation\RageImpl.cs" />
         <Compile Include="AbstractionLayer\Implementation\RageLogger.cs" />
         <Compile Include="AbstractionLayer\ELogLevel.cs" />
+        <Compile Include="Animation\AnimationHelper.cs" />
+        <Compile Include="Animation\Animations.cs" />
+        <Compile Include="Animation\AnimationExecutor.cs" />
         <Compile Include="Api\AutomaticRoadblocksApi.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
         <Compile Include="Barriers\BarrierFactory.cs" />
         <Compile Include="Barriers\BarrierType.cs" />
+        <Compile Include="Debug\Menu\DebugDeploySpikeStripComponent.cs" />
         <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
         <Compile Include="Debug\Menu\DebugEndCurrentCalloutComponent.cs" />
         <Compile Include="Debug\Menu\DebugPursuitForceOnFootComponent.cs" />
@@ -71,7 +75,15 @@
         <Compile Include="Debug\Menu\DebugRoadPreviewComponent.cs" />
         <Compile Include="Debug\Menu\DebugPursuitToggleComponent.cs" />
         <Compile Include="Debug\Menu\DebugZoneInfoComponent.cs" />
+        <Compile Include="Debug\Menu\CalloutEndComponent.cs" />
+        <Compile Include="Debug\Menu\DebugPreviewSpikeStripComponent.cs" />
+        <Compile Include="Debug\Menu\PursuitForceOnFootComponent.cs" />
+        <Compile Include="Debug\Menu\RoadInfoComponent.cs" />
+        <Compile Include="Debug\Menu\RoadPreviewComponent.cs" />
+        <Compile Include="Debug\Menu\PursuitToggleComponent.cs" />
+        <Compile Include="Debug\Menu\ZoneInfoComponent.cs" />
         <Compile Include="Instances\AbstractInstancePlacementManager.cs" />
+        <Compile Include="Instances\ARSpikeStrip.cs" />
         <Compile Include="Instances\IARInstance.cs" />
         <Compile Include="Instances\ARPed.cs" />
         <Compile Include="Instances\ARScenery.cs" />
@@ -130,8 +142,9 @@
         <Compile Include="Pursuit\Menu\DispatchNowComponent.cs" />
         <Compile Include="Pursuit\Menu\DispatchPreviewComponent.cs" />
         <Compile Include="Pursuit\Menu\PursuitDispatchSpawnComponentItem.cs" />
-        <Compile Include="Pursuit\Menu\EnableAutomaticLevelIncreaseComponent.cs" />
+        <Compile Include="Pursuit\Menu\PursuitEnableAutomaticLevelIncreaseComponent.cs" />
         <Compile Include="Pursuit\Menu\PursuitEnableDuringPursuitComponentItem.cs" />
+        <Compile Include="Pursuit\Menu\PursuitEnableSpikeStripComponentItem.cs" />
         <Compile Include="Pursuit\Menu\PursuitLevelComponent.cs" />
         <Compile Include="Pursuit\NoPursuitActiveException.cs" />
         <Compile Include="Pursuit\PursuitEvents.cs" />
@@ -152,6 +165,7 @@
         <Compile Include="RedirectTraffic\RedirectTrafficDispatcher.cs" />
         <Compile Include="RedirectTraffic\RedirectTrafficType.cs" />
         <Compile Include="Roadblock\AbstractPursuitRoadblock.cs" />
+        <Compile Include="Roadblock\Dispatcher\DispatchOptions.cs" />
         <Compile Include="Roadblock\Dispatcher\IRoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockInfo.cs" />
@@ -173,7 +187,17 @@
         <Compile Include="Settings\ManualPlacementSettings.cs" />
         <Compile Include="Settings\RedirectTrafficSettings.cs" />
         <Compile Include="Settings\SettingsManager.cs" />
-        <Compile Include="Utils\AnimationUtils.cs" />
+        <Compile Include="Sound\SoundHelper.cs" />
+        <Compile Include="Sound\Sounds.cs" />
+        <Compile Include="Spikestrip\Dispatcher\ISpikeStripDispatcher.cs" />
+        <Compile Include="Spikestrip\Dispatcher\SpikeStripDispatcher.cs" />
+        <Compile Include="Spikestrip\ESpikeStripLocation.cs" />
+        <Compile Include="Spikestrip\ESpikeStripState.cs" />
+        <Compile Include="Spikestrip\ISpikeStrip.cs" />
+        <Compile Include="Spikestrip\PursuitSpikeStrip.cs" />
+        <Compile Include="Spikestrip\Slot\SpikeStripSlot.cs" />
+        <Compile Include="Spikestrip\SpikeStrip.cs" />
+        <Compile Include="Spikestrip\SpikeStripEvents.cs" />
         <Compile Include="Utils\EntityUtils.cs" />
         <Compile Include="Utils\GameUtils.cs" />
         <Compile Include="Utils\LspdfrUtils.cs" />
@@ -190,6 +214,7 @@
         <Compile Include="Utils\Type\EMarkerType.cs" />
         <Compile Include="Utils\Type\EVehicleLightState.cs" />
         <Compile Include="Utils\Type\EVehicleSeat.cs" />
+        <Compile Include="Vehicles\EVehicleWheel.cs" />
         <Compile Include="Vehicles\VehicleFactory.cs" />
         <Compile Include="Vehicles\VehicleType.cs" />
     </ItemGroup>

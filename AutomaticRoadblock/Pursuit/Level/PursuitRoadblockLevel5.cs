@@ -5,6 +5,7 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
@@ -13,8 +14,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel5 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel5(Road road, Vehicle vehicle, bool limitSpeed, bool addLights)
-            : base(road, BarrierType.PoliceDoNotCross, vehicle, limitSpeed, addLights)
+        public PursuitRoadblockLevel5(ISpikeStripDispatcher spikeStripDispatcher, Road road, Vehicle targetVehicle, bool limitSpeed, bool addLights,
+            bool spikeStripEnabled)
+            : base(spikeStripDispatcher, road, BarrierType.PoliceDoNotCross, targetVehicle, limitSpeed, addLights, spikeStripEnabled)
         {
         }
 
@@ -22,6 +24,18 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         /// <inheritdoc />
         public override RoadblockLevel Level => RoadblockLevel.Level5;
+
+        #endregion
+        
+        #region Methods
+
+        /// <inheritdoc />
+        public override bool Spawn()
+        {
+            var result = base.Spawn();
+            SpawnChaseVehicleActions();
+            return result;
+        }
 
         #endregion
 
@@ -54,7 +68,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             return new PursuitRoadblockSlotLevel5(lane, MainBarrierType, heading, targetVehicle, shouldAddLights);
         }
-        
+
         /// <inheritdoc />
         protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit()
         {

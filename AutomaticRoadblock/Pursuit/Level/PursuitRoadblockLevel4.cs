@@ -5,6 +5,7 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Road;
 using LSPD_First_Response.Engine.Scripting.Entities;
@@ -14,8 +15,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel4 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel4(Road road, Vehicle vehicle, bool limitSpeed, bool addLights)
-            : base(road, BarrierType.PoliceDoNotCross, vehicle, limitSpeed, addLights)
+        public PursuitRoadblockLevel4(ISpikeStripDispatcher spikeStripDispatcher, Road road, Vehicle targetVehicle, bool limitSpeed, bool addLights,
+            bool spikeStripEnabled)
+            : base(spikeStripDispatcher, road, BarrierType.PoliceDoNotCross, targetVehicle, limitSpeed, addLights, spikeStripEnabled)
         {
             RoadblockStateChanged += StateChanged;
         }
@@ -29,23 +31,11 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         #region Methods
 
+        /// <inheritdoc />
         public override bool Spawn()
         {
             var result = base.Spawn();
-            var vehicle = Instances
-                .Where(x => x.Type == EEntityType.CopVehicle)
-                .Select(x => x.Instance)
-                .Select(x => (ARVehicle)x)
-                .Select(x => x.GameInstance)
-                .First();
-
-            Instances
-                .Where(x => x.Type == EEntityType.CopPed)
-                .Select(x => x.Instance)
-                .Select(x => (ARPed)x)
-                .Select(x => x.GameInstance)
-                .ToList()
-                .ForEach(x => x.WarpIntoVehicle(vehicle, (int)VehicleSeat.Any));
+            SpawnChaseVehicleActions();
             return result;
         }
 
@@ -68,7 +58,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 var lane = currentSlot.Lane.MoveTo(MathHelper.ConvertHeadingToDirection(Heading) * 4f +
                                                    MathHelper.ConvertHeadingToDirection(Heading + 90) * (distanceToNext / 2));
 
-                additionalSlots.Add(new PursuitRoadblockSlotLevel4(lane, BarrierType.None, currentSlot.Heading, Vehicle, false));
+                additionalSlots.Add(new PursuitRoadblockSlotLevel4(lane, BarrierType.None, currentSlot.Heading, TargetVehicle, false));
             }
 
             additionalSlots.AddRange(slots);
@@ -118,7 +108,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         private void StateChanged(IRoadblock roadblock, ERoadblockState newState)
         {
             if (newState is ERoadblockState.Bypassed or ERoadblockState.Hit)
-                RoadblockHelpers.ReleaseInstancesToLspdfr(Instances, Vehicle);
+                RoadblockHelpers.ReleaseInstancesToLspdfr(Instances, TargetVehicle);
         }
 
         #endregion

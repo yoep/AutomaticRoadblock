@@ -26,6 +26,12 @@ namespace AutomaticRoadblocks
         public const string ForcePursuitOnFoot = "Force On-Foot" + DebugIndicatorText;
         public const string ForcePursuitOnFootDescription = "Force the suspects in the pursuit to leave the vehicle";
         public const string EndPursuit = "End pursuit now" + DebugIndicatorText;
+        public const string DeploySpikeStrip = "Deploy spike strip " + DebugIndicatorText;
+        public const string DeploySpikeStripDescription = "Deploy a spike strip on the nearby road";
+        public const string RemoveSpikeStrip = "Remove spike strip " + DebugIndicatorText;
+        public const string PreviewSpikeStrip = "Preview spike strip " + DebugIndicatorText;
+        public const string PreviewSpikeStripDescription = "Create a preview of the spike strip on the nearby road";
+        public const string RemoveSpikeStripPreview = "Remove spike strip preview " + DebugIndicatorText;
 
         private const string DebugIndicatorText = " [DEBUG]";
     }

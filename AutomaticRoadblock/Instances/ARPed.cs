@@ -46,6 +46,33 @@ namespace AutomaticRoadblocks.Instances
                                  !GameInstance.IsValid();
 
         #endregion
+        
+        #region IPreviewSupport
+
+        /// <inheritdoc />
+        public bool IsPreviewActive { get; private set;  }
+
+        /// <inheritdoc />
+        public void CreatePreview()
+        {
+            if (IsPreviewActive || IsInvalid)
+                return;
+
+            IsPreviewActive = true;
+            PreviewUtils.TransformToPreview(GameInstance);
+        }
+
+        /// <inheritdoc />
+        public void DeletePreview()
+        {
+            if (!IsPreviewActive || IsInvalid)
+                return;
+
+            IsPreviewActive = false;
+            EntityUtils.Remove(GameInstance);
+        }
+
+        #endregion
 
         #region IDisposable
 
