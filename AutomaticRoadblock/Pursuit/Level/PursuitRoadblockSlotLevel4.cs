@@ -44,7 +44,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         protected override void InitializeLights()
         {
         }
-        
+
         private static VehicleType DetermineVehicleType()
         {
             return Random.Next(4) switch

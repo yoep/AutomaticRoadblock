@@ -26,8 +26,9 @@ namespace AutomaticRoadblocks.Roadblock
         protected const int BlipFlashDuration = 3500;
         protected const float AdditionalClippingSpace = 0.5f;
 
-        protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        protected readonly IGame Game = IoC.Instance.GetInstance<IGame>();
+        protected static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+        protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
+        
         protected readonly bool IsSpeedLimitEnabled;
         protected readonly bool IsLightsEnabled;
 

@@ -1,7 +1,6 @@
 using System;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Preview;
-using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Instances
@@ -78,7 +77,7 @@ namespace AutomaticRoadblocks.Instances
                 if (instance != null)
                 {
                     Instance = instance;
-                    return Instance.GameInstance.IsValid();
+                    return Instance.GameInstance != null && Instance.GameInstance.IsValid();
                 }
             }
             catch (Exception ex)
@@ -126,23 +125,24 @@ namespace AutomaticRoadblocks.Instances
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive { get; private set; }
+        public bool IsPreviewActive => !IsInvalid && Instance.IsPreviewActive;
 
         /// <inheritdoc />
         public void CreatePreview()
         {
-            IsPreviewActive = true;
             Spawn();
 
             if (!IsInvalid)
-                PreviewUtils.TransformToPreview(Instance.GameInstance);
+                Instance.CreatePreview();
         }
 
         /// <inheritdoc />
         public void DeletePreview()
         {
             Dispose();
-            IsPreviewActive = false;
+
+            if (!IsInvalid)
+                Instance.DeletePreview();
         }
 
         #endregion

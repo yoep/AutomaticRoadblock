@@ -26,6 +26,7 @@ namespace AutomaticRoadblocks.Utils
             public static Model WorkBarrierSmallWithLight => new("prop_barrier_work02a");
             public static Model TrafficArrowLeft => new("prop_trafficdiv_01");
             public static Model TrafficArrowBoth => new("prop_trafficdiv_01");
+            public static Model SpikeStrip => new("p_ld_stinger_s");
         }
 
         #endregion
@@ -302,6 +303,12 @@ namespace AutomaticRoadblocks.Utils
             {
                 Heading = heading
             };
+            return PlaceCorrectlyOnGround(instance);
+        }
+
+        public static Object CreateSpikeStrip(Vector3 position, float heading)
+        {
+            var instance = new Object(Models.SpikeStrip, position, heading);
             return PlaceCorrectlyOnGround(instance);
         }
 

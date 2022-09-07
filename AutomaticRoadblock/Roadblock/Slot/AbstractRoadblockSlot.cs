@@ -18,8 +18,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
     /// <summary>
     /// Abstract implementation of the <see cref="IRoadblockSlot"/>.
     /// This slot defines the entities & scenery items used within the <see cref="IRoadblock"/>.
-    /// <remarks>Make sure that the <see cref="Initialize"/> method is called within the constructor after all properties/fields are set for the slot.</remarks>
     /// </summary>
+    /// <remarks>Make sure that the <see cref="Initialize"/> method is called within the constructor after all properties/fields are set for the slot.</remarks>
     public abstract class AbstractRoadblockSlot : IRoadblockSlot
     {
         protected const int VehicleHeadingMaxOffset = 10;
@@ -194,7 +194,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         /// <inheritdoc />
-        public void Release()
+        public virtual void Release()
         {
             RoadblockHelpers.ReleaseInstancesToLspdfr(this);
         }
@@ -257,6 +257,15 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             return Heading + Random.Next(90 - VehicleHeadingMaxOffset, 91 + VehicleHeadingMaxOffset);
         }
 
+        /// <summary>
+        /// Calculate the position of the vehicle for this slot.
+        /// </summary>
+        /// <returns>Returns the position for the vehicle placement.</returns>
+        protected virtual Vector3 CalculateVehiclePosition()
+        {
+            return OffsetPosition;
+        }
+
         private void InitializeVehicleSlot()
         {
             if (VehicleType == VehicleType.None)
@@ -268,7 +277,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 VehicleModel.LoadAndWait();
             }
 
-            Instances.Add(new InstanceSlot(EEntityType.CopVehicle, OffsetPosition, CalculateVehicleHeading(),
+            Instances.Add(new InstanceSlot(EEntityType.CopVehicle, CalculateVehiclePosition(), CalculateVehicleHeading(),
                 (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading, RecordVehicleCollisions)));
         }
 

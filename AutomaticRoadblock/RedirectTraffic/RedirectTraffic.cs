@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Utils;
@@ -165,7 +166,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
             Cop.Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
-            AnimationUtils.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
+            AnimationHelper.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
             return result;
         }
 

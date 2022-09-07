@@ -5,6 +5,7 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
+using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Utils.Road;
 using Rage;
 
@@ -12,8 +13,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel1 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel1(Road road, Vehicle vehicle, bool limitSpeed, bool addLights)
-            : base(road, BarrierType.SmallCone, vehicle, limitSpeed, addLights)
+        public PursuitRoadblockLevel1(ISpikeStripDispatcher spikeStripDispatcher, Road road, Vehicle targetVehicle, bool limitSpeed, bool addLights,
+            bool spikeStripEnabled)
+            : base(spikeStripDispatcher, road, BarrierType.SmallConeStriped, targetVehicle, limitSpeed, addLights, spikeStripEnabled)
         {
         }
 

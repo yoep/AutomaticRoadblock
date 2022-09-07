@@ -5,6 +5,7 @@ namespace AutomaticRoadblocks.Instances
         Scenery,
         Barrier,
         CopPed,
-        CopVehicle
+        CopVehicle,
+        SpikeStrip
     }
 }
