@@ -76,5 +76,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// This allows the cops to join the pursuit.
         /// </summary>
         void Release();
+
+        /// <summary>
+        /// Warp the cop peds in the slot vehicle.
+        /// </summary>
+        void WarpInVehicle();
     }
 }

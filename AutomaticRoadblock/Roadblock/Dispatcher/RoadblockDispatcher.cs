@@ -225,8 +225,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     .SelectMany(FilterRoadsTravellingAlongTheRoute)
                     .ToList();
 
-                junctionRoads.ForEach(x => CreateRoadblock(x, vehicle, ERoadblockLevel.Level2, createAsPreview,
-                    ERoadblockFlags.JoinPursuitOnHit | ERoadblockFlags.ForceInVehicle));
+                junctionRoads.ForEach(x => CreateRoadblock(x, vehicle, ERoadblockLevel.Level3, createAsPreview,
+                    ERoadblockFlags.DetectBypass | ERoadblockFlags.JoinPursuitOnHit | ERoadblockFlags.ForceInVehicle));
                 _logger.Info($"Deployed an additional {junctionRoads.Count} junction roadblocks along the road");
             }
 

@@ -199,6 +199,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             RoadblockHelpers.ReleaseInstancesToLspdfr(this);
         }
 
+        /// <inheritdoc />
+        public void WarpInVehicle()
+        {
+            CopInstances.ToList()
+                .ForEach(x => x.WarpIntoVehicle(Vehicle, EVehicleSeat.Any));
+        }
+
         #endregion
 
         #region Functions

@@ -26,9 +26,11 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         protected override void InitializeCops()
         {
+            var isBike = ModelUtils.Vehicles.IsBike(VehicleModel);
             var pedSpawnPosition = CalculatePositionBehindVehicle();
+            var totalOccupants = isBike ? 1 : Random.Next(1, 3);
 
-            for (var i = 0; i < 2; i++)
+            for (var i = 0; i < totalOccupants; i++)
             {
                 Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), 0f,
                     (position, heading) =>

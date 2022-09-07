@@ -190,8 +190,10 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 Logger.Trace("Spawning roadblock");
 
-                Slots.ToList().ForEach(x => x.Spawn());
+                Slots.ToList().ForEach(x => { SpawnSlot(x); });
                 result = Instances.All(x => x.Spawn());
+
+                
                 UpdateState(ERoadblockState.Active);
 
                 CreateBlip();
@@ -486,6 +488,16 @@ namespace AutomaticRoadblocks.Roadblock
                 GameFiber.Wait(BlipFlashDuration);
                 DeleteBlip();
             }, "Roadblock.ReleaseEntitiesToLspdfr");
+        }
+
+        private void SpawnSlot(IRoadblockSlot slot)
+        {
+            slot.Spawn();
+            
+            if (Flags.HasFlag(ERoadblockFlags.ForceInVehicle))
+            {
+                slot.WarpInVehicle();
+            }
         }
 
         [Conditional("DEBUG")]

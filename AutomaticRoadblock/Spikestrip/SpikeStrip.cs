@@ -324,6 +324,7 @@ namespace AutomaticRoadblocks.SpikeStrip
             SoundHelper.PlaySound(GameInstance, Sounds.StingerDrop, Sounds.StingerDropRef);
             _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
                 AnimationFlags.None);
+            _animation.Speed = 1.5f;
             _animation.WaitForCompletion();
         }
 

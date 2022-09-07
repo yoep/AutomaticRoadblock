@@ -76,7 +76,7 @@ namespace AutomaticRoadblocks.Street.Factory
 
             do
             {
-                if (attempts == 6)
+                if (attempts == 10)
                 {
                     Logger.Warn($"Failed to discover road node for intersection road at Position: {directionNode.Position}, Heading: {directionNode.Heading}");
                     break;

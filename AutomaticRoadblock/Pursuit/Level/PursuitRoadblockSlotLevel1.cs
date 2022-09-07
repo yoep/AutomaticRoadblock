@@ -21,8 +21,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         public override void Spawn()
         {
             base.Spawn();
-            CopInstances.ToList()
-                .ForEach(x => x.WarpIntoVehicle(Vehicle, EVehicleSeat.Driver));
+            WarpInVehicle();
         }
 
         protected override void InitializeCops()
