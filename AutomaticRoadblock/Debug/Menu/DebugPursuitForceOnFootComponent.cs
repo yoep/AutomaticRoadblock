@@ -40,7 +40,7 @@ namespace AutomaticRoadblocks.Debug.Menu
                 Functions.GetPursuitPeds(handle)
                     .Where(x => x.CurrentVehicle != null)
                     .ToList()
-                    .ForEach(x => x.Tasks.LeaveVehicle(LeaveVehicleFlags.None));
+                    .ForEach(x => x.Tasks.LeaveVehicle(LeaveVehicleFlags.BailOut));
             }
             catch (Exception ex)
             {

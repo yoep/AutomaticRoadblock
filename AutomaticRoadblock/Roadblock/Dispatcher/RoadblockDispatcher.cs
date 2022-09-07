@@ -285,8 +285,10 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 // filter out any unwanted nodes
                 .Where(x => (x.Node.Flags & ENodeFlag.IsAlley) == 0)
                 .Where(x => !road.Position.Equals(x.Position))
-                .Where(x => road.Position.DistanceTo(x.Position) > 5f)
+                .Where(x => road.Position.DistanceTo(x.Position) > 8f)
                 .Where(x => IsRoadMovingAwayFrom(x, junctionPosition))
+                // take a max of 3 additional roadblocks
+                .Take(3)
                 .ToList();
 
             junctionRoads.ForEach(x => DoRoadblockCreation(vehicle, level, x, false, createAsPreview, options));
