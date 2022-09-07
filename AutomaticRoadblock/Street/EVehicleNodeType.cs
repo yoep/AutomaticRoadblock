@@ -1,4 +1,4 @@
-namespace AutomaticRoadblocks.Roads
+namespace AutomaticRoadblocks.Street
 {
     public enum EVehicleNodeType
     {

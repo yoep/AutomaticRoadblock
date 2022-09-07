@@ -1,6 +1,6 @@
 using System;
 
-namespace AutomaticRoadblocks.Roads
+namespace AutomaticRoadblocks.Street
 {
     /// <summary>
     /// The node type flags.

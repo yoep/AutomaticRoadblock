@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using AutomaticRoadblocks.Pursuit.Level;
 using AutomaticRoadblocks.Roadblock;
-using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit.Factory
@@ -40,14 +41,14 @@ namespace AutomaticRoadblocks.Pursuit.Factory
                 }
             };
 
-        internal static IRoadblock Create(ISpikeStripDispatcher spikeStripDispatcher, RoadblockLevel level, Road road, Vehicle vehicle, bool limitSpeed,
+        internal static IRoadblock Create(ISpikeStripDispatcher spikeStripDispatcher, RoadblockLevel level, Road street, Vehicle vehicle, bool limitSpeed,
             bool shouldAddLights, bool addSpikeStrip)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
             Assert.NotNull(level, "level cannot be null");
-            Assert.NotNull(road, "road cannot be null");
+            Assert.NotNull(street, "road cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
-            return Roadblocks[level].Invoke(spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip);
+            return Roadblocks[level].Invoke(spikeStripDispatcher, street, vehicle, limitSpeed, shouldAddLights, addSpikeStrip);
         }
     }
 }

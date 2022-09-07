@@ -1,5 +1,6 @@
 using System;
-using AutomaticRoadblocks.Roads;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using Rage;
 
@@ -22,16 +23,16 @@ namespace AutomaticRoadblocks.SpikeStrip
         private float _lastKnownDistanceToSpikeStrip = 9999f;
         private bool _audioPlayed;
 
-        public PursuitSpikeStrip(Road road, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
-            : base(road, location, offset)
+        public PursuitSpikeStrip(Road street, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
+            : base(street, location, offset)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
             StateChanged += SpikeStripStateChanged;
         }
 
-        internal PursuitSpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
-            : base(road, lane, location, offset)
+        internal PursuitSpikeStrip(Road street, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
+            : base(street, lane, location, offset)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;

@@ -9,9 +9,9 @@ using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
-namespace AutomaticRoadblocks.Roads
+namespace AutomaticRoadblocks.Street.Info
 {
-    public class Road : IPreviewSupport
+    public class Road : IStreet
     {
         private const float LaneHeadingTolerance = 15f;
 
@@ -21,15 +21,14 @@ namespace AutomaticRoadblocks.Roads
 
         #region Properties
 
-        /// <summary>
-        /// The center position of the road.
-        /// </summary>
+        /// <inheritdoc />
         public Vector3 Position => Node.Position;
 
-        /// <summary>
-        /// The heading of the road.
-        /// </summary>
+        /// <inheritdoc />
         public float Heading => Node.Heading;
+
+        /// <inheritdoc />
+        public EStreetType Type => EStreetType.Road;
 
         /// <summary>
         /// Get the right side position of the road.
@@ -45,11 +44,6 @@ namespace AutomaticRoadblocks.Roads
         /// Get the lanes of this road.
         /// </summary>
         public IReadOnlyList<Lane> Lanes { get; internal set; }
-
-        /// <summary>
-        /// The vehicle node info on which this road is based.
-        /// </summary>
-        public NodeInfo Node { get; internal set; }
 
         /// <summary>
         /// Get the total number of lanes.
@@ -83,6 +77,11 @@ namespace AutomaticRoadblocks.Roads
         /// Check if the road goes in one direction (no opposite lane present).
         /// </summary>
         public bool IsSingleDirection => IsSingleDirectionRoad();
+        
+        /// <summary>
+        /// The vehicle node info on which this road is based.
+        /// </summary>
+        internal NodeInfo Node { get; set; }
 
         #endregion
 
@@ -370,136 +369,6 @@ namespace AutomaticRoadblocks.Roads
             {
                 return position + Vector3.WorldUp * 0.25f;
             }
-        }
-
-        /// <summary>
-        /// The vehicle node that was used to determine the road/lane.
-        /// </summary>
-        public class NodeInfo : IPreviewSupport
-        {
-            internal NodeInfo(Vector3 position, float heading, int numberOfLanes1, int numberOfLanes2, float atJunction)
-            {
-                Position = position;
-                Heading = heading;
-                NumberOfLanes1 = numberOfLanes1;
-                NumberOfLanes2 = numberOfLanes2;
-                AtJunction = atJunction;
-            }
-
-            #region Properties
-
-            /// <summary>
-            /// The position of the node.
-            /// </summary>
-            public Vector3 Position { get; }
-
-            /// <summary>
-            /// The heading of the node.
-            /// </summary>
-            public float Heading { get; }
-
-            /// <summary>
-            /// The right side number of lanes for the node.
-            /// </summary>
-            public int NumberOfLanes1 { get; }
-
-            /// <summary>
-            /// The left side number of lanes for the node.
-            /// </summary>
-            public int NumberOfLanes2 { get; }
-
-            /// <summary>
-            /// Indicates if this node is at a junction.
-            /// </summary>
-            public float AtJunction { get; }
-
-            /// <summary>
-            /// The traffic density of the node.
-            /// </summary>
-            public int Density { get; internal set; }
-
-            /// <summary>
-            /// The flags of the node.
-            /// </summary>
-            public ENodeFlag Flags { get; internal set; }
-
-            #endregion
-
-            #region Methods
-
-            public override string ToString()
-            {
-                return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}, {nameof(NumberOfLanes1)}: {NumberOfLanes1}, " +
-                       $"{nameof(NumberOfLanes2)}: {NumberOfLanes2}, {nameof(AtJunction)}: {AtJunction}, {nameof(Density)}: {Density}, {nameof(Flags)}: {Flags} ({(int)Flags})";
-            }
-
-            protected bool Equals(NodeInfo other)
-            {
-                return Position.Equals(other.Position) && Heading.Equals(other.Heading);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((NodeInfo)obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (Position.GetHashCode() * 397) ^ Heading.GetHashCode();
-                }
-            }
-
-            #endregion
-
-            #region IPreviewSupport
-
-            /// <inheritdoc />
-            public bool IsPreviewActive { get; private set; }
-
-            /// <inheritdoc />
-            public void CreatePreview()
-            {
-                if (IsPreviewActive)
-                    return;
-
-                var game = IoC.Instance.GetInstance<IGame>();
-                var direction = MathHelper.ConvertHeadingToDirection(Heading);
-
-                IsPreviewActive = true;
-                game.NewSafeFiber(() =>
-                {
-                    while (IsPreviewActive)
-                    {
-                        game.DrawArrow(FloatAboveGround(Position), direction, Rotator.Zero, 3f, Color.Gold);
-                        game.FiberYield();
-                    }
-                }, "Road.VehicleNode.CreatePreview");
-            }
-
-            /// <inheritdoc />
-            public void DeletePreview()
-            {
-                if (!IsPreviewActive)
-                    return;
-
-                IsPreviewActive = false;
-            }
-
-            #endregion
-
-            #region Functions
-
-            private static Vector3 FloatAboveGround(Vector3 position)
-            {
-                return position + Vector3.WorldUp * 1f;
-            }
-
-            #endregion
         }
     }
 }

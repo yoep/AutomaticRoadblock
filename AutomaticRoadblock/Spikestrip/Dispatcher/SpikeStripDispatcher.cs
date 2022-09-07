@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.Roads;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using JetBrains.Annotations;
 using Rage;
 
@@ -19,39 +20,39 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
         #region ISpikeStripDispatcher
 
         /// <inheritdoc />
-        public ISpikeStrip Spawn(Road road, ESpikeStripLocation stripLocation, float offset = 0f)
+        public ISpikeStrip Spawn(Road street, ESpikeStripLocation stripLocation, float offset = 0f)
         {
-            return DoInternalSpikeStripCreation(road, null, stripLocation, DeploymentType.Spawn, null, offset);
+            return DoInternalSpikeStripCreation(street, null, stripLocation, DeploymentType.Spawn, null, offset);
         }
 
         /// <inheritdoc />
-        public ISpikeStrip Spawn(Road road, Road.Lane lane, ESpikeStripLocation stripLocation, Vehicle targetVehicle, float offset = 0f)
+        public ISpikeStrip Spawn(Road street, Road.Lane lane, ESpikeStripLocation stripLocation, Vehicle targetVehicle, float offset = 0f)
         {
-            return DoInternalSpikeStripCreation(road, lane, stripLocation, DeploymentType.Spawn, targetVehicle, offset);
+            return DoInternalSpikeStripCreation(street, lane, stripLocation, DeploymentType.Spawn, targetVehicle, offset);
         }
 
         /// <inheritdoc />
         public ISpikeStrip Deploy(Vector3 position, ESpikeStripLocation stripLocation)
         {
-            var road = RoadUtils.FindClosestRoad(position, EVehicleNodeType.AllNodes);
+            var road = (Road)RoadUtils.FindClosestRoad(position, EVehicleNodeType.AllNodes);
             return DoInternalSpikeStripCreation(road, null, stripLocation, DeploymentType.Deploy, null, 0f);
         }
 
         /// <inheritdoc />
-        public ISpikeStrip Deploy(Road road, ESpikeStripLocation stripLocation)
+        public ISpikeStrip Deploy(Road street, ESpikeStripLocation stripLocation)
         {
-            return DoInternalSpikeStripCreation(road, null, stripLocation, DeploymentType.Deploy, null, 0f);
+            return DoInternalSpikeStripCreation(street, null, stripLocation, DeploymentType.Deploy, null, 0f);
         }
 
-        public ISpikeStrip Deploy(Road road, ESpikeStripLocation stripLocation, Vehicle targetVehicle)
+        public ISpikeStrip Deploy(Road street, ESpikeStripLocation stripLocation, Vehicle targetVehicle)
         {
-            return DoInternalSpikeStripCreation(road, null, stripLocation, DeploymentType.Deploy, targetVehicle, 0f);
+            return DoInternalSpikeStripCreation(street, null, stripLocation, DeploymentType.Deploy, targetVehicle, 0f);
         }
 
         /// <inheritdoc />
         public ISpikeStrip CreatePreview(Vector3 position, ESpikeStripLocation stripLocation)
         {
-            var road = RoadUtils.FindClosestRoad(position, EVehicleNodeType.AllNodes);
+            var road = (Road)RoadUtils.FindClosestRoad(position, EVehicleNodeType.AllNodes);
             return DoInternalSpikeStripCreation(road, null, stripLocation, DeploymentType.Preview, null, 0f);
         }
 
@@ -83,7 +84,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
 
         #region Functions
 
-        private ISpikeStrip DoInternalSpikeStripCreation(Road road, [CanBeNull] Road.Lane lane, ESpikeStripLocation stripLocation, DeploymentType type,
+        private ISpikeStrip DoInternalSpikeStripCreation(Road street, [CanBeNull] Road.Lane lane, ESpikeStripLocation stripLocation, DeploymentType type,
             [CanBeNull] Vehicle targetVehicle, float offset)
         {
             ISpikeStrip spikeStrip;
@@ -91,8 +92,8 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
             lock (_spikeStrips)
             {
                 spikeStrip = targetVehicle == null
-                    ? DoSpikeStripCreation(road, stripLocation, offset)
-                    : DoPursuitSpikeStripCreation(road, lane, stripLocation, targetVehicle, offset);
+                    ? DoSpikeStripCreation(street, stripLocation, offset)
+                    : DoPursuitSpikeStripCreation(street, lane, stripLocation, targetVehicle, offset);
                 _spikeStrips.Add(spikeStrip);
             }
             
@@ -121,17 +122,17 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
             _logger.Debug($"Spike strip state changed to {state} for {spikeStrip}");
         }
 
-        private static SpikeStrip DoSpikeStripCreation(Road road, ESpikeStripLocation stripLocation, float offset)
+        private static SpikeStrip DoSpikeStripCreation(Road street, ESpikeStripLocation stripLocation, float offset)
         {
-            return new SpikeStrip(road, stripLocation, offset);
+            return new SpikeStrip(street, stripLocation, offset);
         }
 
-        private static PursuitSpikeStrip DoPursuitSpikeStripCreation(Road road, [CanBeNull] Road.Lane lane, ESpikeStripLocation stripLocation,
+        private static PursuitSpikeStrip DoPursuitSpikeStripCreation(Road street, [CanBeNull] Road.Lane lane, ESpikeStripLocation stripLocation,
             Vehicle targetVehicle, float offset)
         {
             return lane == null
-                ? new PursuitSpikeStrip(road, stripLocation, targetVehicle, offset)
-                : new PursuitSpikeStrip(road, lane, stripLocation, targetVehicle, offset);
+                ? new PursuitSpikeStrip(street, stripLocation, targetVehicle, offset)
+                : new PursuitSpikeStrip(street, lane, stripLocation, targetVehicle, offset);
         }
 
         #endregion

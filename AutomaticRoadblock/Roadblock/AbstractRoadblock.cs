@@ -7,7 +7,8 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Roads;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
@@ -39,17 +40,17 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Initialize a new roadblock instance.
         /// </summary>
-        /// <param name="road">The road of that the roadblock will block.</param>
+        /// <param name="street">The road of that the roadblock will block.</param>
         /// <param name="mainBarrierType">The main barrier used within the slots.</param>
         /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
         /// <param name="limitSpeed">Indicates if a speed limit should be added.</param>
         /// <param name="addLights">Indicates if light props should be added.</param>
         /// <param name="offset">The offset placement in regards to the road node.</param>
-        internal AbstractRoadblock(Road road, BarrierType mainBarrierType, float targetHeading, bool limitSpeed, bool addLights, float offset = 0f)
+        internal AbstractRoadblock(Road street, BarrierType mainBarrierType, float targetHeading, bool limitSpeed, bool addLights, float offset = 0f)
         {
-            Assert.NotNull(road, "road cannot be null");
+            Assert.NotNull(street, "road cannot be null");
             Assert.NotNull(mainBarrierType, "mainBarrierType cannot be null");
-            Road = road;
+            Road = street;
             MainBarrierType = mainBarrierType;
             TargetHeading = targetHeading;
             Offset = offset;

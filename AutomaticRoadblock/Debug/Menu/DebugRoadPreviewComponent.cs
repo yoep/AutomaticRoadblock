@@ -3,7 +3,8 @@ using System.Diagnostics;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
-using AutomaticRoadblocks.Roads;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using Rage;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
@@ -13,10 +14,10 @@ namespace AutomaticRoadblocks.Debug.Menu
     public class DebugRoadPreviewComponent : IMenuComponent<UIMenuListItem>
     {
         private const float SearchRadius = 15f;
-        
+
         private readonly ILogger _logger;
         private readonly IGame _game;
-        private List<Road> _roads;
+        private List<IStreet> _roads;
 
         public DebugRoadPreviewComponent(ILogger logger, IGame game)
         {
@@ -29,7 +30,10 @@ namespace AutomaticRoadblocks.Debug.Menu
         /// <inheritdoc />
         public UIMenuListItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.RoadPreview, AutomaticRoadblocksPlugin.RoadPreviewDescription,
             new DisplayItem(ERoadPreviewType.Closest, AutomaticRoadblocksPlugin.RoadPreviewClosest),
-            new DisplayItem(ERoadPreviewType.NearbyAll, AutomaticRoadblocksPlugin.RoadPreviewNearby));
+            new DisplayItem(ERoadPreviewType.ClosestNoJunction, AutomaticRoadblocksPlugin.RoadPreviewClosestNoJunction),
+            new DisplayItem(ERoadPreviewType.NearbyAll, AutomaticRoadblocksPlugin.RoadPreviewNearby),
+            new DisplayItem(ERoadPreviewType.NearbyNoJunction, AutomaticRoadblocksPlugin.RoadPreviewNearbyNoJunction)
+        );
 
         /// <inheritdoc />
         public EMenuType Type => EMenuType.Debug;
@@ -59,18 +63,23 @@ namespace AutomaticRoadblocks.Debug.Menu
             {
                 MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreviewRemove;
                 var type = (ERoadPreviewType)MenuItem.SelectedValue;
+                var playerPosition = Game.LocalPlayer.Character.Position;
 
                 _roads = type switch
                 {
-                    ERoadPreviewType.Closest => new List<Road>
+                    ERoadPreviewType.Closest => new List<IStreet>
                     {
-                        RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, EVehicleNodeType.AllRoadNoJunctions)
+                        RoadUtils.FindClosestRoad(playerPosition, EVehicleNodeType.AllNodes)
+                    },
+                    ERoadPreviewType.ClosestNoJunction => new List<IStreet>
+                    {
+                        RoadUtils.FindClosestRoad(playerPosition, EVehicleNodeType.AllRoadNoJunctions)
                     },
                     ERoadPreviewType.NearbyAll => RoadUtils
-                        .FindNearbyRoads(Game.LocalPlayer.Character.Position, EVehicleNodeType.AllNodes, SearchRadius)
+                        .FindNearbyRoads(playerPosition, EVehicleNodeType.AllNodes, SearchRadius)
                         .ToList(),
                     ERoadPreviewType.NearbyNoJunction => RoadUtils
-                        .FindNearbyRoads(Game.LocalPlayer.Character.Position, EVehicleNodeType.AllRoadNoJunctions, SearchRadius)
+                        .FindNearbyRoads(playerPosition, EVehicleNodeType.AllRoadNoJunctions, SearchRadius)
                         .ToList(),
                     _ => _roads
                 };
@@ -94,6 +103,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         public enum ERoadPreviewType
         {
             Closest,
+            ClosestNoJunction,
             NearbyAll,
             NearbyNoJunction
         }

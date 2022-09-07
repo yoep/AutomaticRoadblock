@@ -9,12 +9,11 @@ namespace AutomaticRoadblocks
         public const string RoadPreview = "Road preview" + DebugIndicatorText;
         public const string RoadPreviewDescription = "Create a visual of the road information";
         public const string RoadPreviewClosest = "Closest road";
+        public const string RoadPreviewClosestNoJunction = "Closest road no junction";
         public const string RoadPreviewNearby = "Nearby roads";
+        public const string RoadPreviewNearbyNoJunction = "Nearby roads no junction";
         public const string RoadPreviewRemove = "Remove preview" + DebugIndicatorText;
-        public const string NearbyVehicleNodes = "Vehicle nodes";
-        public const string RemoveNearbyVehicleNodes = "Remove vehicle nodes";
         public const string ZoneInfo = "Zone info " + DebugIndicatorText;
-        public const string EndCallout = "End current callout " + DebugIndicatorText;
         public const string DispatchPreview = "Dispatch preview" + DebugIndicatorText;
         public const string DispatchPreviewDescription = "Preview a roadblock with the position calculated or at the current location of the player";
         public const string DispatchPreviewCalculateType = "Calculate";

@@ -1,0 +1,103 @@
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using AutomaticRoadblocks.AbstractionLayer;
+using Rage;
+
+namespace AutomaticRoadblocks.Street.Info
+{
+    public class Intersection : IStreet
+    {
+        private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
+
+        #region Properties
+
+        /// <inheritdoc />
+        public Vector3 Position { get; internal set; }
+
+        /// <inheritdoc />
+        public float Heading { get; internal set; }
+
+        /// <inheritdoc />
+        public EStreetType Type => EStreetType.Intersection;
+
+        /// <inheritdoc />
+        public Vector3 RightSide => Vector3.Zero;
+
+        /// <inheritdoc />
+        public Vector3 LeftSide => Vector3.Zero;
+
+        /// <inheritdoc />
+        public int NumberOfLanesSameDirection => 0;
+
+        /// <inheritdoc />
+        public int NumberOfLanesOppositeDirection => 0;
+
+        internal List<NodeInfo> Directions { get; set; }
+
+        #endregion
+
+        #region IPreviewSupport
+
+        /// <inheritdoc />
+        public bool IsPreviewActive { get; private set; }
+
+        /// <inheritdoc />
+        public void CreatePreview()
+        {
+            DoInternalPReviewCreation();
+        }
+
+        /// <inheritdoc />
+        public void DeletePreview()
+        {
+            if (!IsPreviewActive)
+                return;
+
+            IsPreviewActive = false;
+        }
+
+        #endregion
+        
+        #region Methods
+
+        public override string ToString()
+        {
+            return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}, {nameof(Type)}: {Type}, number of {nameof(Directions)}: {Directions.Count}";
+        }
+
+        #endregion
+
+        #region Functions
+
+        [Conditional("DEBUG")]
+        private void DoInternalPReviewCreation()
+        {
+            if (IsPreviewActive)
+                return;
+
+            IsPreviewActive = true;
+            Game.NewSafeFiber(() =>
+            {
+                while (IsPreviewActive)
+                {
+                    Game.DrawSphere(Position, 0.5f, Color.DeepPink);
+                    DrawDirection(Position, Heading);
+                    Directions?.ForEach(x => DrawDirection(x.Position, x.Heading));
+                    GameFiber.Yield();
+                }
+            }, "Intersection.Preview");
+        }
+
+        private static void DrawDirection(Vector3 position, float heading)
+        {
+            var direction = MathHelper.ConvertHeadingToDirection(heading);
+            var drawPosition = position
+                               + Vector3.WorldUp * 1.5f
+                               + direction * 0.4f;
+            Game.DrawArrow(drawPosition, direction, Rotator.Zero, 0.5f, Color.White);
+        }
+
+        #endregion
+    }
+}

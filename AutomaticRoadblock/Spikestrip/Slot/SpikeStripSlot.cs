@@ -3,8 +3,9 @@ using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using JetBrains.Annotations;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
@@ -23,7 +24,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         private bool _hasBeenDeployed;
 
-        public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road road, Road.Lane lane, Vehicle targetVehicle, float heading, bool shouldAddLights,
+        public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road street, Road.Lane lane, Vehicle targetVehicle, float heading, bool shouldAddLights,
             float offset = 0)
             : base(lane, BarrierType.None, VehicleType.Local, heading, shouldAddLights, false, offset)
         {
@@ -31,7 +32,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             SpikeStripDispatcher = spikeStripDispatcher;
             TargetVehicle = targetVehicle;
-            Road = road;
+            Road = street;
             Location = DetermineLocation();
 
             Initialize();

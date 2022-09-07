@@ -2,8 +2,9 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
-using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 
@@ -93,7 +94,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             if (redirectTraffic == null)
             {
-                redirectTraffic = CreateInstance(LastDeterminedRoad ?? CalculateNewLocationForInstance());
+                redirectTraffic = CreateInstance(LastDeterminedStreet ?? CalculateNewLocationForInstance());
 
                 lock (Instances)
                 {
@@ -127,13 +128,13 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         #region Function
 
-        protected override RedirectTraffic CreateInstance(Road road)
+        protected override RedirectTraffic CreateInstance(IStreet street)
         {
             Logger.Trace(
                 $"Creating a redirect traffic instance for {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(Type)}: {Type}, {nameof(ConeDistance)}: {ConeDistance}");
             var redirectTraffic = new RedirectTraffic(new RedirectTraffic.Request
             {
-                Road = road,
+                Road = (Road)street,
                 VehicleType = VehicleType,
                 ConeType = ConeType,
                 Type = Type,

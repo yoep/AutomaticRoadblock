@@ -4,7 +4,8 @@ using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Preview;
-using AutomaticRoadblocks.Roads;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
@@ -16,7 +17,7 @@ namespace AutomaticRoadblocks.Instances
         protected readonly IGame Game;
         protected readonly ILogger Logger;
 
-        protected Road LastDeterminedRoad;
+        protected IStreet LastDeterminedStreet;
 
         protected AbstractInstancePlacementManager(IGame game, ILogger logger)
         {
@@ -57,7 +58,7 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public void DeletePreview()
         {
-            LastDeterminedRoad = null;
+            LastDeterminedStreet = null;
             
             lock (Instances)
             {
@@ -92,9 +93,9 @@ namespace AutomaticRoadblocks.Instances
         /// <summary>
         /// Create a new placeable instance for the given <see cref="Road"/>.
         /// </summary>
-        /// <param name="road">The road to create the instance for.</param>
+        /// <param name="street">The road to create the instance for.</param>
         /// <returns>Returns the created instance.</returns>
-        protected abstract T CreateInstance(Road road);
+        protected abstract T CreateInstance(IStreet street);
 
         /// <summary>
         /// Create a preview for the current properties.
@@ -153,26 +154,26 @@ namespace AutomaticRoadblocks.Instances
             toBoRemoved.ForEach(x => x.Dispose());
         }
 
-        protected Road CalculateNewLocationForInstance()
+        protected IStreet CalculateNewLocationForInstance()
         {
             var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
 
             return RoadUtils.FindClosestRoad(position, EVehicleNodeType.AllNodes);
         }
 
-        private void DoHologramPreviewCreation(Road road, bool force)
+        private void DoHologramPreviewCreation(IStreet street, bool force)
         {
-            if (!force && Equals(road, LastDeterminedRoad))
+            if (!force && Equals(street, LastDeterminedStreet))
                 return;
 
             // remove any existing previews first
             DeletePreview();
 
-            LastDeterminedRoad = road;
+            LastDeterminedStreet = street;
             Game.NewSafeFiber(() =>
             {
-                Logger.Trace($"Creating new instance hologram preview at {road}");
-                var instance = CreateInstance(road);
+                Logger.Trace($"Creating new instance hologram preview at {street}");
+                var instance = CreateInstance(street);
                 Logger.Debug($"Created instance {instance}");
                 instance.CreatePreview();
 
@@ -203,9 +204,9 @@ namespace AutomaticRoadblocks.Instances
             return closestInstance;
         }
 
-        private static void CreatePreviewMarker(Road road)
+        private static void CreatePreviewMarker(IStreet street)
         {
-            GameUtils.CreateMarker(road.Position, EMarkerType.MarkerTypeVerticalCylinder, Color.White, 2.5f, 1.5f, false);
+            GameUtils.CreateMarker(street.Position, EMarkerType.MarkerTypeVerticalCylinder, Color.White, 2.5f, 1.5f, false);
         }
 
         #endregion

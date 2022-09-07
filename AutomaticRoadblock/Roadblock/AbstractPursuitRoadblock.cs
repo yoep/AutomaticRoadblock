@@ -5,9 +5,10 @@ using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Roads;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.SpikeStrip.Slot;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
 using LSPD_First_Response.Engine.Scripting.Entities;
@@ -27,9 +28,9 @@ namespace AutomaticRoadblocks.Roadblock
 
         private float _lastKnownDistanceToRoadblock = 9999f;
 
-        protected AbstractPursuitRoadblock(ISpikeStripDispatcher spikeStripDispatcher, Road road, BarrierType mainBarrierType, Vehicle targetVehicle,
+        protected AbstractPursuitRoadblock(ISpikeStripDispatcher spikeStripDispatcher, Road street, BarrierType mainBarrierType, Vehicle targetVehicle,
             bool limitSpeed, bool addLights, bool spikeStripEnabled)
-            : base(road, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, limitSpeed, addLights)
+            : base(street, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, limitSpeed, addLights)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");

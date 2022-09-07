@@ -1,6 +1,7 @@
 using System;
 using AutomaticRoadblocks.Preview;
-using AutomaticRoadblocks.Roads;
+using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Street.Info;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
