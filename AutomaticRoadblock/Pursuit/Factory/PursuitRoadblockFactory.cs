@@ -11,37 +11,37 @@ namespace AutomaticRoadblocks.Pursuit.Factory
 {
     internal static class PursuitRoadblockFactory
     {
-        private static readonly Dictionary<RoadblockLevel, Func<ISpikeStripDispatcher, Road, Vehicle, bool, bool, bool, IRoadblock>> Roadblocks =
+        private static readonly Dictionary<ERoadblockLevel, Func<ISpikeStripDispatcher, Road, Vehicle, bool, bool, bool, IRoadblock>> Roadblocks =
             new()
             {
                 {
-                    RoadblockLevel.Level1,
+                    ERoadblockLevel.Level1,
                     (spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip) =>
                         new PursuitRoadblockLevel1(spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip)
                 },
                 {
-                    RoadblockLevel.Level2,
+                    ERoadblockLevel.Level2,
                     (spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip) =>
                         new PursuitRoadblockLevel2(spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip)
                 },
                 {
-                    RoadblockLevel.Level3,
+                    ERoadblockLevel.Level3,
                     (spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip) =>
                         new PursuitRoadblockLevel3(spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip)
                 },
                 {
-                    RoadblockLevel.Level4,
+                    ERoadblockLevel.Level4,
                     (spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip) =>
                         new PursuitRoadblockLevel4(spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip)
                 },
                 {
-                    RoadblockLevel.Level5,
+                    ERoadblockLevel.Level5,
                     (spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip) =>
                         new PursuitRoadblockLevel5(spikeStripDispatcher, road, vehicle, limitSpeed, shouldAddLights, addSpikeStrip)
                 }
             };
 
-        internal static IRoadblock Create(ISpikeStripDispatcher spikeStripDispatcher, RoadblockLevel level, Road street, Vehicle vehicle, bool limitSpeed,
+        internal static IRoadblock Create(ISpikeStripDispatcher spikeStripDispatcher, ERoadblockLevel level, Road street, Vehicle vehicle, bool limitSpeed,
             bool shouldAddLights, bool addSpikeStrip)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");

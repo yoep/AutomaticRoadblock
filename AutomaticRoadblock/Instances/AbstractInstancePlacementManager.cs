@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Instances
         protected readonly IGame Game;
         protected readonly ILogger Logger;
 
-        protected IStreet LastDeterminedStreet;
+        protected IVehicleNode LastDeterminedStreet;
 
         protected AbstractInstancePlacementManager(IGame game, ILogger logger)
         {
@@ -95,7 +95,7 @@ namespace AutomaticRoadblocks.Instances
         /// </summary>
         /// <param name="street">The road to create the instance for.</param>
         /// <returns>Returns the created instance.</returns>
-        protected abstract T CreateInstance(IStreet street);
+        protected abstract T CreateInstance(IVehicleNode street);
 
         /// <summary>
         /// Create a preview for the current properties.
@@ -154,14 +154,14 @@ namespace AutomaticRoadblocks.Instances
             toBoRemoved.ForEach(x => x.Dispose());
         }
 
-        protected IStreet CalculateNewLocationForInstance()
+        protected IVehicleNode CalculateNewLocationForInstance()
         {
             var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
 
             return RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
         }
 
-        private void DoHologramPreviewCreation(IStreet street, bool force)
+        private void DoHologramPreviewCreation(IVehicleNode street, bool force)
         {
             if (!force && Equals(street, LastDeterminedStreet))
                 return;
@@ -204,7 +204,7 @@ namespace AutomaticRoadblocks.Instances
             return closestInstance;
         }
 
-        private static void CreatePreviewMarker(IStreet street)
+        private static void CreatePreviewMarker(IVehicleNode street)
         {
             GameUtils.CreateMarker(street.Position, EMarkerType.MarkerTypeVerticalCylinder, Color.White, 2.5f, 1.5f, false);
         }

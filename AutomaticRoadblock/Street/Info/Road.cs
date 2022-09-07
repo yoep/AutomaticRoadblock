@@ -11,7 +11,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.Street.Info
 {
-    public class Road : IStreet
+    public class Road : IVehicleNode
     {
         private const float LaneHeadingTolerance = 15f;
 
@@ -56,11 +56,6 @@ namespace AutomaticRoadblocks.Street.Info
         public int NumberOfLanesOppositeDirection => Lanes.Count(x => x.IsOppositeHeadingOfRoadNodeHeading);
 
         /// <summary>
-        /// Get the junction indicator for the road.
-        /// </summary>
-        public int JunctionIndicator { get; internal set; }
-
-        /// <summary>
         /// Get or set the width of the road.
         /// </summary>
         public float Width
@@ -69,19 +64,14 @@ namespace AutomaticRoadblocks.Street.Info
         }
 
         /// <summary>
-        /// Check if the road position is at a junction.
-        /// </summary>
-        public bool IsAtJunction => JunctionIndicator != 0;
-
-        /// <summary>
         /// Check if the road goes in one direction (no opposite lane present).
         /// </summary>
         public bool IsSingleDirection => IsSingleDirectionRoad();
-        
+
         /// <summary>
         /// The vehicle node info on which this road is based.
         /// </summary>
-        internal NodeInfo Node { get; set; }
+        internal VehicleNodeInfo Node { get; set; }
 
         #endregion
 
@@ -158,9 +148,8 @@ namespace AutomaticRoadblocks.Street.Info
         public override string ToString()
         {
             return $"{nameof(Position)}: {Position}, {nameof(Width)}: {Width}, {nameof(RightSide)}: {RightSide}, {nameof(LeftSide)}: {LeftSide}\n" +
-                   $"{nameof(NumberOfLanesSameDirection)}: {NumberOfLanesSameDirection}, {nameof(NumberOfLanesOppositeDirection)}: {NumberOfLanesOppositeDirection}, {nameof(JunctionIndicator)}: {JunctionIndicator}, " +
-                   $"{nameof(IsAtJunction)}: {IsAtJunction}, {nameof(IsSingleDirection)}: {IsSingleDirection}\n" +
-                   $"{nameof(Node)}: {Node}" +
+                   $"{nameof(NumberOfLanesSameDirection)}: {NumberOfLanesSameDirection}, {nameof(NumberOfLanesOppositeDirection)}: {NumberOfLanesOppositeDirection}, " +
+                   $"{nameof(IsSingleDirection)}: {IsSingleDirection}, {nameof(Node)}: {Node}" +
                    "\n--- Lanes ---" +
                    $"\n{string.Join("\n", Lanes)}" +
                    "\n---";
@@ -200,10 +189,9 @@ namespace AutomaticRoadblocks.Street.Info
             GameFiber.StartNew(() =>
             {
                 var game = IoC.Instance.GetInstance<IGame>();
-                var junctionMarkerPosition = Position + MathHelper.ConvertHeadingToDirection(Heading) * 2f;
                 var color = Color.LightGray;
 
-                if (Node.Flags.HasFlag(ENodeFlag.IsGravelRoad) || Node.Flags.HasFlag(ENodeFlag.IsOffRoad))
+                if ((Node.Flags & (ENodeFlag.IsGravelRoad | ENodeFlag.IsOffRoad)) != 0)
                 {
                     color = Color.SandyBrown;
                 }
@@ -217,10 +205,6 @@ namespace AutomaticRoadblocks.Street.Info
                     game.DrawSphere(Position, 0.5f, color);
                     GameUtils.CreateMarker(LeftSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Blue, 0.5f, 1.5f, false);
                     GameUtils.CreateMarker(RightSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Green, 0.5f, 1.5f, false);
-
-                    if (IsAtJunction)
-                        game.DrawSphere(junctionMarkerPosition, 0.5f, Color.Orange);
-
                     game.FiberYield();
                 }
             });

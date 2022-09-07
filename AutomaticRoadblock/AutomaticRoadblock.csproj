@@ -168,7 +168,7 @@
         <Compile Include="Roadblock\Menu\RoadblockMenuSwitchItem.cs" />
         <Compile Include="Roadblock\RoadblockEvents.cs" />
         <Compile Include="Roadblock\RoadblockHelpers.cs" />
-        <Compile Include="Roadblock\RoadblockLevel.cs" />
+        <Compile Include="Roadblock\ERoadblockLevel.cs" />
         <Compile Include="Roadblock\ERoadblockState.cs" />
         <Compile Include="Roadblock\Slot\AbstractPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\AbstractRoadblockSlot.cs" />
@@ -183,9 +183,9 @@
         <Compile Include="Street\Factory\RoadFactory.cs" />
         <Compile Include="Street\ILane.cs" />
         <Compile Include="Street\Info\Intersection.cs" />
-        <Compile Include="Street\Info\NodeInfo.cs" />
+        <Compile Include="Street\Info\VehicleNodeInfo.cs" />
         <Compile Include="Street\Info\Road.cs" />
-        <Compile Include="Street\IStreet.cs" />
+        <Compile Include="Street\IVehicleNode.cs" />
         <Compile Include="Street\RoadQuery.cs" />
         <Compile Include="Settings\AutomaticRoadblocksSettings.cs" />
         <Compile Include="Settings\GeneralSettings.cs" />

@@ -148,7 +148,7 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         #region Functions
 
-        protected override ManualRoadblock CreateInstance(IStreet street)
+        protected override ManualRoadblock CreateInstance(IVehicleNode street)
         {
             Assert.NotNull(street, "road cannot be null");
             var roadblock = new ManualRoadblock(new ManualRoadblock.Request

@@ -24,7 +24,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         #region Properties
 
         /// <inheritdoc />
-        public override RoadblockLevel Level => RoadblockLevel.Level5;
+        public override ERoadblockLevel Level => ERoadblockLevel.Level5;
 
         #endregion
         

@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Debug.Menu
 
         private readonly ILogger _logger;
         private readonly IGame _game;
-        private List<IStreet> _roads;
+        private List<IVehicleNode> _roads;
 
         public DebugRoadPreviewComponent(ILogger logger, IGame game)
         {
@@ -67,11 +67,11 @@ namespace AutomaticRoadblocks.Debug.Menu
 
                 _roads = type switch
                 {
-                    ERoadPreviewType.Closest => new List<IStreet>
+                    ERoadPreviewType.Closest => new List<IVehicleNode>
                     {
                         RoadQuery.FindClosestRoad(playerPosition, EVehicleNodeType.AllNodes)
                     },
-                    ERoadPreviewType.ClosestNoJunction => new List<IStreet>
+                    ERoadPreviewType.ClosestNoJunction => new List<IVehicleNode>
                     {
                         RoadQuery.FindClosestRoad(playerPosition, EVehicleNodeType.AllRoadNoJunctions)
                     },

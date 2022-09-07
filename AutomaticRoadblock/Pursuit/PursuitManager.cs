@@ -562,9 +562,9 @@ namespace AutomaticRoadblocks.Pursuit
             _game.DisplayNotification($"Suspect killed a total of ~r~{_totalCopsKilled}~s~ cops");
         }
 
-        private static RoadblockLevel ToRoadblockLevel(PursuitLevel pursuitLevel)
+        private static ERoadblockLevel ToRoadblockLevel(PursuitLevel pursuitLevel)
         {
-            return RoadblockLevel.Levels
+            return ERoadblockLevel.Levels
                 .First(x => x.Level == pursuitLevel.Level);
         }
 

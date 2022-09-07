@@ -53,7 +53,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         #region IRoadblock
 
         /// <inheritdoc />
-        public override RoadblockLevel Level => RoadblockLevel.None;
+        public override ERoadblockLevel Level => ERoadblockLevel.None;
 
         #endregion
 

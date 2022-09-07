@@ -66,7 +66,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Get the level of the roadblock.
         /// </summary>
-        public abstract RoadblockLevel Level { get; }
+        public abstract ERoadblockLevel Level { get; }
 
         /// <inheritdoc />
         public ERoadblockState State { get; private set; } = ERoadblockState.Preparing;

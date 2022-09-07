@@ -128,7 +128,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         #region Function
 
-        protected override RedirectTraffic CreateInstance(IStreet street)
+        protected override RedirectTraffic CreateInstance(IVehicleNode street)
         {
             Logger.Trace(
                 $"Creating a redirect traffic instance for {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(Type)}: {Type}, {nameof(ConeDistance)}: {ConeDistance}");

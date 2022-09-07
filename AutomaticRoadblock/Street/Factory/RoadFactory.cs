@@ -6,7 +6,7 @@ namespace AutomaticRoadblocks.Street.Factory
 {
     internal static class RoadFactory
     {
-        internal static Road Create(NodeInfo nodeInfo)
+        internal static Road Create(VehicleNodeInfo nodeInfo)
         {
             var nodeHeading = nodeInfo.Heading;
             var rightSideHeading = nodeHeading - 90f;
@@ -26,9 +26,8 @@ namespace AutomaticRoadblocks.Street.Factory
             {
                 RightSide = roadRightSide,
                 LeftSide = roadLeftSide,
-                JunctionIndicator = (int)nodeInfo.AtJunction,
-                Lanes = DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, nodeHeading, nodeInfo.NumberOfLanes1,
-                    nodeInfo.NumberOfLanes2),
+                Lanes = DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, nodeHeading, nodeInfo.LanesInSameDirection,
+                    nodeInfo.LanesInOppositeDirection),
                 Node = nodeInfo,
             };
         }

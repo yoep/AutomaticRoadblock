@@ -6,7 +6,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.Street.Info
 {
-    public class Intersection : IStreet
+    public class Intersection : IVehicleNode
     {
         private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
@@ -21,22 +21,10 @@ namespace AutomaticRoadblocks.Street.Info
         /// <inheritdoc />
         public EStreetType Type => EStreetType.Intersection;
 
-        /// <inheritdoc />
-        public Vector3 RightSide => Vector3.Zero;
-
-        /// <inheritdoc />
-        public Vector3 LeftSide => Vector3.Zero;
-
-        /// <inheritdoc />
-        public int NumberOfLanesSameDirection => 0;
-
-        /// <inheritdoc />
-        public int NumberOfLanesOppositeDirection => 0;
-
         /// <summary>
         /// The directions of the intersection.
         /// </summary>
-        internal List<NodeInfo> Directions { get; set; }
+        internal List<VehicleNodeInfo> Directions { get; set; }
 
         /// <summary>
         /// The roads which connect to this intersection.
