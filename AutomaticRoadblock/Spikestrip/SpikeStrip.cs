@@ -23,23 +23,23 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         private AnimationExecutor _animation;
 
-        internal SpikeStrip(Road road, ESpikeStripLocation location)
+        internal SpikeStrip(Road road, ESpikeStripLocation location, float offset)
         {
             Assert.NotNull(road, "road cannot be null");
             Road = road;
             Location = location;
             Lane = CalculatePlacementLane();
-            Position = CalculateSpikeStripPosition();
+            Position = CalculateSpikeStripPosition(offset);
         }
 
-        internal SpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location)
+        internal SpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, float offset)
         {
             Assert.NotNull(road, "road cannot be null");
             Assert.NotNull(lane, "lane cannot be null");
             Road = road;
             Lane = lane;
             Location = location;
-            Position = CalculateSpikeStripPosition();
+            Position = CalculateSpikeStripPosition(offset);
         }
 
         #region Properties
@@ -179,6 +179,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// <param name="wheel">The vehicle's wheel that hit it.</param>
         protected virtual void VehicleHitSpikeStrip(Vehicle vehicle, VehicleWheel wheel)
         {
+            Logger.Debug($"Vehicle hit spike strip in state {State}");
             wheel.BurstTire();
         }
 
@@ -254,7 +255,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         {
             Game.NewSafeFiber(() =>
             {
-                while (State is not ESpikeStripState.Preparing or ESpikeStripState.Undeployed or ESpikeStripState.Disposed)
+                while (State is not (ESpikeStripState.Preparing or ESpikeStripState.Undeployed or ESpikeStripState.Disposed))
                 {
                     DoNearbyVehiclesCheck();
                     DoAdditionalVerifications();
@@ -293,7 +294,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         {
             if (IsInvalid)
                 return false;
-            
+
             var instancePosition = GameInstance.Position;
             var orientation = GameInstance.Orientation;
             var size = PropUtils.Models.SpikeStrip.Dimensions;
@@ -335,17 +336,19 @@ namespace AutomaticRoadblocks.SpikeStrip
                 AnimationFlags.StayInEndFrame);
             PropUtils.PlaceCorrectlyOnGround(GameInstance);
         }
-        
-        private Vector3 CalculateSpikeStripPosition()
+
+        private Vector3 CalculateSpikeStripPosition(float offset)
         {
-            var direction = MathHelper.ConvertHeadingToDirection(Heading);
-            var movementDistance = Lane.Width / 2;
-            return Location switch
+            var position = Location switch
             {
-                ESpikeStripLocation.Left => Road.LeftSide + direction * movementDistance,
-                ESpikeStripLocation.Middle => Road.Position + direction * movementDistance,
-                _ => Road.RightSide + direction * movementDistance
+                ESpikeStripLocation.Left => Road.LeftSide,
+                ESpikeStripLocation.Middle => Road.Position,
+                _ => Road.RightSide
             };
+
+            return position
+                   + MathHelper.ConvertHeadingToDirection(Heading) * (Lane.Width / 2)
+                   + MathHelper.ConvertHeadingToDirection(Road.Node.Heading) * offset;
         }
 
         private Road.Lane CalculatePlacementLane()

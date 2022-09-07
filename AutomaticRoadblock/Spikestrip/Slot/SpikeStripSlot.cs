@@ -19,6 +19,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
     {
         private const float DeploySpikeStripRange = 40f;
         private const int DelayBetweenStateChangeAndUndeploy = 2 * 1000;
+        private const float PlacementInFrontOfVehicle = 0.25f;
 
         private bool _hasBeenDeployed;
 
@@ -31,6 +32,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             SpikeStripDispatcher = spikeStripDispatcher;
             TargetVehicle = targetVehicle;
             Road = road;
+            Location = DetermineLocation();
 
             Initialize();
         }
@@ -63,6 +65,11 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             .Select(x => x.SpikeStrip)
             .FirstOrDefault();
 
+        /// <summary>
+        /// Determine the spike strip location.
+        /// </summary>
+        private ESpikeStripLocation Location { get; }
+
         #endregion
 
         #region Methods
@@ -80,7 +87,14 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// <inheritdoc />
         protected override void InitializeCops()
         {
-            Instances.Add(new InstanceSlot(EEntityType.CopPed, CalculateCopOrVehiclePosition(), Heading - 90, PedFactory.CreateLocaleCop));
+            var position = CalculateVehiclePositionOnSide() + CalculateDirectionInFrontOfVehicle(PlacementInFrontOfVehicle);
+            var heading = Location switch
+            {
+                ESpikeStripLocation.Right => Heading + 90,
+                _ => Heading - 90
+            };
+
+            Instances.Add(new InstanceSlot(EEntityType.CopPed, position, heading, PedFactory.CreateLocaleCop));
         }
 
         /// <inheritdoc />
@@ -106,33 +120,13 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// <inheritdoc />
         protected override Vector3 CalculateVehiclePosition()
         {
-            return OffsetPosition
-                   + CalculateCopOrVehiclePosition()
-                   + MathHelper.ConvertHeadingToDirection(Heading) * VehicleModel.Dimensions.Y;
-        }
-
-        private ESpikeStripLocation DetermineLocation()
-        {
-            var distanceLeft = Road.LeftSide.DistanceTo2D(Lane.Position);
-            var distanceMiddle = Road.Position.DistanceTo2D(Lane.Position);
-            var distanceRight = Road.RightSide.DistanceTo2D(Lane.Position);
-
-            if (distanceLeft < distanceMiddle && distanceLeft < distanceRight)
-            {
-                return ESpikeStripLocation.Left;
-            }
-
-            if (distanceRight < distanceMiddle && distanceRight < distanceLeft)
-            {
-                return ESpikeStripLocation.Right;
-            }
-
-            return ESpikeStripLocation.Middle;
+            return CalculateVehiclePositionOnSide();
         }
 
         private ISpikeStrip CreateSpikeStripInstance()
         {
-            var spikeStrip = SpikeStripDispatcher.Spawn(Road, Lane, DetermineLocation(), TargetVehicle);
+            var offset = VehicleModel.Dimensions.Y + PlacementInFrontOfVehicle;
+            var spikeStrip = SpikeStripDispatcher.Spawn(Road, Lane, Location, TargetVehicle, offset);
             spikeStrip.StateChanged += SpikeStripStateChanged;
             return spikeStrip;
         }
@@ -157,16 +151,14 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                 return;
 
             Logger.Trace("Starting spike strip slot monitor");
-            _hasBeenDeployed = true;
             Game.NewSafeFiber(() =>
             {
                 var spikeStrip = SpikeStrip;
                 while (spikeStrip?.State == ESpikeStripState.Undeployed)
                 {
-                    var distanceToSlot = TargetVehicle.DistanceTo2D(Position);
-                    if (distanceToSlot <= DeploySpikeStripRange)
+                    if (TargetVehicle.DistanceTo2D(Position) <= DeploySpikeStripRange)
                     {
-                        DoSpikeStripDeploy(distanceToSlot);
+                        DoSpikeStripDeploy();
                     }
 
                     Game.FiberYield();
@@ -185,18 +177,59 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             }, "SpikeStripSlot.Undeploy");
         }
 
-        private void DoSpikeStripDeploy(float distanceToSlot)
+        private void DoSpikeStripDeploy()
         {
+            if (_hasBeenDeployed)
+                return;
+
+            Logger.Trace($"Target vehicle is in range of spike strip ({TargetVehicle.DistanceTo2D(Position)}), deploying spike strip");
             var spikeStrip = SpikeStrip;
-            Logger.Trace($"Target vehicle is in range of spike strip ({distanceToSlot}), deploying spike strip {spikeStrip}");
             var cop = Cops.First();
             AnimationHelper.PlayAnimation(cop.GameInstance, Animations.Dictionaries.GrenadeDictionary, Animations.ThrowShortLow, AnimationFlags.None);
             spikeStrip?.Deploy();
+            _hasBeenDeployed = true;
         }
 
-        private Vector3 CalculateCopOrVehiclePosition()
+        private Vector3 CalculateVehiclePositionOnSide()
         {
-            return Position + MathHelper.ConvertHeadingToDirection(Heading + 90) * (Lane.Width / 2);
+            var position = OffsetPosition;
+            var headingRotation = Location switch
+            {
+                ESpikeStripLocation.Right => Heading - 90f,
+                _ => Heading + 90f
+            };
+
+            if (Location == ESpikeStripLocation.Middle)
+            {
+                position += MathHelper.ConvertHeadingToDirection(Heading) * 2f;
+            }
+
+            return position + MathHelper.ConvertHeadingToDirection(headingRotation) * (Lane.Width / 2);
+        }
+
+        private Vector3 CalculateDirectionInFrontOfVehicle(float additionalVerticalOffset)
+        {
+            return MathHelper.ConvertHeadingToDirection(Heading) * (VehicleModel.Dimensions.Y + additionalVerticalOffset);
+        }
+
+        private ESpikeStripLocation DetermineLocation()
+        {
+            var distanceLeft = Road.LeftSide.DistanceTo2D(Lane.Position);
+            var distanceMiddle = Road.Position.DistanceTo2D(Lane.Position);
+            var distanceRight = Road.RightSide.DistanceTo2D(Lane.Position);
+            var totalLanes = Road.NumberOfLanes1 + Road.NumberOfLanes2;
+
+            if (distanceRight <= distanceMiddle && distanceRight <= distanceLeft)
+            {
+                return ESpikeStripLocation.Right;
+            }
+
+            if (totalLanes > 2 && distanceMiddle < distanceRight && distanceMiddle < distanceLeft)
+            {
+                return ESpikeStripLocation.Middle;
+            }
+
+            return ESpikeStripLocation.Left;
         }
 
         #endregion

@@ -22,16 +22,16 @@ namespace AutomaticRoadblocks.SpikeStrip
         private float _lastKnownDistanceToSpikeStrip = 9999f;
         private bool _audioPlayed;
 
-        public PursuitSpikeStrip(Road road, ESpikeStripLocation location, Vehicle targetVehicle)
-            : base(road, location)
+        public PursuitSpikeStrip(Road road, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
+            : base(road, location, offset)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
             StateChanged += SpikeStripStateChanged;
         }
 
-        internal PursuitSpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle)
-            : base(road, lane, location)
+        internal PursuitSpikeStrip(Road road, Road.Lane lane, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
+            : base(road, lane, location, offset)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;

@@ -213,19 +213,14 @@ namespace AutomaticRoadblocks.Roadblock
             if (!TargetVehicle.HasBeenDamagedByAnyVehicle)
                 return;
 
-            Logger.Trace("Collision has been detected for target vehicle");
-            if (Slots.Any(HasBeenDamagedBy))
-            {
-                Logger.Debug("Determined that the collision must have been against a roadblock slot");
-                BlipFlashNewState(Color.Green);
-                Release();
-                UpdateState(ERoadblockState.Hit);
-                Logger.Info("Roadblock has been hit by the suspect");
-            }
-            else
-            {
-                Logger.Debug("Determined that the collision was not the roadblock");
-            }
+            if (!Slots.Any(HasBeenDamagedBy)) 
+                return;
+            
+            Logger.Debug("Determined that the collision must have been against a roadblock slot");
+            BlipFlashNewState(Color.Green);
+            Release();
+            UpdateState(ERoadblockState.Hit);
+            Logger.Info("Roadblock has been hit by the suspect");
         }
 
         private void VerifyRoadblockCopKilled()
