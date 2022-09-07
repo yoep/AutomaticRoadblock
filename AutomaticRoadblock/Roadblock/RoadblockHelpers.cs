@@ -3,7 +3,6 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Utils.Type;
 using AutomaticRoadblocks.Vehicles;
 using Rage;
 

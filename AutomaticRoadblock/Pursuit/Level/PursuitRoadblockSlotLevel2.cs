@@ -3,7 +3,6 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using Rage;
@@ -29,7 +28,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         protected override void InitializeCops()
         {
             var isBike = ModelUtils.Vehicles.IsBike(VehicleModel);
-            var totalOccupants = isBike ? 1 : 2;
+            var totalOccupants = isBike ? 1 : Random.Next(1, 3);
             var pedSpawnPosition = CalculatePositionBehindVehicle();
 
             for (var i = 0; i < totalOccupants; i++)

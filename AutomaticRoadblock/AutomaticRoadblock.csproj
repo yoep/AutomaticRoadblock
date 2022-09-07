@@ -167,6 +167,7 @@
         <Compile Include="Roadblock\AbstractRoadblock.cs" />
         <Compile Include="Roadblock\Menu\RoadblockMenuSwitchItem.cs" />
         <Compile Include="Roadblock\RoadblockEvents.cs" />
+        <Compile Include="Roadblock\ERoadblockFlags.cs" />
         <Compile Include="Roadblock\RoadblockHelpers.cs" />
         <Compile Include="Roadblock\ERoadblockLevel.cs" />
         <Compile Include="Roadblock\ERoadblockState.cs" />

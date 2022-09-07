@@ -23,8 +23,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private const float MinimumDistanceFromTargetForJunctionRoadblocks = 60f;
         private const string AudioRequestDenied = "ROADBLOCK_REQUEST_DENIED";
         private const string AudioRequestConfirmed = "ROADBLOCK_REQUEST_CONFIRMED";
-        private const string AudioRoadblockBypassed = "ROADBLOCK_BYPASSED";
-        private const string AudioRoadblockHit = "ROADBLOCK_HIT";
 
         private static readonly Random Random = new();
 
@@ -211,11 +209,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             var primaryRoadblock = DoRoadblockCreations(discoveredVehicleNodes, vehicle, level, false, options);
-
-            _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(primaryRoadblockNode.Position)]);
-            LspdfrUtils.PlayScannerAudioNonBlocking("ROADBLOCK_DEPLOYED");
             _userRequestedRoadblockDispatching = false;
-
             return primaryRoadblock;
         }
 
@@ -231,21 +225,37 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     .SelectMany(FilterRoadsTravellingAlongTheRoute)
                     .ToList();
 
-                junctionRoads.ForEach(x => CreateRoadblock(x, vehicle, ERoadblockLevel.Level2, createAsPreview, new DispatchOptions()));
+                junctionRoads.ForEach(x => CreateRoadblock(x, vehicle, ERoadblockLevel.Level2, createAsPreview,
+                    ERoadblockFlags.JoinPursuitOnHit | ERoadblockFlags.ForceInVehicle));
                 _logger.Info($"Deployed an additional {junctionRoads.Count} junction roadblocks along the road");
             }
 
-            return CreateRoadblock(streetNodes.OfType<Road>().Last(), vehicle, level, createAsPreview, options);
+            var flags = ERoadblockFlags.JoinPursuit | ERoadblockFlags.PlayAudio;
+
+            if (options.EnableSpikeStrips)
+                flags |= ERoadblockFlags.EnableSpikeStrips;
+
+            return CreateRoadblock(streetNodes.OfType<Road>().Last(), vehicle, level, createAsPreview, flags);
         }
 
-        private IRoadblock CreateRoadblock(Road road, Vehicle vehicle, ERoadblockLevel level, bool createAsPreview, DispatchOptions options)
+        private IRoadblock CreateRoadblock(Road road, Vehicle vehicle, ERoadblockLevel level, bool createAsPreview, ERoadblockFlags flags)
         {
-            // as a junction might contain dirt roads
-            // we determine the actual roadblock for each individual road
-            // as it might be that we need to downgrade one, but not the others
+            // add additional flags based on settings & world data
+            if (Settings.SlowTraffic)
+                flags |= ERoadblockFlags.LimitSpeed;
+            if (ShouldAddLightsToRoadblock())
+                flags |= ERoadblockFlags.EnableLights;
+            if (ShouldPlaceSpikeStripInRoadblock(flags.HasFlag(ERoadblockFlags.EnableSpikeStrips)))
+            {
+                flags |= ERoadblockFlags.EnableSpikeStrips;
+            }
+            else
+            {
+                flags &= ~ERoadblockFlags.EnableSpikeStrips;
+            }
+
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-            var roadblock = PursuitRoadblockFactory.Create(_spikeStripDispatcher, actualLevelToUse, road, vehicle, Settings.SlowTraffic,
-                ShouldAddLightsToRoadblock(), ShouldPlaceSpikeStripInRoadblock(options.EnableSpikeStrips));
+            var roadblock = PursuitRoadblockFactory.Create(_spikeStripDispatcher, actualLevelToUse, road, vehicle, flags);
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
             lock (_roadblocks)
@@ -335,22 +345,13 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private void InternalRoadblockStateChanged(IRoadblock roadblock, ERoadblockState newState)
         {
             _logger.Debug($"Roadblock state changed to {newState}");
+
             _game.NewSafeFiber(() =>
             {
-                switch (newState)
+                if (newState == ERoadblockState.Disposed)
                 {
-                    case ERoadblockState.Hit:
-                        _game.DisplayNotification(_localizer[LocalizationKey.RoadblockHasBeenHit]);
-                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockHit);
-                        break;
-                    case ERoadblockState.Bypassed:
-                        _game.DisplayNotification(_localizer[LocalizationKey.RoadblockHasBeenBypassed]);
-                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockBypassed);
-                        break;
-                    case ERoadblockState.Disposed:
-                        _logger.Trace($"Removing roadblock {roadblock} from dispatcher");
-                        RemoveRoadblock(roadblock);
-                        break;
+                    _logger.Trace($"Removing roadblock {roadblock} from dispatcher");
+                    RemoveRoadblock(roadblock);
                 }
             }, "RoadblockDispatcher.RoadblockStateChanged");
             RoadblockStateChanged?.Invoke(roadblock, newState);
@@ -461,7 +462,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private static float DetermineRoadblockDistanceFor(Vehicle vehicle)
         {
             var vehicleSpeed = vehicle.Speed;
-            var distance = vehicleSpeed * 3.5f;
+            var distance = vehicleSpeed * 4f;
 
             if (distance < MinimumRoadblockPlacementDistance)
                 distance = MinimumRoadblockPlacementDistance;

@@ -5,7 +5,6 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Vehicles;
 
@@ -14,7 +13,7 @@ namespace AutomaticRoadblocks.ManualPlacement
     public class ManualRoadblock : AbstractRoadblock, IPlaceableInstance
     {
         internal ManualRoadblock(Request request)
-            : base(request.Road, request.BarrierType, request.TargetHeading, request.LimitSpeed, request.AddLights, request.Offset)
+            : base(request.Road, request.BarrierType, request.TargetHeading, RequestToFlags(request), request.Offset)
         {
             Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
             Assert.NotNull(request.LightSourceType, "lightSourceType cannot be null");
@@ -85,7 +84,8 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
 
             return lanesToBlock
-                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, VehicleType, LightSourceType, TargetHeading, IsLightsEnabled, CopsEnabled, Offset))
+                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, VehicleType, LightSourceType, TargetHeading,
+                    Flags.HasFlag(ERoadblockFlags.EnableLights), CopsEnabled, Offset))
                 .ToList();
         }
 
@@ -105,6 +105,18 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
         }
 
+        private static ERoadblockFlags RequestToFlags(Request request)
+        {
+            var flags = ERoadblockFlags.None;
+
+            if (request.LimitSpeed)
+                flags |= ERoadblockFlags.LimitSpeed;
+            if (request.AddLights)
+                flags |= ERoadblockFlags.EnableLights;
+
+            return flags;
+        }
+
         #endregion
 
         /// <summary>
@@ -121,7 +133,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             public bool LimitSpeed { get; set; }
             public bool AddLights { get; set; }
             public bool CopsEnabled { get; set; }
-            
+
             public float Offset { get; set; }
 
             public override string ToString()

@@ -4,11 +4,12 @@ using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.SpikeStrip.Slot;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
 using LSPD_First_Response.Engine.Scripting.Entities;
@@ -23,20 +24,24 @@ namespace AutomaticRoadblocks.Roadblock
     internal abstract class AbstractPursuitRoadblock : AbstractRoadblock
     {
         private const float BypassTolerance = 20f;
+        private const string AudioRoadblockDeployed = "ROADBLOCK_DEPLOYED";
+        private const string AudioRoadblockBypassed = "ROADBLOCK_BYPASSED";
+        private const string AudioRoadblockHit = "ROADBLOCK_HIT";
 
         private static readonly Random Random = new();
+        private static readonly ILocalizer Localizer = IoC.Instance.GetInstance<ILocalizer>();
 
         private float _lastKnownDistanceToRoadblock = 9999f;
 
         protected AbstractPursuitRoadblock(ISpikeStripDispatcher spikeStripDispatcher, Road street, BarrierType mainBarrierType, Vehicle targetVehicle,
-            bool limitSpeed, bool addLights, bool spikeStripEnabled)
-            : base(street, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, limitSpeed, addLights)
+            ERoadblockFlags flags)
+            : base(street, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             SpikeStripDispatcher = spikeStripDispatcher;
             TargetVehicle = targetVehicle;
-            SpikeStripEnabled = spikeStripEnabled;
+            RoadblockStateChanged += OnStateChanged;
 
             Initialize();
         }
@@ -48,11 +53,6 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         [CanBeNull]
         protected Vehicle TargetVehicle { get; }
-
-        /// <summary>
-        /// The indication if a spike strip will be spawned along the road block.
-        /// </summary>
-        protected bool SpikeStripEnabled { get; }
 
         /// <summary>
         /// Verify if the <see cref="TargetVehicle"/> instance is invalidated by the game.
@@ -80,7 +80,7 @@ namespace AutomaticRoadblocks.Roadblock
 
         public override string ToString()
         {
-            return $"{nameof(SpikeStripEnabled)}: {SpikeStripEnabled}, {base.ToString()}";
+            return $"SpikeStripsEnabled: {Flags.HasFlag(ERoadblockFlags.EnableSpikeStrips)}, {base.ToString()}";
         }
 
         #endregion
@@ -102,7 +102,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             Road.Lane spikeStripLane = null;
 
-            if (SpikeStripEnabled)
+            if (Flags.HasFlag(ERoadblockFlags.EnableSpikeStrips))
             {
                 spikeStripLane = lanesToBlock[Random.Next(lanesToBlock.Count)];
                 Logger.Trace($"Adding spike strip on lane {spikeStripLane}");
@@ -110,8 +110,8 @@ namespace AutomaticRoadblocks.Roadblock
 
             return lanesToBlock
                 .Select(lane => lane == spikeStripLane
-                    ? CreateSpikeStripSlot(lane, Heading, TargetVehicle, IsLightsEnabled)
-                    : CreateSlot(lane, Heading, TargetVehicle, IsLightsEnabled))
+                    ? CreateSpikeStripSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights))
+                    : CreateSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights)))
                 .ToList();
         }
 
@@ -187,8 +187,10 @@ namespace AutomaticRoadblocks.Roadblock
                 {
                     try
                     {
-                        VerifyIfRoadblockIsBypassed();
-                        VerifyIfRoadblockIsHit();
+                        if (Flags.HasFlag(ERoadblockFlags.DetectBypass))
+                            VerifyIfRoadblockIsBypassed();
+                        if (Flags.HasFlag(ERoadblockFlags.DetectHit))
+                            VerifyIfRoadblockIsHit();
                         VerifyRoadblockCopKilled();
                     }
                     catch (Exception ex)
@@ -218,7 +220,8 @@ namespace AutomaticRoadblocks.Roadblock
             else if (Math.Abs(currentDistance - _lastKnownDistanceToRoadblock) > BypassTolerance)
             {
                 BlipFlashNewState(Color.LightGray);
-                Release();
+                if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass))
+                    Release();
                 UpdateState(ERoadblockState.Bypassed);
                 Logger.Info("Roadblock has been bypassed");
             }
@@ -240,7 +243,8 @@ namespace AutomaticRoadblocks.Roadblock
 
             Logger.Debug("Determined that the collision must have been against a roadblock slot");
             BlipFlashNewState(Color.Green);
-            Release();
+            if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
+                Release();
             UpdateState(ERoadblockState.Hit);
             Logger.Info("Roadblock has been hit by the suspect");
         }
@@ -285,6 +289,33 @@ namespace AutomaticRoadblocks.Roadblock
         private IRoadblockSlot CreateSpikeStripSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool addLights)
         {
             return new SpikeStripSlot(SpikeStripDispatcher, Road, lane, targetVehicle, heading, addLights);
+        }
+
+        private void OnStateChanged(IRoadblock roadblock, ERoadblockState newState)
+        {
+            // if the audio is disabled for this roadblock
+            // then ignore the state change
+            if (!Flags.HasFlag(ERoadblockFlags.PlayAudio))
+                return;
+
+            Game.NewSafeFiber(() =>
+            {
+                switch (newState)
+                {
+                    case ERoadblockState.Active:
+                        Game.DisplayNotification(Localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(Position)]);
+                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockDeployed);
+                        break;
+                    case ERoadblockState.Hit:
+                        Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenHit]);
+                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockHit);
+                        break;
+                    case ERoadblockState.Bypassed:
+                        Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenBypassed]);
+                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockBypassed);
+                        break;
+                }
+            }, "PursuitRoadblock.OnStateChanged");
         }
 
         #endregion

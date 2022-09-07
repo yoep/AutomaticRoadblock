@@ -1,6 +1,5 @@
 using System;
 using AutomaticRoadblocks.Preview;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using Rage;
 
@@ -32,6 +31,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// Get the state of the roadblock.
         /// </summary>
         ERoadblockState State { get; }
+        
+        /// <summary>
+        /// The roadblock flags.
+        /// </summary>
+        ERoadblockFlags Flags { get; }
 
         /// <summary>
         /// Invoked when the roadblock state changes.

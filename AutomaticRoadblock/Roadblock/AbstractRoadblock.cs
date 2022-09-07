@@ -30,9 +30,6 @@ namespace AutomaticRoadblocks.Roadblock
 
         protected static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
-        
-        protected readonly bool IsSpeedLimitEnabled;
-        protected readonly bool IsLightsEnabled;
 
         protected Blip Blip;
         private int _speedZoneId;
@@ -43,19 +40,17 @@ namespace AutomaticRoadblocks.Roadblock
         /// <param name="street">The road of that the roadblock will block.</param>
         /// <param name="mainBarrierType">The main barrier used within the slots.</param>
         /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
-        /// <param name="limitSpeed">Indicates if a speed limit should be added.</param>
-        /// <param name="addLights">Indicates if light props should be added.</param>
+        /// <param name="flags">The roadblock configuration.</param>
         /// <param name="offset">The offset placement in regards to the road node.</param>
-        internal AbstractRoadblock(Road street, BarrierType mainBarrierType, float targetHeading, bool limitSpeed, bool addLights, float offset = 0f)
+        internal AbstractRoadblock(Road street, BarrierType mainBarrierType, float targetHeading, ERoadblockFlags flags, float offset = 0f)
         {
             Assert.NotNull(street, "road cannot be null");
             Assert.NotNull(mainBarrierType, "mainBarrierType cannot be null");
             Road = street;
             MainBarrierType = mainBarrierType;
             TargetHeading = targetHeading;
+            Flags = flags;
             Offset = offset;
-            IsSpeedLimitEnabled = limitSpeed;
-            IsLightsEnabled = addLights;
         }
 
         #region Properties
@@ -72,8 +67,11 @@ namespace AutomaticRoadblocks.Roadblock
         public ERoadblockState State { get; private set; } = ERoadblockState.Preparing;
 
         /// <inheritdoc />
+        public ERoadblockFlags Flags { get; }
+
+        /// <inheritdoc />
         public Vector3 Position => Road.Position;
-        
+
         /// <summary>
         /// The offset position for the roadblock.
         /// </summary>
@@ -187,7 +185,7 @@ namespace AutomaticRoadblocks.Roadblock
         public virtual bool Spawn()
         {
             var result = false;
-            
+
             try
             {
                 Logger.Trace("Spawning roadblock");
@@ -223,7 +221,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Level)}: {Level}, {nameof(State)}: {State}, Number of {nameof(Slots)}: [{Slots.Count}]\n" +
+            return $"{nameof(Level)}: {Level}, {nameof(State)}: {State}, {nameof(Flags)}: {Flags} Number of {nameof(Slots)}: [{Slots.Count}]\n" +
                    $"--- {nameof(Slots)} ---\n" +
                    $"{string.Join("\n", Slots)}\n" +
                    $"--- {nameof(Road)} ---\n" +
@@ -305,9 +303,11 @@ namespace AutomaticRoadblocks.Roadblock
             InitializeRoadblockSlots();
             InitializeAdditionalVehicles();
             InitializeScenery();
-            InitializeSpeedLimit(IsSpeedLimitEnabled);
 
-            if (IsLightsEnabled)
+            if (Flags.HasFlag(ERoadblockFlags.LimitSpeed))
+                InitializeSpeedLimit();
+
+            if (Flags.HasFlag(ERoadblockFlags.EnableLights))
                 InitializeLights();
         }
 
@@ -363,11 +363,8 @@ namespace AutomaticRoadblocks.Roadblock
             PreventSlotVehiclesClipping();
         }
 
-        private void InitializeSpeedLimit(bool limitSpeed)
+        private void InitializeSpeedLimit()
         {
-            if (!limitSpeed)
-                return;
-
             Logger.Trace("Creating speed zone at roadblock");
             CreateSpeedZoneLimit();
         }

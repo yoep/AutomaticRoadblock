@@ -6,19 +6,16 @@ using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using LSPD_First_Response.Engine.Scripting.Entities;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel4 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel4(ISpikeStripDispatcher spikeStripDispatcher, Road street, Vehicle targetVehicle, bool limitSpeed, bool addLights,
-            bool spikeStripEnabled)
-            : base(spikeStripDispatcher, street, BarrierType.PoliceDoNotCross, targetVehicle, limitSpeed, addLights, spikeStripEnabled)
+        public PursuitRoadblockLevel4(ISpikeStripDispatcher spikeStripDispatcher, Road street, Vehicle targetVehicle, ERoadblockFlags flags)
+            : base(spikeStripDispatcher, street, BarrierType.PoliceDoNotCross, targetVehicle, flags)
         {
             RoadblockStateChanged += StateChanged;
         }
