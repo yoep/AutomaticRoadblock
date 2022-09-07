@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            var road = RoadUtils.FindClosestRoad(Game.LocalPlayer.Character.Position, EVehicleNodeType.AllNodes);
+            var road = RoadQuery.FindClosestRoad(Game.LocalPlayer.Character.Position, EVehicleNodeType.AllNodes);
             _logger.Info("Nearest road info: " + road);
             _game.DisplayPluginNotification("see console or log file for info about the closest road");
         }

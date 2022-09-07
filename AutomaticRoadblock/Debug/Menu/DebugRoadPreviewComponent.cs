@@ -69,16 +69,16 @@ namespace AutomaticRoadblocks.Debug.Menu
                 {
                     ERoadPreviewType.Closest => new List<IStreet>
                     {
-                        RoadUtils.FindClosestRoad(playerPosition, EVehicleNodeType.AllNodes)
+                        RoadQuery.FindClosestRoad(playerPosition, EVehicleNodeType.AllNodes)
                     },
                     ERoadPreviewType.ClosestNoJunction => new List<IStreet>
                     {
-                        RoadUtils.FindClosestRoad(playerPosition, EVehicleNodeType.AllRoadNoJunctions)
+                        RoadQuery.FindClosestRoad(playerPosition, EVehicleNodeType.AllRoadNoJunctions)
                     },
-                    ERoadPreviewType.NearbyAll => RoadUtils
+                    ERoadPreviewType.NearbyAll => RoadQuery
                         .FindNearbyRoads(playerPosition, EVehicleNodeType.AllNodes, SearchRadius)
                         .ToList(),
-                    ERoadPreviewType.NearbyNoJunction => RoadUtils
+                    ERoadPreviewType.NearbyNoJunction => RoadQuery
                         .FindNearbyRoads(playerPosition, EVehicleNodeType.AllRoadNoJunctions, SearchRadius)
                         .ToList(),
                     _ => _roads

@@ -376,7 +376,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             try
             {
-                _speedZoneId = RoadUtils.CreateSpeedZone(OffsetPosition, 10f, SpeedLimit);
+                _speedZoneId = RoadQuery.CreateSpeedZone(OffsetPosition, 10f, SpeedLimit);
             }
             catch (Exception ex)
             {
@@ -387,7 +387,7 @@ namespace AutomaticRoadblocks.Roadblock
         private void DeleteSpeedZone()
         {
             if (_speedZoneId != 0)
-                RoadUtils.RemoveSpeedZone(_speedZoneId);
+                RoadQuery.RemoveSpeedZone(_speedZoneId);
         }
 
         private void CreateBlip()

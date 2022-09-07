@@ -483,7 +483,7 @@ namespace AutomaticRoadblocks.Pursuit
         {
             var vehicle = GetSuspectVehicle();
 
-            return vehicle != null && RoadUtils.IsPointOnRoad(vehicle.Position);
+            return vehicle != null && RoadQuery.IsPointOnRoad(vehicle.Position);
         }
 
         private bool HasAtLeastDeployedXRoadblocks()

@@ -5,7 +5,7 @@ namespace AutomaticRoadblocks.Street
 {
     /// <summary>
     /// The information of a vehicle node presented as street info.
-    /// This can either be a <see cref="Info.Road"/> or <see cref="Info.Intersection"/>.
+    /// This can either be a <see cref="Info.Road"/> or <see cref="Info.Intersection"/> (see <see cref="Type"/> to know which one).
     /// </summary>
     public interface IStreet : IPreviewSupport
     {
@@ -23,27 +23,5 @@ namespace AutomaticRoadblocks.Street
         /// The type of the street.
         /// </summary>
         EStreetType Type { get; }
-        
-        /// <summary>
-        /// The right side position of the street.
-        /// </summary>
-        public Vector3 RightSide { get; }
-
-        /// <summary>
-        /// The left side position of the street.
-        /// </summary>
-        public Vector3 LeftSide { get; }
-
-        /// <summary>
-        /// The number of lanes which follow the same heading as the road.
-        /// </summary>
-        int NumberOfLanesSameDirection { get; }
-        
-        /// <summary>
-        /// The number of lanes which are the opposite heading of the road.
-        /// </summary>
-        int NumberOfLanesOppositeDirection { get; }
-        
-        
     }
 }

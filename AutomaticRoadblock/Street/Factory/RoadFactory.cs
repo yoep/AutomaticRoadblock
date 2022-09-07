@@ -6,7 +6,7 @@ namespace AutomaticRoadblocks.Street.Factory
 {
     internal static class RoadFactory
     {
-        internal static IStreet Create(NodeInfo nodeInfo)
+        internal static Road Create(NodeInfo nodeInfo)
         {
             var nodeHeading = nodeInfo.Heading;
             var rightSideHeading = nodeHeading - 90f;

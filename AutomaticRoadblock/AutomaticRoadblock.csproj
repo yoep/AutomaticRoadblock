@@ -186,7 +186,7 @@
         <Compile Include="Street\Info\NodeInfo.cs" />
         <Compile Include="Street\Info\Road.cs" />
         <Compile Include="Street\IStreet.cs" />
-        <Compile Include="Street\RoadUtils.cs" />
+        <Compile Include="Street\RoadQuery.cs" />
         <Compile Include="Settings\AutomaticRoadblocksSettings.cs" />
         <Compile Include="Settings\GeneralSettings.cs" />
         <Compile Include="Settings\ISettingsManager.cs" />

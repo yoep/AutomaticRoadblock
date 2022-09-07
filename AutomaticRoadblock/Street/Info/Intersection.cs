@@ -33,7 +33,15 @@ namespace AutomaticRoadblocks.Street.Info
         /// <inheritdoc />
         public int NumberOfLanesOppositeDirection => 0;
 
+        /// <summary>
+        /// The directions of the intersection.
+        /// </summary>
         internal List<NodeInfo> Directions { get; set; }
+
+        /// <summary>
+        /// The roads which connect to this intersection.
+        /// </summary>
+        internal List<Road> Roads { get; set; }
 
         #endregion
 
@@ -55,15 +63,18 @@ namespace AutomaticRoadblocks.Street.Info
                 return;
 
             IsPreviewActive = false;
+            Roads?.ForEach(x => x.DeletePreview());
         }
 
         #endregion
-        
+
         #region Methods
 
+        /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}, {nameof(Type)}: {Type}, number of {nameof(Directions)}: {Directions.Count}";
+            return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}, {nameof(Type)}: {Type}, number of {nameof(Directions)}: {Directions.Count}," +
+                   $"number of {nameof(Roads)}: {Roads.Count}";
         }
 
         #endregion
@@ -77,6 +88,7 @@ namespace AutomaticRoadblocks.Street.Info
                 return;
 
             IsPreviewActive = true;
+            Roads?.ForEach(x => x.CreatePreview());
             Game.NewSafeFiber(() =>
             {
                 while (IsPreviewActive)

@@ -10,7 +10,7 @@ using Rage.Native;
 
 namespace AutomaticRoadblocks.Street
 {
-    public static class RoadUtils
+    public static class RoadQuery
     {
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
@@ -27,7 +27,7 @@ namespace AutomaticRoadblocks.Street
             NodeInfo closestRoad = null;
             var closestRoadDistance = 99999f;
 
-            foreach (var road in FindNearbyVehicleNodes(position, nodeType))
+            foreach (var road in StreetHelper.FindNearbyVehicleNodes(position, nodeType))
             {
                 var roadDistanceToPosition = Vector3.Distance2D(road.Position, position);
 
@@ -154,8 +154,8 @@ namespace AutomaticRoadblocks.Street
         private static NodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, EVehicleNodeType nodeType,
             ENodeFlag blacklistedFlags = ENodeFlag.None)
         {
-            Logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading}");
-            var nodes = FindNearbyVehicleNodes(position, nodeType).ToList();
+            Logger.Trace($"Searching for vehicle nodes at {position} matching heading {heading} and type {nodeType}");
+            var nodes = StreetHelper.FindNearbyVehicleNodes(position, nodeType).ToList();
             var closestNodeDistance = 9999f;
             var closestNode = (NodeInfo)null;
             var ignoreHeading = false;
@@ -212,9 +212,11 @@ namespace AutomaticRoadblocks.Street
 
             lastFoundNodeInfo = new NodeInfo(position, heading, -1, -1, -1f);
 
-            while (distanceTraversed < distance)
+            // keep traversing the road while the expected distance isn't reached
+            // or we've ended at a junction (never end at a junction as it actually never can be used)
+            while (distanceTraversed < distance || lastFoundNodeInfo.Flags.HasFlag(ENodeFlag.IsJunction))
             {
-                if (findNodeAttempt == 10)
+                if (findNodeAttempt == 5)
                 {
                     Logger.Warn($"Failed to traverse road, unable to find next node after {lastFoundNodeInfo} (tried {findNodeAttempt} times)");
                     break;
@@ -259,18 +261,6 @@ namespace AutomaticRoadblocks.Street
                 : RoadFactory.Create(nodeInfo);
         }
 
-        private static IEnumerable<NodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType)
-        {
-            NativeFunction.Natives.GET_CLOSEST_ROAD(position.X, position.Y, position.Z, 1f, 1, out Vector3 roadPosition1, out Vector3 roadPosition2,
-                out int numberOfLanes1, out int numberOfLanes2, out float junctionIndication, (int)ERoadType.All);
-
-            return new List<NodeInfo>
-            {
-                FindVehicleNode(roadPosition1, nodeType, numberOfLanes1, numberOfLanes2, junctionIndication),
-                FindVehicleNode(roadPosition2, nodeType, numberOfLanes2, numberOfLanes1, junctionIndication)
-            };
-        }
-
         private static IEnumerable<NodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType, float radius,
             int rotationInterval = 20)
         {
@@ -285,7 +275,7 @@ namespace AutomaticRoadblocks.Street
                     var x = (float)(position.X + rad * Math.Sin(rot));
                     var y = (float)(position.Y + rad * Math.Cos(rot));
 
-                    var node = FindVehicleNode(new Vector3(x, y, position.Z + 5f), nodeType);
+                    var node = StreetHelper.FindVehicleNode(new Vector3(x, y, position.Z + 5f), nodeType);
 
                     if (nodes.Contains(node))
                         continue;
@@ -305,35 +295,6 @@ namespace AutomaticRoadblocks.Street
             }
 
             return nodes;
-        }
-
-        private static NodeInfo FindVehicleNode(Vector3 position, EVehicleNodeType type)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            Assert.NotNull(type, "type cannot be null");
-            NativeFunction.Natives.GET_CLOSEST_ROAD(position.X, position.Y, position.Z, 1f, 1, out Vector3 roadPosition1, out Vector3 roadPosition2,
-                out int numberOfLanes1, out int numberOfLanes2, out float junctionIndication, (int)ERoadType.All);
-
-            return position.DistanceTo2D(roadPosition1) < position.DistanceTo2D(roadPosition2)
-                ? FindVehicleNode(roadPosition1, type, numberOfLanes1, numberOfLanes2, junctionIndication)
-                : FindVehicleNode(roadPosition1, type, numberOfLanes2, numberOfLanes1, junctionIndication);
-        }
-
-        private static NodeInfo FindVehicleNode(Vector3 position, EVehicleNodeType type, int numberOfLanes1, int numberOfLanes2,
-            float junctionIndication)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            Assert.NotNull(type, "type cannot be null");
-
-            NativeFunction.Natives.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(position.X, position.Y, position.Z, out Vector3 nodePosition, out float nodeHeading,
-                (int)type, 3, 0);
-            NativeFunction.Natives.GET_VEHICLE_NODE_PROPERTIES<bool>(nodePosition.X, nodePosition.Y, nodePosition.Z, out int density, out int flags);
-
-            return new NodeInfo(nodePosition, MathHelper.NormalizeHeading(nodeHeading), numberOfLanes1, numberOfLanes2, junctionIndication)
-            {
-                Density = density,
-                Flags = (ENodeFlag)flags
-            };
         }
 
         private static int GetClosestNodeId(Vector3 position)

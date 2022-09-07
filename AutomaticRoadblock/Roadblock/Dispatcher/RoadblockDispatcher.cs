@@ -34,7 +34,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private readonly ISpikeStripDispatcher _spikeStripDispatcher;
 
         private readonly List<RoadblockInfo> _roadblocks = new();
-        private readonly List<Road> _foundRoads = new();
+        private readonly List<IStreet> _foundRoads = new();
 
         private bool _cleanerRunning;
         private bool _userRequestedRoadblockDispatching;
@@ -100,7 +100,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             Assert.NotNull(vehicle, "vehicle cannot be null");
             _logger.Debug($"Dispatching new roadblock preview with options: {options}");
             var roads = DetermineRoadblockLocationPreview(level, vehicle, options.AtCurrentLocation);
-            var road = roads.Last();
+            var road = roads.OfType<Road>().Last();
             _logger.Trace($"Dispatching roadblock on {road}");
 
             _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(road.Position)]);
@@ -280,7 +280,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             _logger.Debug("Deploying additional junction roadblocks");
             var startedAt = DateTime.Now.Ticks;
             var junctionPosition = street.Position + MathHelper.ConvertHeadingToDirection(street.Heading) * 10f;
-            var junctionRoads = RoadUtils
+            var junctionRoads = RoadQuery
                 .FindNearbyRoads(junctionPosition, EVehicleNodeType.MainRoads, 15f)
                 .Select(x => (Road)x)
                 .Where(x => x.IsAtJunction)
@@ -301,7 +301,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private bool IsAtJunction(Road street)
         {
             return street.IsAtJunction ||
-                   RoadUtils.FindNearbyRoads(street.Position, EVehicleNodeType.AllNodes, 10f)
+                   RoadQuery.FindNearbyRoads(street.Position, EVehicleNodeType.AllNodes, 10f)
                        .Any(x => x.Type == EStreetType.Intersection);
         }
 
@@ -328,19 +328,18 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             _logger.Trace(
                 $"Determining roadblock location with Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(roadblockDistance)}: {roadblockDistance}, {nameof(roadType)}: {roadType}");
-            return (Road)RoadUtils.FindRoadTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType,
+            return (Road)RoadQuery.FindRoadTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType,
                 DetermineBlacklistedFlagsForType(roadType));
         }
 
-        private ICollection<Road> DetermineRoadblockLocationPreview(RoadblockLevel level, Vehicle vehicle, bool atCurrentLocation)
+        private ICollection<IStreet> DetermineRoadblockLocationPreview(RoadblockLevel level, Vehicle vehicle, bool atCurrentLocation)
         {
             var roadblockDistance = CalculateRoadblockDistance(vehicle, atCurrentLocation);
             var roadType = DetermineAllowedRoadTypes(vehicle, level);
 
             _logger.Trace(
                 $"Determining roadblock location for the preview with Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(roadblockDistance)}: {roadblockDistance}, {nameof(roadType)}: {roadType}");
-            return RoadUtils.FindRoadsTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType, DetermineBlacklistedFlagsForType(roadType))
-                .Select(x => (Road)x)
+            return RoadQuery.FindRoadsTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType, DetermineBlacklistedFlagsForType(roadType))
                 .ToList();
         }
 
@@ -515,7 +514,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         {
             // verify the current road type
             // if we're already at a dirt/offroad road, all road types for the trajectory calculation are allowed
-            if (RoadUtils.IsSlowRoad(vehicle.Position))
+            if (RoadQuery.IsSlowRoad(vehicle.Position))
             {
                 _logger.Debug("Following the current dirt/offroad road for the roadblock placement");
                 return EVehicleNodeType.AllNodes;

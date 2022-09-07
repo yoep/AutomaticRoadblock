@@ -158,7 +158,7 @@ namespace AutomaticRoadblocks.Instances
         {
             var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
 
-            return RoadUtils.FindClosestRoad(position, EVehicleNodeType.AllNodes);
+            return RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
         }
 
         private void DoHologramPreviewCreation(IStreet street, bool force)
