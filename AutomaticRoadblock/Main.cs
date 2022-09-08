@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.AbstractionLayer.Implementation;
@@ -32,6 +33,7 @@ namespace AutomaticRoadblocks
         public Main()
         {
             InitializeIoC();
+            AppDomain.CurrentDomain.AssemblyResolve += LSPDFRResolveEventHandler;
         }
 
         public override void Initialize()
@@ -66,6 +68,13 @@ namespace AutomaticRoadblocks
                 logger.Error("An error occurred while unloading the plugin", ex);
                 game.DisplayPluginNotification("~r~failed to correctly unload the plugin, see logs for more info");
             }
+        }
+        
+        public static Assembly LSPDFRResolveEventHandler(object sender, ResolveEventArgs args)
+        {
+            return Functions
+                .GetAllUserPlugins()
+                .FirstOrDefault(assembly => args.Name.ToLower().Contains(assembly.GetName().Name.ToLower()));
         }
 
         private static void InitializeIoC()
@@ -169,6 +178,15 @@ namespace AutomaticRoadblocks
             {
                 pursuitListener.StopListener();
             }
+        }
+
+        private static bool IsLSPDFRPluginRunning(string plugin, Version minVersion = null)
+        {
+            return Functions
+                .GetAllUserPlugins()
+                .Select(assembly => assembly.GetName())
+                .Where(assemblyName => string.Equals(assemblyName.Name, plugin, StringComparison.CurrentCultureIgnoreCase))
+                .Any(assemblyName => minVersion == null || assemblyName.Version.CompareTo(minVersion) >= 0);
         }
 
         [Conditional("DEBUG")]

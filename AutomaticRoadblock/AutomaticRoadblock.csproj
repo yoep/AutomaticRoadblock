@@ -40,6 +40,9 @@
           <HintPath>..\Libs\LSPD First Response.dll</HintPath>
         </Reference>
         <Reference Include="Microsoft.CSharp" />
+        <Reference Include="PoliceSmartRadio">
+          <HintPath>..\Libs\PoliceSmartRadio.dll</HintPath>
+        </Reference>
         <Reference Include="RAGENativeUI, Version=1.9.0.0, Culture=neutral, processorArchitecture=Amd64">
           <HintPath>..\packages\RAGENativeUI.1.9.0\lib\net472\RAGENativeUI.dll</HintPath>
         </Reference>
@@ -118,6 +121,8 @@
         <Compile Include="Menu\MenuImpl.cs" />
         <Compile Include="Menu\EMenuType.cs" />
         <Compile Include="Menu\Switcher\IMenuSwitchItem.cs" />
+        <Compile Include="PoliceSmartRadio\IPoliceSmartRadio.cs" />
+        <Compile Include="PoliceSmartRadio\PoliceSmartRadioImpl.cs" />
         <Compile Include="Preview\IPreviewSupport.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Pursuit\EPursuitState.cs" />
