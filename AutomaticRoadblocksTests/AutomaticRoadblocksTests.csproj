@@ -64,6 +64,9 @@
       <Content Include="lspdfr\data\agency.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <Content Include="lspdfr\data\outfits.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />

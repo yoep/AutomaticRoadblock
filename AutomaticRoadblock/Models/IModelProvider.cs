@@ -5,8 +5,8 @@ namespace AutomaticRoadblocks.Models
     public interface IModelProvider
     {
         /// <summary>
-        /// The agency model data.
+        /// Load the model provider information.
         /// </summary>
-        Agencies Agencies { get; }
+        void Load();
     }
 }

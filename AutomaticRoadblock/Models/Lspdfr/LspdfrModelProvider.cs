@@ -9,8 +9,10 @@ namespace AutomaticRoadblocks.Models.Lspdfr
     {
         private const string LspdfrDataDirectory = @"./lspdfr/data/";
         private const string AgencyFilename = "agency.xml";
+        private const string OutfitsFilename = "outfits.xml";
 
         private readonly ILogger _logger;
+        private readonly ObjectMapper _objectMapper = ObjectMapperFactory.CreateInstance();
 
         public LspdfrModelProvider(ILogger logger)
         {
@@ -19,8 +21,26 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         
         #region Properties
 
-        /// <inheritdoc />
+        /// <summary>
+        /// The agency model data.
+        /// </summary>
         public Agencies Agencies { get; private set; }
+        
+        /// <summary>
+        /// The outfits model data.
+        /// </summary>
+        public Outfits Outfits { get; private set; }
+
+        #endregion
+
+        #region Method
+
+        /// <inheritdoc />
+        public void Load()
+        {
+            Agencies = TryToLoadDatafile<Agencies>(AgencyFilename);
+            Outfits = TryToLoadDatafile<Outfits>(OutfitsFilename);
+        }
 
         #endregion
 
@@ -28,16 +48,21 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            var objectMapper = ObjectMapperFactory.CreateInstance();
+           Load();
+        }
 
+        private T TryToLoadDatafile<T>(string filename) where T : class
+        {
             try
             {
-                Agencies = objectMapper.ReadValue<Agencies>(LspdfrDataDirectory + AgencyFilename);
+                return _objectMapper.ReadValue<T>(LspdfrDataDirectory + filename);
             }
             catch (Exception ex)
             {
-                _logger.Error($"Failed to load agency.xml data, {ex.Message}", ex);
+                _logger.Error($"Failed to load {filename} data, {ex.Message}", ex);
             }
+
+            return default;
         }
     }
 }

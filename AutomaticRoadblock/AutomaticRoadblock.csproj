@@ -124,6 +124,8 @@
         <Compile Include="Models\Lspdfr\Loadout.cs" />
         <Compile Include="Models\Lspdfr\LspdfrModelProvider.cs" />
         <Compile Include="Models\Lspdfr\NumPeds.cs" />
+        <Compile Include="Models\Lspdfr\Outfit.cs" />
+        <Compile Include="Models\Lspdfr\Outfits.cs" />
         <Compile Include="Models\Lspdfr\Ped.cs" />
         <Compile Include="Models\Lspdfr\Vehicle.cs" />
         <Compile Include="Preview\IPreviewSupport.cs" />
