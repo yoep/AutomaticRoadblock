@@ -30,6 +30,8 @@ jobs:
       - name: NuGet Restore
         if: steps.cache.outputs.cache-hit != 'true'
         run: nuget restore AutomaticRoadblock.sln
+      - name: Test
+        run: make test
       - name: Build
         run: make ${{ inputs.choice }}
       - name: Archive artifacts

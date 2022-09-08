@@ -19,6 +19,9 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             if (deserializer == null)
                 throw new XmlException("Could not find deserializer for type " + genericType);
 
+            if (deserializationContext.Nodes == null) 
+                return values;
+            
             foreach (XPathNavigator node in deserializationContext.Nodes)
             {
                 values.Add(deserializationContext.Deserialize(parser, node, genericType));

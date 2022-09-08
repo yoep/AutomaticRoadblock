@@ -1,4 +1,5 @@
 using System.Xml.XPath;
+using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Xml.Context
 {
@@ -30,6 +31,7 @@ namespace AutomaticRoadblocks.Xml.Context
 
         public XPathNavigator CurrentNode { get; }
         
+        [CanBeNull]
         public XPathNodeIterator Nodes { get; }
         
         public string Value { get; }

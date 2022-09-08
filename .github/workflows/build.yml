@@ -25,6 +25,8 @@ jobs:
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.json') }}
+      - name: Test
+        run: make test
       - name: Build
         run: make build
       - name: Archive artifacts

@@ -20,6 +20,7 @@ namespace AutomaticRoadblocksTests.Models
             var provider = IoC.Instance.GetInstance<IModelProvider>();
 
             Assert.NotNull(provider.Agencies);
+            Assert.Equal(16, provider.Agencies.Items.Count);
         }
     }
 }

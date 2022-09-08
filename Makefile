@@ -10,6 +10,9 @@ bump-%: bump-dependencies # Bump the (major, minor, patch) version of the applic
 clean:	# Clean the build directory of the application
 	@dotnet clean
 
+test:
+	@dotnet test AutomaticRoadblocksTests\AutomaticRoadblocksTests.csproj --configuration Debug /p:Platform=x64 --no-restore
+
 build: # Build the debug version of the application
 	@dotnet build --configuration Debug /p:Platform=x64 --no-restore
 
