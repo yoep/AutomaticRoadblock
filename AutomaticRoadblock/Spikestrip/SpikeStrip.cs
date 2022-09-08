@@ -4,7 +4,6 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Sound;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
@@ -234,7 +233,7 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         private void DoInternalUndeploy()
         {
-            if (IsInvalid || State != ESpikeStripState.Deployed)
+            if (IsInvalid || State is not (ESpikeStripState.Deployed or ESpikeStripState.Bypassed or ESpikeStripState.Hit))
                 return;
 
             Logger.Trace($"Undeploying spike strip {this}");
