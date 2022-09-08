@@ -82,7 +82,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             var type = property.PropertyType;
 
             if (string.IsNullOrEmpty(value) && !xmlAttribute.IsOptional)
-                throw new XmlException("Missing xml attribute for " + parser.GetXmlAttributeLookupName(property));
+                throw new XmlException("Missing xml attribute for " + XmlParser.GetXmlAttributeLookupNames(property));
 
             if (type.IsEnum)
                 return ProcessEnum(value, type);

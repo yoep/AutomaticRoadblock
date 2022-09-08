@@ -1,4 +1,5 @@
 using AutomaticRoadblocks.Xml.Attributes;
+using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Models.Lspdfr
 {
@@ -11,12 +12,15 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         public string ScriptName { get; internal set; }
         
         [XmlElement(IsOptional = true)]
+        [CanBeNull]
         public string Inventory { get; internal set; }
         
         [XmlElement(IsOptional = true)]
+        [CanBeNull]
         public string TextureDictionary { get; internal set; }
         
         [XmlElement(IsOptional = true)]
+        [CanBeNull]
         public string TextureName { get; internal set; }
         
         public Loadout Loadout { get; internal set; }

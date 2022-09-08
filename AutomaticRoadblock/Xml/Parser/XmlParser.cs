@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Xml.XPath;
 using AutomaticRoadblocks.Xml.Attributes;
@@ -41,7 +43,9 @@ namespace AutomaticRoadblocks.Xml.Parser
             Assert.NotNull(context, "context cannot be null");
             Assert.NotNull(member, "member cannot be null");
             var xmlAttribute = member.GetCustomAttribute<XmlAttribute>();
-            var attributeValue = GetAttributeValue(context, GetXmlAttributeLookupName(member));
+            var attributeValue = GetXmlAttributeLookupNames(member)
+                .Select(x => GetAttributeValue(context, x))
+                .FirstOrDefault(x => !string.IsNullOrEmpty(x));
 
             return string.IsNullOrEmpty(attributeValue) && xmlAttribute.DefaultValue != null
                 ? xmlAttribute.DefaultValue.ToString()
@@ -65,14 +69,24 @@ namespace AutomaticRoadblocks.Xml.Parser
                 : LookupPropertyName(member);
         }
 
-        public string GetXmlAttributeLookupName(MemberInfo member)
+        public static ICollection<string> GetXmlAttributeLookupNames(MemberInfo member)
         {
             var xmlAttribute = member.GetCustomAttribute<XmlAttribute>();
 
             if (xmlAttribute != null && !string.IsNullOrEmpty(xmlAttribute.Name))
-                return xmlAttribute.Name;
+            {
+                return new List<string> { xmlAttribute.Name, LowercaseFirstLetter(xmlAttribute.Name) };
+            }
 
-            return member.Name;
+            return new List<string> { member.Name, LowercaseFirstLetter(member.Name) };
+        }
+
+        private static string LowercaseFirstLetter(string value)
+        {
+            if (value == null || !char.IsUpper(value[0]))
+                return value;
+
+            return char.ToLower(value[0]) + value.Substring(1);
         }
 
         private static string LookupTypeName(MemberInfo member)

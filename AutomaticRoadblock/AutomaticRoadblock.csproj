@@ -123,6 +123,8 @@
         <Compile Include="Models\Lspdfr\Agency.cs" />
         <Compile Include="Models\Lspdfr\Loadout.cs" />
         <Compile Include="Models\Lspdfr\LspdfrModelProvider.cs" />
+        <Compile Include="Models\Lspdfr\NumPeds.cs" />
+        <Compile Include="Models\Lspdfr\Ped.cs" />
         <Compile Include="Models\Lspdfr\Vehicle.cs" />
         <Compile Include="Preview\IPreviewSupport.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
@@ -237,6 +239,7 @@
         <Compile Include="Xml\Deserializers\BooleanXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\CollectionXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\DoubleXmlDeserializer.cs" />
+        <Compile Include="Xml\Deserializers\Int32Deserializer.cs" />
         <Compile Include="Xml\Deserializers\ObjectXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\StringXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\UnwrapXmlDeserializer.cs" />

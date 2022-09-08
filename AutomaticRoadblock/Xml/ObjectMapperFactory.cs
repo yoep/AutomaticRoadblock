@@ -31,6 +31,7 @@ namespace AutomaticRoadblocks.Xml
             //insert the natives before the object serializer (because everything is an object)
             _deserializers.InsertRange(0, new List<IXmlDeserializer>
             {
+                new Int32Deserializer(),
                 new StringXmlDeserializer(),
                 new DoubleXmlDeserializer(),
                 new BooleanXmlDeserializer()
