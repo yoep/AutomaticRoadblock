@@ -40,6 +40,9 @@
           <HintPath>..\Libs\LSPD First Response.dll</HintPath>
         </Reference>
         <Reference Include="Microsoft.CSharp" />
+        <Reference Include="PoliceSmartRadio">
+          <HintPath>..\Libs\PoliceSmartRadio.dll</HintPath>
+        </Reference>
         <Reference Include="RAGENativeUI, Version=1.9.0.0, Culture=neutral, processorArchitecture=Amd64">
           <HintPath>..\packages\RAGENativeUI.1.9.0\lib\net472\RAGENativeUI.dll</HintPath>
         </Reference>
@@ -87,6 +90,11 @@
         <Compile Include="Instances\InstanceSlot.cs" />
         <Compile Include="Instances\InstanceType.cs" />
         <Compile Include="Instances\RemoveType.cs" />
+        <Compile Include="Integrations\IPluginIntegration.cs" />
+        <Compile Include="Integrations\IPluginIntegrationManager.cs" />
+        <Compile Include="Integrations\PluginIntegrationManager.cs" />
+        <Compile Include="Integrations\PoliceSmartRadio\IPoliceSmartRadio.cs" />
+        <Compile Include="Integrations\PoliceSmartRadio\PoliceSmartRadioIntegration.cs" />
         <Compile Include="IoC.cs" />
         <Compile Include="IoCException.cs" />
         <Compile Include="LightSources\LightSourceRoadblockFactory.cs" />

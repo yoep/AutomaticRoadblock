@@ -1,10 +1,13 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.AbstractionLayer.Implementation;
 using AutomaticRoadblocks.Debug.Menu;
+using AutomaticRoadblocks.Integrations;
+using AutomaticRoadblocks.Integrations.PoliceSmartRadio;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.ManualPlacement.Menu;
@@ -29,9 +32,14 @@ namespace AutomaticRoadblocks
     [SuppressMessage("ReSharper", "UnusedType.Global")]
     public class Main : Plugin
     {
+        private const int WaitTimeForIntegrationsInitialization = 3 * 1000;
+        private const string PoliceSmartRadioPluginName = "PoliceSmartRadio";
+        private const string PoliceSmartRadioPluginVersion = "1.2.0.0";
+
         public Main()
         {
             InitializeIoC();
+            // AppDomain.CurrentDomain.AssemblyResolve += LSPDFRResolveEventHandler;
         }
 
         public override void Initialize()
@@ -41,6 +49,7 @@ namespace AutomaticRoadblocks
             InitializeMenuComponents();
             InitializeDebugComponents();
             InitializeMenu();
+            InitializeIntegrations();
 
             AttachDebugger();
         }
@@ -75,6 +84,7 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<ILogger>(typeof(RageLogger))
                 .RegisterSingleton<ILocalizer>(typeof(Localizer))
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
+                .RegisterSingleton<IPluginIntegrationManager>(typeof(PluginIntegrationManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
@@ -146,6 +156,33 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficRemoveComponentItem));
         }
 
+        private static void InitializeIntegrations()
+        {
+            var ioc = IoC.Instance;
+            var game = ioc.GetInstance<IGame>();
+            var logger = ioc.GetInstance<ILogger>();
+
+            game.NewSafeFiber(() =>
+            {
+                GameFiber.Sleep(WaitTimeForIntegrationsInitialization);
+                logger.Trace("Verifying available plugin integrations");
+
+                // register each integration in the IoC
+                if (IsLSPDFRPluginRunning(PoliceSmartRadioPluginName, Version.Parse(PoliceSmartRadioPluginVersion)))
+                {
+                    ioc.RegisterSingleton<IPoliceSmartRadio>(typeof(PoliceSmartRadioIntegration));
+                    logger.Info($"Integration for {PoliceSmartRadioPluginName} is enabled");
+                }
+                else
+                {
+                    logger.Info($"Integration for {PoliceSmartRadioPluginName} is disabled, plugin not detected");
+                }
+
+                // load all registered plugin integrations
+                ioc.GetInstance<IPluginIntegrationManager>().LoadPlugins();
+            }, "Main.Integrations");
+        }
+
         private static void OnDutyStateChanged(bool onDuty)
         {
             var ioC = IoC.Instance;
@@ -169,6 +206,22 @@ namespace AutomaticRoadblocks
             {
                 pursuitListener.StopListener();
             }
+        }
+
+        private static Assembly LSPDFRResolveEventHandler(object sender, ResolveEventArgs args)
+        {
+            return Functions
+                .GetAllUserPlugins()
+                .FirstOrDefault(assembly => args.Name.ToLower().Contains(assembly.GetName().Name.ToLower()));
+        }
+
+        private static bool IsLSPDFRPluginRunning(string plugin, Version minVersion = null)
+        {
+            return Functions
+                .GetAllUserPlugins()
+                .Select(assembly => assembly.GetName())
+                .Where(assemblyName => string.Equals(assemblyName.Name, plugin, StringComparison.CurrentCultureIgnoreCase))
+                .Any(assemblyName => minVersion == null || assemblyName.Version.CompareTo(minVersion) >= 0);
         }
 
         [Conditional("DEBUG")]
