@@ -10,7 +10,7 @@ using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
-    public class RedirectTrafficDispatcher : AbstractInstancePlacementManager<RedirectTraffic>, IRedirectTrafficDispatcher
+    internal class RedirectTrafficDispatcher : AbstractInstancePlacementManager<RedirectTraffic>, IRedirectTrafficDispatcher
     {
         private readonly ISettingsManager _settingsManager;
 

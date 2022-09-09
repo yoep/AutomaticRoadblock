@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     /// <summary>
     /// Abstract implementation of the <see cref="IRoadblockSlot"/>.
-    /// This slot defines the entities & scenery items used within the <see cref="IRoadblock"/>.
+    /// This slot defines the entities and scenery items used within the <see cref="IRoadblock"/>.
     /// </summary>
     /// <remarks>Make sure that the <see cref="Initialize"/> method is called within the constructor after all properties/fields are set for the slot.</remarks>
     public abstract class AbstractRoadblockSlot : IRoadblockSlot

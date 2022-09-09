@@ -14,7 +14,7 @@ namespace AutomaticRoadblocks.SpikeStrip
 {
     /// <summary>
     /// A basic spike strip implementation which implements the <see cref="ISpikeStrip"/>.
-    /// This spike strip implements the animations & logic for bursting tires when needed.
+    /// This spike strip implements the animations and logic for bursting tires when needed.
     /// </summary>
     public class SpikeStrip : ISpikeStrip
     {

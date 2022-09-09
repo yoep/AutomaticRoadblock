@@ -21,6 +21,7 @@
       <WarningLevel>4</WarningLevel>
       <OutputPath>bin\x64\Release\</OutputPath>
       <PlatformTarget>x64</PlatformTarget>
+      <DocumentationFile>bin\x64\Release\AutomaticRoadblocks.xml</DocumentationFile>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
       <DebugSymbols>true</DebugSymbols>
@@ -65,7 +66,7 @@
         <Compile Include="Animation\AnimationHelper.cs" />
         <Compile Include="Animation\Animations.cs" />
         <Compile Include="Animation\AnimationExecutor.cs" />
-        <Compile Include="Api\AutomaticRoadblocksApi.cs" />
+        <Compile Include="Api\Functions.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
         <Compile Include="Barriers\BarrierFactory.cs" />
