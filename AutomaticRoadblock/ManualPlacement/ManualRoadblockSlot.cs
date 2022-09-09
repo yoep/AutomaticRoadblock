@@ -2,9 +2,7 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Utils.Type;
 using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
