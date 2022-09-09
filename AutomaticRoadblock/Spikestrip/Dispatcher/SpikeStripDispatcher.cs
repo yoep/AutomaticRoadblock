@@ -7,7 +7,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
 {
-    public class SpikeStripDispatcher : ISpikeStripDispatcher
+    internal class SpikeStripDispatcher : ISpikeStripDispatcher
     {
         private readonly ILogger _logger;
         private readonly List<ISpikeStrip> _spikeStrips = new();

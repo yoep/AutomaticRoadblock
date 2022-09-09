@@ -13,7 +13,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Dispatcher
 {
-    public class RoadblockDispatcher : IRoadblockDispatcher
+    internal class RoadblockDispatcher : IRoadblockDispatcher
     {
         private const float MinimumVehicleSpeed = 20f;
         private const float MinimumRoadblockPlacementDistance = 175f;

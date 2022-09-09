@@ -16,6 +16,12 @@ When roadblocks are deployed, custom scanner audio is played as well as for the 
 - Dynamic roadblocks with light sources during the evening/night
 - Manual configurable roadblock placement
 - Configurable traffic redirection
+- Spike strips
+- Junction roadblocks
+
+## API/plugin integration
+
+Plugins can use the [Functions](AutomaticRoadblock/Api/Functions.cs) for available api's.
 
 ## Development
 

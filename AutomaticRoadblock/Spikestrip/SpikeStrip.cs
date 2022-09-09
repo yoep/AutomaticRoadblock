@@ -4,7 +4,6 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Sound;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
@@ -15,7 +14,7 @@ namespace AutomaticRoadblocks.SpikeStrip
 {
     /// <summary>
     /// A basic spike strip implementation which implements the <see cref="ISpikeStrip"/>.
-    /// This spike strip implements the animations & logic for bursting tires when needed.
+    /// This spike strip implements the animations and logic for bursting tires when needed.
     /// </summary>
     public class SpikeStrip : ISpikeStrip
     {
@@ -234,7 +233,7 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         private void DoInternalUndeploy()
         {
-            if (IsInvalid || State != ESpikeStripState.Deployed)
+            if (IsInvalid || State is not (ESpikeStripState.Deployed or ESpikeStripState.Bypassed or ESpikeStripState.Hit))
                 return;
 
             Logger.Trace($"Undeploying spike strip {this}");

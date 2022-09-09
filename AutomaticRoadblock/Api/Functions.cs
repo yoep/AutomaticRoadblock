@@ -9,7 +9,7 @@ namespace AutomaticRoadblocks.Api
 {
     [SuppressMessage("ReSharper", "UnusedType.Global")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public static class AutomaticRoadblocksApi
+    public static class Functions
     {
         /// <summary>
         /// Get the roadblock dispatcher.

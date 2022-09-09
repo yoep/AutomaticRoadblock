@@ -11,7 +11,7 @@ using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
-    public class ManualPlacement : AbstractInstancePlacementManager<ManualRoadblock>, IManualPlacement
+    internal class ManualPlacement : AbstractInstancePlacementManager<ManualRoadblock>, IManualPlacement
     {
         private readonly ISettingsManager _settingsManager;
 
