@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.ManualPlacement;
+using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
@@ -35,5 +36,17 @@ namespace AutomaticRoadblocks.Api
         /// Get the spike strip dispatcher instance.
         /// </summary>
         public static ISpikeStripDispatcher SpikeStripDispatcher => IoC.Instance.GetInstance<ISpikeStripDispatcher>();
+        
+        /// <summary>
+        /// Get the model provider instance.
+        /// This provider converts the raw data from <see cref="IModelData"/> to actual models.
+        /// </summary>
+        public static IModelProvider ModelProvider => IoC.Instance.GetInstance<IModelProvider>();
+        
+        /// <summary>
+        /// Get the model data instance.
+        /// This is the raw model data info used by the <see cref="IModelProvider"/> which is parsed from data files.
+        /// </summary>
+        public static IModelData ModelData => IoC.Instance.GetInstance<IModelData>();
     }
 }

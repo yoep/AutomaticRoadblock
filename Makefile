@@ -7,6 +7,9 @@ bump-dependencies: # Install required dependencies
 bump-%: bump-dependencies # Bump the (major, minor, patch) version of the application
 	@bumpversion $*
 
+restore: # Restore the nuget packages
+	@nuget restore AutomaticRoadblock.sln
+
 clean:	# Clean the build directory of the application
 	@dotnet clean
 

@@ -41,7 +41,6 @@ namespace AutomaticRoadblocks
         public Main()
         {
             InitializeIoC();
-            // AppDomain.CurrentDomain.AssemblyResolve += LSPDFRResolveEventHandler;
         }
 
         public override void Initialize()
@@ -88,6 +87,7 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
                 .RegisterSingleton<IPluginIntegrationManager>(typeof(PluginIntegrationManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
+                .RegisterSingleton<IModelData>(typeof(LspdfrModelData))
                 .RegisterSingleton<IModelProvider>(typeof(LspdfrModelProvider))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
@@ -209,13 +209,6 @@ namespace AutomaticRoadblocks
             {
                 pursuitListener.StopListener();
             }
-        }
-
-        private static Assembly LSPDFRResolveEventHandler(object sender, ResolveEventArgs args)
-        {
-            return Functions
-                .GetAllUserPlugins()
-                .FirstOrDefault(assembly => args.Name.ToLower().Contains(assembly.GetName().Name.ToLower()));
         }
 
         private static bool IsLSPDFRPluginRunning(string plugin, Version minVersion = null)

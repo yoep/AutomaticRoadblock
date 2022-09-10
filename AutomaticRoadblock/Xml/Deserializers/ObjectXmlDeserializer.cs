@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
             foreach (var property in deserializationContext.DeserializationType.GetProperties())
             {
-                if (!IsNotIgnored(property))
+                if (IsIgnored(property) || IsUnwrapAttribute(property))
                     continue;
 
                 if (GetElementAnnotation(property) != null && GetAttributeAnnotation(property) != null)
@@ -116,11 +116,14 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             return xmlProperty == null || !xmlProperty.IsOptional;
         }
 
-        private static bool IsNotIgnored(MemberInfo member)
+        private static bool IsIgnored(MemberInfo member)
         {
-            var xmlIgnore = member.GetCustomAttribute<XmlIgnore>();
-
-            return xmlIgnore == null;
+            return member.GetCustomAttribute<XmlIgnore>() != null;
+        }
+        
+        private static bool IsUnwrapAttribute(MemberInfo member)
+        {
+            return member.GetCustomAttribute<XmlUnwrapContents>() != null;
         }
 
         private static bool IsNativeType(Type type)

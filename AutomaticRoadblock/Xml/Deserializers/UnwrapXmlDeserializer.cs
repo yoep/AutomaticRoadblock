@@ -21,8 +21,9 @@ namespace AutomaticRoadblocks.Xml.Deserializers
         /// <inheritdoc />
         public object Deserialize(XmlParser parser, XmlDeserializationContext deserializationContext)
         {
-            var instance = Activator.CreateInstance(deserializationContext.DeserializationType);
-            var unwrapProperty = deserializationContext.DeserializationType.GetProperties().First(HasUnwrapAttribute);
+            var instance = CreateInstance(parser, deserializationContext);
+            var properties = deserializationContext.DeserializationType.GetProperties();
+            var unwrapProperty = properties.First(IsUnwrapProperty);
             var clazz = unwrapProperty.PropertyType;
             var nodes = parser.FetchNodesForMember(deserializationContext, unwrapProperty, GetLookupName(deserializationContext.DeserializationType));
 
@@ -36,6 +37,16 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             }
 
             return instance;
+        }
+
+        private static object CreateInstance(XmlParser parser, XmlDeserializationContext deserializationContext)
+        {
+            // deserialize the node into a normal object without the unwrap property first
+            // this allows us to reuse existing deserializers for types without having to reimplement everything in this deserializer
+            return deserializationContext.Deserializers
+                .Where(x => x.GetType() != typeof(UnwrapXmlDeserializer))
+                .First(x => x.CanHandle(deserializationContext.DeserializationType))
+                .Deserialize(parser, deserializationContext);
         }
 
         private static void ProcessElements(XmlParser parser, XmlDeserializationContext deserializationContext, XPathNodeIterator nodes, Type clazz,
@@ -64,10 +75,10 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
         private static bool ContainsUnwrapAttribute(Type clazz)
         {
-            return clazz.GetProperties().Any(HasUnwrapAttribute);
+            return clazz.GetProperties().Any(IsUnwrapProperty);
         }
 
-        private static bool HasUnwrapAttribute(MemberInfo x)
+        private static bool IsUnwrapProperty(MemberInfo x)
         {
             return x.GetCustomAttribute<XmlUnwrapContents>() != null;
         }

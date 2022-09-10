@@ -1,11 +1,10 @@
 using System;
-using AutomaticRoadblocks;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Models.Lspdfr;
 using Xunit.Abstractions;
 
-namespace AutomaticRoadblocksTests
+namespace AutomaticRoadblocks
 {
     public static class TestUtils
     {
@@ -14,7 +13,7 @@ namespace AutomaticRoadblocksTests
             IoC.Instance
                 .UnregisterAll()
                 .RegisterSingleton<ILogger>(typeof(ConsoleLogger))
-                .RegisterSingleton<IModelProvider>(typeof(LspdfrModelProvider));
+                .RegisterSingleton<IModelData>(typeof(LspdfrModelData));
         }
 
         public static void SetLogger(ITestOutputHelper testOutputHelper)

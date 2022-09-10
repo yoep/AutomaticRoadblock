@@ -12,7 +12,6 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         [CanBeNull]
         public List<Vehicle> Vehicles { get; internal set; }
         
-        [XmlElement]
         public List<Ped> Peds { get; internal set; }
         
         [XmlElement(IsOptional = true)]
