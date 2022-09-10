@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Street.Info;
 using Rage;
 
@@ -6,6 +7,8 @@ namespace AutomaticRoadblocks.Street.Factory
 {
     internal static class RoadFactory
     {
+        private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+
         internal static Road Create(VehicleNodeInfo nodeInfo)
         {
             var nodeHeading = nodeInfo.Heading;
@@ -14,12 +17,18 @@ namespace AutomaticRoadblocks.Street.Factory
 
             if (!StreetHelper.LastPointOnRoadUsingRaytracing(nodeInfo.Position, rightSideHeading, out var roadRightSide))
             {
-                StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, rightSideHeading, out roadRightSide);
+                StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, rightSideHeading, out var roadRightSideNative);
+                roadRightSide = roadRightSideNative;
+                Logger.Info(
+                    $"Using native function right side last point {roadRightSide} instead (distance from center {nodeInfo.Position.DistanceTo(roadRightSide)})");
             }
 
             if (!StreetHelper.LastPointOnRoadUsingRaytracing(nodeInfo.Position, leftSideHeading, out var roadLeftSide))
             {
-                StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, leftSideHeading, out roadLeftSide);
+                StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, leftSideHeading, out var roadLeftSideNative);
+                roadLeftSide = roadLeftSideNative;
+                Logger.Info(
+                    $"Using native function left side last point {roadLeftSide} instead (distance from center {nodeInfo.Position.DistanceTo(roadLeftSide)})");
             }
 
             return new Road
@@ -31,7 +40,7 @@ namespace AutomaticRoadblocks.Street.Factory
                 Node = nodeInfo,
             };
         }
-        
+
         private static List<Road.Lane> DiscoverLanes(Vector3 roadRightSide, Vector3 roadLeftSide, Vector3 roadMiddle, float rightSideHeading,
             int numberOfLanes1, int numberOfLanes2)
         {
