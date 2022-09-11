@@ -330,10 +330,11 @@ namespace AutomaticRoadblocks.Street.Info
                 {
                     var rightSideDirection = MathHelper.ConvertHeadingToDirection(Heading) * 1f;
                     var leftSideDirection = MathHelper.ConvertHeadingToDirection(Heading) * 1.25f;
+                    var colorLaneArrow = Color.FromArgb(125, Color.Red);
 
                     while (IsPreviewActive)
                     {
-                        game.DrawArrow(FloatAboveGround(Position), rightSideDirection, Rotator.Zero, Width - 1f, Color.Red);
+                        game.DrawArrow(FloatAboveGround(Position), rightSideDirection, Rotator.Zero, Width - 1f, colorLaneArrow);
                         GameUtils.CreateMarker(RightSide + rightSideDirection, EMarkerType.MarkerTypeVerticalCylinder, Color.Yellow, 0.5f, 2f, false);
                         GameUtils.CreateMarker(LeftSide + leftSideDirection, EMarkerType.MarkerTypeVerticalCylinder, Color.DarkViolet, 0.5f, 2f, false);
                         game.FiberYield();

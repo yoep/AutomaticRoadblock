@@ -1,10 +1,8 @@
 using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit.Level
@@ -24,15 +22,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
         #endregion
 
         #region Functions
-
-        /// <inheritdoc />
-        protected override void InitializeScenery()
-        {
-            var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 2f;
-
-            Instances.Add(new InstanceSlot(EEntityType.Scenery, position, 0f,
-                (conePosition, _) => new ARScenery(PropUtils.CreateBigConeWithStripes(conePosition))));
-        }
 
         /// <inheritdoc />
         protected override void InitializeLights()

@@ -41,15 +41,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
         #region Functions
 
         /// <inheritdoc />
-        protected override void InitializeScenery()
-        {
-            var position = Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading - 180) * 2f;
-
-            Instances.Add(new InstanceSlot(EEntityType.Scenery, position, 0f,
-                (conePosition, _) => BarrierFactory.Create(BarrierType.BigCone, conePosition)));
-        }
-
-        /// <inheritdoc />
         protected override void InitializeLights()
         {
             Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));

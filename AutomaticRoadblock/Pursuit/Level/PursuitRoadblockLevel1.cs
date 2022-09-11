@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
@@ -26,15 +25,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
         #endregion
 
         #region Functions
-
-        /// <inheritdoc />
-        protected override void InitializeScenery()
-        {
-            var position = Position + MathHelper.ConvertHeadingToDirection(MathHelper.NormalizeHeading(Road.Node.Heading - 180)) * 2f;
-
-            Instances.Add(new InstanceSlot(EEntityType.Scenery, position, 0f,
-                (conePosition, _) => BarrierFactory.Create(BarrierType.BigCone, conePosition)));
-        }
 
         /// <inheritdoc />
         protected override void InitializeLights()
