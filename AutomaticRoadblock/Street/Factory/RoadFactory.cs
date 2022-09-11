@@ -7,38 +7,64 @@ namespace AutomaticRoadblocks.Street.Factory
 {
     internal static class RoadFactory
     {
+        private const float MinLaneDistance = 4f;
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
         internal static Road Create(VehicleNodeInfo nodeInfo)
         {
-            var nodeHeading = nodeInfo.Heading;
-            var rightSideHeading = nodeHeading - 90f;
-            var leftSideHeading = nodeHeading + 90f;
-
-            if (!StreetHelper.LastPointOnRoadUsingRaytracing(nodeInfo.Position, rightSideHeading, out var roadRightSide))
-            {
-                StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, rightSideHeading, out var roadRightSideNative);
-                roadRightSide = roadRightSideNative;
-                Logger.Info(
-                    $"Using native function right side last point {roadRightSide} instead (distance from center {nodeInfo.Position.DistanceTo(roadRightSide)})");
-            }
-
-            if (!StreetHelper.LastPointOnRoadUsingRaytracing(nodeInfo.Position, leftSideHeading, out var roadLeftSide))
-            {
-                StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, leftSideHeading, out var roadLeftSideNative);
-                roadLeftSide = roadLeftSideNative;
-                Logger.Info(
-                    $"Using native function left side last point {roadLeftSide} instead (distance from center {nodeInfo.Position.DistanceTo(roadLeftSide)})");
-            }
+            CalculateRoadSidePoints(nodeInfo, out var roadRightSide, out var roadLeftSide);
 
             return new Road
             {
                 RightSide = roadRightSide,
                 LeftSide = roadLeftSide,
-                Lanes = DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, nodeHeading, nodeInfo.LanesInSameDirection,
+                Lanes = DiscoverLanes(roadRightSide, roadLeftSide, nodeInfo.Position, nodeInfo.Heading, nodeInfo.LanesInSameDirection,
                     nodeInfo.LanesInOppositeDirection),
                 Node = nodeInfo,
             };
+        }
+
+        private static void CalculateRoadSidePoints(VehicleNodeInfo nodeInfo, out Vector3 rightSide, out Vector3 leftSide)
+        {
+            var nodeHeading = nodeInfo.Heading;
+            var rightSideHeading = nodeHeading - 90f;
+            var leftSideHeading = nodeHeading + 90f;
+
+            if (!StreetHelper.LastPointOnRoadUsingRaytracing(nodeInfo.Position, rightSideHeading, out rightSide))
+            {
+                Logger.Debug($"Using native to calculate the right side for Position: {nodeInfo.Position}");
+                if (!StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, rightSideHeading, out rightSide))
+                {
+                    Logger.Warn("Native road right side calculation failed");
+                }
+            }
+
+            if (!StreetHelper.LastPointOnRoadUsingRaytracing(nodeInfo.Position, leftSideHeading, out leftSide))
+            {
+                Logger.Debug($"Using native to calculate the left side for Position: {nodeInfo.Position}");
+                if (!StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, leftSideHeading, out leftSide))
+                {
+                    Logger.Warn("Native road left side calculation failed");
+                }
+            }
+
+            // verify if the points are not the same
+            // if so, correct the left side
+            if (rightSide.Equals(leftSide))
+            {
+                leftSide = nodeInfo.Position + MathHelper.ConvertHeadingToDirection(leftSideHeading) * nodeInfo.Position.DistanceTo(rightSide);
+            }
+
+            // verify if the lane was calculated correctly
+            if (nodeInfo.Position.DistanceTo(rightSide) < MinLaneDistance)
+            {
+                rightSide = nodeInfo.Position + MathHelper.ConvertHeadingToDirection(rightSideHeading) * MinLaneDistance;
+            }
+
+            if (nodeInfo.Position.DistanceTo(leftSide) < MinLaneDistance)
+            {
+                leftSide = nodeInfo.Position + MathHelper.ConvertHeadingToDirection(leftSideHeading) * MinLaneDistance;
+            }
         }
 
         private static List<Road.Lane> DiscoverLanes(Vector3 roadRightSide, Vector3 roadLeftSide, Vector3 roadMiddle, float rightSideHeading,
