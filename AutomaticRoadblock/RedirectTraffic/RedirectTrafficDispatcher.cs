@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private readonly ISettingsManager _settingsManager;
 
         private float _coneDistance = 2f;
-        private VehicleType _vehicleType = VehicleType.LocalPatrol;
+        private VehicleType _vehicleType = VehicleType.Local;
         private BarrierType _coneType = BarrierType.BigConeStriped;
         private RedirectTrafficType _type = RedirectTrafficType.Lane;
         private bool _enableRedirectionArrow = true;
@@ -94,7 +94,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             if (redirectTraffic == null)
             {
-                redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedNode ?? CalculateNewLocationForInstance()));
+                redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
 
                 lock (Instances)
                 {

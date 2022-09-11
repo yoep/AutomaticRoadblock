@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Instances
         protected readonly IGame Game;
         protected readonly ILogger Logger;
 
-        protected IVehicleNode LastDeterminedStreet;
+        protected VehicleNodeInfo LastDeterminedStreet;
 
         protected AbstractInstancePlacementManager(IGame game, ILogger logger)
         {
@@ -36,7 +36,7 @@ namespace AutomaticRoadblocks.Instances
         /// Indicates if a hologram preview should be shown or a marker.
         /// </summary>
         protected abstract bool IsHologramPreviewEnabled { get; }
-        
+
         /// <summary>
         /// The distance in front of the player for which a location must be determined.
         /// </summary>
@@ -59,7 +59,7 @@ namespace AutomaticRoadblocks.Instances
         public void DeletePreview()
         {
             LastDeterminedStreet = null;
-            
+
             lock (Instances)
             {
                 var instancesToRemove = Instances.Where(x => x.IsPreviewActive).ToList();
@@ -154,14 +154,14 @@ namespace AutomaticRoadblocks.Instances
             toBoRemoved.ForEach(x => x.Dispose());
         }
 
-        protected IVehicleNode CalculateNewLocationForInstance()
+        protected VehicleNodeInfo CalculateNewLocationForInstance()
         {
             var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
 
-            return RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
+            return RoadQuery.FindClosestNode(position, EVehicleNodeType.AllNodes);
         }
 
-        private void DoHologramPreviewCreation(IVehicleNode street, bool force)
+        private void DoHologramPreviewCreation(VehicleNodeInfo street, bool force)
         {
             if (!force && Equals(street, LastDeterminedStreet))
                 return;
@@ -173,7 +173,7 @@ namespace AutomaticRoadblocks.Instances
             Game.NewSafeFiber(() =>
             {
                 Logger.Trace($"Creating new instance hologram preview at {street}");
-                var instance = CreateInstance(street);
+                var instance = CreateInstance(RoadQuery.ToVehicleNode(street));
                 Logger.Debug($"Created instance {instance}");
                 instance.CreatePreview();
 
@@ -204,7 +204,7 @@ namespace AutomaticRoadblocks.Instances
             return closestInstance;
         }
 
-        private static void CreatePreviewMarker(IVehicleNode street)
+        private static void CreatePreviewMarker(VehicleNodeInfo street)
         {
             GameUtils.CreateMarker(street.Position, EMarkerType.MarkerTypeVerticalCylinder, Color.White, 2.5f, 1.5f, false);
         }

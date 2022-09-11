@@ -16,7 +16,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private readonly ISettingsManager _settingsManager;
 
         private BarrierType _barrier = BarrierType.SmallCone;
-        private VehicleType _vehicleType = VehicleType.LocalPatrol;
+        private VehicleType _vehicleType = VehicleType.Local;
         private LightSourceType _lightSourceType = LightSourceType.Flares;
         private PlacementType _placementType = PlacementType.All;
         private bool _copsEnabled;
@@ -115,7 +115,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
             else
             {
-                roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedNode ?? CalculateNewLocationForInstance()));
+                roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
                 lock (Instances)
                 {
                     Instances.Add(roadblockToSpawn);

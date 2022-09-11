@@ -22,19 +22,18 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         public bool Force { get; set; }
         
         /// <summary>
-        /// The indication if the roadblock should be dispatched at the current location of the vehicle
-        /// instead of calculating a position ahead of the vehicle.
+        /// The roadblock placement distance in regards to the target. 
         /// </summary>
-        public bool AtCurrentLocation { get; set; }
+        public ERoadblockDistance RoadblockDistance { get; set; }
 
         public override string ToString()
         {
-            return $"{nameof(EnableSpikeStrips)}: {EnableSpikeStrips}, {nameof(IsUserRequested)}: {IsUserRequested}, {nameof(Force)}: {Force}, {nameof(AtCurrentLocation)}: {AtCurrentLocation}";
+            return $"{nameof(EnableSpikeStrips)}: {EnableSpikeStrips}, {nameof(IsUserRequested)}: {IsUserRequested}, {nameof(Force)}: {Force}, {nameof(RoadblockDistance)}: {RoadblockDistance}";
         }
 
         protected bool Equals(DispatchOptions other)
         {
-            return EnableSpikeStrips == other.EnableSpikeStrips && IsUserRequested == other.IsUserRequested && Force == other.Force && AtCurrentLocation == other.AtCurrentLocation;
+            return EnableSpikeStrips == other.EnableSpikeStrips && IsUserRequested == other.IsUserRequested && Force == other.Force && RoadblockDistance == other.RoadblockDistance;
         }
 
         public override bool Equals(object obj)
@@ -52,7 +51,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 var hashCode = EnableSpikeStrips.GetHashCode();
                 hashCode = (hashCode * 397) ^ IsUserRequested.GetHashCode();
                 hashCode = (hashCode * 397) ^ Force.GetHashCode();
-                hashCode = (hashCode * 397) ^ AtCurrentLocation.GetHashCode();
+                hashCode = (hashCode * 397) ^ RoadblockDistance.GetHashCode();
                 return hashCode;
             }
         }
