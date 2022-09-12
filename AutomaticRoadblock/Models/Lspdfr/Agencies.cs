@@ -1,12 +1,12 @@
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using AutomaticRoadblocks.Xml.Attributes;
 
 namespace AutomaticRoadblocks.Models.Lspdfr
 {
-    [XmlRootName("Agencies")]
+    [XmlRoot("Agencies")]
     public class Agencies
     {
-        [XmlUnwrapContents]
-        public List<Agency> Items { get; internal set; }
+        [XmlUnwrapContents] public List<Agency> Items { get; internal set; }
     }
 }

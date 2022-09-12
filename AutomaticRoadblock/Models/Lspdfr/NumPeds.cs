@@ -1,13 +1,11 @@
-using AutomaticRoadblocks.Xml.Attributes;
+using System.Xml.Serialization;
 
 namespace AutomaticRoadblocks.Models.Lspdfr
 {
     public class NumPeds
     {
-        [Xml]
-        public int Min { get; internal set; }
-        
-        [Xml]
-        public int Max { get; internal set; }
+        [XmlAttribute] public int Min { get; internal set; }
+
+        [XmlAttribute] public int Max { get; internal set; }
     }
 }

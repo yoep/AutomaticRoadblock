@@ -2,12 +2,11 @@ using System;
 using System.Collections;
 using System.Reflection;
 using System.Xml;
+using System.Xml.Serialization;
 using System.Xml.XPath;
 using AutomaticRoadblocks.Xml.Attributes;
 using AutomaticRoadblocks.Xml.Context;
 using AutomaticRoadblocks.Xml.Parser;
-using XmlAttribute = AutomaticRoadblocks.Xml.Attributes.XmlAttribute;
-using XmlElement = AutomaticRoadblocks.Xml.Attributes.XmlElement;
 
 namespace AutomaticRoadblocks.Xml.Deserializers
 {
@@ -28,7 +27,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
                 var value = IsXmlElement(property)
                     ? ProcessElement(parser, deserializationContext, property)
-                    : ProcessAttribute(parser, deserializationContext, property);
+                    : ProcessAttribute(instance, parser, deserializationContext, property);
 
                 property.SetValue(instance, value);
             }
@@ -74,15 +73,12 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             return deserializationContext.Deserialize(parser, node, property.PropertyType);
         }
 
-        private static object ProcessAttribute(XmlParser parser, XmlDeserializationContext deserializationContext,
+        private static object ProcessAttribute(object instance, XmlParser parser, XmlDeserializationContext deserializationContext,
             PropertyInfo property)
         {
-            var xmlAttribute = property.GetCustomAttribute<XmlAttribute>();
             var value = parser.FetchAttributeValue(deserializationContext, property);
+            var defaultValue = property.GetValue(instance);
             var type = property.PropertyType;
-
-            if (string.IsNullOrEmpty(value) && !xmlAttribute.IsOptional)
-                throw new XmlException("Missing xml attribute for " + XmlParser.GetXmlAttributeLookupNames(property));
 
             if (type.IsEnum)
                 return ProcessEnum(value, type);
@@ -90,7 +86,9 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             if (type == typeof(Array))
                 throw new DeserializationException("Attribute cannot be of type Array");
 
-            return deserializationContext.Deserialize(parser, value, type);
+            return string.IsNullOrWhiteSpace(value) 
+                ? defaultValue 
+                : deserializationContext.Deserialize(parser, value, type);
         }
 
         private static object ProcessEnum(string value, Type type)
@@ -111,16 +109,16 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
         private static bool IsRequiredMember(MemberInfo member)
         {
-            var xmlProperty = member.GetCustomAttribute<XmlElement>();
+            var xmlProperty = member.GetCustomAttribute<XmlElementAttribute>();
 
-            return xmlProperty == null || !xmlProperty.IsOptional;
+            return xmlProperty is not { IsNullable: true };
         }
 
         private static bool IsIgnored(MemberInfo member)
         {
-            return member.GetCustomAttribute<XmlIgnore>() != null;
+            return member.GetCustomAttribute<XmlIgnoreAttribute>() != null;
         }
-        
+
         private static bool IsUnwrapAttribute(MemberInfo member)
         {
             return member.GetCustomAttribute<XmlUnwrapContents>() != null;
@@ -144,14 +142,14 @@ namespace AutomaticRoadblocks.Xml.Deserializers
                    && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type));
         }
 
-        private static XmlAttribute GetAttributeAnnotation(MemberInfo member)
+        private static XmlAttributeAttribute GetAttributeAnnotation(MemberInfo member)
         {
-            return member.GetCustomAttribute<XmlAttribute>();
+            return member.GetCustomAttribute<XmlAttributeAttribute>();
         }
 
-        private static XmlElement GetElementAnnotation(MemberInfo member)
+        private static XmlElementAttribute GetElementAnnotation(MemberInfo member)
         {
-            return member.GetCustomAttribute<XmlElement>();
+            return member.GetCustomAttribute<XmlElementAttribute>();
         }
     }
 }

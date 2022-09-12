@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.Xml.Attributes;
+using System.Xml.Serialization;
 
 namespace AutomaticRoadblocks.Models.Lspdfr
 {
@@ -21,8 +21,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
 
         public List<BackupAgency> NorthYankton { get; internal set; }
 
-        [XmlElement(IsOptional = true)] 
-        public List<BackupAgency> MountChiliad { get; internal set; }
+        [XmlElement(IsNullable = true)] public List<BackupAgency> MountChiliad { get; internal set; }
 
         public List<BackupAgency> CayoPerico { get; internal set; }
     }

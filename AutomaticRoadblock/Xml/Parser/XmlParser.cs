@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 using System.Xml.XPath;
-using AutomaticRoadblocks.Xml.Attributes;
 using AutomaticRoadblocks.Xml.Context;
 
 namespace AutomaticRoadblocks.Xml.Parser
@@ -42,14 +42,11 @@ namespace AutomaticRoadblocks.Xml.Parser
         {
             Assert.NotNull(context, "context cannot be null");
             Assert.NotNull(member, "member cannot be null");
-            var xmlAttribute = member.GetCustomAttribute<XmlAttribute>();
             var attributeValue = GetXmlAttributeLookupNames(member)
                 .Select(x => GetAttributeValue(context, x))
                 .FirstOrDefault(x => !string.IsNullOrEmpty(x));
 
-            return string.IsNullOrEmpty(attributeValue) && xmlAttribute.DefaultValue != null
-                ? xmlAttribute.DefaultValue.ToString()
-                : attributeValue;
+            return attributeValue;
         }
 
         public string GetAttributeValue(XmlContext context, string lookupName)
@@ -71,11 +68,11 @@ namespace AutomaticRoadblocks.Xml.Parser
 
         public static ICollection<string> GetXmlAttributeLookupNames(MemberInfo member)
         {
-            var xmlAttribute = member.GetCustomAttribute<XmlAttribute>();
+            var xmlAttribute = member.GetCustomAttribute<XmlAttributeAttribute>();
 
-            if (xmlAttribute != null && !string.IsNullOrEmpty(xmlAttribute.Name))
+            if (xmlAttribute != null && !string.IsNullOrEmpty(xmlAttribute.AttributeName))
             {
-                return new List<string> { xmlAttribute.Name, LowercaseFirstLetter(xmlAttribute.Name) };
+                return new List<string> { xmlAttribute.AttributeName, LowercaseFirstLetter(xmlAttribute.AttributeName) };
             }
 
             return new List<string> { member.Name, LowercaseFirstLetter(member.Name) };
@@ -91,17 +88,17 @@ namespace AutomaticRoadblocks.Xml.Parser
 
         private static string LookupTypeName(MemberInfo member)
         {
-            var rootName = member.GetCustomAttribute<XmlRootName>();
+            var rootName = member.GetCustomAttribute<XmlRootAttribute>();
 
-            return rootName != null && !string.IsNullOrEmpty(rootName.Name) ? rootName.Name : member.Name;
+            return rootName != null && !string.IsNullOrEmpty(rootName.ElementName) ? rootName.ElementName : member.Name;
         }
 
         private static string LookupPropertyName(MemberInfo member)
         {
-            var xmlElement = member.GetCustomAttribute<XmlElement>();
+            var xmlElement = member.GetCustomAttribute<XmlElementAttribute>();
 
-            if (xmlElement != null && !string.IsNullOrEmpty(xmlElement.Name))
-                return xmlElement.Name;
+            if (xmlElement != null && !string.IsNullOrEmpty(xmlElement.ElementName))
+                return xmlElement.ElementName;
 
             return member.Name;
         }

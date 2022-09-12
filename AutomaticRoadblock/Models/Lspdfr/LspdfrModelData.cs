@@ -14,10 +14,12 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         private const string AgencyFilename = "agency.xml";
         private const string OutfitsFilename = "outfits.xml";
         private const string BackupFilename = "backup.xml";
+        private const string InventoryFilename = "inventory.xml";
 
+        private static readonly Random Random = new();
+        
         private readonly ILogger _logger;
         private readonly ObjectMapper _objectMapper = ObjectMapperFactory.CreateInstance();
-        private readonly Random _random = new();
 
         public LspdfrModelData(ILogger logger)
         {
@@ -40,17 +42,22 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         /// The backup units for each region.
         /// </summary>
         public BackupUnits BackupUnits { get; private set; }
+        
+        /// <summary>
+        /// The inventories with their items.
+        /// </summary>
+        public Inventories Inventories { get; private set; }
 
         /// <inheritdoc />
         public PedModelInfo Ped(EUnitType unitType, EWorldZoneCounty zone)
         {
-            return RetrieveModelInfoFor(unitType, zone);
+            return RetrievePedModelInfoFor(unitType, zone);
         }
 
         /// <inheritdoc />
         public VehicleModelInfo Vehicle(EUnitType unitType, EWorldZoneCounty zone)
         {
-            return null;
+            return RetrieveVehicleModelInfoFor(unitType, zone);
         }
 
         #endregion
@@ -63,6 +70,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
             Agencies = TryToLoadDatafile<Agencies>(AgencyFilename);
             Outfits = TryToLoadDatafile<Outfits>(OutfitsFilename);
             BackupUnits = TryToLoadDatafile(BackupFilename, BackupUnits.Default);
+            Inventories = TryToLoadDatafile<Inventories>(InventoryFilename);
         }
 
         #endregion
@@ -90,20 +98,47 @@ namespace AutomaticRoadblocks.Models.Lspdfr
             return defaultValue;
         }
 
-        private PedModelInfo RetrieveModelInfoFor(EUnitType unitType, EWorldZoneCounty zone)
+        private PedModelInfo RetrievePedModelInfoFor(EUnitType unitType, EWorldZoneCounty zone)
+        {
+            var agency = RetrieveAgencyFor(unitType, zone);
+            var ped = SelectPedBasedOnChance(agency.Loadout.Peds);
+            
+            return new PedModelInfo
+            {
+                Name = ped.Name
+            };
+        }
+
+        private VehicleModelInfo RetrieveVehicleModelInfoFor(EUnitType unitType, EWorldZoneCounty zone)
+        {
+            var agency = RetrieveAgencyFor(unitType, zone);
+            var vehicles = agency.Loadout.Vehicles;
+
+            // verify if any vehicle is configured for the criteria
+            if (vehicles?.Any() != true)
+            {
+                _logger.Warn($"No vehicle model available for agency {agency}");
+                throw new NoModelAvailableException(unitType, zone);
+            }
+
+            var vehicle = vehicles[Random.Next(vehicles.Count)];
+            return new VehicleModelInfo
+            {
+                Name = vehicle.Name
+            };
+        }
+
+        private Agency RetrieveAgencyFor(EUnitType unitType, EWorldZoneCounty zone)
         {
             // retrieve the backup info for the given unit type
             var backup = GetBackupFor(unitType);
             // retrieve a agency info based on the backup zone
-            var agency = GetAgencyFor(ZoneToDataString(zone), backup);
-            var ped = SelectPedBasedOmChance(agency.Loadout.Peds);
-
-            return null;
+            return GetAgencyFor(ZoneToDataString(zone), backup);
         }
 
-        private Ped SelectPedBasedOmChance(List<Ped> peds)
+        private Ped SelectPedBasedOnChance(List<Ped> peds)
         {
-            var threshold = _random.Next(101);
+            var threshold = Random.Next(101);
             var totalChance = 0;
 
             foreach (var ped in peds.OrderBy(x => x.Chance))
@@ -122,7 +157,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         private Agency GetAgencyFor(string zone, Backup backup)
         {
             var agencies = backup[zone];
-            var agencyName = agencies[_random.Next(agencies.Count)].Name;
+            var agencyName = agencies[Random.Next(agencies.Count)].Name;
 
             return Agencies.Items
                 .First(x => x.ScriptName.Equals(agencyName));

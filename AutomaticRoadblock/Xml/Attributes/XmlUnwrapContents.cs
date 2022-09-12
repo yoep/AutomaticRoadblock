@@ -11,6 +11,9 @@ namespace AutomaticRoadblocks.Xml.Attributes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class XmlUnwrapContents : Attribute
     {
-        
+        /// <summary>
+        /// Use the child element name for the value if present, else unwrap the contents from the node into the field.
+        /// </summary>
+        public string OptionalElementName { get; set; }
     }
 }

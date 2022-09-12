@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using AutomaticRoadblocks.Xml.Attributes;
+using System.Xml.Serialization;
 
 namespace AutomaticRoadblocks.Models.Lspdfr
 {
-    [XmlRootName("BackupUnits")]
+    [XmlRoot("BackupUnits")]
     public class BackupUnits
     {
         public static readonly BackupUnits Default = new()

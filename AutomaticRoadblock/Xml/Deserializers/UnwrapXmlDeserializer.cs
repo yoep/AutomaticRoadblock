@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using System.Xml.Serialization;
 using System.Xml.XPath;
 using AutomaticRoadblocks.Xml.Attributes;
 using AutomaticRoadblocks.Xml.Context;
 using AutomaticRoadblocks.Xml.Parser;
-using XmlElement = AutomaticRoadblocks.Xml.Attributes.XmlElement;
 
 namespace AutomaticRoadblocks.Xml.Deserializers
 {
@@ -66,10 +66,10 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
         private static string GetLookupName(Type clazz)
         {
-            var xmlRootAttribute = clazz.GetCustomAttribute<XmlRootName>();
+            var xmlRootAttribute = clazz.GetCustomAttribute<XmlRootAttribute>();
 
             return xmlRootAttribute != null
-                ? xmlRootAttribute.Name
+                ? xmlRootAttribute.ElementName
                 : clazz.Name;
         }
 
@@ -90,9 +90,9 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
         private static bool IsRequiredMember(MemberInfo member)
         {
-            var xmlProperty = member.GetCustomAttribute<XmlElement>();
+            var xmlProperty = member.GetCustomAttribute<XmlElementAttribute>();
 
-            return xmlProperty is not { IsOptional: true };
+            return xmlProperty is not { IsNullable: true };
         }
     }
 }

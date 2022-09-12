@@ -4,10 +4,10 @@ using AutomaticRoadblocks.Xml.Attributes;
 
 namespace AutomaticRoadblocks.Models.Lspdfr
 {
-    [XmlRoot("Outfits")]
-    public class Outfits
+    [XmlRoot(ElementName = "Inventories")]
+    public class Inventories
     {
-        [XmlUnwrapContents] 
-        public List<Outfit> Items { get; internal set; }
+        [XmlUnwrapContents]
+        public List<Inventory> Items { get; internal set; }
     }
 }
