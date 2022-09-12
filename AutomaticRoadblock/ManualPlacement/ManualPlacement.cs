@@ -126,7 +126,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             {
                 Logger.Trace($"Spawning manual roadblock {roadblockToSpawn}");
                 var success = roadblockToSpawn.Spawn();
-                
+
                 if (success)
                 {
                     Logger.Info($"Manual roadblock has been spawned with success, {roadblockToSpawn}");
@@ -151,6 +151,9 @@ namespace AutomaticRoadblocks.ManualPlacement
         protected override ManualRoadblock CreateInstance(IVehicleNode street)
         {
             Assert.NotNull(street, "road cannot be null");
+            if (street.GetType() == typeof(Intersection))
+                return null;
+
             var roadblock = new ManualRoadblock(new ManualRoadblock.Request
             {
                 Road = (Road)street,

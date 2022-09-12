@@ -130,6 +130,10 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         protected override RedirectTraffic CreateInstance(IVehicleNode street)
         {
+            Assert.NotNull(street, "street cannot be null");
+            if (street.GetType() == typeof(Intersection))
+                return null;
+            
             Logger.Trace(
                 $"Creating a redirect traffic instance for {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(Type)}: {Type}, {nameof(ConeDistance)}: {ConeDistance}");
             var redirectTraffic = new RedirectTraffic(new RedirectTraffic.Request
@@ -143,7 +147,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 EnableLights = ShouldAddLights(),
                 Offset = Offset
             });
-            Logger.Debug($"Created redirect traffic {redirectTraffic}");
             return redirectTraffic;
         }
 

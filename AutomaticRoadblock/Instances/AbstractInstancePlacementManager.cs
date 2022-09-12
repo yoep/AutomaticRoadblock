@@ -8,6 +8,7 @@ using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
+using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Instances
@@ -94,7 +95,8 @@ namespace AutomaticRoadblocks.Instances
         /// Create a new placeable instance for the given <see cref="Road"/>.
         /// </summary>
         /// <param name="street">The road to create the instance for.</param>
-        /// <returns>Returns the created instance.</returns>
+        /// <returns>Returns the created instance on success, else null.</returns>
+        [CanBeNull]
         protected abstract T CreateInstance(IVehicleNode street);
 
         /// <summary>
@@ -104,6 +106,10 @@ namespace AutomaticRoadblocks.Instances
         protected void DoInternalPreviewCreation(bool force)
         {
             var road = CalculateNewLocationForInstance();
+
+            // ignore intersections and wait for the player to move
+            if (road.GetType() == typeof(Intersection))
+                return;
 
             if (IsHologramPreviewEnabled)
             {
@@ -158,7 +164,7 @@ namespace AutomaticRoadblocks.Instances
         {
             var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
 
-            return RoadQuery.FindClosestNode(position, EVehicleNodeType.AllNodes);
+            return RoadQuery.FindClosestNode(position, EVehicleNodeType.AllRoadNoJunctions);
         }
 
         private void DoHologramPreviewCreation(VehicleNodeInfo street, bool force)
@@ -174,6 +180,12 @@ namespace AutomaticRoadblocks.Instances
             {
                 Logger.Trace($"Creating new instance hologram preview at {street}");
                 var instance = CreateInstance(RoadQuery.ToVehicleNode(street));
+                if (instance == null)
+                {
+                    Logger.Warn($"Failed to create placement instance at {street}");
+                    return;
+                }
+
                 Logger.Debug($"Created instance {instance}");
                 instance.CreatePreview();
 
