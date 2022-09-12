@@ -98,6 +98,24 @@ namespace AutomaticRoadblocks.Roadblock
         protected abstract IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights);
 
         /// <inheritdoc />
+        protected override void InitializeScenery()
+        {
+            var direction = MathHelper.ConvertHeadingToDirection(MathHelper.NormalizeHeading(Heading - 180));
+            var conePositions = new List<Vector3>
+            {
+                Position,
+                Road.RightSide,
+                Road.LeftSide
+            };
+            
+            foreach (var position in conePositions)
+            {
+                Instances.Add(new InstanceSlot(EEntityType.Scenery, position + direction * 3.5f, 0f,
+                    (conePosition, _) => BarrierFactory.Create(BarrierType.BigConeStriped, conePosition)));
+            }
+        }
+
+        /// <inheritdoc />
         protected override IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
         {
             Road.Lane spikeStripLane = null;

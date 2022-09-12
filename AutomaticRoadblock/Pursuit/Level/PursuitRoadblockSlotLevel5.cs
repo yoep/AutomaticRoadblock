@@ -63,8 +63,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             return Random.Next(4) switch
             {
-                0 => VehicleType.Swat,
-                _ => VehicleType.Fbi,
+                0 => VehicleType.NooseTeam,
+                _ => VehicleType.SwatTeam,
             };
         }
     }

@@ -33,3 +33,19 @@ Plugins can use the [Functions](AutomaticRoadblock/Api/Functions.cs) for availab
 - Rage Native UI
 - LSPDFR SDK 4.9+
 - Make
+
+### Getting started
+
+To get started using this project, do the following steps.
+
+1. Download all nuget packages through the `restore` target
+
+```bash
+make restore
+```
+
+2. Try to compile the project
+
+```bash
+make build
+```

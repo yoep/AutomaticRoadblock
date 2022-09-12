@@ -7,10 +7,16 @@ bump-dependencies: # Install required dependencies
 bump-%: bump-dependencies # Bump the (major, minor, patch) version of the application
 	@bumpversion $*
 
+restore: # Restore the nuget packages
+	@nuget restore AutomaticRoadblock.sln
+
 clean:	# Clean the build directory of the application
 	@dotnet clean
 
-build: # Build the debug version of the application
+test: clean
+	@dotnet test AutomaticRoadblocksTests\AutomaticRoadblocksTests.csproj --configuration Debug /p:Platform=x64 --no-restore
+
+build: clean # Build the debug version of the application
 	@dotnet build --configuration Debug /p:Platform=x64 --no-restore
 
 build-release: # Build the release version of the application

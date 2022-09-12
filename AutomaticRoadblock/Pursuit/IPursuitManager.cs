@@ -1,3 +1,4 @@
+using AutomaticRoadblocks.Roadblock;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit
@@ -67,16 +68,16 @@ namespace AutomaticRoadblocks.Pursuit
         /// </summary>
         /// <param name="userRequested">Indicates if the roadblock is requested by the user.</param>
         /// <param name="force">Force the spawning of a roadblock, this will disable the verification of conditions which are applied before a roadblock can be dispatched.</param>
-        /// <param name="atCurrentLocation">Indicates if the roadblock location should be calculated or the current location of the target should be used.</param>
+        /// <param name="roadblockDistance">The placement distance if the roadblock.</param>
         /// <returns>Returns true if a roadblock will be dispatched, else false.</returns>
         /// <remarks>Execute this method on a separate fiber.</remarks>
-        bool DispatchNow(bool userRequested = false, bool force = false, bool atCurrentLocation = false);
+        bool DispatchNow(bool userRequested = false, bool force = false, ERoadblockDistance roadblockDistance = ERoadblockDistance.Default);
 
         /// <summary>
         /// Dispatch a preview of a possible roadblock.
         /// This preview doesn't require an active pursuit, but required that the player has at least a vehicle to determine the roadblock location.
         /// </summary>
         /// <remarks>Execute this method on a separate fiber.</remarks>
-        void DispatchPreview(bool currentLocation);
+        void DispatchPreview(ERoadblockDistance roadblockDistance);
     }
 }

@@ -17,14 +17,14 @@ namespace AutomaticRoadblocks.Street
         #region Methods
 
         /// <summary>
-        /// Get the closest road near the given position.
+        /// Find the closest vehicle node to the given position.
         /// </summary>
         /// <param name="position">Set the position to use as reference.</param>
         /// <param name="nodeType">Set the road type.</param>
-        /// <returns>Returns the position of the closest road.</returns>
-        public static IVehicleNode FindClosestRoad(Vector3 position, EVehicleNodeType nodeType)
+        /// <returns></returns>
+        public static VehicleNodeInfo FindClosestNode(Vector3 position, EVehicleNodeType nodeType)
         {
-            VehicleNodeInfo closestRoad = null;
+            VehicleNodeInfo closestVehicleNode = null;
             var closestRoadDistance = 99999f;
 
             foreach (var road in StreetHelper.FindNearbyVehicleNodes(position, nodeType))
@@ -34,11 +34,22 @@ namespace AutomaticRoadblocks.Street
                 if (roadDistanceToPosition > closestRoadDistance)
                     continue;
 
-                closestRoad = road;
+                closestVehicleNode = road;
                 closestRoadDistance = roadDistanceToPosition;
             }
 
-            return DiscoverRoadForVehicleNode(closestRoad);
+            return closestVehicleNode;
+        }
+
+        /// <summary>
+        /// Get the closest road near the given position.
+        /// </summary>
+        /// <param name="position">Set the position to use as reference.</param>
+        /// <param name="nodeType">Set the road type.</param>
+        /// <returns>Returns the position of the closest road.</returns>
+        public static IVehicleNode FindClosestRoad(Vector3 position, EVehicleNodeType nodeType)
+        {
+            return ToVehicleNode(FindClosestNode(position, nodeType));
         }
 
         /// <summary>
@@ -54,7 +65,7 @@ namespace AutomaticRoadblocks.Street
         {
             FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags, out var lastFoundNode);
             var startedAt = DateTime.Now.Ticks;
-            var road = DiscoverRoadForVehicleNode(lastFoundNode);
+            var road = ToVehicleNode(lastFoundNode);
             var calculationTime = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
             Logger.Debug($"Converted the vehicle node into a road in {calculationTime} millis");
             return road;
@@ -78,7 +89,7 @@ namespace AutomaticRoadblocks.Street
 
             var startedAt = DateTime.Now.Ticks;
             var roads = nodeInfos
-                .Select(DiscoverRoadForVehicleNode)
+                .Select(ToVehicleNode)
                 .ToList();
             var calculationTime = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
             Logger.Debug($"Converted a total of {nodeInfos.Count} nodes to roads in {calculationTime} millis");
@@ -99,7 +110,7 @@ namespace AutomaticRoadblocks.Street
             var nodes = FindNearbyVehicleNodes(position, nodeType, radius);
 
             return nodes
-                .Select(DiscoverRoadForVehicleNode)
+                .Select(ToVehicleNode)
                 .ToList();
         }
 
@@ -146,6 +157,18 @@ namespace AutomaticRoadblocks.Street
         {
             var nodeId = GetClosestNodeId(position);
             return IsSlowRoad(nodeId);
+        }
+
+        /// <summary>
+        /// Convert the given node info into actual road information.
+        /// </summary>
+        /// <param name="nodeInfo">The vehicle node info to convert.</param>
+        /// <returns>Returns the discovered road info for the given node.</returns>
+        public static IVehicleNode ToVehicleNode(VehicleNodeInfo nodeInfo)
+        {
+            return nodeInfo.Flags.HasFlag(ENodeFlag.IsJunction)
+                ? IntersectionFactory.Create(nodeInfo)
+                : RoadFactory.Create(nodeInfo);
         }
 
         #endregion
@@ -255,13 +278,6 @@ namespace AutomaticRoadblocks.Street
                 $"Traversed a total of {position.DistanceTo(lastFoundNodeInfo.Position)} distance with expectation {expectedDistance} within {calculationTime} millis\n" +
                 $"origin: {position}, destination: {lastFoundNodeInfo.Position}");
             return nodeInfos;
-        }
-
-        private static IVehicleNode DiscoverRoadForVehicleNode(VehicleNodeInfo nodeInfo)
-        {
-            return nodeInfo.Flags.HasFlag(ENodeFlag.IsJunction)
-                ? IntersectionFactory.Create(nodeInfo)
-                : RoadFactory.Create(nodeInfo);
         }
 
         private static IEnumerable<VehicleNodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType, float radius,

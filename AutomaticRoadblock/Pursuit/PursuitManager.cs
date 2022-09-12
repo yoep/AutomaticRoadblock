@@ -164,22 +164,22 @@ namespace AutomaticRoadblocks.Pursuit
         }
 
         /// <inheritdoc />
-        public bool DispatchNow(bool userRequested = false, bool force = false, bool atCurrentLocation = false)
+        public bool DispatchNow(bool userRequested = false, bool force = false, ERoadblockDistance roadblockDistance = ERoadblockDistance.Default)
         {
             if (!IsPursuitActive)
             {
-                return DispatchForNonActivePursuit(userRequested, force, atCurrentLocation);
+                return DispatchForNonActivePursuit(userRequested, force, roadblockDistance);
             }
 
             var vehicle = GetSuspectVehicle();
 
             // try to dispatch a new roadblock for a chased vehicle
             // if successful, store the dispatch time
-            return vehicle != null && DoDispatch(vehicle, userRequested, force, false);
+            return vehicle != null && DoDispatch(vehicle, userRequested, force, roadblockDistance);
         }
 
         /// <inheritdoc />
-        public void DispatchPreview(bool currentLocation)
+        public void DispatchPreview(ERoadblockDistance roadblockDistance)
         {
             var vehicle = GetSuspectVehicle() ?? _game.PlayerVehicle;
 
@@ -194,7 +194,7 @@ namespace AutomaticRoadblocks.Pursuit
             _roadblockDispatcher.DispatchPreview(ToRoadblockLevel(PursuitLevel), vehicle, new DispatchOptions
             {
                 EnableSpikeStrips = EnableSpikeStrips,
-                AtCurrentLocation = currentLocation
+                RoadblockDistance = roadblockDistance
             });
         }
 
@@ -395,17 +395,17 @@ namespace AutomaticRoadblocks.Pursuit
                    HasEnoughTimePassedAfterLastDeployment();
         }
 
-        private bool DoDispatch(Vehicle vehicle, bool userRequested, bool force, bool atCurrentLocation)
+        private bool DoDispatch(Vehicle vehicle, bool userRequested, bool force, ERoadblockDistance roadblockDistance)
         {
             _logger.Debug(
                 $"Dispatching roadblock for pursuit with {nameof(PursuitLevel)}: {PursuitLevel}, {nameof(userRequested)}: {userRequested}, " +
-                $"{nameof(force)}: {force}, {nameof(atCurrentLocation)}: {atCurrentLocation}");
+                $"{nameof(force)}: {force}, {nameof(roadblockDistance)}: {roadblockDistance}");
             var roadblock = _roadblockDispatcher.Dispatch(ToRoadblockLevel(PursuitLevel), vehicle, new DispatchOptions
             {
                 EnableSpikeStrips = EnableSpikeStrips,
                 IsUserRequested = userRequested,
                 Force = force,
-                AtCurrentLocation = atCurrentLocation
+                RoadblockDistance = roadblockDistance
             });
 
             if (roadblock == null)
@@ -426,10 +426,10 @@ namespace AutomaticRoadblocks.Pursuit
                 DispatchNow();
         }
 
-        private bool DispatchForNonActivePursuit(bool userRequest, bool force, bool atCurrentLocation)
+        private bool DispatchForNonActivePursuit(bool userRequest, bool force, ERoadblockDistance roadblockDistance)
         {
             if (!userRequest && force)
-                return DoDispatch(_game.PlayerVehicle, false, true, atCurrentLocation);
+                return DoDispatch(_game.PlayerVehicle, false, true, roadblockDistance);
 
             _logger.Warn("Unable to dispatch roadblock, no active pursuit ongoing");
             return false;

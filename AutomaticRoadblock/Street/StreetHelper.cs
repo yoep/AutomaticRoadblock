@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.Street
         internal static bool LastPointOnRoadUsingRaytracing(Vector3 position, float heading, out Vector3 lastPointOnRoad)
         {
             const float stopAtMinimumInterval = 0.2f;
-            const float maxLaneWidth = 25f;
+            const float maxRoadWidth = 35f;
             var intervalCheck = 2f;
             var direction = MathHelper.ConvertHeadingToDirection(heading);
             var roadMaterial = 0U;
@@ -43,7 +43,7 @@ namespace AutomaticRoadblocks.Street
 
                 // verify if we're not exceeding the maximum
                 // as this indicates that the raytracing isn't working as it supposed to
-                if (rayTracingDistance > maxLaneWidth)
+                if (rayTracingDistance > maxRoadWidth)
                 {
                     Logger.Warn(
                         $"Failed to calculate the last point on road using raytracing for position: {position}, heading: {heading} (tracing distance: {rayTracingDistance})");

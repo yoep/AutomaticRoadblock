@@ -98,7 +98,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             Assert.NotNull(level, "level cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
             _logger.Debug($"Dispatching new roadblock preview with options: {options}");
-            var roads = DetermineRoadblockLocation(level, vehicle, options.AtCurrentLocation);
+            var roads = DetermineRoadblockLocation(level, vehicle, options.RoadblockDistance);
             _logger.Trace($"Dispatching roadblock on {roads.Last()}");
 
             _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(roads.Last().Position)]);
@@ -197,7 +197,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             // calculate the roadblock location
             _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
-            var discoveredVehicleNodes = DetermineRoadblockLocation(level, vehicle, options.AtCurrentLocation);
+            var discoveredVehicleNodes = DetermineRoadblockLocation(level, vehicle, options.RoadblockDistance);
             var primaryRoadblockNode = discoveredVehicleNodes.Last();
 
             // verify if another roadblock is already present nearby
@@ -301,14 +301,14 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return isThereANearbyRoadblock;
         }
 
-        private ICollection<IVehicleNode> DetermineRoadblockLocation(ERoadblockLevel level, Vehicle vehicle, bool atCurrentLocation)
+        private ICollection<IVehicleNode> DetermineRoadblockLocation(ERoadblockLevel level, Vehicle vehicle, ERoadblockDistance roadblockDistance)
         {
-            var roadblockDistance = CalculateRoadblockDistance(vehicle, atCurrentLocation);
+            var distanceToUse = CalculateRoadblockDistance(vehicle, roadblockDistance);
             var roadType = DetermineAllowedRoadTypes(vehicle, level);
 
             _logger.Trace(
-                $"Determining roadblock location for Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(roadblockDistance)}: {roadblockDistance}, {nameof(roadType)}: {roadType}");
-            return RoadQuery.FindRoadsTraversing(vehicle.Position, vehicle.Heading, roadblockDistance, roadType, DetermineBlacklistedFlagsForType(roadType))
+                $"Determining roadblock location for Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(distanceToUse)}: {distanceToUse}, {nameof(roadType)}: {roadType}");
+            return RoadQuery.FindRoadsTraversing(vehicle.Position, vehicle.Heading, distanceToUse, roadType, DetermineBlacklistedFlagsForType(roadType))
                 .ToList();
         }
 
@@ -454,9 +454,18 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                    || street.Node.Flags.HasFlag(ENodeFlag.IsOffRoad);
         }
 
-        private static float CalculateRoadblockDistance(Vehicle vehicle, bool atCurrentLocation)
+        private static float CalculateRoadblockDistance(Vehicle vehicle, ERoadblockDistance roadblockDistance)
         {
-            return atCurrentLocation ? 2.5f : DetermineRoadblockDistanceFor(vehicle);
+            return roadblockDistance switch
+            {
+                ERoadblockDistance.CurrentLocation => 5f,
+                ERoadblockDistance.Closely => 50f,
+                ERoadblockDistance.Default => DetermineRoadblockDistanceFor(vehicle),
+                ERoadblockDistance.Far => 250f,
+                ERoadblockDistance.VeryFar => 500f,
+                ERoadblockDistance.ExtremelyFar => 1000f,
+                _ => throw new ArgumentOutOfRangeException(nameof(roadblockDistance), roadblockDistance, "roadblock distance is not supported")
+            };
         }
 
         private static float DetermineRoadblockDistanceFor(Vehicle vehicle)

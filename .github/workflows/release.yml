@@ -16,20 +16,19 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: dotnet restore
       - uses: nuget/setup-nuget@v1
         with:
           nuget-api-key: ${{ secrets.NuGetAPIKey }}
           nuget-version: latest
-      - uses: actions/cache@v1
-        id: cache
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v2
         with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-      - name: NuGet Restore
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: nuget restore AutomaticRoadblock.sln
+          dotnet-version: |
+            5.0.x
+      - name: Install dependencies
+        run: make restore
+      - name: Test
+        run: make test
       - name: Build
         run: make ${{ inputs.choice }}
       - name: Archive artifacts

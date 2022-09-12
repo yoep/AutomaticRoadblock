@@ -13,11 +13,11 @@ namespace AutomaticRoadblocks.Vehicles
             // a null model is not allowed as Rage will always try to load in a model
             // so we use a placeholder instead
             { VehicleType.None, _ => ModelUtils.Vehicles.GetStatePoliceVehicle() },
-            { VehicleType.Local, ModelUtils.Vehicles.GetLocalPoliceVehicle },
-            { VehicleType.Transporter, _ => ModelUtils.Vehicles.GetTransporterPoliceVehicle() },
-            { VehicleType.State, _ => ModelUtils.Vehicles.GetStatePoliceVehicle() },
-            { VehicleType.Fbi, _ => ModelUtils.Vehicles.GetFbiPoliceVehicle() },
-            { VehicleType.Swat, _ => ModelUtils.Vehicles.GetSwatPoliceVehicle() },
+            { VehicleType.LocalUnit, ModelUtils.Vehicles.GetLocalPoliceVehicle },
+            { VehicleType.PrisonerTransport, _ => ModelUtils.Vehicles.GetTransporterPoliceVehicle() },
+            { VehicleType.StateUnit, _ => ModelUtils.Vehicles.GetStatePoliceVehicle() },
+            { VehicleType.SwatTeam, _ => ModelUtils.Vehicles.GetFbiPoliceVehicle() },
+            { VehicleType.NooseTeam, _ => ModelUtils.Vehicles.GetSwatPoliceVehicle() },
         };
 
         private static readonly IDictionary<VehicleType, Func<Vector3, float, bool, ARVehicle>> Vehicles =
@@ -27,29 +27,29 @@ namespace AutomaticRoadblocks.Vehicles
                 // so we use a placeholder instead
                 { VehicleType.None, (_, _, _) => null },
                 {
-                    VehicleType.Local,
+                    VehicleType.LocalUnit,
                     (position, heading, recordCollisions) =>
-                        DoInternalVehicleCreation(CreateModel(VehicleType.Local, position), position, heading, recordCollisions)
+                        DoInternalVehicleCreation(CreateModel(VehicleType.LocalUnit, position), position, heading, recordCollisions)
                 },
                 {
-                    VehicleType.Transporter,
+                    VehicleType.PrisonerTransport,
                     (position, heading, recordCollisions) =>
-                        DoInternalVehicleCreation(CreateModel(VehicleType.Transporter, position), position, heading, recordCollisions)
+                        DoInternalVehicleCreation(CreateModel(VehicleType.PrisonerTransport, position), position, heading, recordCollisions)
                 },
                 {
-                    VehicleType.State,
+                    VehicleType.StateUnit,
                     (position, heading, recordCollisions) =>
-                        DoInternalVehicleCreation(CreateModel(VehicleType.State, position), position, heading, recordCollisions)
+                        DoInternalVehicleCreation(CreateModel(VehicleType.StateUnit, position), position, heading, recordCollisions)
                 },
                 {
-                    VehicleType.Fbi,
+                    VehicleType.SwatTeam,
                     (position, heading, recordCollisions) =>
-                        DoInternalVehicleCreation(CreateModel(VehicleType.Fbi, position), position, heading, recordCollisions)
+                        DoInternalVehicleCreation(CreateModel(VehicleType.SwatTeam, position), position, heading, recordCollisions)
                 },
                 {
-                    VehicleType.Swat,
+                    VehicleType.NooseTeam,
                     (position, heading, recordCollisions) =>
-                        DoInternalVehicleCreation(CreateModel(VehicleType.Swat, position), position, heading, recordCollisions)
+                        DoInternalVehicleCreation(CreateModel(VehicleType.NooseTeam, position), position, heading, recordCollisions)
                 },
             };
 

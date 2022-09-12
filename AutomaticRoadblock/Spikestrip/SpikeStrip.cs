@@ -208,6 +208,7 @@ namespace AutomaticRoadblocks.SpikeStrip
 
             Logger.Trace($"Spawning spike strip {this}");
             GameInstance = PropUtils.CreateSpikeStrip(Position, Heading);
+            GameInstance.IsPersistent = true;
             DoUndeployAnimation();
             UpdateState(ESpikeStripState.Undeployed);
         }

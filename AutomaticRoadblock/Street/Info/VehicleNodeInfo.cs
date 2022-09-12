@@ -5,7 +5,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.Street.Info
 {
-    internal class VehicleNodeInfo : IPreviewSupport
+    public class VehicleNodeInfo : IPreviewSupport
     {
         internal VehicleNodeInfo(Vector3 position, float heading)
         {
