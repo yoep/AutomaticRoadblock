@@ -17,6 +17,14 @@ namespace AutomaticRoadblocks.Xml.Parser
 
             return context.CurrentNode.SelectSingleNode(GetXmlLookupName(member));
         }
+        
+        public XPathNavigator FetchNodeForName(XmlContext context, string name)
+        {
+            Assert.NotNull(context, "context cannot be null");
+            Assert.NotNull(name, "name cannot be null");
+
+            return context.CurrentNode.SelectSingleNode(name);
+        }
 
         public XPathNodeIterator FetchNodesForMember(XmlContext context, MemberInfo member)
         {
@@ -34,8 +42,9 @@ namespace AutomaticRoadblocks.Xml.Parser
             var filteredChildNodes = currentNode.Name.Equals(lookupName)
                 ? currentNode.SelectChildren(XPathNodeType.Element)
                 : currentNode.Select(lookupName);
-
-            return filteredChildNodes.Count > 1 ? filteredChildNodes : currentNode.SelectSingleNode(lookupName)?.SelectChildren(XPathNodeType.Element);
+            var nestedChildNodes = currentNode.SelectSingleNode(lookupName)?.SelectChildren(XPathNodeType.Element);
+            
+            return filteredChildNodes.Count > 1 || nestedChildNodes?.Count == 0 ? filteredChildNodes : nestedChildNodes;
         }
 
         public string FetchAttributeValue(XmlContext context, MemberInfo member)

@@ -27,7 +27,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             var clazz = unwrapProperty.PropertyType;
             var nodes = parser.FetchNodesForMember(deserializationContext, unwrapProperty, GetLookupName(deserializationContext.DeserializationType));
 
-            if (nodes != null)
+            if (nodes is { Count: > 1 })
             {
                 ProcessElements(parser, deserializationContext, nodes, clazz, unwrapProperty, instance);
             }
@@ -58,10 +58,20 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
         private static void ProcessElement(XmlParser parser, XmlDeserializationContext deserializationContext, PropertyInfo unwrapProperty, object instance)
         {
+            var value = GetValueForOptionalElementName(parser, deserializationContext) ?? deserializationContext.CurrentNode.Value;
+
             if (IsRequiredMember(unwrapProperty) && !HasValue(deserializationContext))
                 throw new XmlException("Missing xml node for " + parser.GetXmlLookupName(unwrapProperty));
-            
-            unwrapProperty.SetValue(instance, deserializationContext.CurrentNode.Value);
+
+            unwrapProperty.SetValue(instance, value);
+        }
+
+        private static string GetValueForOptionalElementName(XmlParser parser, XmlDeserializationContext deserializationContext)
+        {
+            var lookupName = GetLookupNameFromUnwrapAttribute(deserializationContext.DeserializationType);
+            return string.IsNullOrWhiteSpace(lookupName) 
+                ? null 
+                : parser.FetchNodeForName(deserializationContext, lookupName)?.Value;
         }
 
         private static string GetLookupName(Type clazz)
@@ -70,7 +80,17 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
             return xmlRootAttribute != null
                 ? xmlRootAttribute.ElementName
-                : clazz.Name;
+                : GetLookupNameFromUnwrapAttribute(clazz, clazz.Name);
+        }
+
+        private static string GetLookupNameFromUnwrapAttribute(Type clazz, string defaultName = null)
+        {
+            var unwrapProperty = clazz.GetProperties().First(IsUnwrapProperty);
+            var unwrapAttribute = unwrapProperty.GetCustomAttribute<XmlUnwrapContentsAttribute>();
+
+            return string.IsNullOrWhiteSpace(unwrapAttribute.OptionalElementName)
+                ? defaultName
+                : unwrapAttribute.OptionalElementName;
         }
 
         private static bool ContainsUnwrapAttribute(Type clazz)
@@ -80,7 +100,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
         private static bool IsUnwrapProperty(MemberInfo x)
         {
-            return x.GetCustomAttribute<XmlUnwrapContents>() != null;
+            return x.GetCustomAttribute<XmlUnwrapContentsAttribute>() != null;
         }
 
         private static bool HasValue(XmlContext xmlDeserializationContext)

@@ -9,7 +9,7 @@ namespace AutomaticRoadblocks.Xml.Attributes
     /// All other properties will also be ignored.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class XmlUnwrapContents : Attribute
+    public class XmlUnwrapContentsAttribute : Attribute
     {
         /// <summary>
         /// Use the child element name for the value if present, else unwrap the contents from the node into the field.

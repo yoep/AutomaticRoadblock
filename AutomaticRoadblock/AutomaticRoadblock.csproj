@@ -254,7 +254,7 @@
         <Compile Include="Vehicles\EVehicleWheel.cs" />
         <Compile Include="Vehicles\VehicleFactory.cs" />
         <Compile Include="Vehicles\VehicleType.cs" />
-        <Compile Include="Xml\Attributes\XmlUnwrapContents.cs" />
+        <Compile Include="Xml\Attributes\XmlUnwrapContentsAttribute.cs" />
         <Compile Include="Xml\Context\XmlContext.cs" />
         <Compile Include="Xml\Context\XmlDeserializationContext.cs" />
         <Compile Include="Xml\DeserializationException.cs" />

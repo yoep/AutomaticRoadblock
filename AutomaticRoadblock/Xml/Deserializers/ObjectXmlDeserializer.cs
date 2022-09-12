@@ -121,7 +121,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
         private static bool IsUnwrapAttribute(MemberInfo member)
         {
-            return member.GetCustomAttribute<XmlUnwrapContents>() != null;
+            return member.GetCustomAttribute<XmlUnwrapContentsAttribute>() != null;
         }
 
         private static bool IsNativeType(Type type)
