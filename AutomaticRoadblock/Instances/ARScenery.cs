@@ -13,7 +13,9 @@ namespace AutomaticRoadblocks.Instances
     {
         public ARScenery(Entity gameInstance)
         {
+            Assert.NotNull(gameInstance, "gameInstance cannot be null");
             GameInstance = gameInstance;
+            GameInstance.IsPersistent = true;
         }
         
         #region Properties
