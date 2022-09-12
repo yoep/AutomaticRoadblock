@@ -52,9 +52,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             return Random.Next(5) switch
             {
-                0 => VehicleType.Transporter,
-                1 => VehicleType.State,
-                _ => VehicleType.Local
+                0 => VehicleType.PrisonerTransport,
+                1 => VehicleType.StateUnit,
+                _ => VehicleType.LocalUnit
             };
         }
     }

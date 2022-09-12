@@ -5,20 +5,20 @@ namespace AutomaticRoadblocks.Vehicles
 {
     public class VehicleType
     {
-        public static readonly VehicleType Local = new(LocalizationKey.VehicleTypeLocal);
-        public static readonly VehicleType State = new(LocalizationKey.VehicleTypeState);
-        public static readonly VehicleType Fbi = new(LocalizationKey.VehicleTypeFbi);
-        public static readonly VehicleType Swat = new(LocalizationKey.VehicleTypeSwat);
-        public static readonly VehicleType Transporter = new(LocalizationKey.VehicleTypeTransporter);
+        public static readonly VehicleType LocalUnit = new(LocalizationKey.VehicleTypeLocal);
+        public static readonly VehicleType StateUnit = new(LocalizationKey.VehicleTypeState);
+        public static readonly VehicleType SwatTeam = new(LocalizationKey.VehicleTypeFbi);
+        public static readonly VehicleType NooseTeam = new(LocalizationKey.VehicleTypeSwat);
+        public static readonly VehicleType PrisonerTransport = new(LocalizationKey.VehicleTypeTransporter);
         public static readonly VehicleType None = new(LocalizationKey.None);
 
         public static readonly IEnumerable<VehicleType> Values = new[]
         {
-            Local,
-            State,
-            Fbi,
-            Swat,
-            Transporter,
+            LocalUnit,
+            StateUnit,
+            SwatTeam,
+            NooseTeam,
+            PrisonerTransport,
             None
         };
 

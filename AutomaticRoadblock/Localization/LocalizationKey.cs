@@ -101,8 +101,8 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly LocalizationKey VehicleTypeLocal = new(nameof(VehicleTypeLocal), "Local");
         public static readonly LocalizationKey VehicleTypeState = new(nameof(VehicleTypeState), "State");
-        public static readonly LocalizationKey VehicleTypeFbi = new(nameof(VehicleTypeFbi), "FBI");
-        public static readonly LocalizationKey VehicleTypeSwat = new(nameof(VehicleTypeSwat), "Swat");
+        public static readonly LocalizationKey VehicleTypeFbi = new(nameof(VehicleTypeFbi), "Swat");
+        public static readonly LocalizationKey VehicleTypeSwat = new(nameof(VehicleTypeSwat), "Noose");
         public static readonly LocalizationKey VehicleTypeTransporter = new(nameof(VehicleTypeTransporter), "Transporter");
 
         #endregion

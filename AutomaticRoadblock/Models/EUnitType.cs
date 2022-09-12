@@ -5,6 +5,7 @@ namespace AutomaticRoadblocks.Models
         LocalPatrol,
         StatePatrol,
         LocalSwat,
-        NooseSwat
+        NooseSwat,
+        PrisonerTransport
     }
 }

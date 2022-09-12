@@ -15,17 +15,19 @@ namespace AutomaticRoadblocks.Models.Lspdfr
             _modelData = modelData;
         }
 
-        public Model LocalCopPed(Vector3 position, EUnitType type)
+        /// <inheritdoc />
+        public Model CopPed(Vector3 position, EUnitType type)
         {
-            var modelInfo = _modelData.Ped(EUnitType.LocalPatrol, Functions.GetZoneAtPosition(position).County);
+            var modelInfo = _modelData.Ped(type, Functions.GetZoneAtPosition(position).County);
             
-            return null;
+            return new Model(modelInfo.Name);
         }
 
-        public Model LocalCopVehicle(Vector3 position, EUnitType type)
+        /// <inheritdoc />
+        public Model CopVehicle(Vector3 position, EUnitType type)
         {
-            var zone = Functions.GetZoneAtPosition(position);
-            return null;
+            var modelInfo = _modelData.Vehicle(type, Functions.GetZoneAtPosition(position).County);
+            return new Model(modelInfo.Name);
         }
     }
 }
