@@ -14,7 +14,7 @@ clean:	# Clean the build directory of the application
 	@dotnet clean
 
 test: clean
-	@dotnet test AutomaticRoadblocksTests\AutomaticRoadblocksTests.csproj --configuration Debug /p:Platform=x64 --no-restore
+	@dotnet test --configuration Debug /p:Platform=x64 --no-restore
 
 build: clean # Build the debug version of the application
 	@dotnet build --configuration Debug /p:Platform=x64 --no-restore
@@ -24,6 +24,8 @@ build-release: # Build the release version of the application
 	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.dll" "Build\Grand Theft Auto V\plugins\LSPDFR\" /f /y
 	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.ini" "Build\Grand Theft Auto V\plugins\LSPDFR\" /f /y
 	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.pdb" "Build\Grand Theft Auto V\plugins\LSPDFR\" /f /y
+	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.xml" "Build\API Documentation\" /f /y
+	@xcopy "AutomaticRoadblock\Api\Functions.cs" "Build\API Documentation\" /f /y
 
 release: bump-minor build-release # Build the release version of the application
 	
