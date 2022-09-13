@@ -1,0 +1,70 @@
+<Barriers>
+    <Barrier>
+        <Name>Small cone</Name> <!-- The (display) name of the barrier -->
+        <ScriptName>small_cone</ScriptName> <!-- The name to use as reference in other data files to this barrier -->
+        <Model>prop_mp_cone_03</Model> <!-- The game model name -->
+        <Spacing>0.4</Spacing> <!-- The spacing between each barrier of this type -->
+        <Flags>
+            <Flag>ManualPlacement</Flag> <!-- Make it usable within the manual placement -->
+            <Flag>RedirectTraffic</Flag>  <!-- Make it usable within the traffic redirection -->
+        </Flags>
+    </Barrier>
+    <Barrier>
+        <Name>Small cone with stripes</Name>
+        <ScriptName>small_cone_stripes</ScriptName>
+        <Model>prop_mp_cone_02</Model>
+        <Spacing>0.4</Spacing>
+        <Flags>
+            <Flag>ManualPlacement</Flag>
+            <Flag>RedirectTraffic</Flag>
+        </Flags>
+    </Barrier>
+    <Barrier>
+        <Name>Big cone</Name>
+        <ScriptName>big_cone</ScriptName>
+        <Model>prop_roadcone01c</Model>
+        <Spacing>0.5</Spacing>
+        <Flags>
+            <Flag>ManualPlacement</Flag>
+            <Flag>RedirectTraffic</Flag>
+        </Flags>
+    </Barrier>
+    <Barrier>
+        <Name>Big cone with stripes</Name>
+        <ScriptName>big_cone_stripes</ScriptName>
+        <Model>prop_mp_cone_01</Model>
+        <Spacing>0.5</Spacing>
+        <Flags>
+            <Flag>ManualPlacement</Flag>
+            <Flag>RedirectTraffic</Flag>
+        </Flags>
+    </Barrier>
+    <Barrier>
+        <Name>Police do not cross</Name>
+        <ScriptName>police_do_not_cross</ScriptName>
+        <Model>prop_barrier_work05</Model>
+        <Spacing>0.2</Spacing>
+        <Flags>
+            <Flag>ManualPlacement</Flag>
+        </Flags>
+    </Barrier>
+    <Barrier>
+        <Name>Work barrier large</Name>
+        <ScriptName>work_barrier_large</ScriptName>
+        <Model>prop_barrier_work06a</Model>
+        <Spacing>0.2</Spacing>
+        <Flags>
+            <Flag>ManualPlacement</Flag>
+        </Flags>
+    </Barrier>
+    <Barrier>
+        <Name>Work barrier small</Name>
+        <ScriptName>work_barrier_small</ScriptName>
+        <Model>prop_barrier_work01a</Model>
+        <Spacing>0.3</Spacing>
+        <Flags>
+            <Flag>ManualPlacement</Flag>
+            <Flag>RedirectTraffic</Flag>
+        </Flags>
+    </Barrier>
+</Barriers>

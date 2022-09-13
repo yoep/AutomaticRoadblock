@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.Xml;
 using LSPD_First_Response.Engine.Scripting;
 
 namespace AutomaticRoadblocks.Models.Lspdfr
 {
-    public class LspdfrModelData : IModelData
+    public class LspdfrModelData : AbstractModelDataLoader, ILspdfrModelData
     {
         private const string LspdfrDataDirectory = @"./lspdfr/data/";
         private const string AgencyFilename = "agency.xml";
@@ -17,13 +16,10 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         private const string InventoryFilename = "inventory.xml";
 
         private static readonly Random Random = new();
-        
-        private readonly ILogger _logger;
-        private readonly ObjectMapper _objectMapper = ObjectMapperFactory.CreateInstance();
 
         public LspdfrModelData(ILogger logger)
+            : base(logger, LspdfrDataDirectory)
         {
-            _logger = logger;
         }
 
         #region Properties
@@ -42,7 +38,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         /// The backup units for each region.
         /// </summary>
         public BackupUnits BackupUnits { get; private set; }
-        
+
         /// <summary>
         /// The inventories with their items.
         /// </summary>
@@ -65,7 +61,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         #region Method
 
         /// <inheritdoc />
-        public void Reload()
+        public override void Reload()
         {
             Agencies = TryToLoadDatafile<Agencies>(AgencyFilename);
             Outfits = TryToLoadDatafile<Outfits>(OutfitsFilename);
@@ -84,25 +80,11 @@ namespace AutomaticRoadblocks.Models.Lspdfr
             Reload();
         }
 
-        private T TryToLoadDatafile<T>(string filename, T defaultValue = null) where T : class
-        {
-            try
-            {
-                return _objectMapper.ReadValue<T>(LspdfrDataDirectory + filename);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Failed to load {filename} data, {ex.Message}", ex);
-            }
-
-            return defaultValue;
-        }
-
         private PedModelInfo RetrievePedModelInfoFor(EUnitType unitType, EWorldZoneCounty zone)
         {
             var agency = RetrieveAgencyFor(unitType, zone);
             var ped = SelectPedBasedOnChance(agency.Loadout.Peds);
-            
+
             return new PedModelInfo
             {
                 Name = ped.Name
@@ -117,7 +99,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
             // verify if any vehicle is configured for the criteria
             if (vehicles?.Any() != true)
             {
-                _logger.Warn($"No vehicle model available for agency {agency}");
+                Logger.Warn($"No vehicle model available for agency {agency}");
                 throw new NoModelAvailableException(unitType, zone);
             }
 

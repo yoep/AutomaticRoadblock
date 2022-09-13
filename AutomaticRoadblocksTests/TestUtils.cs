@@ -1,5 +1,6 @@
 using System;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Models.Lspdfr;
 using Xunit.Abstractions;
@@ -13,7 +14,8 @@ namespace AutomaticRoadblocks
             IoC.Instance
                 .UnregisterAll()
                 .RegisterSingleton<ILogger>(typeof(ConsoleLogger))
-                .RegisterSingleton<IModelData>(typeof(LspdfrModelData));
+                .RegisterSingleton<ILspdfrModelData>(typeof(LspdfrModelData))
+                .RegisterSingleton<IBarrierModelData>(typeof(BarrierModelData));
         }
 
         public static void SetLogger(ITestOutputHelper testOutputHelper)

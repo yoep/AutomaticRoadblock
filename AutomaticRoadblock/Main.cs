@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.AbstractionLayer.Implementation;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Debug.Menu;
 using AutomaticRoadblocks.Integrations;
 using AutomaticRoadblocks.Integrations.PoliceSmartRadio;
@@ -87,8 +88,9 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
                 .RegisterSingleton<IPluginIntegrationManager>(typeof(PluginIntegrationManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
-                .RegisterSingleton<IModelData>(typeof(LspdfrModelData))
                 .RegisterSingleton<IModelProvider>(typeof(LspdfrModelProvider))
+                .RegisterSingleton<ILspdfrModelData>(typeof(LspdfrModelData))
+                .RegisterSingleton<IBarrierModelData>(typeof(BarrierModelData))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
                 .RegisterSingleton<IManualPlacement>(typeof(ManualPlacement.ManualPlacement))

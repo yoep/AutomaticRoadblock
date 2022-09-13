@@ -7,9 +7,9 @@ namespace AutomaticRoadblocks.Models.Lspdfr
     internal class LspdfrModelProvider : IModelProvider
     {
         private readonly ILogger _logger;
-        private readonly IModelData _modelData;
+        private readonly ILspdfrModelData _modelData;
 
-        public LspdfrModelProvider(ILogger logger, IModelData modelData)
+        public LspdfrModelProvider(ILogger logger, ILspdfrModelData modelData)
         {
             _logger = logger;
             _modelData = modelData;

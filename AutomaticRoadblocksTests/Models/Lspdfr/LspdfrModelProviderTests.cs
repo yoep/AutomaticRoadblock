@@ -15,30 +15,6 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         }
 
         [Fact]
-        public void TestAgenciesDeserialization()
-        {
-            var provider = (LspdfrModelData)IoC.Instance.GetInstance<IModelData>();
-
-            Xunit.Assert.NotNull(provider.Agencies);
-        }
-
-        [Fact]
-        public void TestOutfitsDeserialization()
-        {
-            var provider = (LspdfrModelData)IoC.Instance.GetInstance<IModelData>();
-
-            Xunit.Assert.NotNull(provider.Outfits);
-        }
-
-        [Fact]
-        public void TestInventoryDeserialization()
-        {
-            var provider = (LspdfrModelData)IoC.Instance.GetInstance<IModelData>();
-
-            Xunit.Assert.NotNull(provider.Inventories);
-        }
-
-        [Fact]
         public void TestAgencyDeserialization()
         {
             var expectedResult = new Agency("Los Santos Police Department", "LSPD", "lspd", "default", "web_lossantospolicedept", "web_lossantospolicedept",
@@ -54,7 +30,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
                     new Ped("mp_f_freemode_01", 25, "lspd_cop.f_base", "patrol"),
                     new Ped("mp_f_freemode_01", 5, "lspd_cop", "patrol_stun"),
                 }, new NumPeds(2, 2)));
-            var provider = (LspdfrModelData)IoC.Instance.GetInstance<IModelData>();
+            var provider = (LspdfrModelData)IoC.Instance.GetInstance<ILspdfrModelData>();
 
             var result = provider.Agencies;
 
@@ -69,7 +45,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
             const string agencyLocalPatrolCity = "lspd";
             const string agencyLocalPatrolCounty = "lssd";
             const string agencyLocalPatrolYankton = "nysp";
-            var provider = (LspdfrModelData)IoC.Instance.GetInstance<IModelData>();
+            var provider = (LspdfrModelData)IoC.Instance.GetInstance<ILspdfrModelData>();
 
             Xunit.Assert.NotNull(provider.BackupUnits);
             Xunit.Assert.NotNull(provider.BackupUnits.LocalPatrol);
@@ -84,7 +60,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         [Fact]
         public void TestRetrievePedModelInfoForLocalPatrolCity()
         {
-            var provider = IoC.Instance.GetInstance<IModelData>();
+            var provider = IoC.Instance.GetInstance<ILspdfrModelData>();
             var expectedModelNames = new List<string>
             {
                 "mp_m_freemode_01",
@@ -100,7 +76,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         [Fact]
         public void TestRetrieveVehicleModelInfoForLocalPatrolCity()
         {
-            var provider = IoC.Instance.GetInstance<IModelData>();
+            var provider = IoC.Instance.GetInstance<ILspdfrModelData>();
             var expectedVehicleNames = new List<string>
             {
                 "police",
@@ -117,7 +93,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         [Fact]
         public void TestInventoryMultipleWeaponsDeserialization()
         {
-            var provider = (LspdfrModelData)IoC.Instance.GetInstance<IModelData>();
+            var provider = (LspdfrModelData)IoC.Instance.GetInstance<ILspdfrModelData>();
             var expectedResult = new Inventory("Patrol", "patrol", new List<InventoryWeapon>
             {
                 new InventoryWeapon("WEAPON_PUMPSHOTGUN", 10),
@@ -135,7 +111,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         [Fact]
         public void TestInventorySingleWeaponDeserialization()
         {
-            var provider = (LspdfrModelData)IoC.Instance.GetInstance<IModelData>();
+            var provider = (LspdfrModelData)IoC.Instance.GetInstance<ILspdfrModelData>();
             var expectedResult = new Inventory("Default", "default", new List<InventoryWeapon>
             {
                 new InventoryWeapon("WEAPON_PISTOL", 100),
@@ -151,7 +127,7 @@ namespace AutomaticRoadblocks.Models.Lspdfr
         [Fact]
         public void TestInventoryWeaponComponentsDeserialization()
         {
-            var provider = (LspdfrModelData)IoC.Instance.GetInstance<IModelData>();
+            var provider = (LspdfrModelData)IoC.Instance.GetInstance<ILspdfrModelData>();
             var expectedResult = new Inventory("SWAT", "swat", new List<InventoryWeapon>
             {
                 new InventoryWeapon("WEAPON_CARBINERIFLE", new List<string>
