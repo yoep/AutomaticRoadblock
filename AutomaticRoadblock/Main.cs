@@ -42,9 +42,18 @@ namespace AutomaticRoadblocks
         {
             InitializeIoC();
         }
+        
+        #region Properties
+
+        private static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
+        
+        #endregion
+        
+        #region Plugin
 
         public override void Initialize()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += LSPDFRResolveEventHandler;
             InitializeSettings();
             InitializeDutyListener();
             InitializeMenuComponents();
@@ -77,6 +86,8 @@ namespace AutomaticRoadblocks
                 game.DisplayPluginNotification("~r~failed to correctly unload the plugin, see logs for more info");
             }
         }
+        
+        #endregion
 
         private static void InitializeIoC()
         {
@@ -190,25 +201,33 @@ namespace AutomaticRoadblocks
         {
             var ioC = IoC.Instance;
             var logger = ioC.GetInstance<ILogger>();
+            var game = ioC.GetInstance<IGame>();
             var pursuitListener = ioC.GetInstance<IPursuitManager>();
             logger.Trace($"On duty state changed to {onDuty}");
 
             if (onDuty)
             {
                 pursuitListener.StartListener();
-
-                var game = ioC.GetInstance<IGame>();
                 ioC.GetInstance<IMenu>().Activate();
+                
                 game.NewSafeFiber(() =>
                 {
+                    logger.Info($"Loaded version {Version}");
+                    
                     GameFiber.Wait(2 * 1000);
-                    game.DisplayPluginNotification($"{Assembly.GetExecutingAssembly().GetName().Version}, by ~b~yoep~s~, has been loaded");
+                    game.DisplayPluginNotification($"{Version}, by ~b~yoep~s~, has been loaded");
                 }, "Main.DisplayPluginNotification");
             }
             else
             {
                 pursuitListener.StopListener();
             }
+        }
+        
+        private static Assembly LSPDFRResolveEventHandler(object sender, ResolveEventArgs args)
+        {
+            return Functions.GetAllUserPlugins()
+                .FirstOrDefault(assembly => args.Name.ToLower().Contains(assembly.GetName().Name.ToLower()));
         }
 
         private static bool IsLSPDFRPluginRunning(string plugin, Version minVersion = null)
@@ -217,7 +236,8 @@ namespace AutomaticRoadblocks
                 .GetAllUserPlugins()
                 .Select(assembly => assembly.GetName())
                 .Where(assemblyName => string.Equals(assemblyName.Name, plugin, StringComparison.CurrentCultureIgnoreCase))
-                .Any(assemblyName => minVersion == null || assemblyName.Version.CompareTo(minVersion) >= 0);
+                .Select(assemblyName => assemblyName.Version)
+                .Any(assemblyVersion => minVersion == null || assemblyVersion.CompareTo(minVersion) >= 0);
         }
 
         [Conditional("DEBUG")]
