@@ -6,6 +6,8 @@ namespace AutomaticRoadblocks.Barriers
 {
     public class BarrierModel : AbstractModel
     {
+        private const string LocalizationKeyPrefix = "BarrierType";
+
         public static readonly BarrierModel None = new()
         {
             Barrier = new Barrier("None", "none", null, 1.0, EBarrierFlags.All),
@@ -70,7 +72,7 @@ namespace AutomaticRoadblocks.Barriers
             return new BarrierModel
             {
                 Barrier = barrier,
-                LocalizationKey = new LocalizationKey(ToCamelCase(barrier.ScriptName), barrier.Name),
+                LocalizationKey = new LocalizationKey(LocalizationKeyPrefix + ToCamelCase(barrier.ScriptName), barrier.Name),
                 Model = model,
                 Width = DimensionOf(model)
             };

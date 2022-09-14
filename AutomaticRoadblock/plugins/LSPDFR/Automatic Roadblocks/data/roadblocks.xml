@@ -14,13 +14,12 @@
     <Roadblock>
         <Level>4</Level>
         <MainBarrier>police_do_not_cross</MainBarrier>
-        <SecondaryBarrier>work_barrier_high</SecondaryBarrier>  <!-- The barrier which is placed behind the roadblock -->
-        <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier> <!-- The barrier to place between the chase vehicle and the roadblock -->
+        <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier>
     </Roadblock>
     <Roadblock>
         <Level>5</Level>
         <MainBarrier>police_do_not_cross</MainBarrier>
-        <SecondaryBarrier>work_barrier_high</SecondaryBarrier>
-        <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier>
+        <SecondaryBarrier>work_barrier_high</SecondaryBarrier> <!-- The barrier which is placed behind the roadblock -->
+        <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier>  <!-- The barrier to place between the chase vehicle and the roadblock -->
     </Roadblock>
 </Roadblocks>

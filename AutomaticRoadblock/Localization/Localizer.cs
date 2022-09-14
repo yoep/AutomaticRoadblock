@@ -89,11 +89,7 @@ namespace AutomaticRoadblocks.Localization
                 // this will not preload dynamic keys from the bariers
                 foreach (var key in LocalizationKey.Values)
                 {
-                    if (AddLocalizationKeyToCacheIfFound(key))
-                    {
-                        _logger.Trace($"Loading localization key {key.Identifier} from Localization ini");
-                    }
-                    else
+                    if (!AddLocalizationKeyToCacheIfFound(key))
                     {
                         missingDataKeys++;
                         _logger.Warn($"Missing localization key {key.Identifier} in Localization ini");
@@ -118,19 +114,16 @@ namespace AutomaticRoadblocks.Localization
             {
                 // verify if the key exists in the cache
                 // if not, try to search it in the localization file and add it
-                if (!_messages.ContainsKey(key))
+                if (!_messages.ContainsKey(key) && !AddLocalizationKeyToCacheIfFound(key))
                 {
-                    if (!AddLocalizationKeyToCacheIfFound(key))
+                    if (string.IsNullOrWhiteSpace(key.DefaultText))
                     {
-                        if (string.IsNullOrWhiteSpace(key.DefaultText))
-                        {
-                            _logger.Error($"Unable to load localized message for {key}, key not found in localization data nor default text provided");
-                            throw new LocalizationNotFound(key);
-                        }
-
-                        textValue = key.DefaultText;
-                        _logger.Warn($"Missing localization message for {key}, using default text ({textValue}) instead");
+                        _logger.Error($"Unable to load localized message for {key.Identifier}, key not found in localization data nor default text provided");
+                        throw new LocalizationNotFound(key);
                     }
+
+                    textValue = key.DefaultText;
+                    _logger.Warn($"Missing localization message for {key.Identifier}, using default text ({textValue}) instead");
                 }
                 else
                 {
@@ -149,6 +142,7 @@ namespace AutomaticRoadblocks.Localization
             lock (_messages)
             {
                 _messages[key] = _localizationFile.ReadString(Section, key.Identifier, key.DefaultText);
+                _logger.Trace($"Added localization key {key.Identifier} from {_localizationFile.FileName}");
             }
 
             return true;
