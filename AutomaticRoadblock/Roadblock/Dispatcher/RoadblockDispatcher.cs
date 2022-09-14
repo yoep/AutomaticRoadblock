@@ -5,7 +5,6 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Pursuit.Factory;
 using AutomaticRoadblocks.Settings;
-using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
@@ -30,7 +29,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly ILocalizer _localizer;
-        private readonly ISpikeStripDispatcher _spikeStripDispatcher;
 
         private readonly List<RoadblockInfo> _roadblocks = new();
         private readonly List<IVehicleNode> _foundRoads = new();
@@ -38,14 +36,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private bool _cleanerRunning;
         private bool _userRequestedRoadblockDispatching;
 
-        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer,
-            ISpikeStripDispatcher spikeStripDispatcher)
+        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
             _localizer = localizer;
-            _spikeStripDispatcher = spikeStripDispatcher;
         }
 
         #region Properties
@@ -255,7 +251,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-            var roadblock = PursuitRoadblockFactory.Create(_spikeStripDispatcher, actualLevelToUse, road, vehicle, flags);
+            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, vehicle, flags);
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
             lock (_roadblocks)

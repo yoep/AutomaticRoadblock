@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <summary>
         /// The barrier type to use within the roadblock.
         /// </summary>
-        BarrierType Barrier { get; set; }
+        BarrierModel Barrier { get; set; }
         
         /// <summary>
         /// The vehicle type to use within the roadblock.

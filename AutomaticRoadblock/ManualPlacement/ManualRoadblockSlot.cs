@@ -9,7 +9,7 @@ namespace AutomaticRoadblocks.ManualPlacement
 {
     public class ManualRoadblockSlot : AbstractRoadblockSlot
     {
-        public ManualRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, LightSourceType lightSourceType, float heading,
+        public ManualRoadblockSlot(Road.Lane lane, BarrierModel barrierType, VehicleType vehicleType, LightSourceType lightSourceType, float heading,
             bool shouldAddLights, bool copsEnabled, float offset)
             : base(lane, barrierType, vehicleType, heading, shouldAddLights, false, offset)
         {

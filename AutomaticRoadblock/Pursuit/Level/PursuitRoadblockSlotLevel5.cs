@@ -11,7 +11,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     public class PursuitRoadblockSlotLevel5 : AbstractPursuitRoadblockSlot
     {
-        internal PursuitRoadblockSlotLevel5(Road.Lane lane, BarrierType barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
+        internal PursuitRoadblockSlotLevel5(Road.Lane lane, BarrierModel barrierType, float heading, Vehicle targetVehicle, bool shouldAddLights)
             : base(lane, barrierType, DetermineVehicleType(), heading, targetVehicle, shouldAddLights)
         {
         }

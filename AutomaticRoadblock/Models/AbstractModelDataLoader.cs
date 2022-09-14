@@ -25,9 +25,12 @@ namespace AutomaticRoadblocks.Models
 
         protected T TryToLoadDatafile<T>(string filename, T defaultValue = null) where T : class
         {
+            var fullFilePath = _dataDirectory + filename;
+            
             try
             {
-                return ObjectMapper.ReadValue<T>(_dataDirectory + filename);
+                Logger.Trace($"Loading {fullFilePath} data file");
+                return ObjectMapper.ReadValue<T>(fullFilePath);
             }
             catch (Exception ex)
             {

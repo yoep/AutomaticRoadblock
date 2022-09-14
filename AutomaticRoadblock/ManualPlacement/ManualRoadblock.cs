@@ -125,7 +125,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         public class Request
         {
             public Road Road { get; set; }
-            public BarrierType BarrierType { get; set; }
+            public BarrierModel BarrierType { get; set; }
             public VehicleType VehicleType { get; set; }
             public LightSourceType LightSourceType { get; set; }
             public PlacementType PlacementType { get; set; }

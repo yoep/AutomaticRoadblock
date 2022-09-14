@@ -7,6 +7,7 @@ namespace AutomaticRoadblocks.Barriers
     {
         None = 0,
         ManualPlacement = 1,
-        RedirectTraffic = 2
+        RedirectTraffic = 2,
+        All = ManualPlacement | RedirectTraffic
     }
 }

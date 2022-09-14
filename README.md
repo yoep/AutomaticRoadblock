@@ -44,8 +44,22 @@ To get started using this project, do the following steps.
 make restore
 ```
 
-2. Try to compile the project
+2. Try to compile the project 
+
+This target compiles a debug version of the application and copies the binaries to the Build directory.
 
 ```bash
 make build
+```
+
+Use the `build-release` target to create a release version of the application.
+
+```bash
+make build-release
+```
+
+3. Run the project tests (always in Debug config)
+
+```bash
+make test
 ```

@@ -30,7 +30,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private readonly bool _shouldAddLights;
 
-        protected AbstractRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, float heading, bool shouldAddLights,
+        protected AbstractRoadblockSlot(Road.Lane lane, BarrierModel barrierType, VehicleType vehicleType, float heading, bool shouldAddLights,
             bool recordVehicleCollisions, float offset = 0f)
         {
             Assert.NotNull(lane, "lane cannot be null");
@@ -85,7 +85,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <summary>
         /// The barrier type that is used within this slot.
         /// </summary>
-        public BarrierType BarrierType { get; }
+        public BarrierModel BarrierType { get; }
 
         /// <summary>
         /// The indication if the spawned vehicle should record collisions.
@@ -291,7 +291,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         private void InitializeBarriers()
         {
             // verify if a barrier type is given
-            if (BarrierType == BarrierType.None)
+            if (BarrierType.IsNone)
                 return;
 
             Logger.Trace("Initializing the roadblock slot barriers");

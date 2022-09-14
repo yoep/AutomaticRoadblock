@@ -14,16 +14,42 @@ namespace AutomaticRoadblocks.Barriers
                 new()
                 {
                     Name = "Small cone",
-                    ScriptName = "small_cone",
+                    ScriptName = Barrier.SmallConeScriptName,
                     Model = "prop_mp_cone_03",
-                    Spacing = 0.4
+                    Spacing = 0.4,
+                    Flags = EBarrierFlags.All
                 },
                 new()
                 {
                     Name = "Small cone with stripes",
-                    ScriptName = "small_cone_stripes",
+                    ScriptName = Barrier.SmallConeStripesScriptName,
                     Model = "prop_mp_cone_02",
-                    Spacing = 0.4
+                    Spacing = 0.4,
+                    Flags = EBarrierFlags.All
+                },
+                new()
+                {
+                    Name = "Big cone",
+                    ScriptName = Barrier.BigConeScriptName,
+                    Model = "prop_roadcone01c",
+                    Spacing = 0.5,
+                    Flags = EBarrierFlags.All
+                },
+                new()
+                {
+                    Name = "Big cone with stripes",
+                    ScriptName = Barrier.BigConeStripesScriptName,
+                    Model = "prop_mp_cone_01",
+                    Spacing = 0.5,
+                    Flags = EBarrierFlags.All
+                },
+                new()
+                {
+                    Name = "Barrel",
+                    ScriptName = Barrier.BarrelScriptName,
+                    Model = "prop_barrier_wat_03b",
+                    Spacing = 0.5,
+                    Flags = EBarrierFlags.ManualPlacement
                 }
             }
         };

@@ -16,7 +16,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private float _coneDistance = 2f;
         private VehicleType _vehicleType = VehicleType.LocalUnit;
-        private BarrierType _coneType = BarrierType.BigConeStriped;
+        private BarrierModel _coneType = BarrierModel.None;
         private RedirectTrafficType _type = RedirectTrafficType.Lane;
         private bool _enableRedirectionArrow = true;
         private float _offset;
@@ -44,7 +44,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         }
 
         /// <inheritdoc />
-        public BarrierType ConeType
+        public BarrierModel ConeType
         {
             get => _coneType;
             set => UpdateConeType(value);
@@ -168,7 +168,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             DoInternalPreviewCreation(true);
         }
 
-        private void UpdateConeType(BarrierType value)
+        private void UpdateConeType(BarrierModel value)
         {
             _coneType = value;
             DoInternalPreviewCreation(true);

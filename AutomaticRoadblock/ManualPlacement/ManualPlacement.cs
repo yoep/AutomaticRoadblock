@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.ManualPlacement
     {
         private readonly ISettingsManager _settingsManager;
 
-        private BarrierType _barrier = BarrierType.SmallCone;
+        private BarrierModel _barrier = BarrierModel.None;
         private VehicleType _vehicleType = VehicleType.LocalUnit;
         private LightSourceType _lightSourceType = LightSourceType.Flares;
         private PlacementType _placementType = PlacementType.All;
@@ -31,7 +31,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         #region Properties
 
         /// <inheritdoc />
-        public BarrierType Barrier
+        public BarrierModel Barrier
         {
             get => _barrier;
             set => UpdateBarrier(value);
@@ -171,7 +171,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             return roadblock;
         }
 
-        private void UpdateBarrier(BarrierType newType)
+        private void UpdateBarrier(BarrierModel newType)
         {
             _barrier = newType;
             DoInternalPreviewCreation(true);

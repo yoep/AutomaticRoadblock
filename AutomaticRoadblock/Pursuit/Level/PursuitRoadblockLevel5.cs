@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using Rage;
@@ -14,8 +12,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel5 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel5(ISpikeStripDispatcher spikeStripDispatcher, Road street, Vehicle targetVehicle, ERoadblockFlags flags)
-            : base(spikeStripDispatcher, street, BarrierType.PoliceDoNotCross, targetVehicle, flags)
+        public PursuitRoadblockLevel5(Road street, Vehicle targetVehicle, ERoadblockFlags flags)
+            : base(street, BarrierType.PoliceDoNotCross, targetVehicle, flags)
         {
         }
 
@@ -25,7 +23,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         public override ERoadblockLevel Level => ERoadblockLevel.Level5;
 
         #endregion
-        
+
         #region Methods
 
         /// <inheritdoc />

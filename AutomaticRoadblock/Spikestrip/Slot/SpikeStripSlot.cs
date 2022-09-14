@@ -26,7 +26,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road street, Road.Lane lane, Vehicle targetVehicle, float heading,
             bool shouldAddLights,
             float offset = 0)
-            : base(lane, BarrierType.None, VehicleType.LocalUnit, heading, shouldAddLights, false, offset)
+            : base(lane, BarrierModel.None, VehicleType.LocalUnit, heading, shouldAddLights, false, offset)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");

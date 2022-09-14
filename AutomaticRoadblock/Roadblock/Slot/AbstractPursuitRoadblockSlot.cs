@@ -9,7 +9,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot, IPursuitRoadblockSlot
     {
-        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, float heading, Vehicle targetVehicle,
+        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierModel barrierType, VehicleType vehicleType, float heading, Vehicle targetVehicle,
             bool shouldAddLights)
             : base(lane, barrierType, vehicleType, heading, shouldAddLights, true)
         {

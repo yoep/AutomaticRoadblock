@@ -3,11 +3,11 @@ bin/
 obj/
 packages/
 Media/
+Build/API Documentation/
 
 **/*.iml
 **/*.DotSettings.user
 
 Build/*.zip
-Build/Grand Theft Auto V/plugins/LSPDFR/AutomaticRoadblocks.dll
-Build/Grand Theft Auto V/plugins/LSPDFR/AutomaticRoadblocks.ini
-Build/Grand Theft Auto V/plugins/LSPDFR/AutomaticRoadblocks.pdb
+Build/Grand Theft Auto V/plugins/LSPDFR/AutomaticRoadblocks.*
+Build/Grand Theft Auto V/plugins/LSPDFR/Automatic Roadblocks/data/*

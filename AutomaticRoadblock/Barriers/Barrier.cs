@@ -2,6 +2,12 @@ namespace AutomaticRoadblocks.Barriers
 {
     public class Barrier
     {
+        public const string SmallConeScriptName = "small_cone";
+        public const string SmallConeStripesScriptName = "small_cone_stripes";
+        public const string BigConeScriptName = "big_cone";
+        public const string BigConeStripesScriptName = "big_cone_stripes";
+        public const string BarrelScriptName = "barrel_traffic_catcher";
+        
         public Barrier()
         {
         }

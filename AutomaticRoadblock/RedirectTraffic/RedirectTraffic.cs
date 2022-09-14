@@ -6,7 +6,6 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
@@ -20,6 +19,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private const float DefaultVehicleWidth = 2f;
         private const float DefaultVehicleLength = 4f;
         private const string RedirectTrafficAnimation = "amb@world_human_car_park_attendant@male@base";
+        private const string ConeWithLightName = "cone_with_light";
 
         private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
@@ -76,7 +76,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <summary>
         /// The cone type of the redirect traffic instance.
         /// </summary>
-        public BarrierType ConeType { get; }
+        public BarrierModel ConeType { get; }
 
         /// <summary>
         /// The type of the redirect traffic instance.
@@ -411,7 +411,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private float ConeHeading()
         {
-            if (ConeType == BarrierType.ConeWithLight)
+            if (ConeType.Barrier.ScriptName.Equals(ConeWithLightName))
                 return Lane.Heading - 90;
 
             return Lane.Heading;
@@ -462,7 +462,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             public VehicleType VehicleType { get; set; }
 
-            public BarrierType ConeType { get; set; }
+            public BarrierModel ConeType { get; set; }
 
             public RedirectTrafficType Type { get; set; }
 

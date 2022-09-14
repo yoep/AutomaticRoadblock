@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using AutomaticRoadblocks.Barriers;
 using Rage;
 
 namespace AutomaticRoadblocks.Models
@@ -8,21 +11,48 @@ namespace AutomaticRoadblocks.Models
     public interface IModelProvider
     {
         /// <summary>
-        /// Retrieve a ped model for the given postion and type.
+        /// Retrieve all models of the given type.
         /// </summary>
-        /// <param name="position">The position of the model.</param>
-        /// <param name="type">The type of the model.</param>
-        /// <returns>Returns the cop ped model.</returns>
-        /// <exception cref="NoModelAvailableException">Is thrown when no model if configured for the given criteria.</exception>
-        Model CopPed(Vector3 position, EUnitType type);
+        /// <param name="type">The type to return the available models of.</param>
+        IEnumerable<IModel> this[Type type] { get; }
+        
+        /// <summary>
+        /// Retrieve the model for the given script name.
+        /// If multiple models are found with the same name, the first matching model is returned.
+        /// </summary>
+        /// <param name="scriptName">Returns the model for the script, else null.</param>
+        IModel this[string scriptName] { get; }
+        
+        /// <summary>
+        /// Retrieve the model for the given script name.
+        /// If multiple models are found with the same name, the first matching model is returned.
+        /// </summary>
+        /// <param name="scriptName">Returns the model for the script, else null.</param>
+        /// <param name="type">The type of the model to search for.</param>
+        IModel this[string scriptName, Type type] { get; }
+        
+        /// <summary>
+        /// The available barrier models based on the data file.
+        /// </summary>
+        IEnumerable<BarrierModel> BarrierModels { get; }
 
         /// <summary>
-        /// Retrieve a vehicle model for the given postion and type.
+        /// Invoked when the barrier models list has changed.
         /// </summary>
-        /// <param name="position">The position of the model.</param>
-        /// <param name="type">The type of the model.</param>
-        /// <returns>Returns the cop vehicle model.</returns>
-        /// <exception cref="NoModelAvailableException">Is thrown when no model if configured for the given criteria.</exception>
-        Model CopVehicle(Vector3 position, EUnitType type);
+        event ModelProviderEvents.BarrierModelsChanged BarrierModelsChanged;
+
+        /// <summary>
+        /// Retrieve the model by the matching script name.
+        /// </summary>
+        /// <param name="scriptName">The script name to match.</param>
+        /// <typeparam name="T">The model data type.</typeparam>
+        /// <returns>Returns the found model for the script name.</returns>
+        /// <exception cref="ModelNotFoundException">Is thrown when the given script name doesn't exist.</exception>
+        T RetrieveModelByScriptName<T>(string scriptName) where T : IModel;
+
+        /// <summary>
+        /// Reload the models of the provider.
+        /// </summary>
+        void Reload();
     }
 }

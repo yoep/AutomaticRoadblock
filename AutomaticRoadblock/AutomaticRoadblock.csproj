@@ -72,8 +72,8 @@
         <Compile Include="Barriers\Barrier.cs" />
         <Compile Include="Barriers\BarrierFactory.cs" />
         <Compile Include="Barriers\BarrierModelData.cs" />
+        <Compile Include="Barriers\BarrierModel.cs" />
         <Compile Include="Barriers\Barriers.cs" />
-        <Compile Include="Barriers\BarrierType.cs" />
         <Compile Include="Barriers\EBarrierFlags.cs" />
         <Compile Include="Barriers\IBarrierModelData.cs" />
         <Compile Include="Debug\Menu\DebugDeploySpikeStripComponent.cs" />
@@ -132,35 +132,16 @@
         <Compile Include="Menu\MenuImpl.cs" />
         <Compile Include="Menu\EMenuType.cs" />
         <Compile Include="Menu\Switcher\IMenuSwitchItem.cs" />
+        <Compile Include="Models\AbstractModel.cs" />
         <Compile Include="Models\AbstractModelDataLoader.cs" />
-        <Compile Include="Models\CommonModelInfo.cs" />
         <Compile Include="Models\EUnitType.cs" />
-        <Compile Include="Models\ILspdfrModelData.cs" />
+        <Compile Include="Models\IModel.cs" />
         <Compile Include="Models\IModelData.cs" />
         <Compile Include="Models\IModelProvider.cs" />
-        <Compile Include="Models\IPedModelData.cs" />
-        <Compile Include="Models\IVehicleModelData.cs" />
-        <Compile Include="Models\Lspdfr\Agencies.cs" />
-        <Compile Include="Models\Lspdfr\Agency.cs" />
-        <Compile Include="Models\Lspdfr\Backup.cs" />
-        <Compile Include="Models\Lspdfr\BackupAgency.cs" />
-        <Compile Include="Models\Lspdfr\BackupUnits.cs" />
-        <Compile Include="Models\Lspdfr\Inventories.cs" />
-        <Compile Include="Models\Lspdfr\Inventory.cs" />
-        <Compile Include="Models\Lspdfr\InventoryWeapon.cs" />
-        <Compile Include="Models\Lspdfr\Loadout.cs" />
-        <Compile Include="Models\Lspdfr\LspdfrModelData.cs" />
-        <Compile Include="Models\Lspdfr\LspdfrModelProvider.cs" />
-        <Compile Include="Models\Lspdfr\NumPeds.cs" />
-        <Compile Include="Models\Lspdfr\Outfit.cs" />
-        <Compile Include="Models\Lspdfr\Outfits.cs" />
-        <Compile Include="Models\Lspdfr\Ped.cs" />
-        <Compile Include="Models\Lspdfr\StunWeapon.cs" />
-        <Compile Include="Models\Lspdfr\Vehicle.cs" />
         <Compile Include="Models\ModelException.cs" />
-        <Compile Include="Models\NoModelAvailableException.cs" />
-        <Compile Include="Models\PedModelInfo.cs" />
-        <Compile Include="Models\VehicleModelInfo.cs" />
+        <Compile Include="Models\ModelNotFoundException.cs" />
+        <Compile Include="Models\ModelProvider.cs" />
+        <Compile Include="Models\ModelProviderEvents.cs" />
         <Compile Include="Preview\IPreviewSupport.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Pursuit\EPursuitState.cs" />
@@ -284,6 +265,9 @@
     <ItemGroup>
       <Content Include="AutomaticRoadblocks.ini">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="plugins\LSPDFR\Automatic Roadblocks\data\barriers.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
     <ItemGroup>
