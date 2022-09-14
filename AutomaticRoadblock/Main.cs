@@ -19,6 +19,7 @@ using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Pursuit.Menu;
 using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.RedirectTraffic.Menu;
+using AutomaticRoadblocks.Roadblock.Data;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
@@ -87,7 +88,8 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
                 .RegisterSingleton<IPluginIntegrationManager>(typeof(PluginIntegrationManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
-                .RegisterSingleton<IBarrierModelData>(typeof(BarrierModelData))
+                .RegisterSingleton<IBarrierData>(typeof(BarrierDataFile))
+                .RegisterSingleton<IRoadblockData>(typeof(RoadblockDataFile))
                 .RegisterSingleton<IModelProvider>(typeof(ModelProvider))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
@@ -240,6 +242,7 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugDeploySpikeStripComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPreviewSpikeStripComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugReloadDataFilesComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugZoneInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))

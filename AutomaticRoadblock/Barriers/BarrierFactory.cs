@@ -1,4 +1,5 @@
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Utils;
 using Rage;
 
@@ -10,8 +11,13 @@ namespace AutomaticRoadblocks.Barriers
         {
             Assert.NotNull(barrierModel, "barrierModel cannot be null");
             Assert.NotNull(position, "position cannot be null");
+            if (barrierModel.Model == null)
+                throw new InvalidModelException(barrierModel);
+
             var groundPostPosition = GameUtils.GetOnTheGroundPosition(position);
-            return new ARScenery(new Object(barrierModel.Model, groundPostPosition, heading));
+            var instance = new Object(barrierModel.Model.Value, groundPostPosition, heading);
+            instance.Position += Vector3.WorldUp * barrierModel.VerticalOffset;
+            return new ARScenery(instance);
         }
     }
 }

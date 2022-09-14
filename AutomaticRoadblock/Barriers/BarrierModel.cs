@@ -8,10 +8,10 @@ namespace AutomaticRoadblocks.Barriers
     {
         public static readonly BarrierModel None = new()
         {
-            Barrier = new Barrier("None", "none", null, 0.0, EBarrierFlags.All),
+            Barrier = new Barrier("None", "none", null, 1.0, EBarrierFlags.All),
             LocalizationKey = LocalizationKey.None,
             Model = null,
-            Width = 0
+            Width = 1f
         };
 
         private BarrierModel()
@@ -32,7 +32,7 @@ namespace AutomaticRoadblocks.Barriers
         /// <summary>
         /// The game model.
         /// </summary>
-        public Model Model { get; private set; }
+        public Model? Model { get; private set; }
 
         /// <summary>
         /// The actual width of the model.
@@ -43,6 +43,11 @@ namespace AutomaticRoadblocks.Barriers
         /// The spacing between the barrier model instances. 
         /// </summary>
         public float Spacing => (float)Barrier.Spacing;
+
+        /// <summary>
+        /// The vertical offset position of the barrier instance when spawned.
+        /// </summary>
+        public float VerticalOffset => (float)Barrier.VerticalOffset;
 
         /// <summary>
         /// Verify if this barrier model is the special <see cref="None"/> type.

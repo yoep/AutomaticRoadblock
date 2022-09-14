@@ -45,6 +45,14 @@ namespace AutomaticRoadblocks.Barriers
                 },
                 new()
                 {
+                    Name = "Police do not cross",
+                    ScriptName = Barrier.PoliceDoNotCrossScriptName,
+                    Model = "prop_barrier_work05",
+                    Spacing = 0.2,
+                    Flags = EBarrierFlags.ManualPlacement
+                },
+                new()
+                {
                     Name = "Barrel",
                     ScriptName = Barrier.BarrelScriptName,
                     Model = "prop_barrier_wat_03b",

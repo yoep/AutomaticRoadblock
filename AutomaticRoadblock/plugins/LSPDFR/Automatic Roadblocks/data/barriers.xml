@@ -118,6 +118,7 @@
         <ScriptName>cone_with_light</ScriptName>
         <Model>prop_air_conelight</Model>
         <Spacing>0.5</Spacing>
+        <VerticalOffset>-0.1</VerticalOffset>
         <Flags>
             <Flag>ManualPlacement</Flag>
             <Flag>RedirectTraffic</Flag>

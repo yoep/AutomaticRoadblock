@@ -1,8 +1,8 @@
-using AutomaticRoadblocks.Models;
+using AutomaticRoadblocks.Data;
 
 namespace AutomaticRoadblocks.Barriers
 {
-    public interface IBarrierModelData : IModelData
+    public interface IBarrierData : IDataFile
     {
         /// <summary>
         /// The barriers model data.

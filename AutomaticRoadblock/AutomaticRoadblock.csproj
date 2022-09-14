@@ -71,14 +71,17 @@
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
         <Compile Include="Barriers\Barrier.cs" />
         <Compile Include="Barriers\BarrierFactory.cs" />
-        <Compile Include="Barriers\BarrierModelData.cs" />
+        <Compile Include="Barriers\BarrierDataFile.cs" />
         <Compile Include="Barriers\BarrierModel.cs" />
         <Compile Include="Barriers\Barriers.cs" />
         <Compile Include="Barriers\EBarrierFlags.cs" />
-        <Compile Include="Barriers\IBarrierModelData.cs" />
+        <Compile Include="Barriers\IBarrierData.cs" />
+        <Compile Include="Data\AbstractDataFileLoader.cs" />
+        <Compile Include="Data\IDataFile.cs" />
         <Compile Include="Debug\Menu\DebugDeploySpikeStripComponent.cs" />
         <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
         <Compile Include="Debug\Menu\DebugPursuitForceOnFootComponent.cs" />
+        <Compile Include="Debug\Menu\DebugReloadDataFilesComponent.cs" />
         <Compile Include="Debug\Menu\DebugRoadInfoComponent.cs" />
         <Compile Include="Debug\Menu\DebugRoadPreviewComponent.cs" />
         <Compile Include="Debug\Menu\DebugPursuitToggleComponent.cs" />
@@ -133,11 +136,9 @@
         <Compile Include="Menu\EMenuType.cs" />
         <Compile Include="Menu\Switcher\IMenuSwitchItem.cs" />
         <Compile Include="Models\AbstractModel.cs" />
-        <Compile Include="Models\AbstractModelDataLoader.cs" />
-        <Compile Include="Models\EUnitType.cs" />
         <Compile Include="Models\IModel.cs" />
-        <Compile Include="Models\IModelData.cs" />
         <Compile Include="Models\IModelProvider.cs" />
+        <Compile Include="Models\InvalidModelException.cs" />
         <Compile Include="Models\ModelException.cs" />
         <Compile Include="Models\ModelNotFoundException.cs" />
         <Compile Include="Models\ModelProvider.cs" />
@@ -182,6 +183,10 @@
         <Compile Include="RedirectTraffic\RedirectTrafficDispatcher.cs" />
         <Compile Include="RedirectTraffic\RedirectTrafficType.cs" />
         <Compile Include="Roadblock\AbstractPursuitRoadblock.cs" />
+        <Compile Include="Roadblock\Data\IRoadblockData.cs" />
+        <Compile Include="Roadblock\Data\RoadblockData.cs" />
+        <Compile Include="Roadblock\Data\RoadblockDataFile.cs" />
+        <Compile Include="Roadblock\Data\Roadblocks.cs" />
         <Compile Include="Roadblock\Dispatcher\DispatchOptions.cs" />
         <Compile Include="Roadblock\Dispatcher\IRoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockDispatcher.cs" />
@@ -193,6 +198,7 @@
         <Compile Include="Roadblock\Menu\RoadblockMenuSwitchItem.cs" />
         <Compile Include="Roadblock\RoadblockEvents.cs" />
         <Compile Include="Roadblock\ERoadblockFlags.cs" />
+        <Compile Include="Roadblock\RoadblockException.cs" />
         <Compile Include="Roadblock\RoadblockHelpers.cs" />
         <Compile Include="Roadblock\ERoadblockLevel.cs" />
         <Compile Include="Roadblock\ERoadblockState.cs" />
@@ -267,6 +273,9 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="plugins\LSPDFR\Automatic Roadblocks\data\barriers.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="plugins\LSPDFR\Automatic Roadblocks\data\roadblocks.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>

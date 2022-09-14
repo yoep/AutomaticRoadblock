@@ -1,16 +1,15 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.Models;
+using AutomaticRoadblocks.Data;
 
 namespace AutomaticRoadblocks.Barriers
 {
-    public class BarrierModelData : AbstractModelDataLoader, IBarrierModelData
+    public class BarrierDataFile : AbstractDataFileLoader, IBarrierData
     {
-        private const string ModelDataDirectory = @"./plugins/LSPDFR/Automatic Roadblocks/data/";
         private const string BarriersFilename = "barriers.xml";
 
-        public BarrierModelData(ILogger logger)
-            : base(logger, ModelDataDirectory)
+        public BarrierDataFile(ILogger logger)
+            : base(logger)
         {
         }
 

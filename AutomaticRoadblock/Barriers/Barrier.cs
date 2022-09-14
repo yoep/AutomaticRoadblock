@@ -1,3 +1,5 @@
+using System.Xml.Serialization;
+
 namespace AutomaticRoadblocks.Barriers
 {
     public class Barrier
@@ -6,8 +8,9 @@ namespace AutomaticRoadblocks.Barriers
         public const string SmallConeStripesScriptName = "small_cone_stripes";
         public const string BigConeScriptName = "big_cone";
         public const string BigConeStripesScriptName = "big_cone_stripes";
+        public const string PoliceDoNotCrossScriptName = "police_do_not_cross";
         public const string BarrelScriptName = "barrel_traffic_catcher";
-        
+
         public Barrier()
         {
         }
@@ -22,23 +25,27 @@ namespace AutomaticRoadblocks.Barriers
         }
 
         public string Name { get; internal set; }
-        
+
         public string ScriptName { get; internal set; }
-        
+
         public string Model { get; internal set; }
-        
+
         public double Spacing { get; internal set; }
-        
+
+        [XmlElement(IsNullable = true)] public double VerticalOffset { get; internal set; }
+
         public EBarrierFlags Flags { get; internal set; }
 
         public override string ToString()
         {
-            return $"{nameof(Name)}: {Name}, {nameof(ScriptName)}: {ScriptName}, {nameof(Model)}: {Model}, {nameof(Spacing)}: {Spacing}, {nameof(Flags)}: {Flags}";
+            return
+                $"{nameof(Name)}: {Name}, {nameof(ScriptName)}: {ScriptName}, {nameof(Model)}: {Model}, {nameof(Spacing)}: {Spacing}, {nameof(VerticalOffset)}: {VerticalOffset}, {nameof(Flags)}: {Flags}";
         }
 
         protected bool Equals(Barrier other)
         {
-            return Name == other.Name && ScriptName == other.ScriptName && Model == other.Model && Spacing.Equals(other.Spacing) && Flags == other.Flags;
+            return Name == other.Name && ScriptName == other.ScriptName && Model == other.Model && Spacing.Equals(other.Spacing) &&
+                   VerticalOffset.Equals(other.VerticalOffset) && Flags == other.Flags;
         }
 
         public override bool Equals(object obj)
@@ -57,6 +64,7 @@ namespace AutomaticRoadblocks.Barriers
                 hashCode = (hashCode * 397) ^ (ScriptName != null ? ScriptName.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Model != null ? Model.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ Spacing.GetHashCode();
+                hashCode = (hashCode * 397) ^ VerticalOffset.GetHashCode();
                 hashCode = (hashCode * 397) ^ (int)Flags;
                 return hashCode;
             }

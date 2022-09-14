@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using AutomaticRoadblocks.Barriers;
-using Rage;
+using AutomaticRoadblocks.Data;
 
 namespace AutomaticRoadblocks.Models
 {
     /// <summary>
-    /// The model provider convert the <see cref="IModelData"/> into an actual usable <see cref="Model"/>.
+    /// The model provider convert the <see cref="IDataFile"/> into an actual usable <see cref="Rage.Model"/>.
     /// </summary>
     public interface IModelProvider
     {

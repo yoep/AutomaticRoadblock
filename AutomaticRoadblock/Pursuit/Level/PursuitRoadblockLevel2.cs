@@ -1,3 +1,4 @@
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
@@ -7,8 +8,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel2 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel2( Road street, Vehicle targetVehicle, ERoadblockFlags flags)
-            : base(street, BarrierType.BigCone, targetVehicle, flags)
+        public PursuitRoadblockLevel2(Road street, BarrierModel mainBarrier, Vehicle targetVehicle, ERoadblockFlags flags)
+            : base(street, mainBarrier, targetVehicle, flags)
         {
         }
 

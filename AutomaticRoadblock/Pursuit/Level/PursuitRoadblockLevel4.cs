@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
@@ -12,8 +13,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel4 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel4( Road street, Vehicle targetVehicle, ERoadblockFlags flags)
-            : base(street, BarrierType.PoliceDoNotCross, targetVehicle, flags)
+        public PursuitRoadblockLevel4(Road street, BarrierModel mainBarrier, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle, ERoadblockFlags flags)
+            : base(street, mainBarrier, chaseVehicleBarrier, targetVehicle, flags)
         {
             RoadblockStateChanged += StateChanged;
         }
@@ -54,7 +55,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 var lane = currentSlot.Lane.MoveTo(MathHelper.ConvertHeadingToDirection(Heading) * 4f +
                                                    MathHelper.ConvertHeadingToDirection(Heading + 90) * (distanceToNext / 2));
 
-                additionalSlots.Add(new PursuitRoadblockSlotLevel4(lane, BarrierType.None, currentSlot.Heading, TargetVehicle, false));
+                additionalSlots.Add(new PursuitRoadblockSlotLevel4(lane, BarrierModel.None, currentSlot.Heading, TargetVehicle, false));
             }
 
             additionalSlots.AddRange(slots);

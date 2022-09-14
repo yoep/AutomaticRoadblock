@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using AutomaticRoadblocks.Data;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Pursuit;
@@ -39,7 +40,7 @@ namespace AutomaticRoadblocks.Api
         
         /// <summary>
         /// Get the model provider instance.
-        /// This provider converts the raw data from <see cref="IModelData"/> to actual models.
+        /// This provider converts the raw data from <see cref="IDataFile"/> to actual models.
         /// </summary>
         public static IModelProvider ModelProvider => IoC.Instance.GetInstance<IModelProvider>();
     }

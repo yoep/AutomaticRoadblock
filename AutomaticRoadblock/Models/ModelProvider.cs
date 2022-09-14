@@ -12,9 +12,9 @@ namespace AutomaticRoadblocks.Models
     {
         private readonly IGame _game;
         private readonly ILogger _logger;
-        private readonly IBarrierModelData _barrierModelData;
+        private readonly IBarrierData _barrierModelData;
 
-        public ModelProvider(IGame game, ILogger logger, IBarrierModelData barrierModelData)
+        public ModelProvider(IGame game, ILogger logger, IBarrierData barrierModelData)
         {
             _game = game;
             _logger = logger;

@@ -42,6 +42,19 @@ namespace AutomaticRoadblocks.Roadblock
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
+            ChaseVehicleBarrier = BarrierModel.None;
+            RoadblockStateChanged += OnStateChanged;
+
+            Initialize();
+        }
+        
+        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrierType, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle,
+            ERoadblockFlags flags)
+            : base(street, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
+        {
+            Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
+            TargetVehicle = targetVehicle;
+            ChaseVehicleBarrier = chaseVehicleBarrier;
             RoadblockStateChanged += OnStateChanged;
 
             Initialize();
@@ -54,6 +67,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         [CanBeNull]
         protected Vehicle TargetVehicle { get; }
+        
+        /// <summary>
+        /// The barrier model for the chase vehicle.
+        /// </summary>
+        protected BarrierModel ChaseVehicleBarrier { get; }
 
         /// <summary>
         /// Verify if the <see cref="TargetVehicle"/> instance is invalidated by the game.
@@ -176,15 +194,14 @@ namespace AutomaticRoadblocks.Roadblock
         private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
         {
             var rowPosition = chasePosition + MathHelper.ConvertHeadingToDirection(TargetHeading - 180) * 4f;
-            var barrierCatcher = ModelProvider.RetrieveModelByScriptName<BarrierModel>(Barrier.BarrelScriptName);
-            var nextPositionDistance = barrierCatcher.Width + barrierCatcher.Spacing;
+            var nextPositionDistance = ChaseVehicleBarrier.Width + ChaseVehicleBarrier.Spacing;
             var nextPositionDirection = MathHelper.ConvertHeadingToDirection(TargetHeading - 90);
             var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(TargetHeading + 90) * (nextPositionDistance * 2f);
 
             for (var i = 0; i < 5; i++)
             {
                 Instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, TargetHeading,
-                    (position, heading) => BarrierFactory.Create(barrierCatcher, position, heading)));
+                    (position, heading) => BarrierFactory.Create(ChaseVehicleBarrier, position, heading)));
                 startPosition += nextPositionDirection * nextPositionDistance;
             }
         }

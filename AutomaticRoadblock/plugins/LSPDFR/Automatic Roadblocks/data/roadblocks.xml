@@ -1,0 +1,24 @@
+<Roadblocks>
+    <Roadblock>
+        <Level>1</Level> <!-- The roadblock level identifier (don't modify this!) -->
+        <MainBarrier>small_cone_stripes</MainBarrier> <!-- The main barrier to use for the roadblock -->
+    </Roadblock>
+    <Roadblock>
+        <Level>2</Level>
+        <MainBarrier>big_cone</MainBarrier>
+    </Roadblock>
+    <Roadblock>
+        <Level>3</Level>
+        <MainBarrier>police_do_not_cross</MainBarrier>
+    </Roadblock>
+    <Roadblock>
+        <Level>4</Level>
+        <MainBarrier>police_do_not_cross</MainBarrier>
+        <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier> <!-- The barrier to place between the chase vehicle and the roadblock -->
+    </Roadblock>
+    <Roadblock>
+        <Level>5</Level>
+        <MainBarrier>police_do_not_cross</MainBarrier>
+        <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier>
+    </Roadblock>
+</Roadblocks>

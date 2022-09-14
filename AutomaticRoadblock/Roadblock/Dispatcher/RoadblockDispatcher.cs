@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Pursuit.Factory;
+using AutomaticRoadblocks.Roadblock.Data;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
@@ -29,6 +32,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly ILocalizer _localizer;
+        private readonly IRoadblockData _roadblockData;
+        private readonly IModelProvider _modelProvider;
 
         private readonly List<RoadblockInfo> _roadblocks = new();
         private readonly List<IVehicleNode> _foundRoads = new();
@@ -36,12 +41,15 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private bool _cleanerRunning;
         private bool _userRequestedRoadblockDispatching;
 
-        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer)
+        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer, IRoadblockData roadblockData,
+            IModelProvider modelProvider)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
             _localizer = localizer;
+            _roadblockData = roadblockData;
+            _modelProvider = modelProvider;
         }
 
         #region Properties
@@ -251,7 +259,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, vehicle, flags);
+            var configData = GetDataForLevel(actualLevelToUse);
+            var mainBarrier = _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.MainBarrier);
+            var chaseVehicleBarrier = !string.IsNullOrWhiteSpace(configData.ChaseVehicleBarrier)
+                ? _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.ChaseVehicleBarrier)
+                : BarrierModel.None;
+            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, mainBarrier, chaseVehicleBarrier, vehicle, flags);
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
             lock (_roadblocks)
@@ -515,6 +528,15 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     _logger.Warn($"Unable to remove roadblock from dispatcher, roadblock not found: {roadblock}");
                 }
             }
+        }
+
+        private RoadblockData GetDataForLevel(ERoadblockLevel level)
+        {
+            var data = _roadblockData.Roadblocks.Items.FirstOrDefault(x => x.Level == level.Level);
+            if (data == null)
+                throw new RoadblockException($"Roadblock data couldn't be found for level {level}");
+
+            return data;
         }
 
         /// <summary>

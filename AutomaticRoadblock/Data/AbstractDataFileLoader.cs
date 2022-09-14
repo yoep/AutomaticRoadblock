@@ -1,23 +1,23 @@
 using System;
+using System.IO;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Xml;
 
-namespace AutomaticRoadblocks.Models
+namespace AutomaticRoadblocks.Data
 {
     /// <summary>
-    /// Abstract loader implementation of <see cref="IModelData"/>.
+    /// Abstract loader implementation of <see cref="IDataFile"/>.
     /// </summary>
-    public abstract class AbstractModelDataLoader : IModelData
+    public abstract class AbstractDataFileLoader : IDataFile
     {
+        private const string DataDirectory = @"./plugins/LSPDFR/Automatic Roadblocks/data/";
+        
         protected readonly ILogger Logger;
         protected readonly ObjectMapper ObjectMapper = ObjectMapperFactory.CreateInstance();
-        
-        private readonly string _dataDirectory;
 
-        protected AbstractModelDataLoader(ILogger logger, string dataDirectory)
+        protected AbstractDataFileLoader(ILogger logger)
         {
             Logger = logger;
-            _dataDirectory = dataDirectory;
         }
 
         /// <inheritdoc />
@@ -25,8 +25,14 @@ namespace AutomaticRoadblocks.Models
 
         protected T TryToLoadDatafile<T>(string filename, T defaultValue = null) where T : class
         {
-            var fullFilePath = _dataDirectory + filename;
-            
+            var fullFilePath = Path.Combine(DataDirectory, filename);
+
+            if (!File.Exists(fullFilePath))
+            {
+                Logger.Warn($"Data file {fullFilePath} doesn't exist, using defaults instead");
+                return defaultValue;
+            }
+
             try
             {
                 Logger.Trace($"Loading {fullFilePath} data file");
@@ -34,7 +40,7 @@ namespace AutomaticRoadblocks.Models
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to load {filename} data, {ex.Message}", ex);
+                Logger.Error($"Failed to load {fullFilePath} data file, {ex.Message}", ex);
             }
 
             return defaultValue;
