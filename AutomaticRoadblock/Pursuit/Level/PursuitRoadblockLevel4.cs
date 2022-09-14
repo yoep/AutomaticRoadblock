@@ -13,8 +13,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel4 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel4(Road street, BarrierModel mainBarrier, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle, ERoadblockFlags flags)
-            : base(street, mainBarrier, chaseVehicleBarrier, targetVehicle, flags)
+        public PursuitRoadblockLevel4(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle, ERoadblockFlags flags)
+            : base(street, mainBarrier, secondaryBarrier, chaseVehicleBarrier, targetVehicle, flags)
         {
             RoadblockStateChanged += StateChanged;
         }
@@ -55,7 +55,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 var lane = currentSlot.Lane.MoveTo(MathHelper.ConvertHeadingToDirection(Heading) * 4f +
                                                    MathHelper.ConvertHeadingToDirection(Heading + 90) * (distanceToNext / 2));
 
-                additionalSlots.Add(new PursuitRoadblockSlotLevel4(lane, BarrierModel.None, currentSlot.Heading, TargetVehicle, false));
+                additionalSlots.Add(new PursuitRoadblockSlotLevel4(lane, BarrierModel.None, BarrierModel.None, currentSlot.Heading, TargetVehicle, false));
             }
 
             additionalSlots.AddRange(slots);
@@ -78,7 +78,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
-            return new PursuitRoadblockSlotLevel4(lane, MainBarrierType, heading, targetVehicle, shouldAddLights);
+            return new PursuitRoadblockSlotLevel4(lane, MainBarrier, SecondaryBarrier, heading, targetVehicle, shouldAddLights);
         }
 
         /// <inheritdoc />

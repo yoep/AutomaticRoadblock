@@ -13,8 +13,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel5 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel5(Road street, BarrierModel mainBarrier, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle, ERoadblockFlags flags)
-            : base(street, mainBarrier, chaseVehicleBarrier, targetVehicle, flags)
+        public PursuitRoadblockLevel5(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle, ERoadblockFlags flags)
+            : base(street, mainBarrier, secondaryBarrier, chaseVehicleBarrier, targetVehicle, flags)
         {
         }
 
@@ -55,7 +55,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
-            return new PursuitRoadblockSlotLevel5(lane, MainBarrierType, heading, targetVehicle, shouldAddLights);
+            return new PursuitRoadblockSlotLevel5(lane, MainBarrier, SecondaryBarrier, heading, targetVehicle, shouldAddLights);
         }
 
         /// <inheritdoc />

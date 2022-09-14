@@ -36,9 +36,9 @@ namespace AutomaticRoadblocks.Roadblock
 
         private float _lastKnownDistanceToRoadblock = 9999f;
 
-        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrierType, Vehicle targetVehicle,
+        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, Vehicle targetVehicle,
             ERoadblockFlags flags)
-            : base(street, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
+            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
@@ -48,9 +48,9 @@ namespace AutomaticRoadblocks.Roadblock
             Initialize();
         }
         
-        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrierType, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle,
+        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle,
             ERoadblockFlags flags)
-            : base(street, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
+            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;

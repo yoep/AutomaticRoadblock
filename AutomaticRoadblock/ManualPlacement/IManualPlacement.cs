@@ -11,9 +11,14 @@ namespace AutomaticRoadblocks.ManualPlacement
     public interface IManualPlacement : IPreviewSupport, IDisposable
     {
         /// <summary>
-        /// The barrier type to use within the roadblock.
+        /// The first row barrier to place.
         /// </summary>
-        BarrierModel Barrier { get; set; }
+        BarrierModel MainBarrier { get; set; }
+        
+        /// <summary>
+        /// The second row barrier to place.
+        /// </summary>
+        BarrierModel SecondaryBarrier { get; set; }
         
         /// <summary>
         /// The vehicle type to use within the roadblock.

@@ -9,9 +9,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot, IPursuitRoadblockSlot
     {
-        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierModel barrierType, VehicleType vehicleType, float heading, Vehicle targetVehicle,
+        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, VehicleType vehicleType, float heading, Vehicle targetVehicle,
             bool shouldAddLights)
-            : base(lane, barrierType, vehicleType, heading, shouldAddLights, true)
+            : base(lane, mainBarrier, secondaryBarrier, vehicleType, heading, shouldAddLights, true)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;

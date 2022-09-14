@@ -24,12 +24,16 @@ namespace AutomaticRoadblocks.Debug.Menu
         public EMenuType Type => EMenuType.Debug;
 
         /// <inheritdoc />
-        public bool IsAutoClosed => true;
+        public bool IsAutoClosed => false;
 
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _game.NewSafeFiber(() => _dataFiles.ForEach(x => x.Reload()), "Debug.ReloadDataFiles");
+            _game.NewSafeFiber(() =>
+            {
+                _dataFiles.ForEach(x => x.Reload());
+                _game.DisplayNotification("Data files have been reloaded");
+            }, "Debug.ReloadDataFiles");
         }
     }
 }

@@ -259,12 +259,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-            var configData = GetDataForLevel(actualLevelToUse);
-            var mainBarrier = _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.MainBarrier);
-            var chaseVehicleBarrier = !string.IsNullOrWhiteSpace(configData.ChaseVehicleBarrier)
-                ? _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.ChaseVehicleBarrier)
-                : BarrierModel.None;
-            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, mainBarrier, chaseVehicleBarrier, vehicle, flags);
+            GetBarriersForLevel(actualLevelToUse, out var mainBarrier, out var secondaryBarrier, out var chaseVehicleBarrier);
+            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, flags);
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
             lock (_roadblocks)
@@ -537,6 +533,19 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 throw new RoadblockException($"Roadblock data couldn't be found for level {level}");
 
             return data;
+        }
+
+        private void GetBarriersForLevel(ERoadblockLevel level, out BarrierModel mainBarrier, out BarrierModel secondaryBarrier,
+            out BarrierModel chaseVehicleBarrier)
+        {
+            var configData = GetDataForLevel(level);
+            mainBarrier = _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.MainBarrier);
+            secondaryBarrier = !string.IsNullOrWhiteSpace(configData.SecondaryBarrier)
+                ? _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.SecondaryBarrier)
+                : BarrierModel.None;
+            chaseVehicleBarrier = !string.IsNullOrWhiteSpace(configData.ChaseVehicleBarrier)
+                ? _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.ChaseVehicleBarrier)
+                : BarrierModel.None;
         }
 
         /// <summary>

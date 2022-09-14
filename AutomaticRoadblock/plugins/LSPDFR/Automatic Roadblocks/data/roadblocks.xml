@@ -1,7 +1,7 @@
 <Roadblocks>
     <Roadblock>
         <Level>1</Level> <!-- The roadblock level identifier (don't modify this!) -->
-        <MainBarrier>small_cone_stripes</MainBarrier> <!-- The main barrier to use for the roadblock -->
+        <MainBarrier>small_cone_stripes</MainBarrier> <!-- The main barrier which is placed in front of the roadblock -->
     </Roadblock>
     <Roadblock>
         <Level>2</Level>
@@ -14,11 +14,13 @@
     <Roadblock>
         <Level>4</Level>
         <MainBarrier>police_do_not_cross</MainBarrier>
+        <SecondaryBarrier>work_barrier_high</SecondaryBarrier>  <!-- The barrier which is placed behind the roadblock -->
         <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier> <!-- The barrier to place between the chase vehicle and the roadblock -->
     </Roadblock>
     <Roadblock>
         <Level>5</Level>
         <MainBarrier>police_do_not_cross</MainBarrier>
+        <SecondaryBarrier>work_barrier_high</SecondaryBarrier>
         <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier>
     </Roadblock>
 </Roadblocks>

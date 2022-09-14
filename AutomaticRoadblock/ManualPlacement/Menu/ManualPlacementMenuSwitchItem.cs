@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             _game = game;
             _manualPlacement = manualPlacement;
             _localizer = localizer;
-            
+
             Menu = new UIMenu(_localizer[LocalizationKey.MenuTitle],
                 "~b~" + _localizer[LocalizationKey.MenuSubtitle]);
         }

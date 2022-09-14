@@ -9,20 +9,20 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class ManualPlacementBarrierComponentItem : IMenuComponent<UIMenuListScrollerItem<BarrierModel>>
+    public abstract class AbstractBarrierComponentItem : IMenuComponent<UIMenuListScrollerItem<BarrierModel>>
     {
-        private readonly IManualPlacement _manualPlacement;
+        protected readonly IManualPlacement ManualPlacement;
         private readonly IModelProvider _modelProvider;
         private readonly ILocalizer _localizer;
 
-        public ManualPlacementBarrierComponentItem(IManualPlacement manualPlacement, IModelProvider modelProvider, ILocalizer localizer)
+        public AbstractBarrierComponentItem(IManualPlacement manualPlacement, IModelProvider modelProvider, ILocalizer localizer, LocalizationKey name,
+            LocalizationKey description)
         {
-            _manualPlacement = manualPlacement;
+            ManualPlacement = manualPlacement;
             _modelProvider = modelProvider;
             _localizer = localizer;
 
-            MenuItem = new UIMenuListScrollerItem<BarrierModel>(localizer[LocalizationKey.Barrier], localizer[LocalizationKey.BarrierDescription],
-                FilterItems(_modelProvider.BarrierModels));
+            MenuItem = new UIMenuListScrollerItem<BarrierModel>(localizer[name], localizer[description], FilterItems(_modelProvider.BarrierModels));
         }
 
         /// <inheritdoc />
@@ -40,19 +40,21 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             // no-op   
         }
 
+        /// <summary>
+        /// The action to invoke when the index of the list is changed.
+        /// </summary>
+        protected abstract void MenuIndexChanged(UIMenuScrollerItem sender, int oldIndex, int newIndex);
+
+        protected abstract void SelectInitialMenuItem();
+
         [IoC.PostConstruct]
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
             MenuItem.Formatter = model => _localizer[model.LocalizationKey];
-            MenuItem.SelectedItem = _manualPlacement.Barrier;
+            SelectInitialMenuItem();
             MenuItem.IndexChanged += MenuIndexChanged;
             _modelProvider.BarrierModelsChanged += BarrierModelsChanged;
-        }
-
-        private void MenuIndexChanged(UIMenuScrollerItem sender, int oldIndex, int newIndex)
-        {
-            _manualPlacement.Barrier = MenuItem.SelectedItem;
         }
 
         private void BarrierModelsChanged(IEnumerable<BarrierModel> models)

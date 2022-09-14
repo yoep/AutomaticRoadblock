@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
             _modelProvider = modelProvider;
             _localizer = localizer;
 
-            MenuItem = new UIMenuListScrollerItem<BarrierModel>(localizer[LocalizationKey.Barrier], localizer[LocalizationKey.BarrierDescription],
+            MenuItem = new UIMenuListScrollerItem<BarrierModel>(localizer[LocalizationKey.MainBarrier], localizer[LocalizationKey.MainBarrierDescription],
                 FilterItems(_modelProvider.BarrierModels));
         }
 

@@ -43,8 +43,10 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly LocalizationKey Place = new(nameof(Place), "Place");
         public static readonly LocalizationKey PlaceDescription = new(nameof(PlaceDescription), "Place a roadblock at the current highlighted location");
-        public static readonly LocalizationKey Barrier = new(nameof(Barrier), "Barrier");
-        public static readonly LocalizationKey BarrierDescription = new(nameof(BarrierDescription), "The barrier type to use");
+        public static readonly LocalizationKey MainBarrier = new(nameof(MainBarrier), "Main barrier");
+        public static readonly LocalizationKey MainBarrierDescription = new(nameof(MainBarrierDescription), "The first line barrier type");
+        public static readonly LocalizationKey SecondaryBarrier = new(nameof(SecondaryBarrier), "Secondary barrier");
+        public static readonly LocalizationKey SecondaryBarrierDescription = new(nameof(SecondaryBarrierDescription), "The second line barrier type");
         public static readonly LocalizationKey EnableCops = new(nameof(EnableCops), "Enable cops");
         public static readonly LocalizationKey EnableCopsDescription = new(nameof(EnableCopsDescription), "Check if cops should be spawned with the roadblock");
         public static readonly LocalizationKey SpeedLimit = new(nameof(SpeedLimit), "Slow traffic");
@@ -125,8 +127,10 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {
-            Barrier,
-            BarrierDescription,
+            MainBarrier,
+            MainBarrierDescription,
+            SecondaryBarrier,
+            SecondaryBarrierDescription,
             BlockLanes,
             BlockLanesDescription,
             Blue,

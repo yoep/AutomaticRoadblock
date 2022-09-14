@@ -52,7 +52,7 @@ namespace AutomaticRoadblocks.Barriers
         /// <summary>
         /// Verify if this barrier model is the special <see cref="None"/> type.
         /// </summary>
-        public bool IsNone => Equals(None);
+        public bool IsNone => Model == null;
 
         /// <summary>
         /// Create a model for the given barrier data. 

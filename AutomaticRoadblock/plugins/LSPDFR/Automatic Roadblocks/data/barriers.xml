@@ -98,7 +98,7 @@
     <Barrier>
         <Name>High barrier</Name>
         <ScriptName>work_barrier_high</ScriptName>
-        <Model>prop_barrier_work06b</Model>
+        <Model>prop_mp_barrier_02b</Model>
         <Spacing>0.2</Spacing>
         <Flags>
             <Flag>ManualPlacement</Flag>
