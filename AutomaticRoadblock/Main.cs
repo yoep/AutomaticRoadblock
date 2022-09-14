@@ -53,6 +53,7 @@ namespace AutomaticRoadblocks
 
         public override void Initialize()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += LSPDFRResolveEventHandler;
             InitializeSettings();
             InitializeDutyListener();
             InitializeMenuComponents();
@@ -221,6 +222,12 @@ namespace AutomaticRoadblocks
             {
                 pursuitListener.StopListener();
             }
+        }
+        
+        private static Assembly LSPDFRResolveEventHandler(object sender, ResolveEventArgs args)
+        {
+            return Functions.GetAllUserPlugins()
+                .FirstOrDefault(assembly => args.Name.ToLower().Contains(assembly.GetName().Name.ToLower()));
         }
 
         private static bool IsLSPDFRPluginRunning(string plugin, Version minVersion = null)
