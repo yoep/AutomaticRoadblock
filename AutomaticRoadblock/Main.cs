@@ -153,6 +153,7 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitEnableSpikeStripComponentItem))
                 // manual placement components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualRoadblockPlaceComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementRemoveComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PlacementTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableCopsComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableSpeedLimitComponentItem))
@@ -161,7 +162,6 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementLightTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementVehicleTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementOffsetComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementRemoveComponentItem))
                 // redirect traffic components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficPlaceComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficLaneTypeComponentItem))
