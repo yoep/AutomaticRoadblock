@@ -45,6 +45,7 @@ namespace AutomaticRoadblocks.Xml
             // insert the additions before the object serializer (because everything is an object)
             _deserializers.InsertRange(0, new List<IXmlDeserializer>
             {
+                new EBarrierFlagsXmlDeserializer()
             });
 
             return this;

@@ -30,15 +30,17 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private readonly bool _shouldAddLights;
 
-        protected AbstractRoadblockSlot(Road.Lane lane, BarrierType barrierType, VehicleType vehicleType, float heading, bool shouldAddLights,
+        protected AbstractRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, VehicleType vehicleType, float heading,
+            bool shouldAddLights,
             bool recordVehicleCollisions, float offset = 0f)
         {
             Assert.NotNull(lane, "lane cannot be null");
-            Assert.NotNull(barrierType, "barrierType cannot be null");
+            Assert.NotNull(mainBarrier, "barrierType cannot be null");
             Assert.NotNull(vehicleType, "vehicleType cannot be null");
             Assert.NotNull(heading, "heading cannot be null");
             Lane = lane;
-            BarrierType = barrierType;
+            MainBarrier = mainBarrier;
+            SecondaryBarrier = secondaryBarrier;
             VehicleType = vehicleType;
             Heading = heading;
             RecordVehicleCollisions = recordVehicleCollisions;
@@ -83,9 +85,14 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             .ToList();
 
         /// <summary>
-        /// The barrier type that is used within this slot.
+        /// The main barrier that is used within this slot as first row.
         /// </summary>
-        public BarrierType BarrierType { get; }
+        public BarrierModel MainBarrier { get; }
+
+        /// <summary>
+        /// The secondary barrier that is used within this slot as second row.
+        /// </summary>
+        public BarrierModel SecondaryBarrier { get; }
 
         /// <summary>
         /// The indication if the spawned vehicle should record collisions.
@@ -165,7 +172,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             return
                 $"Number of {nameof(Instances)}: {Instances.Count}, {nameof(Position)}: {Position}, {nameof(OffsetPosition)}: {OffsetPosition}, {nameof(Heading)}: {Heading}, " +
-                $"{nameof(BarrierType)}: {BarrierType} {nameof(VehicleType)}: {VehicleType}";
+                $"{nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, {nameof(VehicleType)}: {VehicleType}";
         }
 
         /// <inheritdoc />
@@ -220,8 +227,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             InitializeCops();
             InitializeScenery();
 
-            if (!BarrierType.IsNone)
-                InitializeBarriers();
+            if (!MainBarrier.IsNone)
+                InitializeBarriers(MainBarrier, 3f);
+
+            if (!SecondaryBarrier.IsNone)
+                InitializeBarriers(SecondaryBarrier, -3f);
 
             if (_shouldAddLights)
                 InitializeLights();
@@ -288,37 +298,34 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading, RecordVehicleCollisions)));
         }
 
-        private void InitializeBarriers()
+        private void InitializeBarriers(BarrierModel barrierModel, float roadOffset)
         {
-            // verify if a barrier type is given
-            if (BarrierType == BarrierType.None)
-                return;
-
-            Logger.Trace("Initializing the roadblock slot barriers");
-            var rowPosition = OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading - 180) * 3f;
-            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * (Lane.Width / 2 - BarrierType.Width / 2);
+            Logger.Trace($"Initializing roadblock slot barriers for {{{barrierModel}}} with offset {roadOffset}");
+            var rowPosition = OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading - 180) * roadOffset;
+            var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(Heading + 90) * (Lane.Width / 2 - barrierModel.Width / 2);
             var direction = MathHelper.ConvertHeadingToDirection(Heading - 90);
-            var barrierTotalWidth = BarrierType.Spacing + BarrierType.Width;
+            var barrierTotalWidth = barrierModel.Spacing + barrierModel.Width;
             var totalBarriers = (int)Math.Floor(Lane.Width / barrierTotalWidth);
 
-            Logger.Trace($"Barrier info: lane width {Lane.Width}, type {BarrierType}, width: {BarrierType.Width}, spacing: {BarrierType.Spacing}");
-            Logger.Debug($"Creating a total of {totalBarriers} barriers with type {BarrierType} for the roadblock slot");
+            Logger.Trace($"Barrier info: lane width {Lane.Width}, type {barrierModel}, width: {barrierModel.Width}, spacing: {barrierModel.Spacing}");
+            Logger.Debug($"Creating a total of {totalBarriers} barriers with type {barrierModel} for the roadblock slot");
             for (var i = 0; i < totalBarriers; i++)
             {
-                Instances.Add(new InstanceSlot(EEntityType.Barrier, startPosition, Heading, CreateBarrier));
+                Instances.Add(new InstanceSlot(EEntityType.Barrier, startPosition, Heading,
+                    (position, heading) => CreateBarrier(barrierModel, position, heading)));
                 startPosition += direction * barrierTotalWidth;
             }
         }
 
-        private IARInstance<Entity> CreateBarrier(Vector3 position, float heading)
+        private IARInstance<Entity> CreateBarrier(BarrierModel barrierModel, Vector3 position, float heading)
         {
             try
             {
-                return BarrierFactory.Create(BarrierType, position, heading);
+                return BarrierFactory.Create(barrierModel, position, heading);
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to create barrier of type {BarrierType}, {ex.Message}", ex);
+                Logger.Error($"Failed to create barrier of type {barrierModel}, {ex.Message}", ex);
                 return null;
             }
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.SpikeStrip.Slot;
@@ -30,17 +31,30 @@ namespace AutomaticRoadblocks.Roadblock
 
         private static readonly Random Random = new();
         private static readonly ILocalizer Localizer = IoC.Instance.GetInstance<ILocalizer>();
+        private static readonly ISpikeStripDispatcher SpikeStripDispatcher = IoC.Instance.GetInstance<ISpikeStripDispatcher>();
+        private static readonly IModelProvider ModelProvider = IoC.Instance.GetInstance<IModelProvider>();
 
         private float _lastKnownDistanceToRoadblock = 9999f;
 
-        protected AbstractPursuitRoadblock(ISpikeStripDispatcher spikeStripDispatcher, Road street, BarrierType mainBarrierType, Vehicle targetVehicle,
+        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, Vehicle targetVehicle,
             ERoadblockFlags flags)
-            : base(street, mainBarrierType, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
+            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
         {
-            Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
-            SpikeStripDispatcher = spikeStripDispatcher;
             TargetVehicle = targetVehicle;
+            ChaseVehicleBarrier = BarrierModel.None;
+            RoadblockStateChanged += OnStateChanged;
+
+            Initialize();
+        }
+        
+        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle,
+            ERoadblockFlags flags)
+            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
+        {
+            Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
+            TargetVehicle = targetVehicle;
+            ChaseVehicleBarrier = chaseVehicleBarrier;
             RoadblockStateChanged += OnStateChanged;
 
             Initialize();
@@ -53,17 +67,17 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         [CanBeNull]
         protected Vehicle TargetVehicle { get; }
+        
+        /// <summary>
+        /// The barrier model for the chase vehicle.
+        /// </summary>
+        protected BarrierModel ChaseVehicleBarrier { get; }
 
         /// <summary>
         /// Verify if the <see cref="TargetVehicle"/> instance is invalidated by the game.
         /// This might be the case by the pursuit suddenly being (forcefully) ended.
         /// </summary>
         private bool IsVehicleInstanceInvalid => TargetVehicle == null || !TargetVehicle.IsValid();
-
-        /// <summary>
-        /// The spike strip dispatcher to use for deploying spike strip slots.
-        /// </summary>
-        private ISpikeStripDispatcher SpikeStripDispatcher { get; }
 
         #endregion
 
@@ -107,11 +121,12 @@ namespace AutomaticRoadblocks.Roadblock
                 Road.RightSide,
                 Road.LeftSide
             };
-            
+
             foreach (var position in conePositions)
             {
                 Instances.Add(new InstanceSlot(EEntityType.Scenery, position + direction * 3.5f, 0f,
-                    (conePosition, _) => BarrierFactory.Create(BarrierType.BigConeStriped, conePosition)));
+                    (conePosition, _) =>
+                        BarrierFactory.Create(ModelProvider.RetrieveModelByScriptName<BarrierModel>(Barrier.BigConeStripesScriptName), conePosition)));
             }
         }
 
@@ -179,14 +194,14 @@ namespace AutomaticRoadblocks.Roadblock
         private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
         {
             var rowPosition = chasePosition + MathHelper.ConvertHeadingToDirection(TargetHeading - 180) * 4f;
-            var nextPositionDistance = BarrierType.BarrelTrafficCatcher.Width + BarrierType.BarrelTrafficCatcher.Spacing;
+            var nextPositionDistance = ChaseVehicleBarrier.Width + ChaseVehicleBarrier.Spacing;
             var nextPositionDirection = MathHelper.ConvertHeadingToDirection(TargetHeading - 90);
             var startPosition = rowPosition + MathHelper.ConvertHeadingToDirection(TargetHeading + 90) * (nextPositionDistance * 2f);
 
             for (var i = 0; i < 5; i++)
             {
                 Instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, TargetHeading,
-                    (position, heading) => BarrierFactory.Create(BarrierType.BarrelTrafficCatcher, position, heading)));
+                    (position, heading) => BarrierFactory.Create(ChaseVehicleBarrier, position, heading)));
                 startPosition += nextPositionDirection * nextPositionDistance;
             }
         }

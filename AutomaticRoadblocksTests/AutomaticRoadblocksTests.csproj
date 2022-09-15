@@ -38,7 +38,16 @@
         <Reference Include="LSPD First Response">
           <HintPath>..\Libs\LSPD First Response.dll</HintPath>
         </Reference>
+        <Reference Include="Microsoft.CSharp" />
+        <Reference Include="RAGENativeUI, Version=1.9.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\RAGENativeUI.1.9.0\lib\net472\RAGENativeUI.dll</HintPath>
+        </Reference>
+        <Reference Include="RagePluginHook, Version=0.0.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\RagePluginHook.1.86.1\lib\net472\RagePluginHook.dll</HintPath>
+        </Reference>
         <Reference Include="System" />
+        <Reference Include="System.Drawing" />
+        <Reference Include="System.Windows.Forms" />
         <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
           <HintPath>..\packages\xunit.abstractions.2.0.3\lib\net35\xunit.abstractions.dll</HintPath>
         </Reference>
@@ -53,8 +62,10 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Models\Lspdfr\LspdfrModelProviderTests.cs" />
+        <Compile Include="Barriers\BarrierDataTests.cs" />
+        <Compile Include="Debug\DebugReloadDataFilesComponentTests.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Roadblock\Data\RoadblockDataFileTests.cs" />
         <Compile Include="TestUtils.cs" />
     </ItemGroup>
     <ItemGroup>
@@ -62,20 +73,6 @@
         <Project>{a869776e-0e1d-4a25-a9b8-c5ce060bf760}</Project>
         <Name>AutomaticRoadblock</Name>
       </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="lspdfr\data\agency.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="lspdfr\data\backup.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="lspdfr\data\inventory.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="lspdfr\data\outfits.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />

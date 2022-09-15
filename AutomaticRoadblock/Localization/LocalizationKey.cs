@@ -43,8 +43,10 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly LocalizationKey Place = new(nameof(Place), "Place");
         public static readonly LocalizationKey PlaceDescription = new(nameof(PlaceDescription), "Place a roadblock at the current highlighted location");
-        public static readonly LocalizationKey Barrier = new(nameof(Barrier), "Barrier");
-        public static readonly LocalizationKey BarrierDescription = new(nameof(BarrierDescription), "The barrier type to use");
+        public static readonly LocalizationKey MainBarrier = new(nameof(MainBarrier), "Main barrier");
+        public static readonly LocalizationKey MainBarrierDescription = new(nameof(MainBarrierDescription), "The first line barrier type");
+        public static readonly LocalizationKey SecondaryBarrier = new(nameof(SecondaryBarrier), "Secondary barrier");
+        public static readonly LocalizationKey SecondaryBarrierDescription = new(nameof(SecondaryBarrierDescription), "The second line barrier type");
         public static readonly LocalizationKey EnableCops = new(nameof(EnableCops), "Enable cops");
         public static readonly LocalizationKey EnableCopsDescription = new(nameof(EnableCopsDescription), "Check if cops should be spawned with the roadblock");
         public static readonly LocalizationKey SpeedLimit = new(nameof(SpeedLimit), "Slow traffic");
@@ -110,22 +112,6 @@ namespace AutomaticRoadblocks.Localization
         #region BarrierType
 
         public static readonly LocalizationKey None = new(nameof(None), "None");
-        public static readonly LocalizationKey BarrierTypeSmallCone = new(nameof(BarrierTypeSmallCone), "Small cone");
-        public static readonly LocalizationKey BarrierTypeSmallConeStriped = new(nameof(BarrierTypeSmallConeStriped), "Small cone striped");
-        public static readonly LocalizationKey BarrierTypeBigCone = new(nameof(BarrierTypeBigCone), "Big cone");
-        public static readonly LocalizationKey BarrierTypeBigConeStriped = new(nameof(BarrierTypeBigConeStriped), "Big cone striped");
-        public static readonly LocalizationKey BarrierTypePoliceDoNotCross = new(nameof(BarrierTypePoliceDoNotCross), "Police do not cross");
-        public static readonly LocalizationKey BarrierTypeWorkBarrierLarge = new(nameof(BarrierTypeWorkBarrierLarge), "Work barrier large");
-        public static readonly LocalizationKey BarrierTypeWorkBarrierSmall = new(nameof(BarrierTypeWorkBarrierSmall), "Work barrier small");
-
-        public static readonly LocalizationKey BarrierTypeWorkBarrierSmallWithLight =
-            new(nameof(BarrierTypeWorkBarrierSmallWithLight), "Work barrier small light");
-
-        public static readonly LocalizationKey BarrierTypeWorkBarrierWithSign = new(nameof(BarrierTypeWorkBarrierWithSign), "Work ahead sign");
-        public static readonly LocalizationKey BarrierTypeWorkBarrierWithSignLight = new(nameof(BarrierTypeWorkBarrierWithSignLight), "Work ahead sign lights");
-        public static readonly LocalizationKey BarrierTypeWorkBarrierHigh = new(nameof(BarrierTypeWorkBarrierHigh), "High barrier");
-        public static readonly LocalizationKey BarrierTypeBarrelTrafficCatcher = new(nameof(BarrierTypeBarrelTrafficCatcher), "Barrel");
-        public static readonly LocalizationKey BarrierTypeConeWithLight = new(nameof(BarrierTypeConeWithLight), "Cone light");
 
         #endregion
 
@@ -141,20 +127,10 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {
-            Barrier,
-            BarrierDescription,
-            BarrierTypeBarrelTrafficCatcher,
-            BarrierTypeBigCone,
-            BarrierTypeBigConeStriped,
-            BarrierTypeConeWithLight,
-            BarrierTypePoliceDoNotCross,
-            BarrierTypeSmallCone,
-            BarrierTypeSmallConeStriped,
-            BarrierTypeWorkBarrierHigh,
-            BarrierTypeWorkBarrierLarge,
-            BarrierTypeWorkBarrierSmall,
-            BarrierTypeWorkBarrierWithSign,
-            BarrierTypeWorkBarrierWithSignLight,
+            MainBarrier,
+            MainBarrierDescription,
+            SecondaryBarrier,
+            SecondaryBarrierDescription,
             BlockLanes,
             BlockLanesDescription,
             Blue,
@@ -212,7 +188,7 @@ namespace AutomaticRoadblocks.Localization
             Warning,
         };
 
-        private LocalizationKey(string identifier, string defaultText)
+        public LocalizationKey(string identifier, string defaultText)
         {
             Identifier = identifier;
             DefaultText = defaultText;

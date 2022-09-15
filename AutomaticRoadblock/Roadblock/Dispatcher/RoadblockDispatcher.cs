@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Pursuit.Factory;
+using AutomaticRoadblocks.Roadblock.Data;
 using AutomaticRoadblocks.Settings;
-using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
@@ -30,7 +32,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly ILocalizer _localizer;
-        private readonly ISpikeStripDispatcher _spikeStripDispatcher;
+        private readonly IRoadblockData _roadblockData;
+        private readonly IModelProvider _modelProvider;
 
         private readonly List<RoadblockInfo> _roadblocks = new();
         private readonly List<IVehicleNode> _foundRoads = new();
@@ -38,14 +41,15 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private bool _cleanerRunning;
         private bool _userRequestedRoadblockDispatching;
 
-        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer,
-            ISpikeStripDispatcher spikeStripDispatcher)
+        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer, IRoadblockData roadblockData,
+            IModelProvider modelProvider)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
             _localizer = localizer;
-            _spikeStripDispatcher = spikeStripDispatcher;
+            _roadblockData = roadblockData;
+            _modelProvider = modelProvider;
         }
 
         #region Properties
@@ -255,7 +259,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-            var roadblock = PursuitRoadblockFactory.Create(_spikeStripDispatcher, actualLevelToUse, road, vehicle, flags);
+            GetBarriersForLevel(actualLevelToUse, out var mainBarrier, out var secondaryBarrier, out var chaseVehicleBarrier);
+            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, flags);
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
             lock (_roadblocks)
@@ -519,6 +524,28 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     _logger.Warn($"Unable to remove roadblock from dispatcher, roadblock not found: {roadblock}");
                 }
             }
+        }
+
+        private RoadblockData GetDataForLevel(ERoadblockLevel level)
+        {
+            var data = _roadblockData.Roadblocks.Items.FirstOrDefault(x => x.Level == level.Level);
+            if (data == null)
+                throw new RoadblockException($"Roadblock data couldn't be found for level {level}");
+
+            return data;
+        }
+
+        private void GetBarriersForLevel(ERoadblockLevel level, out BarrierModel mainBarrier, out BarrierModel secondaryBarrier,
+            out BarrierModel chaseVehicleBarrier)
+        {
+            var configData = GetDataForLevel(level);
+            mainBarrier = _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.MainBarrier);
+            secondaryBarrier = !string.IsNullOrWhiteSpace(configData.SecondaryBarrier)
+                ? _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.SecondaryBarrier)
+                : BarrierModel.None;
+            chaseVehicleBarrier = !string.IsNullOrWhiteSpace(configData.ChaseVehicleBarrier)
+                ? _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.ChaseVehicleBarrier)
+                : BarrierModel.None;
         }
 
         /// <summary>

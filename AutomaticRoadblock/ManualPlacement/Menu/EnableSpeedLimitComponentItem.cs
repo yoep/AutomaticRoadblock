@@ -5,14 +5,14 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class EnableSpeedLimitComponentItem: IMenuComponent<UIMenuCheckboxItem>
+    public class EnableSpeedLimitComponentItem : IMenuComponent<UIMenuCheckboxItem>
     {
         private readonly IManualPlacement _manualPlacement;
 
         public EnableSpeedLimitComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _manualPlacement = manualPlacement;
-            
+
             MenuItem = new UIMenuCheckboxItem(localizer[LocalizationKey.SpeedLimit], true,
                 localizer[LocalizationKey.SpeedLimitDescription]);
         }

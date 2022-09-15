@@ -383,7 +383,7 @@ namespace AutomaticRoadblocks
                         actualParameterType = GetGenericTypeForCollection(actualParameterType);
                     }
 
-                    return _components.FirstOrDefault(x => x.Type == actualParameterType) != null;
+                    return _components.FirstOrDefault(x => actualParameterType.IsAssignableFrom(x.Type)) != null;
                 });
         }
 

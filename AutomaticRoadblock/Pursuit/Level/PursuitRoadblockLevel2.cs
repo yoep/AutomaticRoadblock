@@ -1,7 +1,6 @@
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Street.Info;
 using Rage;
 
@@ -9,8 +8,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel2 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel2(ISpikeStripDispatcher spikeStripDispatcher, Road street, Vehicle targetVehicle, ERoadblockFlags flags)
-            : base(spikeStripDispatcher, street, BarrierType.BigCone, targetVehicle, flags)
+        public PursuitRoadblockLevel2(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, Vehicle targetVehicle, ERoadblockFlags flags)
+            : base(street, mainBarrier, secondaryBarrier, targetVehicle, flags)
         {
         }
 
@@ -32,7 +31,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
-            return new PursuitRoadblockSlotLevel2(lane, MainBarrierType, heading, targetVehicle, shouldAddLights);
+            return new PursuitRoadblockSlotLevel2(lane, MainBarrier, SecondaryBarrier, heading, targetVehicle, shouldAddLights);
         }
 
         #endregion

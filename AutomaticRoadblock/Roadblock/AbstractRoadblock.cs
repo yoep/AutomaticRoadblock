@@ -38,16 +38,39 @@ namespace AutomaticRoadblocks.Roadblock
         /// Initialize a new roadblock instance.
         /// </summary>
         /// <param name="street">The road of that the roadblock will block.</param>
-        /// <param name="mainBarrierType">The main barrier used within the slots.</param>
+        /// <param name="mainBarrier">The main barrier used within the slots.</param>
         /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
         /// <param name="flags">The roadblock configuration.</param>
         /// <param name="offset">The offset placement in regards to the road node.</param>
-        internal AbstractRoadblock(Road street, BarrierType mainBarrierType, float targetHeading, ERoadblockFlags flags, float offset = 0f)
+        internal AbstractRoadblock(Road street, BarrierModel mainBarrier, float targetHeading, ERoadblockFlags flags, float offset = 0f)
         {
             Assert.NotNull(street, "road cannot be null");
-            Assert.NotNull(mainBarrierType, "mainBarrierType cannot be null");
+            Assert.NotNull(mainBarrier, "mainBarrierType cannot be null");
             Road = street;
-            MainBarrierType = mainBarrierType;
+            MainBarrier = mainBarrier;
+            SecondaryBarrier = BarrierModel.None;
+            TargetHeading = targetHeading;
+            Flags = flags;
+            Offset = offset;
+        }
+
+        /// <summary>
+        /// Initialize a new roadblock instance.
+        /// </summary>
+        /// <param name="street">The road of that the roadblock will block.</param>
+        /// <param name="mainBarrier">The main barrier used within the slots.</param>
+        /// <param name="secondaryBarrier">The secondary barrier used within the slots.</param>
+        /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
+        /// <param name="flags">The roadblock configuration.</param>
+        /// <param name="offset">The offset placement in regards to the road node.</param>
+        internal AbstractRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float targetHeading, ERoadblockFlags flags, float offset = 0f)
+        {
+            Assert.NotNull(street, "road cannot be null");
+            Assert.NotNull(mainBarrier, "mainBarrierType cannot be null");
+            Assert.NotNull(secondaryBarrier, "secondaryBarrier cannot be null");
+            Road = street;
+            MainBarrier = mainBarrier;
+            SecondaryBarrier = secondaryBarrier;
             TargetHeading = targetHeading;
             Flags = flags;
             Offset = offset;
@@ -86,7 +109,12 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Get the main barrier type of the roadblock.
         /// </summary>
-        protected BarrierType MainBarrierType { get; }
+        protected BarrierModel MainBarrier { get; }
+
+        /// <summary>
+        /// Get the secondary barrier type of the roadblock.
+        /// </summary>
+        protected BarrierModel SecondaryBarrier { get; }
 
         /// <summary>
         /// Get the target heading of the roadblock.

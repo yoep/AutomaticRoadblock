@@ -69,11 +69,19 @@
         <Compile Include="Api\Functions.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
+        <Compile Include="Barriers\Barrier.cs" />
         <Compile Include="Barriers\BarrierFactory.cs" />
-        <Compile Include="Barriers\BarrierType.cs" />
+        <Compile Include="Barriers\BarrierDataFile.cs" />
+        <Compile Include="Barriers\BarrierModel.cs" />
+        <Compile Include="Barriers\Barriers.cs" />
+        <Compile Include="Barriers\EBarrierFlags.cs" />
+        <Compile Include="Barriers\IBarrierData.cs" />
+        <Compile Include="Data\AbstractDataFileLoader.cs" />
+        <Compile Include="Data\IDataFile.cs" />
         <Compile Include="Debug\Menu\DebugDeploySpikeStripComponent.cs" />
         <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
         <Compile Include="Debug\Menu\DebugPursuitForceOnFootComponent.cs" />
+        <Compile Include="Debug\Menu\DebugReloadDataFilesComponent.cs" />
         <Compile Include="Debug\Menu\DebugRoadInfoComponent.cs" />
         <Compile Include="Debug\Menu\DebugRoadPreviewComponent.cs" />
         <Compile Include="Debug\Menu\DebugPursuitToggleComponent.cs" />
@@ -106,16 +114,18 @@
         <Compile Include="Localization\LocalizationNotFound.cs" />
         <Compile Include="Localization\Localizer.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="ManualPlacement\Menu\AbstractBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementRemoveComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableCopsComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableSpeedLimitComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualPlacementSecondaryBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\PlacementType.cs" />
         <Compile Include="ManualPlacement\IManualPlacement.cs" />
         <Compile Include="ManualPlacement\ManualPlacement.cs" />
         <Compile Include="ManualPlacement\ManualRoadblock.cs" />
         <Compile Include="ManualPlacement\ManualRoadblockSlot.cs" />
-        <Compile Include="ManualPlacement\Menu\ManualPlacementBarrierComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualPlacementMainBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\PlacementTypeComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementLightTypeComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementMenuSwitchItem.cs" />
@@ -127,31 +137,14 @@
         <Compile Include="Menu\MenuImpl.cs" />
         <Compile Include="Menu\EMenuType.cs" />
         <Compile Include="Menu\Switcher\IMenuSwitchItem.cs" />
-        <Compile Include="Models\CommonModelInfo.cs" />
-        <Compile Include="Models\EUnitType.cs" />
-        <Compile Include="Models\IModelData.cs" />
+        <Compile Include="Models\AbstractModel.cs" />
+        <Compile Include="Models\IModel.cs" />
         <Compile Include="Models\IModelProvider.cs" />
-        <Compile Include="Models\Lspdfr\Agencies.cs" />
-        <Compile Include="Models\Lspdfr\Agency.cs" />
-        <Compile Include="Models\Lspdfr\Backup.cs" />
-        <Compile Include="Models\Lspdfr\BackupAgency.cs" />
-        <Compile Include="Models\Lspdfr\BackupUnits.cs" />
-        <Compile Include="Models\Lspdfr\Inventories.cs" />
-        <Compile Include="Models\Lspdfr\Inventory.cs" />
-        <Compile Include="Models\Lspdfr\InventoryWeapon.cs" />
-        <Compile Include="Models\Lspdfr\Loadout.cs" />
-        <Compile Include="Models\Lspdfr\LspdfrModelData.cs" />
-        <Compile Include="Models\Lspdfr\LspdfrModelProvider.cs" />
-        <Compile Include="Models\Lspdfr\NumPeds.cs" />
-        <Compile Include="Models\Lspdfr\Outfit.cs" />
-        <Compile Include="Models\Lspdfr\Outfits.cs" />
-        <Compile Include="Models\Lspdfr\Ped.cs" />
-        <Compile Include="Models\Lspdfr\StunWeapon.cs" />
-        <Compile Include="Models\Lspdfr\Vehicle.cs" />
+        <Compile Include="Models\InvalidModelException.cs" />
         <Compile Include="Models\ModelException.cs" />
-        <Compile Include="Models\NoModelAvailableException.cs" />
-        <Compile Include="Models\PedModelInfo.cs" />
-        <Compile Include="Models\VehicleModelInfo.cs" />
+        <Compile Include="Models\ModelNotFoundException.cs" />
+        <Compile Include="Models\ModelProvider.cs" />
+        <Compile Include="Models\ModelProviderEvents.cs" />
         <Compile Include="Preview\IPreviewSupport.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Pursuit\EPursuitState.cs" />
@@ -192,6 +185,10 @@
         <Compile Include="RedirectTraffic\RedirectTrafficDispatcher.cs" />
         <Compile Include="RedirectTraffic\RedirectTrafficType.cs" />
         <Compile Include="Roadblock\AbstractPursuitRoadblock.cs" />
+        <Compile Include="Roadblock\Data\IRoadblockData.cs" />
+        <Compile Include="Roadblock\Data\RoadblockData.cs" />
+        <Compile Include="Roadblock\Data\RoadblockDataFile.cs" />
+        <Compile Include="Roadblock\Data\Roadblocks.cs" />
         <Compile Include="Roadblock\Dispatcher\DispatchOptions.cs" />
         <Compile Include="Roadblock\Dispatcher\IRoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockDispatcher.cs" />
@@ -203,6 +200,7 @@
         <Compile Include="Roadblock\Menu\RoadblockMenuSwitchItem.cs" />
         <Compile Include="Roadblock\RoadblockEvents.cs" />
         <Compile Include="Roadblock\ERoadblockFlags.cs" />
+        <Compile Include="Roadblock\RoadblockException.cs" />
         <Compile Include="Roadblock\RoadblockHelpers.cs" />
         <Compile Include="Roadblock\ERoadblockLevel.cs" />
         <Compile Include="Roadblock\ERoadblockState.cs" />
@@ -261,6 +259,7 @@
         <Compile Include="Xml\Deserializers\BooleanXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\CollectionXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\DoubleXmlDeserializer.cs" />
+        <Compile Include="Xml\Deserializers\EBarrierFlagsXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\Int32Deserializer.cs" />
         <Compile Include="Xml\Deserializers\ObjectXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\StringXmlDeserializer.cs" />
@@ -274,6 +273,12 @@
     <ItemGroup>
       <Content Include="AutomaticRoadblocks.ini">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="plugins\LSPDFR\Automatic Roadblocks\data\barriers.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="plugins\LSPDFR\Automatic Roadblocks\data\roadblocks.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
     <ItemGroup>

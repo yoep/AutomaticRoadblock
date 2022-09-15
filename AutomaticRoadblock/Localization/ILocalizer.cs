@@ -17,5 +17,10 @@ namespace AutomaticRoadblocks.Localization
         /// <param name="key">The key to retrieve the message from.</param>
         /// <param name="args">The formatting arguments for the message.</param>
         string this[LocalizationKey key, params object[] args] { get; }
+
+        /// <summary>
+        /// Reload the localization data.
+        /// </summary>
+        void Reload();
     }
 }

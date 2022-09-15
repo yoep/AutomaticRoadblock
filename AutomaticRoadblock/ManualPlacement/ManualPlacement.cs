@@ -15,7 +15,8 @@ namespace AutomaticRoadblocks.ManualPlacement
     {
         private readonly ISettingsManager _settingsManager;
 
-        private BarrierType _barrier = BarrierType.SmallCone;
+        private BarrierModel _mainBarrier = BarrierModel.None;
+        private BarrierModel _secondaryBarrier = BarrierModel.None;
         private VehicleType _vehicleType = VehicleType.LocalUnit;
         private LightSourceType _lightSourceType = LightSourceType.Flares;
         private PlacementType _placementType = PlacementType.All;
@@ -31,10 +32,17 @@ namespace AutomaticRoadblocks.ManualPlacement
         #region Properties
 
         /// <inheritdoc />
-        public BarrierType Barrier
+        public BarrierModel MainBarrier
         {
-            get => _barrier;
-            set => UpdateBarrier(value);
+            get => _mainBarrier;
+            set => UpdateMainBarrier(value);
+        }
+
+        /// <inheritdoc />
+        public BarrierModel SecondaryBarrier
+        {
+            get => _secondaryBarrier;
+            set => UpdateSecondaryBarrier(value);
         }
 
         /// <inheritdoc />
@@ -154,10 +162,11 @@ namespace AutomaticRoadblocks.ManualPlacement
             if (street.GetType() == typeof(Intersection))
                 return null;
 
-            var roadblock = new ManualRoadblock(new ManualRoadblock.Request
+            var request = new ManualRoadblock.Request
             {
                 Road = (Road)street,
-                BarrierType = _barrier,
+                MainBarrier = _mainBarrier,
+                SecondaryBarrier = _secondaryBarrier,
                 VehicleType = _vehicleType,
                 LightSourceType = _lightSourceType,
                 PlacementType = _placementType,
@@ -166,14 +175,23 @@ namespace AutomaticRoadblocks.ManualPlacement
                 AddLights = LightSourceType != LightSourceType.None,
                 CopsEnabled = CopsEnabled,
                 Offset = Offset
-            });
+            };
+            
+            Logger.Trace($"Creating new manual roadblock for request {request}");
+            var roadblock = new ManualRoadblock(request);
             Logger.Debug($"Created manual roadblock {roadblock}");
             return roadblock;
         }
 
-        private void UpdateBarrier(BarrierType newType)
+        private void UpdateMainBarrier(BarrierModel newType)
         {
-            _barrier = newType;
+            _mainBarrier = newType;
+            DoInternalPreviewCreation(true);
+        }
+
+        private void UpdateSecondaryBarrier(BarrierModel newType)
+        {
+            _secondaryBarrier = newType;
             DoInternalPreviewCreation(true);
         }
 

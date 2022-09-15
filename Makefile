@@ -7,28 +7,33 @@ bump-dependencies: # Install required dependencies
 bump-%: bump-dependencies # Bump the (major, minor, patch) version of the application
 	@bumpversion $*
 
+copy-%: # Copy all compiled files to the Build directory
+	@xcopy "AutomaticRoadblock\\bin\\x64\\$*\\AutomaticRoadblocks.dll" "Build\\Grand Theft Auto V\\plugins\\LSPDFR\\" /f /y
+	@xcopy "AutomaticRoadblock\\bin\\x64\\$*\\AutomaticRoadblocks.ini" "Build\\Grand Theft Auto V\\plugins\\LSPDFR\\" /f /y
+	@xcopy "AutomaticRoadblock\\bin\\x64\\$*\\AutomaticRoadblocks.pdb" "Build\\Grand Theft Auto V\\plugins\\LSPDFR\\" /f /y
+	@xcopy "AutomaticRoadblock\\bin\\x64\\$*\\plugins\\LSPDFR\\Automatic Roadblocks\\data\\*.xml" "Build\\Grand Theft Auto V\\plugins\\LSPDFR\\Automatic Roadblocks\\data\\" /f /y
+
 restore: # Restore the nuget packages
 	@nuget restore AutomaticRoadblock.sln
 
-clean:	# Clean the build directory of the application
+clean: # Clean the bin directory of the application
 	@dotnet clean
 
 test: clean
 	@dotnet test --configuration Debug /p:Platform=x64 --no-restore
 
-build: clean # Build the debug version of the application
+build-dotnet: clean # Build the debug version of the application
 	@dotnet build --configuration Debug /p:Platform=x64 --no-restore
 
-build-release: # Build the release version of the application
-	@dotnet build AutomaticRoadblock/AutomaticRoadblock.csproj --configuration Release /p:Platform=x64 --no-restore
-	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.dll" "Build\Grand Theft Auto V\plugins\LSPDFR\" /f /y
-	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.ini" "Build\Grand Theft Auto V\plugins\LSPDFR\" /f /y
-	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.pdb" "Build\Grand Theft Auto V\plugins\LSPDFR\" /f /y
-	@xcopy "AutomaticRoadblock\bin\x64\Release\AutomaticRoadblocks.xml" "Build\API Documentation\" /f /y
-	@xcopy "AutomaticRoadblock\Api\Functions.cs" "Build\API Documentation\" /f /y
+build-dotnet-release: clean # Build the release version of the application
+	@dotnet build --configuration Release /p:Platform=x64 --no-restore
+
+build: build-dotnet copy-Debug # Prepare & Build the Debug version of the application
+
+build-release: build-dotnet-release copy-Release # Prepare & Build the Release version of the application
+	@xcopy "AutomaticRoadblock\\Api\\Functions.cs" "Build\\API Documentation\\" /f /y
 
 release: bump-minor build-release # Build the release version of the application
-	
 
 release-bugfix: bump-patch build-release # Build a bugfix release version of the application
 

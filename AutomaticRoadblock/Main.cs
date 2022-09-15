@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.AbstractionLayer.Implementation;
+using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Debug.Menu;
 using AutomaticRoadblocks.Integrations;
 using AutomaticRoadblocks.Integrations.PoliceSmartRadio;
@@ -14,11 +15,11 @@ using AutomaticRoadblocks.ManualPlacement.Menu;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
 using AutomaticRoadblocks.Models;
-using AutomaticRoadblocks.Models.Lspdfr;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.Pursuit.Menu;
 using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.RedirectTraffic.Menu;
+using AutomaticRoadblocks.Roadblock.Data;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
@@ -98,8 +99,9 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
                 .RegisterSingleton<IPluginIntegrationManager>(typeof(PluginIntegrationManager))
                 .RegisterSingleton<IMenu>(typeof(MenuImpl))
-                .RegisterSingleton<IModelData>(typeof(LspdfrModelData))
-                .RegisterSingleton<IModelProvider>(typeof(LspdfrModelProvider))
+                .RegisterSingleton<IBarrierData>(typeof(BarrierDataFile))
+                .RegisterSingleton<IRoadblockData>(typeof(RoadblockDataFile))
+                .RegisterSingleton<IModelProvider>(typeof(ModelProvider))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
                 .RegisterSingleton<IManualPlacement>(typeof(ManualPlacement.ManualPlacement))
@@ -151,14 +153,15 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitEnableSpikeStripComponentItem))
                 // manual placement components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualRoadblockPlaceComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementRemoveComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PlacementTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableCopsComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableSpeedLimitComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementBarrierComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementMainBarrierComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementSecondaryBarrierComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementLightTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementVehicleTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementOffsetComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementRemoveComponentItem))
                 // redirect traffic components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficPlaceComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficLaneTypeComponentItem))
@@ -260,6 +263,7 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugDeploySpikeStripComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPreviewSpikeStripComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugReloadDataFilesComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugZoneInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))

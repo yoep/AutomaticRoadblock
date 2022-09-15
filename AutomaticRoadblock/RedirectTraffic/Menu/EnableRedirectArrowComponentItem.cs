@@ -5,7 +5,7 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.RedirectTraffic.Menu
 {
-    public class EnableRedirectArrowComponentItem: IMenuComponent<UIMenuCheckboxItem>
+    public class EnableRedirectArrowComponentItem : IMenuComponent<UIMenuCheckboxItem>
     {
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
 

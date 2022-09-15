@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.ManualPlacement
     public class ManualRoadblock : AbstractRoadblock, IPlaceableInstance
     {
         internal ManualRoadblock(Request request)
-            : base(request.Road, request.BarrierType, request.TargetHeading, RequestToFlags(request), request.Offset)
+            : base(request.Road, request.MainBarrier, request.SecondaryBarrier, request.TargetHeading, RequestToFlags(request), request.Offset)
         {
             Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
             Assert.NotNull(request.LightSourceType, "lightSourceType cannot be null");
@@ -63,7 +63,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             return
                 $"{nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, {nameof(PlacementType)}: {PlacementType}, {nameof(CopsEnabled)}: {CopsEnabled}\n" +
-                $"{nameof(Slots)}: [{Slots.Count}]{string.Join(",\n", Slots)}";
+                $"{nameof(Slots)}: [{{{string.Join("}{,\n", Slots)}}}]";
         }
 
         #endregion
@@ -84,7 +84,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
 
             return lanesToBlock
-                .Select(lane => new ManualRoadblockSlot(lane, MainBarrierType, VehicleType, LightSourceType, TargetHeading,
+                .Select(lane => new ManualRoadblockSlot(lane, MainBarrier, SecondaryBarrier, VehicleType, LightSourceType, TargetHeading,
                     Flags.HasFlag(ERoadblockFlags.EnableLights), CopsEnabled, Offset))
                 .ToList();
         }
@@ -125,7 +125,8 @@ namespace AutomaticRoadblocks.ManualPlacement
         public class Request
         {
             public Road Road { get; set; }
-            public BarrierType BarrierType { get; set; }
+            public BarrierModel MainBarrier { get; set; }
+            public BarrierModel SecondaryBarrier { get; set; }
             public VehicleType VehicleType { get; set; }
             public LightSourceType LightSourceType { get; set; }
             public PlacementType PlacementType { get; set; }
@@ -133,14 +134,15 @@ namespace AutomaticRoadblocks.ManualPlacement
             public bool LimitSpeed { get; set; }
             public bool AddLights { get; set; }
             public bool CopsEnabled { get; set; }
-
             public float Offset { get; set; }
 
             public override string ToString()
             {
-                return $"{nameof(BarrierType)}: {BarrierType}, {nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, " +
-                       $"{nameof(PlacementType)}: {PlacementType}, {nameof(TargetHeading)}: {TargetHeading}, {nameof(LimitSpeed)}: {LimitSpeed}, " +
-                       $"{nameof(AddLights)}: {AddLights}, {nameof(CopsEnabled)}: {CopsEnabled}";
+                return
+                    $"{nameof(Road)}: {Road}, {nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, " +
+                    $"{nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, {nameof(PlacementType)}: {PlacementType}, " +
+                    $"{nameof(TargetHeading)}: {TargetHeading}, {nameof(LimitSpeed)}: {LimitSpeed}, {nameof(AddLights)}: {AddLights}, " +
+                    $"{nameof(CopsEnabled)}: {CopsEnabled}, {nameof(Offset)}: {Offset}";
             }
         }
     }

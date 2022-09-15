@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <summary>
         /// The cones which should be used to redirect the traffic.
         /// </summary>
-        BarrierType ConeType { get; set; }
+        BarrierModel ConeType { get; set; }
         
         /// <summary>
         /// The type of the traffic redirection which should be placed.

@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         private readonly IGame _game;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
         private readonly ILocalizer _localizer;
-        
+
         private bool _running = true;
 
         public RedirectTrafficMenuSwitchItem(IGame game, IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
@@ -34,7 +34,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
 
         /// <inheritdoc />
         public string DisplayText => _localizer[LocalizationKey.MenuRedirectTraffic];
-        
+
         /// <inheritdoc />
         public void Dispose()
         {

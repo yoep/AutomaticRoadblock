@@ -5,14 +5,14 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class EnableCopsComponentItem  : IMenuComponent<UIMenuCheckboxItem>
+    public class EnableCopsComponentItem : IMenuComponent<UIMenuCheckboxItem>
     {
         private readonly IManualPlacement _manualPlacement;
 
         public EnableCopsComponentItem(IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _manualPlacement = manualPlacement;
-            
+
             MenuItem = new UIMenuCheckboxItem(localizer[LocalizationKey.EnableCops], true,
                 localizer[LocalizationKey.EnableCopsDescription]);
         }

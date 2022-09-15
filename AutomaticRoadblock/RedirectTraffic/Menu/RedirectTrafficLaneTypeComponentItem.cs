@@ -12,8 +12,9 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         public RedirectTrafficLaneTypeComponentItem(IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
-            
-            MenuItem = new UIMenuListScrollerItem<RedirectTrafficType>(localizer[LocalizationKey.RedirectTrafficType], localizer[LocalizationKey.RedirectTrafficTypeDescription], RedirectTrafficType.Values);
+
+            MenuItem = new UIMenuListScrollerItem<RedirectTrafficType>(localizer[LocalizationKey.RedirectTrafficType],
+                localizer[LocalizationKey.RedirectTrafficTypeDescription], RedirectTrafficType.Values);
         }
 
         /// <inheritdoc />
