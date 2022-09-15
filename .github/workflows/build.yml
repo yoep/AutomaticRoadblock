@@ -28,7 +28,7 @@ jobs:
       - name: Test
         run: make test
       - name: Build
-        run: make build
+        run: make build-dotnet
       - name: Archive artifacts
         uses: actions/upload-artifact@v3
         with:
