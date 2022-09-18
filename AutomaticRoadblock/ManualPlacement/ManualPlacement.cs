@@ -18,7 +18,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private BarrierModel _mainBarrier = BarrierModel.None;
         private BarrierModel _secondaryBarrier = BarrierModel.None;
         private VehicleType _vehicleType = VehicleType.LocalUnit;
-        private LightSourceType _lightSourceType = LightSourceType.Flares;
+        private LightModel _lightSourceType = LightModel.None;
         private PlacementType _placementType = PlacementType.All;
         private bool _copsEnabled;
         private float _offset;
@@ -53,7 +53,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         }
 
         /// <inheritdoc />
-        public LightSourceType LightSourceType
+        public LightModel LightSourceType
         {
             get => _lightSourceType;
             set => UpdateLightSource(value);
@@ -168,15 +168,15 @@ namespace AutomaticRoadblocks.ManualPlacement
                 MainBarrier = _mainBarrier,
                 SecondaryBarrier = _secondaryBarrier,
                 VehicleType = _vehicleType,
-                LightSourceType = _lightSourceType,
                 PlacementType = _placementType,
                 TargetHeading = Game.PlayerHeading,
                 LimitSpeed = SpeedLimit,
-                AddLights = LightSourceType != LightSourceType.None,
+                AddLights = LightSourceType != LightModel.None,
+                LightSources = new List<LightModel> { LightSourceType },
                 CopsEnabled = CopsEnabled,
                 Offset = Offset
             };
-            
+
             Logger.Trace($"Creating new manual roadblock for request {request}");
             var roadblock = new ManualRoadblock(request);
             Logger.Debug($"Created manual roadblock {roadblock}");
@@ -201,7 +201,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             DoInternalPreviewCreation(true);
         }
 
-        private void UpdateLightSource(LightSourceType lightSourceType)
+        private void UpdateLightSource(LightModel lightSourceType)
         {
             _lightSourceType = lightSourceType;
             DoInternalPreviewCreation(true);

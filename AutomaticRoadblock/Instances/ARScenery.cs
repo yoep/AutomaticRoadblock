@@ -15,9 +15,11 @@ namespace AutomaticRoadblocks.Instances
         {
             Assert.NotNull(gameInstance, "gameInstance cannot be null");
             GameInstance = gameInstance;
-            GameInstance.IsPersistent = true;
+
+            if (!IsInvalid)
+                GameInstance.IsPersistent = true;
         }
-        
+
         #region Properties
 
         /// <inheritdoc />
@@ -29,11 +31,11 @@ namespace AutomaticRoadblocks.Instances
                                  !GameInstance.IsValid();
 
         #endregion
-        
+
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive { get; private set;  }
+        public bool IsPreviewActive { get; private set; }
 
         /// <inheritdoc />
         public void CreatePreview()
@@ -50,7 +52,7 @@ namespace AutomaticRoadblocks.Instances
         {
             if (!IsPreviewActive || IsInvalid)
                 return;
-            
+
             IsPreviewActive = false;
             EntityUtils.Remove(GameInstance);
         }
@@ -66,7 +68,7 @@ namespace AutomaticRoadblocks.Instances
         }
 
         #endregion
-        
+
         #region IARInstance
 
         /// <inheritdoc />
@@ -74,7 +76,7 @@ namespace AutomaticRoadblocks.Instances
         {
             if (GameInstance == null || !GameInstance.IsValid())
                 return;
-            
+
             GameInstance.IsPersistent = false;
         }
 

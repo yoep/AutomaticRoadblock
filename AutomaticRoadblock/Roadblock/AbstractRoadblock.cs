@@ -6,6 +6,7 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
@@ -39,39 +40,23 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         /// <param name="street">The road of that the roadblock will block.</param>
         /// <param name="mainBarrier">The main barrier used within the slots.</param>
-        /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
-        /// <param name="flags">The roadblock configuration.</param>
-        /// <param name="offset">The offset placement in regards to the road node.</param>
-        internal AbstractRoadblock(Road street, BarrierModel mainBarrier, float targetHeading, ERoadblockFlags flags, float offset = 0f)
-        {
-            Assert.NotNull(street, "road cannot be null");
-            Assert.NotNull(mainBarrier, "mainBarrierType cannot be null");
-            Road = street;
-            MainBarrier = mainBarrier;
-            SecondaryBarrier = BarrierModel.None;
-            TargetHeading = targetHeading;
-            Flags = flags;
-            Offset = offset;
-        }
-
-        /// <summary>
-        /// Initialize a new roadblock instance.
-        /// </summary>
-        /// <param name="street">The road of that the roadblock will block.</param>
-        /// <param name="mainBarrier">The main barrier used within the slots.</param>
         /// <param name="secondaryBarrier">The secondary barrier used within the slots.</param>
         /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
+        /// <param name="lightSources">The light sources to place for this roadblock.</param>
         /// <param name="flags">The roadblock configuration.</param>
         /// <param name="offset">The offset placement in regards to the road node.</param>
-        internal AbstractRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float targetHeading, ERoadblockFlags flags, float offset = 0f)
+        internal AbstractRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float targetHeading, List<LightModel> lightSources,
+            ERoadblockFlags flags, float offset = 0f)
         {
             Assert.NotNull(street, "road cannot be null");
             Assert.NotNull(mainBarrier, "mainBarrierType cannot be null");
             Assert.NotNull(secondaryBarrier, "secondaryBarrier cannot be null");
+            Assert.NotNull(lightSources, "lightSources cannot be null");
             Road = street;
             MainBarrier = mainBarrier;
             SecondaryBarrier = secondaryBarrier;
             TargetHeading = targetHeading;
+            LightSources = lightSources;
             Flags = flags;
             Offset = offset;
         }
@@ -94,6 +79,11 @@ namespace AutomaticRoadblocks.Roadblock
 
         /// <inheritdoc />
         public Vector3 Position => Road.Position;
+
+        /// <summary>
+        /// The placement offset in regards to the node.
+        /// </summary>
+        public float Offset { get; }
 
         /// <summary>
         /// The offset position for the roadblock.
@@ -122,9 +112,9 @@ namespace AutomaticRoadblocks.Roadblock
         protected float TargetHeading { get; }
 
         /// <summary>
-        /// The placement offset in regards to the node.
+        /// The light sources of the roadblock.
         /// </summary>
-        public float Offset { get; }
+        protected List<LightModel> LightSources { get; }
 
         /// <summary>
         /// Get the generated slots for this roadblock.
@@ -221,7 +211,7 @@ namespace AutomaticRoadblocks.Roadblock
                 Slots.ToList().ForEach(x => { SpawnSlot(x); });
                 result = Instances.All(x => x.Spawn());
 
-                
+
                 UpdateState(ERoadblockState.Active);
 
                 CreateBlip();
@@ -251,11 +241,13 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Level)}: {Level}, {nameof(State)}: {State}, {nameof(Flags)}: {Flags} Number of {nameof(Slots)}: [{Slots.Count}]\n" +
-                   $"--- {nameof(Slots)} ---\n" +
-                   $"{string.Join("\n", Slots)}\n" +
-                   $"--- {nameof(Road)} ---\n" +
-                   $"{Road}";
+            return
+                $"{nameof(Level)}: {Level}, {nameof(State)}: {State}, {nameof(Flags)}: {Flags}, {nameof(LightSources)}: [{string.Join(", ", LightSources)}], " +
+                $"Number of {nameof(Slots)}: [{Slots.Count}]\n" +
+                $"--- {nameof(Slots)} ---\n" +
+                $"{string.Join("\n", Slots)}\n" +
+                $"--- {nameof(Road)} ---\n" +
+                $"{Road}";
         }
 
         #endregion
@@ -521,7 +513,7 @@ namespace AutomaticRoadblocks.Roadblock
         private void SpawnSlot(IRoadblockSlot slot)
         {
             slot.Spawn();
-            
+
             if (Flags.HasFlag(ERoadblockFlags.ForceInVehicle))
             {
                 slot.WarpInVehicle();

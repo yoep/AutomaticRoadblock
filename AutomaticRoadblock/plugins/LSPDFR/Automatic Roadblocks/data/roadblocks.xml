@@ -2,24 +2,40 @@
     <Roadblock>
         <Level>1</Level> <!-- The roadblock level identifier (don't modify this!) -->
         <MainBarrier>small_cone_stripes</MainBarrier> <!-- The main barrier which is placed in front of the roadblock -->
+        <Lights>
+            <Light>flares</Light> <!-- The light source which needs to be placed during evening/night -->
+        </Lights>
     </Roadblock>
     <Roadblock>
         <Level>2</Level>
         <MainBarrier>big_cone</MainBarrier>
+        <Lights>
+            <Light>flares</Light>
+        </Lights>
     </Roadblock>
     <Roadblock>
         <Level>3</Level>
         <MainBarrier>police_do_not_cross</MainBarrier>
+        <Lights>
+            <Light>flares</Light>
+            <Light>ground_standing_spots</Light>
+        </Lights>
     </Roadblock>
     <Roadblock>
         <Level>4</Level>
         <MainBarrier>police_do_not_cross</MainBarrier>
         <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier>
+        <Lights>
+            <Light>spots</Light>
+        </Lights>
     </Roadblock>
     <Roadblock>
         <Level>5</Level>
         <MainBarrier>police_do_not_cross</MainBarrier>
         <SecondaryBarrier>work_barrier_high</SecondaryBarrier> <!-- The barrier which is placed behind the roadblock -->
         <ChaseVehicleBarrier>barrel_traffic_catcher</ChaseVehicleBarrier>  <!-- The barrier to place between the chase vehicle and the roadblock -->
+        <Lights>
+            <Light>spots</Light>
+        </Lights>
     </Roadblock>
 </Roadblocks>

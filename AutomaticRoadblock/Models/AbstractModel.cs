@@ -16,7 +16,13 @@ namespace AutomaticRoadblocks.Models
         public abstract string ScriptName { get; }
 
         /// <inheritdoc />
+        public Model? Model { get; protected set; }
+
+        /// <inheritdoc />
         public LocalizationKey LocalizationKey { get; protected set; }
+
+        /// <inheritdoc />
+        public virtual bool IsNone => Model == null;
 
         #endregion
 

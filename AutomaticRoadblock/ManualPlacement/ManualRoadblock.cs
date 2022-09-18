@@ -13,12 +13,11 @@ namespace AutomaticRoadblocks.ManualPlacement
     public class ManualRoadblock : AbstractRoadblock, IPlaceableInstance
     {
         internal ManualRoadblock(Request request)
-            : base(request.Road, request.MainBarrier, request.SecondaryBarrier, request.TargetHeading, RequestToFlags(request), request.Offset)
+            : base(request.Road, request.MainBarrier, request.SecondaryBarrier, request.TargetHeading, request.LightSources, RequestToFlags(request),
+                request.Offset)
         {
             Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
-            Assert.NotNull(request.LightSourceType, "lightSourceType cannot be null");
             VehicleType = request.VehicleType;
-            LightSourceType = request.LightSourceType;
             PlacementType = request.PlacementType;
             CopsEnabled = request.CopsEnabled;
 
@@ -31,11 +30,6 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// The vehicle type used within the roadblock.
         /// </summary>
         public VehicleType VehicleType { get; }
-
-        /// <summary>
-        /// The light type used within the roadblock.
-        /// </summary>
-        public LightSourceType LightSourceType { get; }
 
         /// <summary>
         /// The placement type of the roadblock.
@@ -62,7 +56,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         public override string ToString()
         {
             return
-                $"{nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, {nameof(PlacementType)}: {PlacementType}, {nameof(CopsEnabled)}: {CopsEnabled}\n" +
+                $"{nameof(VehicleType)}: {VehicleType}, {nameof(PlacementType)}: {PlacementType}, {nameof(CopsEnabled)}: {CopsEnabled}\n" +
                 $"{nameof(Slots)}: [{{{string.Join("}{,\n", Slots)}}}]";
         }
 
@@ -84,7 +78,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
 
             return lanesToBlock
-                .Select(lane => new ManualRoadblockSlot(lane, MainBarrier, SecondaryBarrier, VehicleType, LightSourceType, TargetHeading,
+                .Select(lane => new ManualRoadblockSlot(lane, MainBarrier, SecondaryBarrier, VehicleType, LightSources, TargetHeading,
                     Flags.HasFlag(ERoadblockFlags.EnableLights), CopsEnabled, Offset))
                 .ToList();
         }
@@ -99,10 +93,9 @@ namespace AutomaticRoadblocks.ManualPlacement
         protected override void InitializeLights()
         {
             Logger.Trace("Initializing the manual roadblock lights");
-            if (LightSourceType == LightSourceType.Spots)
-            {
-                Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));
-            }
+            Instances.AddRange(LightSources
+                .Where(x => (x.Light.Flags & ELightSourceFlags.Lane) == 0)
+                .SelectMany(x => LightSourceFactory.Create(x, this)));
         }
 
         private static ERoadblockFlags RequestToFlags(Request request)
@@ -128,21 +121,21 @@ namespace AutomaticRoadblocks.ManualPlacement
             public BarrierModel MainBarrier { get; set; }
             public BarrierModel SecondaryBarrier { get; set; }
             public VehicleType VehicleType { get; set; }
-            public LightSourceType LightSourceType { get; set; }
             public PlacementType PlacementType { get; set; }
             public float TargetHeading { get; set; }
             public bool LimitSpeed { get; set; }
             public bool AddLights { get; set; }
             public bool CopsEnabled { get; set; }
             public float Offset { get; set; }
+            public List<LightModel> LightSources { get; set; }
 
             public override string ToString()
             {
                 return
                     $"{nameof(Road)}: {Road}, {nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, " +
-                    $"{nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, {nameof(PlacementType)}: {PlacementType}, " +
+                    $"{nameof(VehicleType)}: {VehicleType}, {nameof(PlacementType)}: {PlacementType}, " +
                     $"{nameof(TargetHeading)}: {TargetHeading}, {nameof(LimitSpeed)}: {LimitSpeed}, {nameof(AddLights)}: {AddLights}, " +
-                    $"{nameof(CopsEnabled)}: {CopsEnabled}, {nameof(Offset)}: {Offset}";
+                    $"{nameof(CopsEnabled)}: {CopsEnabled}, {nameof(Offset)}: {Offset}, {nameof(LightSources)}: {LightSources}";
             }
         }
     }

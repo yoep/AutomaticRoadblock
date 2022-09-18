@@ -1,0 +1,67 @@
+<Lights>
+    <Light>
+        <Name>Flares</Name> <!-- The (display) name of the light -->
+        <ScriptName>flares</ScriptName> <!-- The name to use as reference in other data files to this light, this value is also used by the localization -->
+        <Model>weapon_flare</Model>  <!-- The game model name -->
+        <Spacing>1.0</Spacing> <!-- The spacing between each light -->
+        <Flags>
+            <Flag>Lane</Flag> <!-- Place the lights across the lane -->
+        </Flags>
+    </Light>
+    <Light> 
+        <Name>Spots</Name>
+        <ScriptName>spots</ScriptName>
+        <Model>prop_generator_03b</Model>
+        <Flags>
+            <Flag>RoadLeft</Flag> <!-- Place the light on the left side of the road -->
+            <Flag>RoadRight</Flag> <!-- Place the light on the right side of the road -->
+        </Flags>
+    </Light>
+    <Light>
+        <Name>Ground spots</Name>
+        <ScriptName>ground_spots</ScriptName>
+        <Model>prop_worklight_02a</Model>
+        <Rotation>180</Rotation> <!-- The relative rotation adjustment when placing the light source -->
+        <Flags>
+            <Flag>RoadLeft</Flag>
+            <Flag>RoadRight</Flag>
+        </Flags>
+    </Light>
+    <Light>
+        <Name>Standing spots</Name>
+        <ScriptName>ground_standing_spots</ScriptName>
+        <Model>prop_worklight_03b</Model>
+        <Rotation>180</Rotation>
+        <Flags>
+            <Flag>RoadLeft</Flag>
+            <Flag>RoadRight</Flag>
+        </Flags>
+    </Light>
+    <Light> 
+        <Name>Warning</Name>
+        <ScriptName>warning</ScriptName>
+        <Model>prop_warninglight_01</Model>
+        <Spacing>1.0</Spacing>
+        <Flags>
+            <Flag>Lane</Flag>
+        </Flags>
+    </Light>
+    <Light> 
+        <Name>Blue standing</Name>
+        <ScriptName>blue_standing</ScriptName>
+        <Model>prop_air_lights_02a</Model>
+        <Spacing>2.0</Spacing>
+        <Flags>
+            <Flag>Lane</Flag>
+        </Flags>
+    </Light>
+    <Light> 
+        <Name>Red standing</Name>
+        <ScriptName>red_standing</ScriptName>
+        <Model>prop_air_lights_02b</Model>
+        <Spacing>2.0</Spacing>
+        <Flags>
+            <Flag>Lane</Flag>
+        </Flags>
+    </Light>
+</Lights>

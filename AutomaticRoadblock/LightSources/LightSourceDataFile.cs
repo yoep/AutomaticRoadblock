@@ -2,34 +2,34 @@ using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Data;
 
-namespace AutomaticRoadblocks.Barriers
+namespace AutomaticRoadblocks.LightSources
 {
-    public class BarrierDataFile : AbstractDataFileLoader, IBarrierData
+    public class LightSourceDataFile : AbstractDataFileLoader, ILightSourceData
     {
-        private const string BarriersFilename = "barriers.xml";
+        private const string LightsFilename = "lights.xml";
 
-        public BarrierDataFile(ILogger logger)
+        public LightSourceDataFile(ILogger logger) 
             : base(logger)
         {
         }
-
+        
         #region Properties
 
         /// <inheritdoc />
-        public Barriers Barriers { get; private set; }
+        public Lights Lights { get; private set; }
 
         #endregion
-
+        
         #region Method
 
         /// <inheritdoc />
         public override void Reload()
         {
-            Barriers = TryToLoadDatafile(BarriersFilename, Barriers.Defaults);
+            Lights = TryToLoadDatafile(LightsFilename, Lights.Defaults);
         }
 
         #endregion
-
+        
         #region Functions
 
         [IoC.PostConstruct]

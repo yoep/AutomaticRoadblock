@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.LightSources;
 using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Models
@@ -13,12 +14,14 @@ namespace AutomaticRoadblocks.Models
         private readonly IGame _game;
         private readonly ILogger _logger;
         private readonly IBarrierData _barrierModelData;
+        private readonly ILightSourceData _lightSourceData;
 
-        public ModelProvider(IGame game, ILogger logger, IBarrierData barrierModelData)
+        public ModelProvider(IGame game, ILogger logger, IBarrierData barrierModelData, ILightSourceData lightSourceData)
         {
             _game = game;
             _logger = logger;
             _barrierModelData = barrierModelData;
+            _lightSourceData = lightSourceData;
         }
 
         #region Properties
@@ -35,15 +38,24 @@ namespace AutomaticRoadblocks.Models
             .FirstOrDefault(x => IsModelScriptName(x, scriptName));
 
         /// <inheritdoc />
-        public IEnumerable<BarrierModel> BarrierModels { get; private set; }
+        public IEnumerable<BarrierModel> BarrierModels { get; private set; } = new List<BarrierModel> { BarrierModel.None };
+
+        /// <inheritdoc />
+        public IEnumerable<LightModel> LightModels { get; private set; } = new List<LightModel> { LightModel.None };
 
         /// <inheritdoc />
         public event ModelProviderEvents.BarrierModelsChanged BarrierModelsChanged;
 
+        /// <inheritdoc />
+        public event ModelProviderEvents.LightModelsChanged LightModelsChanged;
+
         /// <summary>
         /// The available models within this provider.
         /// </summary>
-        private List<IModel> Models => new(BarrierModels);
+        private IEnumerable<IModel> Models => new List<IModel>()
+            .Concat(BarrierModels)
+            .Concat(LightModels)
+            .ToList();
 
         #endregion
 
@@ -68,6 +80,9 @@ namespace AutomaticRoadblocks.Models
             BarrierModels = TrySafeModelLoading(nameof(BarrierModels), () => _barrierModelData.Barriers.Items
                 .Select(BarrierModel.From)
                 .ToList(), InvokeBarrierModelsChanged, new List<BarrierModel> { BarrierModel.None });
+            LightModels = TrySafeModelLoading(nameof(LightModels), () => _lightSourceData.Lights.Items
+                .Select(LightModel.From)
+                .ToList(), InvokeLightModelsChanged, new List<LightModel> { LightModel.None });
             _logger.Info("Data models have been loaded into the model provider");
         }
 
@@ -110,6 +125,11 @@ namespace AutomaticRoadblocks.Models
         private void InvokeBarrierModelsChanged(IEnumerable<BarrierModel> models)
         {
             BarrierModelsChanged?.Invoke(models);
+        }
+
+        private void InvokeLightModelsChanged(IEnumerable<LightModel> models)
+        {
+            LightModelsChanged?.Invoke(models);
         }
 
         private static bool IsModelScriptName(IModel model, string expectedScriptName)
