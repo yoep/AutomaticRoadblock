@@ -13,8 +13,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel5 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel5(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle, ERoadblockFlags flags)
-            : base(street, mainBarrier, secondaryBarrier, chaseVehicleBarrier, targetVehicle, flags)
+        public PursuitRoadblockLevel5(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier,
+            Vehicle targetVehicle, List<LightModel> lightSources, ERoadblockFlags flags)
+            : base(street, mainBarrier, secondaryBarrier, chaseVehicleBarrier, targetVehicle, lightSources, flags)
         {
         }
 
@@ -42,8 +43,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeLights()
         {
-            Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));
-            Instances.AddRange(LightSourceRoadblockFactory.CreateAlternatingGroundLights(this, 3));
+            // Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));
+            // Instances.AddRange(LightSourceRoadblockFactory.CreateAlternatingGroundLights(this, 3));
         }
 
         /// <inheritdoc />

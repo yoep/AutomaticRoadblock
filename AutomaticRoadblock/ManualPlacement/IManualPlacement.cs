@@ -28,7 +28,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <summary>
         /// The light source type to use within the roadblock.
         /// </summary>
-        LightSourceType LightSourceType { get; set; }
+        LightModel LightSourceType { get; set; }
         
         /// <summary>
         /// The placement type of the roadblock.

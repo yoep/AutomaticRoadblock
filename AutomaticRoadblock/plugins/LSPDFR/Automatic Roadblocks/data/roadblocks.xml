@@ -2,6 +2,9 @@
     <Roadblock>
         <Level>1</Level> <!-- The roadblock level identifier (don't modify this!) -->
         <MainBarrier>small_cone_stripes</MainBarrier> <!-- The main barrier which is placed in front of the roadblock -->
+        <Lights>
+            <Light>flares</Light> <!-- The light source which needs to be placed during evening/night -->
+        </Lights>
     </Roadblock>
     <Roadblock>
         <Level>2</Level>

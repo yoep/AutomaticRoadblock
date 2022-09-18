@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Roadblock.Slot;
@@ -37,8 +38,8 @@ namespace AutomaticRoadblocks.Roadblock
         private float _lastKnownDistanceToRoadblock = 9999f;
 
         protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, Vehicle targetVehicle,
-            ERoadblockFlags flags)
-            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
+            List<LightModel> lightSources, ERoadblockFlags flags)
+            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, lightSources, flags)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
@@ -47,10 +48,10 @@ namespace AutomaticRoadblocks.Roadblock
 
             Initialize();
         }
-        
-        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier, Vehicle targetVehicle,
-            ERoadblockFlags flags)
-            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, flags)
+
+        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier,
+            Vehicle targetVehicle, List<LightModel> lightSources, ERoadblockFlags flags)
+            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, lightSources, flags)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             TargetVehicle = targetVehicle;
@@ -67,7 +68,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         [CanBeNull]
         protected Vehicle TargetVehicle { get; }
-        
+
         /// <summary>
         /// The barrier model for the chase vehicle.
         /// </summary>

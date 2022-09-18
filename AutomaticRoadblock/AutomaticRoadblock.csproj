@@ -106,9 +106,13 @@
         <Compile Include="Integrations\PoliceSmartRadio\PoliceSmartRadioIntegration.cs" />
         <Compile Include="IoC.cs" />
         <Compile Include="IoCException.cs" />
-        <Compile Include="LightSources\LightSourceRoadblockFactory.cs" />
-        <Compile Include="LightSources\LightSourceSlotFactory.cs" />
-        <Compile Include="LightSources\LightSourceType.cs" />
+        <Compile Include="LightSources\ELightSourceFlags.cs" />
+        <Compile Include="LightSources\ILightSourceData.cs" />
+        <Compile Include="LightSources\Light.cs" />
+        <Compile Include="LightSources\LightModel.cs" />
+        <Compile Include="LightSources\LightSourceDataFile.cs" />
+        <Compile Include="LightSources\Lights.cs" />
+        <Compile Include="LightSources\LightSourceFactory.cs" />
         <Compile Include="Localization\ILocalizer.cs" />
         <Compile Include="Localization\LocalizationKey.cs" />
         <Compile Include="Localization\LocalizationNotFound.cs" />
@@ -260,6 +264,7 @@
         <Compile Include="Xml\Deserializers\CollectionXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\DoubleXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\EBarrierFlagsXmlDeserializer.cs" />
+        <Compile Include="Xml\Deserializers\ELightSourceFlagsXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\Int32Deserializer.cs" />
         <Compile Include="Xml\Deserializers\ObjectXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\StringXmlDeserializer.cs" />
@@ -275,6 +280,9 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="plugins\LSPDFR\Automatic Roadblocks\data\barriers.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="plugins\LSPDFR\Automatic Roadblocks\data\lights.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Include="plugins\LSPDFR\Automatic Roadblocks\data\roadblocks.xml">

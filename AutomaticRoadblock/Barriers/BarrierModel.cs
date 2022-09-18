@@ -32,11 +32,6 @@ namespace AutomaticRoadblocks.Barriers
         public override string ScriptName => Barrier.ScriptName;
 
         /// <summary>
-        /// The game model.
-        /// </summary>
-        public Model? Model { get; private set; }
-
-        /// <summary>
         /// The actual width of the model.
         /// </summary>
         public float Width { get; private set; }
@@ -50,11 +45,6 @@ namespace AutomaticRoadblocks.Barriers
         /// The vertical offset position of the barrier instance when spawned.
         /// </summary>
         public float VerticalOffset => (float)Barrier.VerticalOffset;
-
-        /// <summary>
-        /// Verify if this barrier model is the special <see cref="None"/> type.
-        /// </summary>
-        public bool IsNone => Model == null;
 
         /// <summary>
         /// Create a model for the given barrier data. 

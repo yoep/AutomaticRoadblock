@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
@@ -9,12 +11,13 @@ namespace AutomaticRoadblocks.ManualPlacement
 {
     public class ManualRoadblockSlot : AbstractRoadblockSlot
     {
-        public ManualRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, VehicleType vehicleType, LightSourceType lightSourceType, float heading,
+        public ManualRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, VehicleType vehicleType,
+            List<LightModel> lightSources, float heading,
             bool shouldAddLights, bool copsEnabled, float offset)
             : base(lane, mainBarrier, secondaryBarrier, vehicleType, heading, shouldAddLights, false, offset)
         {
-            Assert.NotNull(lightSourceType, "lightSourceType cannot be null");
-            LightSourceType = lightSourceType;
+            Assert.NotNull(lightSources, "lightSources cannot be null");
+            LightSources = lightSources;
             CopsEnabled = copsEnabled;
 
             Initialize();
@@ -23,9 +26,9 @@ namespace AutomaticRoadblocks.ManualPlacement
         #region Properties
 
         /// <summary>
-        /// The light type of the slot.
+        /// The light sources of the slot.
         /// </summary>
-        public LightSourceType LightSourceType { get; }
+        public List<LightModel> LightSources { get; }
 
         /// <summary>
         /// The indication if cops are added to the slot.
@@ -40,7 +43,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         public override string ToString()
         {
             return "{" +
-                   $"{base.ToString()}, {nameof(VehicleType)}: {VehicleType}, {nameof(LightSourceType)}: {LightSourceType}, {nameof(CopsEnabled)}: {CopsEnabled}" +
+                   $"{base.ToString()}, {nameof(VehicleType)}: {VehicleType}, {nameof(LightSources)}: [{string.Join(", ", LightSources)}], {nameof(CopsEnabled)}: {CopsEnabled}" +
                    "}";
         }
 
@@ -72,7 +75,10 @@ namespace AutomaticRoadblocks.ManualPlacement
         protected override void InitializeLights()
         {
             Logger.Trace("Initializing the manual roadblock slot lights");
-            Instances.AddRange(LightSourceSlotFactory.Create(LightSourceType, this));
+            Instances.AddRange(LightSources
+                .Where(x => (x.Light.Flags & (ELightSourceFlags.RoadLeft | ELightSourceFlags.RoadRight)) == 0)
+                .SelectMany(x => LightSourceFactory.Create(x, this))
+                .ToList());
         }
 
         #endregion

@@ -1,6 +1,5 @@
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
-using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
@@ -11,7 +10,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     public class PursuitRoadblockSlotLevel1 : AbstractPursuitRoadblockSlot
     {
-        internal PursuitRoadblockSlotLevel1(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float heading, Vehicle targetVehicle, bool shouldAddLights)
+        internal PursuitRoadblockSlotLevel1(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float heading, Vehicle targetVehicle,
+            bool shouldAddLights)
             : base(lane, mainBarrier, secondaryBarrier, VehicleType.LocalUnit, heading, targetVehicle, shouldAddLights)
         {
         }
@@ -35,7 +35,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
 
         protected override void InitializeLights()
         {
-            Instances.AddRange(LightSourceSlotFactory.Create(LightSourceType.Flares, this));
+            // Instances.AddRange(LightSourceSlotFactory.Create(LightSourceType.Flares, this));
         }
     }
 }

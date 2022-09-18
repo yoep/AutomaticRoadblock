@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Pursuit.Factory;
@@ -259,8 +260,9 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
+            var lights = GetLightsForLevel(level);
             GetBarriersForLevel(actualLevelToUse, out var mainBarrier, out var secondaryBarrier, out var chaseVehicleBarrier);
-            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, flags);
+            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, lights, flags);
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
             lock (_roadblocks)
@@ -533,6 +535,15 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 throw new RoadblockException($"Roadblock data couldn't be found for level {level}");
 
             return data;
+        }
+        
+        private List<LightModel> GetLightsForLevel(ERoadblockLevel level)
+        {
+            var configData = GetDataForLevel(level);
+
+            return configData.Lights
+                .Select(x => _modelProvider.RetrieveModelByScriptName<LightModel>(x))
+                .ToList();
         }
 
         private void GetBarriersForLevel(ERoadblockLevel level, out BarrierModel mainBarrier, out BarrierModel secondaryBarrier,

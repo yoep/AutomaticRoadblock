@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Data;
+using AutomaticRoadblocks.LightSources;
 
 namespace AutomaticRoadblocks.Models
 {
@@ -35,11 +36,21 @@ namespace AutomaticRoadblocks.Models
         /// The available barrier models based on the data file.
         /// </summary>
         IEnumerable<BarrierModel> BarrierModels { get; }
+        
+        /// <summary>
+        /// The available light models based on the data file.
+        /// </summary>
+        IEnumerable<LightModel> LightModels { get; }
 
         /// <summary>
         /// Invoked when the barrier models list has changed.
         /// </summary>
         event ModelProviderEvents.BarrierModelsChanged BarrierModelsChanged;
+
+        /// <summary>
+        /// Invoked when the light models list has changed.
+        /// </summary>
+        event ModelProviderEvents.LightModelsChanged LightModelsChanged;
 
         /// <summary>
         /// Retrieve the model by the matching script name.
