@@ -130,6 +130,13 @@ namespace AutomaticRoadblocks.Roadblock
                         BarrierFactory.Create(ModelProvider.RetrieveModelByScriptName<BarrierModel>(Barrier.BigConeStripesScriptName), conePosition)));
             }
         }
+        
+        /// <inheritdoc />
+        protected override void InitializeLights()
+        {
+            Instances.AddRange(RoadblockLightSources()
+                .SelectMany(x => LightSourceFactory.Create(x, this)));
+        }
 
         /// <inheritdoc />
         protected override IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
@@ -190,6 +197,20 @@ namespace AutomaticRoadblocks.Roadblock
                 .Select(x => x.GameInstance)
                 .ToList()
                 .ForEach(x => x.WarpIntoVehicle(vehicle, (int)VehicleSeat.Driver));
+        }
+        
+        protected List<LightModel> SlotLightSources()
+        {
+            return LightSources
+                .Where(x => (x.Light.Flags & (ELightSourceFlags.RoadLeft | ELightSourceFlags.RoadRight)) == 0)
+                .ToList();
+        }
+        
+        protected List<LightModel> RoadblockLightSources()
+        {
+            return LightSources
+                .Where(x => (x.Light.Flags & ELightSourceFlags.Lane) == 0)
+                .ToList();
         }
 
         private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)

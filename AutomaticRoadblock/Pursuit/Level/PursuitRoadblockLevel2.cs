@@ -26,15 +26,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
         #region Functions
 
         /// <inheritdoc />
-        protected override void InitializeLights()
-        {
-            // no-op
-        }
-
-        /// <inheritdoc />
         protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
-            return new PursuitRoadblockSlotLevel2(lane, MainBarrier, SecondaryBarrier, heading, targetVehicle, shouldAddLights);
+            return new PursuitRoadblockSlotLevel2(lane, MainBarrier, SecondaryBarrier, heading, targetVehicle, SlotLightSources(), shouldAddLights);
         }
 
         #endregion

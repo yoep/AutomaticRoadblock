@@ -41,13 +41,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
         #region Functions
 
         /// <inheritdoc />
-        protected override void InitializeLights()
-        {
-            // Instances.AddRange(LightSourceRoadblockFactory.CreateGeneratorLights(this));
-            // Instances.AddRange(LightSourceRoadblockFactory.CreateAlternatingGroundLights(this, 3));
-        }
-
-        /// <inheritdoc />
         protected override void InitializeAdditionalVehicles()
         {
             CreateChaseVehicle(ModelUtils.Vehicles.GetFbiPoliceVehicle());
@@ -56,7 +49,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
-            return new PursuitRoadblockSlotLevel5(lane, MainBarrier, SecondaryBarrier, heading, targetVehicle, shouldAddLights);
+            return new PursuitRoadblockSlotLevel5(lane, MainBarrier, SecondaryBarrier, heading, targetVehicle, SlotLightSources(), shouldAddLights);
         }
 
         /// <inheritdoc />

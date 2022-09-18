@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Street.Info;
 using Rage;
 using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
@@ -10,11 +12,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
     public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot, IPursuitRoadblockSlot
     {
         protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, VehicleType vehicleType, float heading, Vehicle targetVehicle,
-            bool shouldAddLights)
+            List<LightModel> lightSources, bool shouldAddLights)
             : base(lane, mainBarrier, secondaryBarrier, vehicleType, heading, shouldAddLights, true)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
+            Assert.NotNull(lightSources, "lightSources cannot be null");
             TargetVehicle = targetVehicle;
+            LightSources = lightSources;
 
             Initialize();
         }
@@ -25,6 +29,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Get the target vehicle of the slot.
         /// </summary>
         protected Vehicle TargetVehicle { get; }
+
+        /// <summary>
+        /// The light sources of this slot.
+        /// </summary>
+        protected List<LightModel> LightSources { get; }
 
         #endregion
 
@@ -42,6 +51,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         #endregion
 
         #region Functions
+
+        /// <inheritdoc />
+        protected override void InitializeLights()
+        {
+            Instances.AddRange(LightSources
+                .SelectMany(x => LightSourceFactory.Create(x, this)));
+        }
 
         private bool HasCopBeenKilledBySuspects(Entity cop)
         {
