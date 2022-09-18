@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
-using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
@@ -13,9 +11,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
 {
     internal class PursuitRoadblockLevel5 : AbstractPursuitRoadblock
     {
-        public PursuitRoadblockLevel5(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier,
-            Vehicle targetVehicle, List<LightModel> lightSources, ERoadblockFlags flags)
-            : base(street, mainBarrier, secondaryBarrier, chaseVehicleBarrier, targetVehicle, lightSources, flags)
+        public PursuitRoadblockLevel5(PursuitRoadblockRequest request)
+            : base(request.RoadblockData, request.Road, request.TargetVehicle, request.Flags)
         {
         }
 

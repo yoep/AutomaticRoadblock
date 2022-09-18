@@ -164,6 +164,7 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Pursuit\EPursuitState.cs" />
         <Compile Include="Pursuit\Factory\PursuitRoadblockFactory.cs" />
+        <Compile Include="Pursuit\Level\PursuitRoadblockRequest.cs" />
         <Compile Include="Pursuit\Level\PursuitRoadblockLevel1.cs" />
         <Compile Include="Pursuit\Level\PursuitRoadblockLevel2.cs" />
         <Compile Include="Pursuit\Level\PursuitRoadblockLevel3.cs" />
