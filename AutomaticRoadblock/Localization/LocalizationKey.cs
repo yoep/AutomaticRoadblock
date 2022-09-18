@@ -115,16 +115,6 @@ namespace AutomaticRoadblocks.Localization
 
         #endregion
 
-        #region LightType
-
-        public static readonly LocalizationKey Flares = new(nameof(Flares), "Flares");
-        public static readonly LocalizationKey Spots = new(nameof(Spots), "Spots");
-        public static readonly LocalizationKey Warning = new(nameof(Warning), "Warning");
-        public static readonly LocalizationKey Blue = new(nameof(Blue), "Blue");
-        public static readonly LocalizationKey Red = new(nameof(Red), "Red");
-
-        #endregion
-
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {
             MainBarrier,
@@ -133,7 +123,6 @@ namespace AutomaticRoadblocks.Localization
             SecondaryBarrierDescription,
             BlockLanes,
             BlockLanesDescription,
-            Blue,
             CleanRoadblockPlacement,
             CleanRoadblockPlacementDescription,
             DispatchNow,
@@ -145,7 +134,6 @@ namespace AutomaticRoadblocks.Localization
             EnableDuringPursuit,
             EnableDuringPursuitDescription,
             EnableSpikeStrip,
-            Flares,
             LightSource,
             LightSourceDescription,
             MenuManualPlacement,
@@ -161,7 +149,6 @@ namespace AutomaticRoadblocks.Localization
             PlaceDescription,
             PursuitLevel,
             PursuitLevelDescription,
-            Red,
             RedirectTraffic,
             RedirectTrafficConeDistance,
             RedirectTrafficConeDistanceDescription,
@@ -177,7 +164,6 @@ namespace AutomaticRoadblocks.Localization
             RoadblockNoPursuitActive,
             SpeedLimit,
             SpeedLimitDescription,
-            Spots,
             Vehicle,
             VehicleDescription,
             VehicleTypeFbi,
@@ -185,7 +171,6 @@ namespace AutomaticRoadblocks.Localization
             VehicleTypeState,
             VehicleTypeSwat,
             VehicleTypeTransporter,
-            Warning,
         };
 
         public LocalizationKey(string identifier, string defaultText)
