@@ -7,7 +7,8 @@ namespace AutomaticRoadblocks.LightSources
     public class LightModel : AbstractModel
     {
         private const string WeaponAssetPrefix = "weapon";
-        
+        private const string LocalizationKeyPrefix = "LightType";
+
         public static readonly LightModel None = new()
         {
             Light = new Light("None", "none", null, 1.0, ELightSourceFlags.None),
@@ -31,7 +32,7 @@ namespace AutomaticRoadblocks.LightSources
 
         /// <inheritdoc />
         public override string ScriptName => Light.ScriptName;
-        
+
         /// <summary>
         /// The weapon asset which is used for this asset.
         /// </summary>
@@ -77,7 +78,7 @@ namespace AutomaticRoadblocks.LightSources
             return new LightModel
             {
                 Light = light,
-                LocalizationKey = new LocalizationKey(ToCamelCase(light.ScriptName), light.Name),
+                LocalizationKey = new LocalizationKey(LocalizationKeyPrefix + ToCamelCase(light.ScriptName), light.Name),
                 Model = null,
                 WeaponAsset = model,
                 Width = 0.05f
@@ -94,7 +95,7 @@ namespace AutomaticRoadblocks.LightSources
             return new LightModel
             {
                 Light = light,
-                LocalizationKey = new LocalizationKey(ToCamelCase(light.ScriptName), light.Name),
+                LocalizationKey = new LocalizationKey(LocalizationKeyPrefix + ToCamelCase(light.ScriptName), light.Name),
                 Model = model,
                 WeaponAsset = null,
                 Width = DimensionOf(model)
