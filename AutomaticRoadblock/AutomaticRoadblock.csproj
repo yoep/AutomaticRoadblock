@@ -77,6 +77,9 @@
         <Compile Include="Barriers\EBarrierFlags.cs" />
         <Compile Include="Barriers\IBarrierData.cs" />
         <Compile Include="Data\AbstractDataFileLoader.cs" />
+        <Compile Include="Data\ChanceException.cs" />
+        <Compile Include="Data\ChanceProvider.cs" />
+        <Compile Include="Data\IChanceData.cs" />
         <Compile Include="Data\IDataFile.cs" />
         <Compile Include="Debug\Menu\DebugDeploySpikeStripComponent.cs" />
         <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
@@ -117,6 +120,14 @@
         <Compile Include="Localization\LocalizationKey.cs" />
         <Compile Include="Localization\LocalizationNotFound.cs" />
         <Compile Include="Localization\Localizer.cs" />
+        <Compile Include="Lspdfr\Agencies.cs" />
+        <Compile Include="Lspdfr\Agency.cs" />
+        <Compile Include="Lspdfr\Backup.cs" />
+        <Compile Include="Lspdfr\BackupUnits.cs" />
+        <Compile Include="Lspdfr\ILspdfrData.cs" />
+        <Compile Include="Lspdfr\Loadout.cs" />
+        <Compile Include="Lspdfr\LspdfrData.cs" />
+        <Compile Include="Lspdfr\Vehicle.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="ManualPlacement\Menu\AbstractBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
@@ -193,6 +204,7 @@
         <Compile Include="Roadblock\Data\RoadblockData.cs" />
         <Compile Include="Roadblock\Data\RoadblockDataFile.cs" />
         <Compile Include="Roadblock\Data\Roadblocks.cs" />
+        <Compile Include="Roadblock\Data\Unit.cs" />
         <Compile Include="Roadblock\Dispatcher\DispatchOptions.cs" />
         <Compile Include="Roadblock\Dispatcher\IRoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockDispatcher.cs" />
@@ -286,7 +298,7 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Include="plugins\LSPDFR\Automatic Roadblocks\data\roadblocks.xml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
     <ItemGroup>

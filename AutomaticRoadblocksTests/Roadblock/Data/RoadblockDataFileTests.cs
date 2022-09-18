@@ -17,8 +17,25 @@ namespace AutomaticRoadblocks.Roadblock.Data
         [Fact]
         public void TestRoadblockDeserialization()
         {
-            var expectedLevel1Result = new RoadblockData(1, "small_cone_stripes", new List<string> { Light.FlaresScriptName });
-            var expectedLevel4Result = new RoadblockData(5, "police_do_not_cross", "work_barrier_high", "barrel_traffic_catcher");
+            var expectedLevel1Result = new RoadblockData(1, "small_cone_stripes",
+                new List<string>
+                {
+                    Light.FlaresScriptName
+                },
+                new List<Unit>
+                {
+                    new Unit("LocalPatrol")
+                });
+            var expectedLevel5Result = new RoadblockData(5, "police_do_not_cross", "work_barrier_high", "barrel_traffic_catcher",
+                new List<string>
+                {
+                    Light.SpotsScriptName
+                },
+                new List<Unit>
+                {
+                    new Unit("NooseSWAT", 70),
+                    new Unit("LocalSWAT", 30),
+                });
             var data = IoC.Instance.GetInstance<IRoadblockData>();
 
             var result = data.Roadblocks;
@@ -26,7 +43,7 @@ namespace AutomaticRoadblocks.Roadblock.Data
             Xunit.Assert.NotNull(result);
             Xunit.Assert.NotEqual(Roadblocks.Defaults, result);
             Xunit.Assert.Equal(expectedLevel1Result, result.Items.First(x => x.Level == expectedLevel1Result.Level));
-            Xunit.Assert.Equal(expectedLevel4Result, result.Items.First(x => x.Level == expectedLevel4Result.Level));
+            Xunit.Assert.Equal(expectedLevel5Result, result.Items.First(x => x.Level == expectedLevel5Result.Level));
         }
     }
 }

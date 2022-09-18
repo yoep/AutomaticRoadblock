@@ -27,7 +27,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             var clazz = unwrapProperty.PropertyType;
             var nodes = parser.FetchNodesForMember(deserializationContext, unwrapProperty, GetLookupName(deserializationContext.DeserializationType));
 
-            if (nodes is { Count: > 1 })
+            if (nodes is { Count: >= 1 })
             {
                 ProcessElements(parser, deserializationContext, nodes, clazz, unwrapProperty, instance);
             }

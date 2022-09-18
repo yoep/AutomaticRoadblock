@@ -44,7 +44,7 @@ namespace AutomaticRoadblocks.Xml.Parser
                 : currentNode.Select(lookupName);
             var nestedChildNodes = currentNode.SelectSingleNode(lookupName)?.SelectChildren(XPathNodeType.Element);
             
-            return filteredChildNodes.Count > 1 || nestedChildNodes?.Count == 0 ? filteredChildNodes : nestedChildNodes;
+            return filteredChildNodes.Count >= 1 || nestedChildNodes?.Count == 0 ? filteredChildNodes : nestedChildNodes;
         }
 
         public string FetchAttributeValue(XmlContext context, MemberInfo member)

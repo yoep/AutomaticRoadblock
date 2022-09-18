@@ -1,0 +1,427 @@
+<Agencies>
+	<Agency>
+		<Name>Los Santos Police Department</Name>
+		<ShortName>LSPD</ShortName>
+		<ScriptName>lspd</ScriptName>
+		<Inventory>default</Inventory>
+		<TextureDictionary>web_lossantospolicedept</TextureDictionary>
+		<TextureName>web_lossantospolicedept</TextureName>
+		<Loadout>
+			<Name>Patrol Unit</Name>
+			<Vehicles>
+				<Vehicle>police</Vehicle>
+				<Vehicle>police2</Vehicle>
+				<Vehicle>police3</Vehicle>
+			</Vehicles>
+			<Peds>
+				<!-- 70% chance of male peds -->
+				<Ped chance="60" outfit="lspd_cop.m_base" inventory="patrol">mp_m_freemode_01</Ped> <!-- Specifically the "base" variation, with no rank insignia -->
+				<Ped chance="10" outfit="lspd_cop" inventory="patrol_stun">mp_m_freemode_01</Ped> <!-- Any variation - could possibly have rank insignia - will also have a stun weapon -->
+				
+				<!-- 30% chance of female peds -->
+				<Ped chance="25" outfit="lspd_cop.f_base" inventory="patrol">mp_f_freemode_01</Ped> <!-- Specifically the "base" variation, with no rank insignia -->
+				<Ped chance="5" outfit="lspd_cop" inventory="patrol_stun">mp_f_freemode_01</Ped> <!-- Any variation - could possibly have rank insignia - will also have a stun weapon -->
+			</Peds>
+			<NumPeds min="2" max="2" />
+			<Flags>
+				<Flag>RespondsAsTransport</Flag> <!-- Makes the unit eligible to be called for prisoner transport.  Only use this if there will be free seats for prisoners. -->
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+				<Flag>SpawnsAmbiently</Flag>     <!-- Makes the unit eligible to spawn ambiently - e.g. on patrol in the area or outside of police stations -->
+			</Flags>
+		</Loadout>
+		<Loadout>
+			<Name>Transport Unit</Name>
+			<Vehicles>
+				<Vehicle>policet</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="100" outfit="lspd_cop">mp_m_freemode_01</Ped>
+			</Peds>
+			<NumPeds min="1" max="2" />
+			<Flags>RespondsAsTransport</Flags>  <!-- Makes the unit eligible to be called for prisoner transport.  Only use this if there will be free seats for prisoners. -->
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>Los Santos County Sheriff</Name>
+		<ShortName>LSSD</ShortName>
+		<ScriptName>lssd</ScriptName>
+		<Inventory>default</Inventory>
+		<TextureDictionary>dia_police</TextureDictionary>
+		<TextureName>dia_police</TextureName>
+		<Loadout>
+			<Name>Patrol Unit</Name>
+			<Vehicles>
+				<Vehicle>sheriff</Vehicle>
+			</Vehicles>
+			<Peds>
+				<!-- 75% chance of male peds -->
+				<Ped chance="60" inventory="patrol">s_m_y_sheriff_01</Ped> <!-- 60% chance of male sheriff ped with basic patrol inventory -->
+				<Ped chance="15" inventory="patrol_stun">s_m_y_sheriff_01</Ped> <!-- 15% chance of male sheriff ped with stun gun -->
+				
+				<!-- 25% chance of female peds -->
+				<Ped chance="20" inventory="patrol">s_f_y_sheriff_01</Ped> <!-- 20% chance of female sheriff ped with basic patrol inventory -->
+				<Ped chance="5" inventory="patrol_stun">s_f_y_sheriff_01</Ped> <!-- 5% chance of female sheriff ped with stun gun -->
+			</Peds>
+			<NumPeds min="1" max="2" />
+			<Flags>
+				<Flag>RespondsAsTransport</Flag> <!-- Makes the unit eligible to be called for prisoner transport.  Only use this if there will be free seats for prisoners. -->
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+				<Flag>SpawnsAmbiently</Flag>     <!-- Makes the unit eligible to spawn ambiently - e.g. on patrol in the area or outside of police stations -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>San Andreas Highway Patrol</Name>
+		<ShortName>SAHP</ShortName>
+		<ScriptName>sahp</ScriptName>
+		<Inventory>default</Inventory>
+		<TextureDictionary>s_m_y_hwaycop_01</TextureDictionary>
+		<TextureName>decl_diff_001_a_uni</TextureName>
+		<Loadout>
+			<Name>Motor Unit</Name>
+			<Vehicles>
+				<Vehicle>policeb</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped comp_uppr="1" comp_decl="1" comp_lowr="0" prop_head="0" helmet="true" inventory="biker">s_m_y_hwaycop_01</Ped>
+			</Peds>
+			<NumPeds min="1" max="1" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+				<Flag>SpawnsAmbiently</Flag>     <!-- Makes the unit eligible to spawn ambiently - e.g. on patrol in the area or outside of police stations -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>North Yankton State Patrol</Name>
+		<ShortName>NYSP</ShortName>
+		<ScriptName>nysp</ScriptName>
+		<TextureDictionary>dia_police</TextureDictionary>
+		<TextureName>dia_police</TextureName>
+		<Inventory>default</Inventory>
+		<Loadout>
+			<Name>Patrol Unit</Name>
+			<Vehicles>
+				<Vehicle>policeold1</Vehicle>
+				<Vehicle>policeold2</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped prop_head="0">s_m_m_snowcop_01</Ped>
+				<Ped prop_head="1">s_m_m_snowcop_01</Ped>
+			</Peds>
+			<NumPeds min="1" max="2" />
+			<Flags>
+				<Flag>RespondsAsTransport</Flag> <!-- Makes the unit eligible to be called for prisoner transport.  Only use this if there will be free seats for prisoners. -->
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>Los Santos Police Department SWAT</Name>
+		<ShortName>LSPD</ShortName>
+		<ScriptName>lspd_swat</ScriptName>
+		<Inventory>swat</Inventory>
+		<Parent>lspd</Parent>
+		<Loadout>
+			<Name>SWAT Unit</Name>
+			<Vehicles>
+				<Vehicle extra_1="false" extra_2="false">police</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="70" comp_head="0" comp_uppr="0" comp_tex_uppr="0" comp_task="2" comp_accs="2" randomizeProps="false" prop_eyes="2">s_m_y_cop_01</Ped>
+				<Ped chance="15" comp_head="1" comp_uppr="0" comp_tex_uppr="1" comp_task="2" comp_accs="2" randomizeProps="false" prop_eyes="2">s_m_y_cop_01</Ped>
+				<Ped chance="15" comp_head="2" comp_uppr="0" comp_tex_uppr="2" comp_task="2" comp_accs="2" randomizeProps="false" prop_eyes="2">s_m_y_cop_01</Ped>
+			</Peds>
+			<NumPeds min="2" max="2" />
+			<Flags>
+				<Flag>SWAT</Flag> <!-- This is a special flag which enhances the combat abilities of all officers within the loadout. -->
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags> 
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>Los Santos County Sheriff SWAT</Name>
+		<ShortName>LSSD</ShortName>
+		<ScriptName>lssd_swat</ScriptName>
+		<Inventory>swat</Inventory>
+		<Parent>lssd</Parent>
+		<Loadout>
+			<Name>SWAT Unit</Name>
+			<Vehicles>
+				<Vehicle>sheriff2</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped comp_task="2" comp_uppr="0" comp_hand="0" randomizeProps="false">s_m_y_sheriff_01</Ped>
+			</Peds>
+			<NumPeds min="2" max="2" />
+			<Flags>
+				<Flag>SWAT</Flag> <!-- This is a special flag which enhances the combat abilities of all officers within the loadout. -->
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>National Office of Security Enforcement</Name>
+		<ShortName>NOOSE</ShortName>
+		<ScriptName>noose</ScriptName>
+		<TextureDictionary>ap1_03</TextureDictionary>
+		<TextureName>ap1_03_noose2bap1_03_noose2</TextureName>
+		<Inventory>swat</Inventory>
+		<Loadout>
+			<Name>SWAT Unit</Name>
+			<Vehicles>
+				<Vehicle>fbi2</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="80" outfit="mp_noose.m_base">mp_m_freemode_01</Ped>
+				<Ped chance="20" outfit="mp_noose.f_base">mp_f_freemode_01</Ped>
+			</Peds>
+			<NumPeds min="4" max="4" />
+			<Flags>
+				<Flag>SWAT</Flag> <!-- This is a special flag which enhances the combat abilities of all officers within the loadout. -->
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>LSPD Air Support Unit</Name>
+		<ShortName>LSPD</ShortName>
+		<ScriptName>lspd_asu</ScriptName>
+		<Parent>lspd</Parent>
+		<Inventory>default</Inventory>
+		<Loadout>
+			<Name>Air Unit</Name>
+			<Vehicles>
+				<Vehicle livery="1">polmav</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped comp_accs="1" comp_decl="0" helmet="true">s_m_y_pilot_01</Ped>
+			</Peds>
+			<NumPeds min="2" max="2" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>NOOSE Air Support Unit</Name>
+		<ShortName>NOOSE</ShortName>
+		<ScriptName>noose_asu</ScriptName>
+		<Parent>noose</Parent>
+		<Inventory>default</Inventory>
+		<Loadout>
+			<Name>Air Unit</Name>
+			<Vehicles>
+				<Vehicle weapon="VEHICLE_WEAPON_PLAYER_BUZZARD">buzzard</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="80" outfit="mp_noose">mp_m_freemode_01</Ped>
+				<Ped chance="20" outfit="mp_noose">mp_f_freemode_01</Ped>
+			</Peds>
+			<NumPeds min="4" max="4" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>Los Santos Fire Department (EMS)</Name>
+		<ShortName>LSFD</ShortName>
+		<ScriptName>lsfd</ScriptName>
+		<Loadout>
+			<Name>Rescue Ambulance</Name>
+			<Vehicles>
+				<Vehicle livery="2">ambulance</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="50" randomizeProps="true">s_m_m_paramedic_01</Ped>
+				<Ped chance="15" outfit="mp_ems">mp_m_freemode_01</Ped>
+				<Ped chance="10" outfit="mp_ems_jacket">mp_m_freemode_01</Ped>
+				<Ped chance="15" outfit="mp_ems">mp_f_freemode_01</Ped>
+				<Ped chance="10" outfit="mp_ems_jacket">mp_f_freemode_01</Ped>
+			</Peds>
+			<NumPeds min="2" max="2" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>Los Santos Fire Department (Fire)</Name>
+		<ShortName>LSFD</ShortName>
+		<ScriptName>lsfd_fire</ScriptName>
+		<Parent>lsfd</Parent>
+		<Inventory>fire</Inventory>
+		<Loadout>
+			<Name>Fire Truck</Name>
+			<Vehicles>
+				<Vehicle>firetruk</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="40" comp_uppr="0" comp_lowr="0" comp_accs="0" randomizeProps="true">s_m_y_fireman_01</Ped>
+				<Ped chance="40" outfit="mp_fire">mp_m_freemode_01</Ped>
+				<Ped chance="20" outfit="mp_fire">mp_f_freemode_01</Ped>
+			</Peds>
+			<NumPeds min="2" max="2" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+		<Loadout>
+			<Name>Fire Truck (SCBA)</Name>
+			<Vehicles>
+				<Vehicle>firetruk</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="80" outfit="mp_fire_scba" clipset="move_m@fire">mp_m_freemode_01</Ped>
+				<Ped chance="20" outfit="mp_fire_scba" clipset="move_m@fire">mp_f_freemode_01</Ped>
+			</Peds>
+			<NumPeds min="4" max="4" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<!-- The following agencies do not patrol by default but are defined nonetheless.  By default, the DOA and SASPA will not be available as backup. -->
+	<Agency>
+		<Name>Federal Investigation Bureau</Name>
+		<ShortName>FIB</ShortName>
+		<ScriptName>fib</ScriptName>
+		<TextureDictionary>s_m_m_fibsec_01</TextureDictionary>
+		<TextureName>decl_diff_001_a_uni</TextureName>
+		<Inventory>default</Inventory>
+		<BadgeModel>prop_fib_badge</BadgeModel>
+		<EvidenceMarkerModel>ch_prop_ch_fib_01a</EvidenceMarkerModel>
+		<Loadout>
+			<Name>Investigation Team</Name>
+			<Vehicles>
+				<Vehicle>fbi</Vehicle>
+				<Vehicle>fbi2</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="15" outfit="mp_fib">mp_m_freemode_01</Ped>
+				<Ped chance="40" outfit="mp_fib_shirt">mp_m_freemode_01</Ped>
+				<Ped chance="5" outfit="mp_fib">mp_f_freemode_01</Ped>
+				<Ped chance="30" outfit="mp_fib_shirt">mp_f_freemode_01</Ped>
+			</Peds>
+			<NumPeds min="2" max="2" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+		<Loadout>
+			<Name>Response Team</Name>
+			<Vehicles>
+				<Vehicle>fbi</Vehicle>
+				<Vehicle>fbi2</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="99">s_m_m_fibsec_01</Ped>
+				<Ped chance="1" comp_decl="2">ig_stevehains</Ped>
+			</Peds>
+			<NumPeds min="2" max="2" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+		<Loadout>
+			<Name>SWAT Team</Name>
+			<Vehicles>
+				<Vehicle>fbi2</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped comp_tex_decl="1" prop_head="0" inventory="swat">s_m_y_swat_01</Ped>
+			</Peds>
+			<NumPeds min="4" max="4" />
+			<Flags>
+				<Flag>SWAT</Flag> <!-- This is a special flag which enhances the combat abilities of all officers within the loadout. -->
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>International Affairs Agency</Name>
+		<ShortName>IAA</ShortName>
+		<ScriptName>iaa</ScriptName>
+		<TextureDictionary>v_33_cur_of3_deta001+hidr</TextureDictionary>
+		<TextureName>dm_iaa_01</TextureName>
+		<Inventory>default</Inventory>
+		<Loadout>
+			<Name>Response Team</Name>
+			<Vehicles>
+				<Vehicle>fbi</Vehicle>
+				<Vehicle>fbi2</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="49">s_m_m_ciasec_01</Ped>
+				<Ped chance="25" outfit="mp_iaa">mp_m_freemode_01</Ped>
+				<Ped chance="25" outfit="mp_iaa">mp_f_freemode_01</Ped>
+				<Ped chance="1" comp_uppr="3" comp_lowr="2" comp_feet="2" comp_accs="2" comp_task="1" comp_jbib="2">ig_karen_daniels</Ped>
+			</Peds>
+			<NumPeds min="2" max="2" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+			</Flags>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>Drug Observation Agency</Name>
+		<ShortName>DOA</ShortName>
+		<ScriptName>doa</ScriptName>
+		<TextureDictionary>web_doa</TextureDictionary>
+		<TextureName>web_doa</TextureName>
+		<Inventory>default</Inventory>
+		<ExcludeFromBackupMenu>true</ExcludeFromBackupMenu>
+		<Loadout>
+			<Name>Agent</Name>
+			<Peds>
+				<Ped>u_m_m_doa_01</Ped>
+			</Peds>
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>San Andreas State Prison Authority</Name>
+		<ShortName>SASPA</ShortName>
+		<ScriptName>saspa</ScriptName>
+		<TextureDictionary>dia_security</TextureDictionary>
+		<TextureName>dia_security</TextureName>
+		<Inventory>default</Inventory>
+		<ShieldModel>prop_riot_shield</ShieldModel>
+		<ExcludeFromBackupMenu>true</ExcludeFromBackupMenu>
+		<Loadout>
+			<Name>Prison Bus</Name>
+			<Vehicles>
+				<Vehicle>pbus</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped chance="50">s_m_m_prisguard_01</Ped>
+				<Ped chance="25" outfit="mp_saspa">mp_m_freemode_01</Ped>
+				<Ped chance="25" outfit="mp_saspa">mp_f_freemode_01</Ped>
+			</Peds>
+			<NumPeds min="1" max="1" />
+		</Loadout>
+	</Agency>
+	<Agency>
+		<Name>San Andreas Park Rangers</Name>
+		<ShortName>SAPR</ShortName>
+		<ScriptName>sapr</ScriptName>
+		<TextureDictionary>dia_police</TextureDictionary>
+		<TextureName>dia_police</TextureName>
+		<Inventory>default</Inventory>
+		<Loadout>
+			<Name>Patrol Unit</Name>
+			<Vehicles>
+				<Vehicle>pranger</Vehicle>
+			</Vehicles>
+			<Peds>
+				<Ped randomizeProps="true" comp_task="1">s_m_y_ranger_01</Ped>
+				<Ped randomizeProps="true" comp_task="1">s_f_y_ranger_01</Ped>
+			</Peds>
+			<NumPeds min="1" max="1" />
+			<Flags>
+				<Flag>RespondsAsBackup</Flag>    <!-- Makes the unit eligible to be called as either Code 2, Code 3 or Pursuit backup. -->
+				<Flag>SpawnsAmbiently</Flag>     <!-- Makes the unit eligible to spawn ambiently - e.g. on patrol in the area or outside of police stations -->
+			</Flags>
+		</Loadout>
+	</Agency>
+</Agencies>

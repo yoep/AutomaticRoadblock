@@ -5,6 +5,9 @@
         <Lights>
             <Light>flares</Light> <!-- The light source which needs to be placed during evening/night -->
         </Lights>
+        <Units>
+            <Unit>LocalPatrol</Unit> <!-- The LSPDFR patrol unit type which is used within the roadblock (see lspdfr/data/backup.xml for possible types) -->
+        </Units>
     </Roadblock>
     <Roadblock>
         <Level>2</Level>
@@ -12,6 +15,10 @@
         <Lights>
             <Light>flares</Light>
         </Lights>
+        <Units>
+            <Unit chance="70">LocalPatrol</Unit> <!-- 70% chance a patrol unit is used -->
+            <Unit chance="30">StatePatrol</Unit> <!-- 30% chance a state unit is used -->
+        </Units>
     </Roadblock>
     <Roadblock>
         <Level>3</Level>
@@ -20,6 +27,13 @@
             <Light>flares</Light>
             <Light>ground_standing_spots</Light>
         </Lights>
+        <Units>
+            <Unit chance="50">LocalPatrol</Unit>
+            <Unit chance="40">StatePatrol</Unit>
+            <!-- The transport unit type (this is a special type known to the plugin and not defined in the backup.xml) -->
+            <!-- This unit uses the config of lspdfr/data/agency.xml with the loadout name "Transport Unit" -->
+            <Unit chance="10">Transporter</Unit> 
+        </Units>
     </Roadblock>
     <Roadblock>
         <Level>4</Level>
@@ -28,6 +42,11 @@
         <Lights>
             <Light>spots</Light>
         </Lights>
+        <Units>
+            <Unit chance="70">LocalSWAT</Unit>
+            <Unit chance="20">StatePatrol</Unit>
+            <Unit chance="10">NooseSWAT</Unit>
+        </Units>
     </Roadblock>
     <Roadblock>
         <Level>5</Level>
@@ -37,5 +56,9 @@
         <Lights>
             <Light>spots</Light>
         </Lights>
+        <Units>
+            <Unit chance="70">NooseSWAT</Unit>
+            <Unit chance="30">LocalSWAT</Unit>
+        </Units>
     </Roadblock>
 </Roadblocks>
