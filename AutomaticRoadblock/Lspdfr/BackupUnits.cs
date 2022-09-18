@@ -1,3 +1,4 @@
+using System;
 using System.Xml.Serialization;
 
 namespace AutomaticRoadblocks.Lspdfr
@@ -5,6 +6,8 @@ namespace AutomaticRoadblocks.Lspdfr
     [XmlRoot("BackupUnits")]
     public class BackupUnits
     {
+        private Backup this[EBackupUnit unit] => GetBackup(unit);
+
         public Backup LocalPatrol { get; internal set; }
 
         public Backup StatePatrol { get; internal set; }
@@ -43,6 +46,19 @@ namespace AutomaticRoadblocks.Lspdfr
                 hashCode = (hashCode * 397) ^ (NooseSWAT != null ? NooseSWAT.GetHashCode() : 0);
                 return hashCode;
             }
+        }
+        
+        private Backup GetBackup(EBackupUnit unit)
+        {
+            return unit switch
+            {
+                EBackupUnit.LocalPatrol => LocalPatrol,
+                EBackupUnit.StatePatrol => StatePatrol,
+                EBackupUnit.Transporter => null,
+                EBackupUnit.LocalSWAT => LocalSWAT,
+                EBackupUnit.NooseSWAT => NooseSWAT,
+                _ => throw new ArgumentOutOfRangeException(nameof(unit), unit, "unit is not supported")
+            };
         }
     }
 }

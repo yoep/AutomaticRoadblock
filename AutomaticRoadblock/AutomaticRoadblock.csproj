@@ -124,6 +124,7 @@
         <Compile Include="Lspdfr\Agency.cs" />
         <Compile Include="Lspdfr\Backup.cs" />
         <Compile Include="Lspdfr\BackupUnits.cs" />
+        <Compile Include="Lspdfr\EBackupUnit.cs" />
         <Compile Include="Lspdfr\ILspdfrData.cs" />
         <Compile Include="Lspdfr\Loadout.cs" />
         <Compile Include="Lspdfr\LspdfrData.cs" />
@@ -278,6 +279,7 @@
         <Compile Include="Xml\Deserializers\DoubleXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\EBarrierFlagsXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\ELightSourceFlagsXmlDeserializer.cs" />
+        <Compile Include="Xml\Deserializers\EnumXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\Int32Deserializer.cs" />
         <Compile Include="Xml\Deserializers\ObjectXmlDeserializer.cs" />
         <Compile Include="Xml\Deserializers\StringXmlDeserializer.cs" />

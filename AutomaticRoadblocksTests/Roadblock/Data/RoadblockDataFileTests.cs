@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Lspdfr;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -24,7 +25,7 @@ namespace AutomaticRoadblocks.Roadblock.Data
                 },
                 new List<Unit>
                 {
-                    new Unit("LocalPatrol")
+                    new Unit(EBackupUnit.LocalPatrol)
                 });
             var expectedLevel5Result = new RoadblockData(5, "police_do_not_cross", "work_barrier_high", "barrel_traffic_catcher",
                 new List<string>
@@ -33,8 +34,8 @@ namespace AutomaticRoadblocks.Roadblock.Data
                 },
                 new List<Unit>
                 {
-                    new Unit("NooseSWAT", 70),
-                    new Unit("LocalSWAT", 30),
+                    new Unit(EBackupUnit.NooseSWAT, 70),
+                    new Unit(EBackupUnit.LocalSWAT, 30),
                 });
             var data = IoC.Instance.GetInstance<IRoadblockData>();
 

@@ -38,6 +38,7 @@ namespace AutomaticRoadblocks.Roadblock.Data
             MainBarrier = mainBarrier;
             SecondaryBarrier = secondaryBarrier;
             ChaseVehicleBarrier = chaseVehicleBarrier;
+            Lights = lights;
             Units = units;
         }
 

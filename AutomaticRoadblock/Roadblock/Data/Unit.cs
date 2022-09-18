@@ -1,5 +1,6 @@
 using System.Xml.Serialization;
 using AutomaticRoadblocks.Data;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Xml.Attributes;
 
 namespace AutomaticRoadblocks.Roadblock.Data
@@ -10,18 +11,18 @@ namespace AutomaticRoadblocks.Roadblock.Data
         {
         }
 
-        public Unit(string name)
+        public Unit(EBackupUnit name)
         {
             Name = name;
         }
 
-        public Unit(string name, int chance)
+        public Unit(EBackupUnit name, int chance)
         {
             Name = name;
             Chance = chance;
         }
 
-        [XmlUnwrapContents] public string Name { get; internal set; }
+        [XmlUnwrapContents] public EBackupUnit Name { get; internal set; }
 
         [XmlAttribute] public int Chance { get; internal set; } = 100;
 

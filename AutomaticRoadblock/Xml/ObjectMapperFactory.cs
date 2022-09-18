@@ -34,7 +34,8 @@ namespace AutomaticRoadblocks.Xml
                 new Int32Deserializer(),
                 new StringXmlDeserializer(),
                 new DoubleXmlDeserializer(),
-                new BooleanXmlDeserializer()
+                new BooleanXmlDeserializer(),
+                new EnumXmlDeserializer()
             });
 
             return this;

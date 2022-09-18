@@ -58,10 +58,14 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
         private static void ProcessElement(XmlParser parser, XmlDeserializationContext deserializationContext, PropertyInfo unwrapProperty, object instance)
         {
-            var value = GetValueForOptionalElementName(parser, deserializationContext) ?? deserializationContext.CurrentNode.Value;
+            var stringValue = GetValueForOptionalElementName(parser, deserializationContext) ?? deserializationContext.CurrentNode.Value;
 
-            if (IsRequiredMember(unwrapProperty) && !HasValue(deserializationContext))
+            if (IsRequiredMember(unwrapProperty) && string.IsNullOrWhiteSpace(stringValue))
                 throw new XmlException("Missing xml node for " + parser.GetXmlLookupName(unwrapProperty));
+
+            var propertyType = unwrapProperty.PropertyType;
+            var deserializer = deserializationContext.Deserializers.First(x => x.CanHandle(propertyType));
+            var value = deserializer.Deserialize(parser, new XmlDeserializationContext(deserializationContext, deserializationContext.CurrentNode, stringValue, propertyType));
 
             unwrapProperty.SetValue(instance, value);
         }

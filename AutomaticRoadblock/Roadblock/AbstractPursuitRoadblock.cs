@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.Data;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Roadblock.Data;
 using AutomaticRoadblocks.Roadblock.Slot;
@@ -17,6 +19,7 @@ using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
 using LSPD_First_Response.Engine.Scripting.Entities;
 using Rage;
+using Vehicle = Rage.Vehicle;
 
 namespace AutomaticRoadblocks.Roadblock
 {
@@ -35,6 +38,7 @@ namespace AutomaticRoadblocks.Roadblock
         private static readonly ILocalizer Localizer = IoC.Instance.GetInstance<ILocalizer>();
         private static readonly ISpikeStripDispatcher SpikeStripDispatcher = IoC.Instance.GetInstance<ISpikeStripDispatcher>();
         private static readonly IModelProvider ModelProvider = IoC.Instance.GetInstance<IModelProvider>();
+        private static readonly ILspdfrData LspdfrData = IoC.Instance.GetInstance<ILspdfrData>();
 
         private float _lastKnownDistanceToRoadblock = 9999f;
 
@@ -366,6 +370,12 @@ namespace AutomaticRoadblocks.Roadblock
                         break;
                 }
             }, "PursuitRoadblock.OnStateChanged");
+        }
+
+        private Model RetrieveVehicleModel()
+        {
+            var unit = ChanceProvider.Retrieve(RoadblockData.Units);
+            return null;
         }
 
         private static BarrierModel GetMainBarrier(RoadblockData roadblockData)
