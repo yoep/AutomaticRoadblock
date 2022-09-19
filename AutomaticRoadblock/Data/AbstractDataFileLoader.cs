@@ -10,14 +10,22 @@ namespace AutomaticRoadblocks.Data
     /// </summary>
     public abstract class AbstractDataFileLoader : IDataFile
     {
-        private const string DataDirectory = @"./plugins/LSPDFR/Automatic Roadblocks/data/";
+        private const string DefaultDataDirectory = @"./plugins/LSPDFR/Automatic Roadblocks/data/";
         
         protected readonly ILogger Logger;
         protected readonly ObjectMapper ObjectMapper = ObjectMapperFactory.CreateInstance();
+        protected readonly string DataDirectory;
 
         protected AbstractDataFileLoader(ILogger logger)
         {
             Logger = logger;
+            DataDirectory = DefaultDataDirectory;
+        }
+
+        protected AbstractDataFileLoader(ILogger logger, string dataDirectory)
+        {
+            Logger = logger;
+            DataDirectory = dataDirectory;
         }
 
         /// <inheritdoc />

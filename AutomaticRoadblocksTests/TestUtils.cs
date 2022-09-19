@@ -2,6 +2,7 @@ using System;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Data;
 using Xunit.Abstractions;
 
@@ -16,7 +17,8 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<ILogger>(typeof(ConsoleLogger))
                 .RegisterSingleton<IBarrierData>(typeof(BarrierDataFile))
                 .RegisterSingleton<IRoadblockData>(typeof(RoadblockDataFile))
-                .RegisterSingleton<ILightSourceData>(typeof(LightSourceDataFile));
+                .RegisterSingleton<ILightSourceData>(typeof(LightSourceDataFile))
+                .RegisterSingleton<ILspdfrData>(typeof(LspdfrData));
         }
 
         public static void SetLogger(ITestOutputHelper testOutputHelper)

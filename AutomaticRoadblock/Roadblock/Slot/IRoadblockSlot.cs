@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Street.Info;
 using JetBrains.Annotations;
 using Rage;
-using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
@@ -27,9 +27,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         float Heading { get; }
 
         /// <summary>
-        /// Get the vehicle type that will be used for this slot
+        /// Get the backup unit type that will be used for this slot.
         /// </summary>
-        VehicleType VehicleType { get; }
+        EBackupUnit BackupType { get; }
 
         /// <summary>
         /// Get the vehicle model that will be used in this slot.
@@ -53,7 +53,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The cop instances of this roadblock slot.
         /// </summary>
         IEnumerable<ARPed> Cops { get; }
-        
+
         /// <summary>
         /// The game instances of this slot.
         /// </summary>

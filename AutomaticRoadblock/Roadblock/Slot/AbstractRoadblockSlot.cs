@@ -7,11 +7,12 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Street.Info;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
 using Rage;
-using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
@@ -30,25 +31,24 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private readonly bool _shouldAddLights;
 
-        protected AbstractRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, VehicleType vehicleType, float heading,
-            bool shouldAddLights,
-            bool recordVehicleCollisions, float offset = 0f)
+        protected AbstractRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, EBackupUnit backupType, float heading,
+            bool shouldAddLights, bool recordVehicleCollisions, float offset = 0f)
         {
             Assert.NotNull(lane, "lane cannot be null");
             Assert.NotNull(mainBarrier, "barrierType cannot be null");
-            Assert.NotNull(vehicleType, "vehicleType cannot be null");
+            Assert.NotNull(backupType, "backupType cannot be null");
             Assert.NotNull(heading, "heading cannot be null");
             Lane = lane;
             MainBarrier = mainBarrier;
             SecondaryBarrier = secondaryBarrier;
-            VehicleType = vehicleType;
+            BackupType = backupType;
             Heading = heading;
             RecordVehicleCollisions = recordVehicleCollisions;
             Offset = offset;
             _shouldAddLights = shouldAddLights;
 
-            if (VehicleType != VehicleType.None)
-                VehicleModel = VehicleFactory.CreateModel(VehicleType, OffsetPosition);
+            if (backupType != EBackupUnit.None)
+                VehicleModel = LspdfrDataHelper.RetrieveVehicleModel(backupType, OffsetPosition);
         }
 
         #region Properties
@@ -61,9 +61,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         /// <inheritdoc />
         public float Heading { get; }
-
-        /// <inheritdoc />
-        public VehicleType VehicleType { get; }
 
         /// <inheritdoc />
         public List<InstanceSlot> Instances { get; } = new();
@@ -93,6 +90,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The secondary barrier that is used within this slot as second row.
         /// </summary>
         public BarrierModel SecondaryBarrier { get; }
+
+        public EBackupUnit BackupType { get; }
 
         /// <summary>
         /// The indication if the spawned vehicle should record collisions.
@@ -172,7 +171,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             return
                 $"Number of {nameof(Instances)}: {Instances.Count}, {nameof(Position)}: {Position}, {nameof(OffsetPosition)}: {OffsetPosition}, {nameof(Heading)}: {Heading}, " +
-                $"{nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, {nameof(VehicleType)}: {VehicleType}";
+                $"{nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, {nameof(BackupType)}: {BackupType}";
         }
 
         /// <inheritdoc />
@@ -210,7 +209,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public void WarpInVehicle()
         {
             CopInstances.ToList()
-                .ForEach(x => x.WarpIntoVehicle(Vehicle, EVehicleSeat.Any));
+                .ForEach(x => x.WarpIntoVehicle(Vehicle, Vehicle.Driver == null ? EVehicleSeat.Driver : EVehicleSeat.Any));
         }
 
         #endregion
@@ -244,8 +243,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <returns>Returns the position behind the vehicle.</returns>
         protected Vector3 CalculatePositionBehindVehicle()
         {
-            var model = VehicleFactory.CreateModel(VehicleType, OffsetPosition);
-            return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading) * (model.Dimensions.X + 0.5f);
+            return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading) * (VehicleModel.Dimensions.X + 0.5f);
         }
 
         /// <summary>
@@ -285,7 +283,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         private void InitializeVehicleSlot()
         {
-            if (VehicleType == VehicleType.None)
+            if (BackupType == EBackupUnit.None)
                 return;
 
             if (!VehicleModel.IsLoaded)
@@ -295,7 +293,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             }
 
             Instances.Add(new InstanceSlot(EEntityType.CopVehicle, CalculateVehiclePosition(), CalculateVehicleHeading(),
-                (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading, RecordVehicleCollisions)));
+                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundPosition(position), heading, RecordVehicleCollisions)));
         }
 
         private void InitializeBarriers(BarrierModel barrierModel, float roadOffset)

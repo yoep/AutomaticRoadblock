@@ -3,19 +3,20 @@ using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using Rage;
-using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Pursuit.Level
 {
     public class PursuitRoadblockSlotLevel5 : AbstractPursuitRoadblockSlot
     {
-        internal PursuitRoadblockSlotLevel5(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float heading, Vehicle targetVehicle,
+        internal PursuitRoadblockSlotLevel5(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, EBackupUnit backupUnit, float heading,
+            Vehicle targetVehicle,
             List<LightModel> lightSources, bool shouldAddLights)
-            : base(lane, mainBarrier, secondaryBarrier, DetermineVehicleType(), heading, targetVehicle, lightSources, shouldAddLights)
+            : base(lane, mainBarrier, secondaryBarrier, backupUnit, heading, targetVehicle, lightSources, shouldAddLights)
         {
         }
 
@@ -55,15 +56,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 return base.CalculateVehicleHeading() + 30;
 
             return base.CalculateVehicleHeading();
-        }
-
-        private static VehicleType DetermineVehicleType()
-        {
-            return Random.Next(4) switch
-            {
-                0 => VehicleType.NooseTeam,
-                _ => VehicleType.SwatTeam,
-            };
         }
     }
 }

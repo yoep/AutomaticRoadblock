@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Menu;
-using AutomaticRoadblocks.Vehicles;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.RedirectTraffic.Menu
 {
-    public class RedirectTrafficVehicleTypeComponentType : IMenuComponent<UIMenuListScrollerItem<VehicleType>>
+    public class RedirectTrafficVehicleTypeComponentType : IMenuComponent<UIMenuListScrollerItem<EBackupUnit>>
     {
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
         private readonly ILocalizer _localizer;
@@ -16,12 +16,12 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
             _localizer = localizer;
 
-            MenuItem = new UIMenuListScrollerItem<VehicleType>(localizer[LocalizationKey.Vehicle], localizer[LocalizationKey.VehicleDescription],
-                VehicleType.Values);
+            MenuItem = new UIMenuListScrollerItem<EBackupUnit>(localizer[LocalizationKey.Vehicle], localizer[LocalizationKey.VehicleDescription],
+                LspdfrDataHelper.BackupUnits());
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<VehicleType> MenuItem { get; }
+        public UIMenuListScrollerItem<EBackupUnit> MenuItem { get; }
 
         /// <inheritdoc />
         public EMenuType Type => EMenuType.RedirectTraffic;
@@ -39,14 +39,14 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            MenuItem.Formatter = type => _localizer[type.LocalizationKey];
-            MenuItem.SelectedItem = _redirectTrafficDispatcher.VehicleType;
+            MenuItem.Formatter = type => _localizer[LspdfrDataHelper.ToLocalizationKey(type)];
+            MenuItem.SelectedItem = _redirectTrafficDispatcher.BackupType;
             MenuItem.IndexChanged += MenuIndexChanged;
         }
 
         private void MenuIndexChanged(UIMenuScrollerItem sender, int oldIndex, int newIndex)
         {
-            _redirectTrafficDispatcher.VehicleType = MenuItem.SelectedItem;
+            _redirectTrafficDispatcher.BackupType = MenuItem.SelectedItem;
         }
     }
 }

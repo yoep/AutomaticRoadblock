@@ -1,60 +1,40 @@
 using System;
 using System.Collections.Generic;
-using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Pursuit.Level;
 using AutomaticRoadblocks.Roadblock;
-using AutomaticRoadblocks.Street.Info;
-using Rage;
 
 namespace AutomaticRoadblocks.Pursuit.Factory
 {
     internal static class PursuitRoadblockFactory
     {
-        private static readonly
-            Dictionary<ERoadblockLevel, Func<Road, BarrierModel, BarrierModel, BarrierModel, Vehicle, List<LightModel>, ERoadblockFlags, IRoadblock>>
-            Roadblocks =
-                new()
-                {
-                    {
-                        ERoadblockLevel.Level1,
-                        (road, mainBarrier, secondaryBarrier, _, vehicle, lightSources, flags) =>
-                            new PursuitRoadblockLevel1(road, mainBarrier, secondaryBarrier, vehicle, lightSources, flags)
-                    },
-                    {
-                        ERoadblockLevel.Level2,
-                        (road, mainBarrier, secondaryBarrier, _, vehicle, lightSources, flags) =>
-                            new PursuitRoadblockLevel2(road, mainBarrier, secondaryBarrier, vehicle, lightSources, flags)
-                    },
-                    {
-                        ERoadblockLevel.Level3,
-                        (road, mainBarrier, secondaryBarrier, _, vehicle, lightSources, flags) =>
-                            new PursuitRoadblockLevel3(road, mainBarrier, secondaryBarrier, vehicle, lightSources, flags)
-                    },
-                    {
-                        ERoadblockLevel.Level4,
-                        (road, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, lightSources, flags) =>
-                            new PursuitRoadblockLevel4(road, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, lightSources, flags)
-                    },
-                    {
-                        ERoadblockLevel.Level5,
-                        (road, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, lightSources, flags) =>
-                            new PursuitRoadblockLevel5(road, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, lightSources, flags)
-                    }
-                };
-
-        internal static IRoadblock Create(ERoadblockLevel level, Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier,
-            BarrierModel chaseVehicleBarrier, Vehicle vehicle, List<LightModel> lightSources, ERoadblockFlags flags)
+        private static readonly Dictionary<ERoadblockLevel, Func<PursuitRoadblockRequest, IRoadblock>> Roadblocks = new()
         {
-            Assert.NotNull(level, "level cannot be null");
-            Assert.NotNull(mainBarrier, "mainBarrier cannot be null");
-            Assert.NotNull(secondaryBarrier, "secondaryBarrier cannot be null");
-            Assert.NotNull(chaseVehicleBarrier, "chaseVehicleBarrier cannot be null");
-            Assert.NotNull(street, "road cannot be null");
-            Assert.NotNull(vehicle, "vehicle cannot be null");
-            Assert.NotNull(lightSources, "lightSources cannot be null");
+            {
+                ERoadblockLevel.Level1, request => new PursuitRoadblockLevel1(request)
+            },
+            {
+                ERoadblockLevel.Level2, request => new PursuitRoadblockLevel2(request)
+            },
+            {
+                ERoadblockLevel.Level3, request => new PursuitRoadblockLevel3(request)
+            },
+            {
+                ERoadblockLevel.Level4, request => new PursuitRoadblockLevel4(request)
+            },
+            {
+                ERoadblockLevel.Level5, request => new PursuitRoadblockLevel5(request)
+            }
+        };
 
-            return Roadblocks[level].Invoke(street, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, lightSources, flags);
+        internal static IRoadblock Create(PursuitRoadblockRequest request)
+        {
+            Assert.NotNull(request, "request cannot be null");
+            Assert.NotNull(request.RoadblockData, $"request is invalid, {nameof(request.RoadblockData)} cannot be null");
+            Assert.NotNull(request.Level, $"request is invalid, {nameof(request.Level)} cannot be null");
+            Assert.NotNull(request.Road, $"request is invalid, {nameof(request.Road)} cannot be null");
+            Assert.NotNull(request.TargetVehicle, $"request is invalid, {nameof(request.TargetVehicle)} cannot be null");
+            Assert.NotNull(request.Flags, $"request is invalid, {nameof(request.Flags)} cannot be null");
+            return Roadblocks[request.Level].Invoke(request);
         }
     }
 }

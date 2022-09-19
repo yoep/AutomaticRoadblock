@@ -2,11 +2,11 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private readonly ISettingsManager _settingsManager;
 
         private float _coneDistance = 2f;
-        private VehicleType _vehicleType = VehicleType.LocalUnit;
+        private EBackupUnit _backupType = EBackupUnit.LocalPatrol;
         private BarrierModel _coneType = BarrierModel.None;
         private RedirectTrafficType _type = RedirectTrafficType.Lane;
         private bool _enableRedirectionArrow = true;
@@ -37,10 +37,10 @@ namespace AutomaticRoadblocks.RedirectTraffic
         }
 
         /// <inheritdoc />
-        public VehicleType VehicleType
+        public EBackupUnit BackupType
         {
-            get => _vehicleType;
-            set => UpdateVehicleType(value);
+            get => _backupType;
+            set => UpdateBackupType(value);
         }
 
         /// <inheritdoc />
@@ -133,13 +133,13 @@ namespace AutomaticRoadblocks.RedirectTraffic
             Assert.NotNull(street, "street cannot be null");
             if (street.GetType() == typeof(Intersection))
                 return null;
-            
+
             Logger.Trace(
-                $"Creating a redirect traffic instance for {nameof(VehicleType)}: {VehicleType}, {nameof(ConeType)}: {ConeType}, {nameof(Type)}: {Type}, {nameof(ConeDistance)}: {ConeDistance}");
+                $"Creating a redirect traffic instance for {nameof(BackupType)}: {BackupType}, {nameof(ConeType)}: {ConeType}, {nameof(Type)}: {Type}, {nameof(ConeDistance)}: {ConeDistance}");
             var redirectTraffic = new RedirectTraffic(new RedirectTraffic.Request
             {
                 Road = (Road)street,
-                VehicleType = VehicleType,
+                BackupType = BackupType,
                 ConeType = ConeType,
                 Type = Type,
                 ConeDistance = ConeDistance,
@@ -162,9 +162,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
             DoInternalPreviewCreation(true);
         }
 
-        private void UpdateVehicleType(VehicleType value)
+        private void UpdateBackupType(EBackupUnit value)
         {
-            _vehicleType = value;
+            _backupType = value;
             DoInternalPreviewCreation(true);
         }
 

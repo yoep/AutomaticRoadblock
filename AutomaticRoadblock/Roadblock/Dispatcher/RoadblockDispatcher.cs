@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Localization;
-using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Pursuit.Factory;
+using AutomaticRoadblocks.Pursuit.Level;
 using AutomaticRoadblocks.Roadblock.Data;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
@@ -34,7 +32,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private readonly ISettingsManager _settingsManager;
         private readonly ILocalizer _localizer;
         private readonly IRoadblockData _roadblockData;
-        private readonly IModelProvider _modelProvider;
 
         private readonly List<RoadblockInfo> _roadblocks = new();
         private readonly List<IVehicleNode> _foundRoads = new();
@@ -42,15 +39,13 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private bool _cleanerRunning;
         private bool _userRequestedRoadblockDispatching;
 
-        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer, IRoadblockData roadblockData,
-            IModelProvider modelProvider)
+        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer, IRoadblockData roadblockData)
         {
             _logger = logger;
             _game = game;
             _settingsManager = settingsManager;
             _localizer = localizer;
             _roadblockData = roadblockData;
-            _modelProvider = modelProvider;
         }
 
         #region Properties
@@ -260,9 +255,14 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
 
             var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
-            var lights = GetLightsForLevel(level);
-            GetBarriersForLevel(actualLevelToUse, out var mainBarrier, out var secondaryBarrier, out var chaseVehicleBarrier);
-            var roadblock = PursuitRoadblockFactory.Create(actualLevelToUse, road, mainBarrier, secondaryBarrier, chaseVehicleBarrier, vehicle, lights, flags);
+            var roadblock = PursuitRoadblockFactory.Create(new PursuitRoadblockRequest
+            {
+                RoadblockData = GetRoadblockConfigDataForLevel(actualLevelToUse),
+                Level = actualLevelToUse,
+                Road = road,
+                TargetVehicle = vehicle,
+                Flags = flags
+            });
 
             _logger.Info($"Dispatching new roadblock as preview {createAsPreview}\n{roadblock}");
             lock (_roadblocks)
@@ -528,35 +528,13 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             }
         }
 
-        private RoadblockData GetDataForLevel(ERoadblockLevel level)
+        private RoadblockData GetRoadblockConfigDataForLevel(ERoadblockLevel level)
         {
             var data = _roadblockData.Roadblocks.Items.FirstOrDefault(x => x.Level == level.Level);
             if (data == null)
                 throw new RoadblockException($"Roadblock data couldn't be found for level {level}");
 
             return data;
-        }
-        
-        private List<LightModel> GetLightsForLevel(ERoadblockLevel level)
-        {
-            var configData = GetDataForLevel(level);
-
-            return configData.Lights
-                .Select(x => _modelProvider.RetrieveModelByScriptName<LightModel>(x))
-                .ToList();
-        }
-
-        private void GetBarriersForLevel(ERoadblockLevel level, out BarrierModel mainBarrier, out BarrierModel secondaryBarrier,
-            out BarrierModel chaseVehicleBarrier)
-        {
-            var configData = GetDataForLevel(level);
-            mainBarrier = _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.MainBarrier);
-            secondaryBarrier = !string.IsNullOrWhiteSpace(configData.SecondaryBarrier)
-                ? _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.SecondaryBarrier)
-                : BarrierModel.None;
-            chaseVehicleBarrier = !string.IsNullOrWhiteSpace(configData.ChaseVehicleBarrier)
-                ? _modelProvider.RetrieveModelByScriptName<BarrierModel>(configData.ChaseVehicleBarrier)
-                : BarrierModel.None;
         }
 
         /// <summary>

@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.Data;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Models;
+using AutomaticRoadblocks.Roadblock.Data;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.SpikeStrip.Slot;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
 using LSPD_First_Response.Engine.Scripting.Entities;
 using Rage;
@@ -34,34 +36,29 @@ namespace AutomaticRoadblocks.Roadblock
         private static readonly ILocalizer Localizer = IoC.Instance.GetInstance<ILocalizer>();
         private static readonly ISpikeStripDispatcher SpikeStripDispatcher = IoC.Instance.GetInstance<ISpikeStripDispatcher>();
         private static readonly IModelProvider ModelProvider = IoC.Instance.GetInstance<IModelProvider>();
+        private static readonly ILspdfrData LspdfrData = IoC.Instance.GetInstance<ILspdfrData>();
 
         private float _lastKnownDistanceToRoadblock = 9999f;
 
-        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, Vehicle targetVehicle,
-            List<LightModel> lightSources, ERoadblockFlags flags)
-            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, lightSources, flags)
+        protected AbstractPursuitRoadblock(RoadblockData roadblockData, Road street, Vehicle targetVehicle, ERoadblockFlags flags)
+            : base(street, GetMainBarrier(roadblockData), GetSecondaryBarrier(roadblockData), targetVehicle != null ? targetVehicle.Heading : 0f,
+                GetLightSources(roadblockData), flags)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
+            RoadblockData = roadblockData;
             TargetVehicle = targetVehicle;
-            ChaseVehicleBarrier = BarrierModel.None;
-            RoadblockStateChanged += OnStateChanged;
-
-            Initialize();
-        }
-
-        protected AbstractPursuitRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, BarrierModel chaseVehicleBarrier,
-            Vehicle targetVehicle, List<LightModel> lightSources, ERoadblockFlags flags)
-            : base(street, mainBarrier, secondaryBarrier, targetVehicle != null ? targetVehicle.Heading : 0f, lightSources, flags)
-        {
-            Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
-            TargetVehicle = targetVehicle;
-            ChaseVehicleBarrier = chaseVehicleBarrier;
+            ChaseVehicleBarrier = GetChaseVehicleBarrier(roadblockData);
             RoadblockStateChanged += OnStateChanged;
 
             Initialize();
         }
 
         #region Properties
+
+        /// <summary>
+        /// The roadblock config data which determines most of the setup.
+        /// </summary>
+        protected RoadblockData RoadblockData { get; }
 
         /// <summary>
         /// Get the target vehicle of this roadblock.
@@ -130,7 +127,7 @@ namespace AutomaticRoadblocks.Roadblock
                         BarrierFactory.Create(ModelProvider.RetrieveModelByScriptName<BarrierModel>(Barrier.BigConeStripesScriptName), conePosition)));
             }
         }
-        
+
         /// <inheritdoc />
         protected override void InitializeLights()
         {
@@ -168,7 +165,7 @@ namespace AutomaticRoadblocks.Roadblock
             Instances.AddRange(new[]
             {
                 new InstanceSlot(EEntityType.CopVehicle, roadPosition, TargetHeading + 25,
-                    (position, heading) => VehicleFactory.CreateWithModel(vehicleModel, position, heading)),
+                    (position, heading) => new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
                 new InstanceSlot(EEntityType.CopPed, roadPosition, TargetHeading,
                     (position, heading) =>
                         PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(vehicleModel, position, heading)))
@@ -198,19 +195,29 @@ namespace AutomaticRoadblocks.Roadblock
                 .ToList()
                 .ForEach(x => x.WarpIntoVehicle(vehicle, (int)VehicleSeat.Driver));
         }
-        
+
         protected List<LightModel> SlotLightSources()
         {
             return LightSources
                 .Where(x => (x.Light.Flags & (ELightSourceFlags.RoadLeft | ELightSourceFlags.RoadRight)) == 0)
                 .ToList();
         }
-        
+
         protected List<LightModel> RoadblockLightSources()
         {
             return LightSources
                 .Where(x => (x.Light.Flags & ELightSourceFlags.Lane) == 0)
                 .ToList();
+        }
+
+        protected Model RetrieveVehicleModel()
+        {
+            return LspdfrDataHelper.RetrieveVehicleModel(RetrieveBackupUnitType(), OffsetPosition);
+        }
+
+        protected EBackupUnit RetrieveBackupUnitType()
+        {
+            return ChanceProvider.Retrieve(RoadblockData.Units).Type;
         }
 
         private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
@@ -371,6 +378,32 @@ namespace AutomaticRoadblocks.Roadblock
                         break;
                 }
             }, "PursuitRoadblock.OnStateChanged");
+        }
+
+        private static BarrierModel GetMainBarrier(RoadblockData roadblockData)
+        {
+            return ModelProvider.RetrieveModelByScriptName<BarrierModel>(roadblockData.MainBarrier);
+        }
+
+        private static BarrierModel GetSecondaryBarrier(RoadblockData roadblockData)
+        {
+            return !string.IsNullOrWhiteSpace(roadblockData.SecondaryBarrier)
+                ? ModelProvider.RetrieveModelByScriptName<BarrierModel>(roadblockData.SecondaryBarrier)
+                : BarrierModel.None;
+        }
+
+        private static BarrierModel GetChaseVehicleBarrier(RoadblockData roadblockData)
+        {
+            return !string.IsNullOrWhiteSpace(roadblockData.ChaseVehicleBarrier)
+                ? ModelProvider.RetrieveModelByScriptName<BarrierModel>(roadblockData.ChaseVehicleBarrier)
+                : BarrierModel.None;
+        }
+
+        private static List<LightModel> GetLightSources(RoadblockData roadblockData)
+        {
+            return roadblockData.Lights
+                .Select(x => ModelProvider.RetrieveModelByScriptName<LightModel>(x))
+                .ToList();
         }
 
         #endregion

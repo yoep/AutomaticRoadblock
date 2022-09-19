@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Menu;
-using AutomaticRoadblocks.Vehicles;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
-    public class ManualPlacementVehicleTypeComponentItem : IMenuComponent<UIMenuListScrollerItem<VehicleType>>
+    public class ManualPlacementVehicleTypeComponentItem : IMenuComponent<UIMenuListScrollerItem<EBackupUnit>>
     {
         private readonly IManualPlacement _manualPlacement;
         private readonly ILocalizer _localizer;
@@ -16,12 +16,12 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             _manualPlacement = manualPlacement;
             _localizer = localizer;
 
-            MenuItem = new UIMenuListScrollerItem<VehicleType>(localizer[LocalizationKey.Vehicle], localizer[LocalizationKey.VehicleDescription],
-                VehicleType.Values);
+            MenuItem = new UIMenuListScrollerItem<EBackupUnit>(localizer[LocalizationKey.Vehicle], localizer[LocalizationKey.VehicleDescription],
+                LspdfrDataHelper.BackupUnits());
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<VehicleType> MenuItem { get; }
+        public UIMenuListScrollerItem<EBackupUnit> MenuItem { get; }
 
         /// <inheritdoc />
         public EMenuType Type => EMenuType.ManualPlacement;
@@ -39,14 +39,14 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            MenuItem.Formatter = type => _localizer[type.LocalizationKey];
-            MenuItem.SelectedItem = _manualPlacement.VehicleType;
+            MenuItem.Formatter = type => _localizer[LspdfrDataHelper.ToLocalizationKey(type)];
+            MenuItem.SelectedItem = _manualPlacement.BackupType;
             MenuItem.IndexChanged += MenuIndexChanged;
         }
 
         private void MenuIndexChanged(UIMenuScrollerItem sender, int oldIndex, int newIndex)
         {
-            _manualPlacement.VehicleType = MenuItem.SelectedItem;
+            _manualPlacement.BackupType = MenuItem.SelectedItem;
         }
     }
 }

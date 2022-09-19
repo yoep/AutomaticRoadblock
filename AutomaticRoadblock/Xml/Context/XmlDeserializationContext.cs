@@ -21,15 +21,15 @@ namespace AutomaticRoadblocks.Xml.Context
             Deserializers = deserializers;
         }
 
-        private XmlDeserializationContext(XmlDeserializationContext parent, XPathNavigator currentNode, Type deserializationType)
-            : base(parent.Document, currentNode)
+        internal XmlDeserializationContext(XmlDeserializationContext parent, XPathNavigator currentNode, string value, Type deserializationType)
+            : base(parent.Document, currentNode, value)
         {
             Deserializers = parent.Deserializers;
             DeserializationType = deserializationType;
         }
 
-        private XmlDeserializationContext(XmlDeserializationContext parent, XPathNavigator currentNode, string value, Type deserializationType)
-            : base(parent.Document, currentNode, value)
+        private XmlDeserializationContext(XmlDeserializationContext parent, XPathNavigator currentNode, Type deserializationType)
+            : base(parent.Document, currentNode)
         {
             Deserializers = parent.Deserializers;
             DeserializationType = deserializationType;
@@ -104,7 +104,7 @@ namespace AutomaticRoadblocks.Xml.Context
 
         protected bool Equals(XmlDeserializationContext other)
         {
-            return Equals(Deserializers, other.Deserializers) && Equals(DeserializationType, other.DeserializationType);
+            return Equals(Deserializers, other.Deserializers) && DeserializationType == other.DeserializationType;
         }
 
         public override bool Equals(object obj)

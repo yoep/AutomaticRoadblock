@@ -63,8 +63,10 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Barriers\BarrierDataTests.cs" />
+        <Compile Include="Data\ChanceProviderTests.cs" />
         <Compile Include="Debug\DebugReloadDataFilesComponentTests.cs" />
         <Compile Include="LightSources\LightDataFileTests.cs" />
+        <Compile Include="Lspdfr\LcpdfrDataTests.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Roadblock\Data\RoadblockDataFileTests.cs" />
         <Compile Include="TestUtils.cs" />
@@ -81,6 +83,14 @@
     <ItemGroup>
       <Analyzer Include="..\packages\xunit.analyzers.1.0.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
       <Analyzer Include="..\packages\xunit.analyzers.1.0.0\analyzers\dotnet\cs\xunit.analyzers.fixes.dll" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Lspdfr\data\agency.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Lspdfr\data\backup.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

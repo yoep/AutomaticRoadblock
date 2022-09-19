@@ -23,7 +23,7 @@ namespace AutomaticRoadblocks.Debug
             var result = instance.DataFiles;
 
             Xunit.Assert.NotNull(result);
-            Xunit.Assert.Equal(3, result.Count);
+            Xunit.Assert.Equal(4, result.Count);
         }
 
         [Fact]

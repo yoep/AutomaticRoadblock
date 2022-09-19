@@ -7,6 +7,7 @@ namespace AutomaticRoadblocks.LightSources
         public const string FlaresScriptName = "flares";
         public const string SpotsScriptName = "spots";
         public const string GroundSpotsScriptName = "ground_spots";
+        public const string GroundStandingSpotsScriptName = "ground_standing_spots";
 
         public Light()
         {

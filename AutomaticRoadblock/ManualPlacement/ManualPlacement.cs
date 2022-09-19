@@ -4,10 +4,10 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         private BarrierModel _mainBarrier = BarrierModel.None;
         private BarrierModel _secondaryBarrier = BarrierModel.None;
-        private VehicleType _vehicleType = VehicleType.LocalUnit;
+        private EBackupUnit _backupType = EBackupUnit.LocalPatrol;
         private LightModel _lightSourceType = LightModel.None;
         private PlacementType _placementType = PlacementType.All;
         private bool _copsEnabled;
@@ -46,10 +46,10 @@ namespace AutomaticRoadblocks.ManualPlacement
         }
 
         /// <inheritdoc />
-        public VehicleType VehicleType
+        public EBackupUnit BackupType
         {
-            get => _vehicleType;
-            set => UpdateVehicle(value);
+            get => _backupType;
+            set => UpdateBackupUnit(value);
         }
 
         /// <inheritdoc />
@@ -167,7 +167,7 @@ namespace AutomaticRoadblocks.ManualPlacement
                 Road = (Road)street,
                 MainBarrier = _mainBarrier,
                 SecondaryBarrier = _secondaryBarrier,
-                VehicleType = _vehicleType,
+                BackupType = _backupType,
                 PlacementType = _placementType,
                 TargetHeading = Game.PlayerHeading,
                 LimitSpeed = SpeedLimit,
@@ -195,9 +195,9 @@ namespace AutomaticRoadblocks.ManualPlacement
             DoInternalPreviewCreation(true);
         }
 
-        private void UpdateVehicle(VehicleType value)
+        private void UpdateBackupUnit(EBackupUnit value)
         {
-            _vehicleType = value;
+            _backupType = value;
             DoInternalPreviewCreation(true);
         }
 

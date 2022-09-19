@@ -6,11 +6,10 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Vehicles;
 using Rage;
-using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
@@ -30,12 +29,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
         public RedirectTraffic(Request request)
         {
             Assert.NotNull(request.Road, "road cannot be null");
-            Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
+            Assert.NotNull(request.BackupType, "backupType cannot be null");
             Assert.NotNull(request.ConeType, "coneType cannot be null");
             Assert.NotNull(request.Type, "type cannot be null");
             Road = request.Road;
             Lane = GetLaneClosestToPlayer();
-            VehicleType = request.VehicleType;
+            BackupType = request.BackupType;
             ConeType = request.ConeType;
             Type = request.Type;
             ConeDistance = request.ConeDistance;
@@ -69,9 +68,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
         public Road.Lane Lane { get; }
 
         /// <summary>
-        /// The vehicle type of the redirect traffic instance.
+        /// The backup unit type of the redirect traffic instance.
         /// </summary>
-        public VehicleType VehicleType { get; }
+        public EBackupUnit BackupType { get; }
 
         /// <summary>
         /// The cone type of the redirect traffic instance.
@@ -178,7 +177,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         public override string ToString()
         {
             return
-                $"{nameof(Position)}: {Position}, {nameof(OffsetPosition)}: {OffsetPosition}, {nameof(Type)}: {Type}, {nameof(VehicleType)}: {VehicleType}, " +
+                $"{nameof(Position)}: {Position}, {nameof(OffsetPosition)}: {OffsetPosition}, {nameof(Type)}: {Type}, {nameof(BackupType)}: {BackupType}, " +
                 $"{nameof(ConeType)}: {ConeType}, {nameof(IsLeftSideOfLanes)}: {IsLeftSideOfLanes},\n" +
                 $"{nameof(Road)}: {Road}\n" +
                 $"Using {nameof(Lane)}: {Lane}";
@@ -209,14 +208,14 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private void InitializeVehicle()
         {
-            if (VehicleType == VehicleType.None)
+            if (BackupType == EBackupUnit.None)
                 return;
 
             var rotation = IsLeftSideOfLanes ? -35 : 35;
-            VehicleModel = VehicleFactory.CreateModel(VehicleType, OffsetPosition);
+            VehicleModel = LspdfrDataHelper.RetrieveVehicleModel(BackupType, OffsetPosition);
 
             _instances.Add(new InstanceSlot(EEntityType.CopVehicle, OffsetPosition, Lane.Heading + rotation,
-                (position, heading) => VehicleFactory.CreateWithModel(VehicleModel, position, heading)));
+                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)));
         }
 
         private void InitializeCop()
@@ -243,7 +242,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private ARPed CreateCop(Vector3 position, float heading)
         {
-            if (VehicleType != VehicleType.None)
+            if (BackupType != EBackupUnit.None)
                 return PedFactory.CreateCopForVehicle(VehicleModel, position, heading);
 
             return PedFactory.CreateLocaleCop(position, heading);
@@ -395,7 +394,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var vehicleLength = GetVehicleLength() - 1f;
             var placementSide = IsLeftSideOfLanes ? -90 : 90;
 
-            if (VehicleType != VehicleType.None)
+            if (BackupType != EBackupUnit.None)
             {
                 vehicleWidth = VehicleModel.Dimensions.X;
                 vehicleLength = VehicleModel.Dimensions.Y;
@@ -419,12 +418,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private float GetVehicleWidth()
         {
-            return VehicleType == VehicleType.None ? DefaultVehicleWidth : VehicleModel.Dimensions.X;
+            return BackupType == EBackupUnit.None ? DefaultVehicleWidth : VehicleModel.Dimensions.X;
         }
 
         private float GetVehicleLength()
         {
-            return VehicleType == VehicleType.None ? DefaultVehicleLength : VehicleModel.Dimensions.Y;
+            return BackupType == EBackupUnit.None ? DefaultVehicleLength : VehicleModel.Dimensions.Y;
         }
 
         private Vector3 PositionBasedOnType()
@@ -460,7 +459,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             public Road Road { get; set; }
 
-            public VehicleType VehicleType { get; set; }
+            public EBackupUnit BackupType { get; set; }
 
             public BarrierModel ConeType { get; set; }
 
