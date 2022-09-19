@@ -128,7 +128,8 @@
         <Compile Include="Lspdfr\ILspdfrData.cs" />
         <Compile Include="Lspdfr\Loadout.cs" />
         <Compile Include="Lspdfr\LspdfrData.cs" />
-        <Compile Include="Lspdfr\Vehicle.cs" />
+        <Compile Include="Lspdfr\LspdfrDataHelper.cs" />
+        <Compile Include="Lspdfr\VehicleData.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="ManualPlacement\Menu\AbstractBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
@@ -268,8 +269,6 @@
         <Compile Include="Utils\Type\EVehicleLightState.cs" />
         <Compile Include="Vehicles\EVehicleSeat.cs" />
         <Compile Include="Vehicles\EVehicleWheel.cs" />
-        <Compile Include="Vehicles\VehicleFactory.cs" />
-        <Compile Include="Vehicles\VehicleType.cs" />
         <Compile Include="Xml\Attributes\XmlUnwrapContentsAttribute.cs" />
         <Compile Include="Xml\Context\XmlContext.cs" />
         <Compile Include="Xml\Context\XmlDeserializationContext.cs" />

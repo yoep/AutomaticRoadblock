@@ -99,16 +99,6 @@ namespace AutomaticRoadblocks.Localization
 
         #endregion
 
-        #region VehicleType
-
-        public static readonly LocalizationKey VehicleTypeLocal = new(nameof(VehicleTypeLocal), "Local");
-        public static readonly LocalizationKey VehicleTypeState = new(nameof(VehicleTypeState), "State");
-        public static readonly LocalizationKey VehicleTypeFbi = new(nameof(VehicleTypeFbi), "Swat");
-        public static readonly LocalizationKey VehicleTypeSwat = new(nameof(VehicleTypeSwat), "Noose");
-        public static readonly LocalizationKey VehicleTypeTransporter = new(nameof(VehicleTypeTransporter), "Transporter");
-
-        #endregion
-
         #region BarrierType
 
         public static readonly LocalizationKey None = new(nameof(None), "None");
@@ -165,12 +155,7 @@ namespace AutomaticRoadblocks.Localization
             SpeedLimit,
             SpeedLimitDescription,
             Vehicle,
-            VehicleDescription,
-            VehicleTypeFbi,
-            VehicleTypeLocal,
-            VehicleTypeState,
-            VehicleTypeSwat,
-            VehicleTypeTransporter,
+            VehicleDescription
         };
 
         public LocalizationKey(string identifier, string defaultText)

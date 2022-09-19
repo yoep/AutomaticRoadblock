@@ -1,5 +1,7 @@
+using System;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
+using LSPD_First_Response.Engine.Scripting;
 
 namespace AutomaticRoadblocks.Lspdfr
 {
@@ -28,6 +30,9 @@ namespace AutomaticRoadblocks.Lspdfr
             MountChiliad = mountChiliad;
             CayoPerico = cayoPerico;
         }
+
+        [XmlIgnore]
+        public string this[EWorldZoneCounty county] => GetAgencyNameForCounty(county);
 
         public string LosSantosCity { get; internal set; }
 
@@ -75,6 +80,19 @@ namespace AutomaticRoadblocks.Lspdfr
                 hashCode = (hashCode * 397) ^ (CayoPerico != null ? CayoPerico.GetHashCode() : 0);
                 return hashCode;
             }
+        }
+
+        private string GetAgencyNameForCounty(EWorldZoneCounty county)
+        {
+            return county switch
+            {
+                EWorldZoneCounty.LosSantos => LosSantosCity,
+                EWorldZoneCounty.LosSantosCounty => LosSantosCounty,
+                EWorldZoneCounty.BlaineCounty => BlaineCounty,
+                EWorldZoneCounty.NorthYankton => NorthYankton,
+                EWorldZoneCounty.CayoPerico => CayoPerico,
+                _ => throw new ArgumentOutOfRangeException(nameof(county), county, "county is not supported")
+            };
         }
     }
 }

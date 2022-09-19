@@ -3,17 +3,18 @@ using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Street.Info;
 using Rage;
-using VehicleType = AutomaticRoadblocks.Vehicles.VehicleType;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot, IPursuitRoadblockSlot
     {
-        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, VehicleType vehicleType, float heading, Vehicle targetVehicle,
+        protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, EBackupUnit backupType, float heading,
+            Vehicle targetVehicle,
             List<LightModel> lightSources, bool shouldAddLights)
-            : base(lane, mainBarrier, secondaryBarrier, vehicleType, heading, shouldAddLights, true)
+            : base(lane, mainBarrier, secondaryBarrier, backupType, heading, shouldAddLights, true)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             Assert.NotNull(lightSources, "lightSources cannot be null");

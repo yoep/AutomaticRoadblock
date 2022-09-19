@@ -1,8 +1,8 @@
 using System;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Preview;
-using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
@@ -14,9 +14,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
         float ConeDistance { get; set; }
 
         /// <summary>
-        /// The vehicle type to use for redirecting the traffic.
+        /// The backup unit type to use for redirecting the traffic.
         /// </summary>
-        VehicleType VehicleType { get; set; }
+        EBackupUnit BackupType { get; set; }
         
         /// <summary>
         /// The cones which should be used to redirect the traffic.

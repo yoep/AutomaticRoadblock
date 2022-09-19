@@ -32,15 +32,15 @@ namespace AutomaticRoadblocks.Lspdfr
         {
             var lspdAgency = new Agency("Los Santos Police Department", "LSPD", "lspd", "default", "web_lossantospolicedept", "web_lossantospolicedept", new List<Loadout>
             {
-                new Loadout("Patrol Unit",new List<Vehicle>
+                new Loadout("Patrol Unit",new List<VehicleData>
                 {
-                    new Vehicle("police"),
-                    new Vehicle("police2"),
-                    new Vehicle("police3"),
+                    new VehicleData("police"),
+                    new VehicleData("police2"),
+                    new VehicleData("police3"),
                 }),
-                new Loadout("Transport Unit",new List<Vehicle>
+                new Loadout("Transport Unit",new List<VehicleData>
                 {
-                    new Vehicle("policet")
+                    new VehicleData("policet")
                 })
             });
             var data = IoC.Instance.GetInstance<ILspdfrData>();

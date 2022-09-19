@@ -9,7 +9,7 @@ namespace AutomaticRoadblocks.Lspdfr
         {
         }
 
-        public Loadout(string name, List<Vehicle> vehicles)
+        public Loadout(string name, List<VehicleData> vehicles)
         {
             Name = name;
             Vehicles = vehicles;
@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Lspdfr
 
         public string Name { get; internal set; }
 
-        public List<Vehicle> Vehicles { get; internal set; } = new();
+        public List<VehicleData> Vehicles { get; internal set; } = new();
 
         public override string ToString()
         {

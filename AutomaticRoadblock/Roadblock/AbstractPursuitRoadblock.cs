@@ -15,11 +15,9 @@ using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.SpikeStrip.Slot;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
 using LSPD_First_Response.Engine.Scripting.Entities;
 using Rage;
-using Vehicle = Rage.Vehicle;
 
 namespace AutomaticRoadblocks.Roadblock
 {
@@ -167,7 +165,7 @@ namespace AutomaticRoadblocks.Roadblock
             Instances.AddRange(new[]
             {
                 new InstanceSlot(EEntityType.CopVehicle, roadPosition, TargetHeading + 25,
-                    (position, heading) => VehicleFactory.CreateWithModel(vehicleModel, position, heading)),
+                    (position, heading) => new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
                 new InstanceSlot(EEntityType.CopPed, roadPosition, TargetHeading,
                     (position, heading) =>
                         PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(vehicleModel, position, heading)))
@@ -210,6 +208,16 @@ namespace AutomaticRoadblocks.Roadblock
             return LightSources
                 .Where(x => (x.Light.Flags & ELightSourceFlags.Lane) == 0)
                 .ToList();
+        }
+
+        protected Model RetrieveVehicleModel()
+        {
+            return LspdfrDataHelper.RetrieveVehicleModel(RetrieveBackupUnitType(), OffsetPosition);
+        }
+
+        protected EBackupUnit RetrieveBackupUnitType()
+        {
+            return ChanceProvider.Retrieve(RoadblockData.Units).Type;
         }
 
         private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
@@ -370,12 +378,6 @@ namespace AutomaticRoadblocks.Roadblock
                         break;
                 }
             }, "PursuitRoadblock.OnStateChanged");
-        }
-
-        private Model RetrieveVehicleModel()
-        {
-            var unit = ChanceProvider.Retrieve(RoadblockData.Units);
-            return null;
         }
 
         private static BarrierModel GetMainBarrier(RoadblockData roadblockData)

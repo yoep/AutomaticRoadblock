@@ -11,29 +11,29 @@ namespace AutomaticRoadblocks.Roadblock.Data
         {
         }
 
-        public Unit(EBackupUnit name)
+        public Unit(EBackupUnit type)
         {
-            Name = name;
+            Type = type;
         }
 
-        public Unit(EBackupUnit name, int chance)
+        public Unit(EBackupUnit type, int chance)
         {
-            Name = name;
+            Type = type;
             Chance = chance;
         }
 
-        [XmlUnwrapContents] public EBackupUnit Name { get; internal set; }
+        [XmlUnwrapContents] public EBackupUnit Type { get; internal set; }
 
         [XmlAttribute] public int Chance { get; internal set; } = 100;
 
         public override string ToString()
         {
-            return $"{nameof(Name)}: {Name}, {nameof(Chance)}: {Chance}";
+            return $"{nameof(Type)}: {Type}, {nameof(Chance)}: {Chance}";
         }
 
         protected bool Equals(Unit other)
         {
-            return Name == other.Name && Chance == other.Chance;
+            return Type == other.Type && Chance == other.Chance;
         }
 
         public override bool Equals(object obj)
@@ -48,7 +48,7 @@ namespace AutomaticRoadblocks.Roadblock.Data
         {
             unchecked
             {
-                return ((Name != null ? Name.GetHashCode() : 0) * 397) ^ Chance;
+                return ((int)Type * 397) ^ Chance;
             }
         }
     }

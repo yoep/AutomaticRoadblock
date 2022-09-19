@@ -3,6 +3,7 @@ using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Vehicles;
@@ -11,10 +12,10 @@ namespace AutomaticRoadblocks.ManualPlacement
 {
     public class ManualRoadblockSlot : AbstractRoadblockSlot
     {
-        public ManualRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, VehicleType vehicleType,
+        public ManualRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, EBackupUnit backupType,
             List<LightModel> lightSources, float heading,
             bool shouldAddLights, bool copsEnabled, float offset)
-            : base(lane, mainBarrier, secondaryBarrier, vehicleType, heading, shouldAddLights, false, offset)
+            : base(lane, mainBarrier, secondaryBarrier, backupType, heading, shouldAddLights, false, offset)
         {
             Assert.NotNull(lightSources, "lightSources cannot be null");
             LightSources = lightSources;
@@ -43,7 +44,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         public override string ToString()
         {
             return "{" +
-                   $"{base.ToString()}, {nameof(VehicleType)}: {VehicleType}, {nameof(LightSources)}: [{string.Join(", ", LightSources)}], {nameof(CopsEnabled)}: {CopsEnabled}" +
+                   $"{base.ToString()}, {nameof(BackupType)}: {BackupType}, {nameof(LightSources)}: [{string.Join(", ", LightSources)}], {nameof(CopsEnabled)}: {CopsEnabled}" +
                    "}";
         }
 
@@ -54,7 +55,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         protected override void InitializeCops()
         {
-            if (!CopsEnabled || VehicleType == VehicleType.None)
+            if (!CopsEnabled || BackupType == EBackupUnit.None)
                 return;
 
             Instances.Add(new InstanceSlot(EEntityType.CopPed, Position, 0f, (position, heading) =>

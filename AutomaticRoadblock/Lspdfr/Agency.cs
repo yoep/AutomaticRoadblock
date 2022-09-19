@@ -7,6 +7,8 @@ namespace AutomaticRoadblocks.Lspdfr
 {
     public class Agency
     {
+        public const string TransporterLoadout = "Transport Unit";
+        
         public Agency()
         {
         }

@@ -2,9 +2,9 @@ using System;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -21,9 +21,9 @@ namespace AutomaticRoadblocks.ManualPlacement
         BarrierModel SecondaryBarrier { get; set; }
         
         /// <summary>
-        /// The vehicle type to use within the roadblock.
+        /// The backup type to use within the roadblock.
         /// </summary>
-        VehicleType VehicleType { get; set; }
+        EBackupUnit BackupType { get; set; }
         
         /// <summary>
         /// The light source type to use within the roadblock.

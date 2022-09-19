@@ -3,10 +3,10 @@ using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Vehicles;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -16,8 +16,8 @@ namespace AutomaticRoadblocks.ManualPlacement
             : base(request.Road, request.MainBarrier, request.SecondaryBarrier, request.TargetHeading, request.LightSources, RequestToFlags(request),
                 request.Offset)
         {
-            Assert.NotNull(request.VehicleType, "vehicleType cannot be null");
-            VehicleType = request.VehicleType;
+            Assert.NotNull(request.BackupType, "vehicleType cannot be null");
+            BackupType = request.BackupType;
             PlacementType = request.PlacementType;
             CopsEnabled = request.CopsEnabled;
 
@@ -29,7 +29,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <summary>
         /// The vehicle type used within the roadblock.
         /// </summary>
-        public VehicleType VehicleType { get; }
+        public EBackupUnit BackupType { get; }
 
         /// <summary>
         /// The placement type of the roadblock.
@@ -56,7 +56,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         public override string ToString()
         {
             return
-                $"{nameof(VehicleType)}: {VehicleType}, {nameof(PlacementType)}: {PlacementType}, {nameof(CopsEnabled)}: {CopsEnabled}\n" +
+                $"{nameof(BackupType)}: {BackupType}, {nameof(PlacementType)}: {PlacementType}, {nameof(CopsEnabled)}: {CopsEnabled}\n" +
                 $"{nameof(Slots)}: [{{{string.Join("}{,\n", Slots)}}}]";
         }
 
@@ -78,7 +78,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
 
             return lanesToBlock
-                .Select(lane => new ManualRoadblockSlot(lane, MainBarrier, SecondaryBarrier, VehicleType, LightSources, TargetHeading,
+                .Select(lane => new ManualRoadblockSlot(lane, MainBarrier, SecondaryBarrier, BackupType, LightSources, TargetHeading,
                     Flags.HasFlag(ERoadblockFlags.EnableLights), CopsEnabled, Offset))
                 .ToList();
         }
@@ -120,7 +120,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             public Road Road { get; set; }
             public BarrierModel MainBarrier { get; set; }
             public BarrierModel SecondaryBarrier { get; set; }
-            public VehicleType VehicleType { get; set; }
+            public EBackupUnit BackupType { get; set; }
             public PlacementType PlacementType { get; set; }
             public float TargetHeading { get; set; }
             public bool LimitSpeed { get; set; }
@@ -133,7 +133,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             {
                 return
                     $"{nameof(Road)}: {Road}, {nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, " +
-                    $"{nameof(VehicleType)}: {VehicleType}, {nameof(PlacementType)}: {PlacementType}, " +
+                    $"{nameof(BackupType)}: {BackupType}, {nameof(PlacementType)}: {PlacementType}, " +
                     $"{nameof(TargetHeading)}: {TargetHeading}, {nameof(LimitSpeed)}: {LimitSpeed}, {nameof(AddLights)}: {AddLights}, " +
                     $"{nameof(CopsEnabled)}: {CopsEnabled}, {nameof(Offset)}: {Offset}, {nameof(LightSources)}: {LightSources}";
             }

@@ -4,18 +4,18 @@ using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Lspdfr
 {
-    public class Vehicle
+    public class VehicleData
     {
-        public Vehicle()
+        public VehicleData()
         {
         }
 
-        public Vehicle(string modelName)
+        public VehicleData(string modelName)
         {
             ModelName = modelName;
         }
 
-        public Vehicle(string modelName, [CanBeNull] string livery)
+        public VehicleData(string modelName, [CanBeNull] string livery)
         {
             ModelName = modelName;
             Livery = livery;
@@ -33,7 +33,7 @@ namespace AutomaticRoadblocks.Lspdfr
             return $"{nameof(ModelName)}: {ModelName}, {nameof(Livery)}: {Livery}";
         }
 
-        protected bool Equals(Vehicle other)
+        protected bool Equals(VehicleData other)
         {
             return ModelName == other.ModelName && Livery == other.Livery;
         }
@@ -43,7 +43,7 @@ namespace AutomaticRoadblocks.Lspdfr
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Vehicle)obj);
+            return Equals((VehicleData)obj);
         }
 
         public override int GetHashCode()
