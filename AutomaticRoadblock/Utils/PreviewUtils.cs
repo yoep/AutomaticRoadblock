@@ -14,15 +14,6 @@ namespace AutomaticRoadblocks.Utils
             SetToPreviewState(entity, true);
         }
 
-        /// <summary>
-        /// Restore the entity to it's original state.
-        /// </summary>
-        /// <param name="entity">The entity to restore.</param>
-        public static void Restore(Entity entity)
-        {
-            SetToPreviewState(entity, false);
-        }
-
         private static void SetToPreviewState(Entity entity, bool isPreview)
         {
             Assert.NotNull(entity, "entity cannot be null");

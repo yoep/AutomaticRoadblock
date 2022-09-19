@@ -59,17 +59,6 @@ namespace AutomaticRoadblocks.Utils
         }
 
         /// <summary>
-        /// Set if the given ped entity can cower while in cover.
-        /// </summary>
-        /// <param name="ped">The ped to set the cower state.</param>
-        /// <param name="canCower">Set the cower state.</param>
-        public static void CanCowerInCover(Ped ped, bool canCower)
-        {
-            Assert.NotNull(ped, "ped cannot be null");
-            NativeFunction.Natives.SET_PED_CAN_COWER_IN_COVER(ped, canCower);
-        }
-
-        /// <summary>
         /// Set if the given ped entity can peek while in cover.
         /// </summary>
         /// <param name="ped">The ped to set the cower state.</param>

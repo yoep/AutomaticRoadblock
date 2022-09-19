@@ -4,7 +4,6 @@ using System.Linq;
 using LSPD_First_Response.Engine.Scripting;
 using LSPD_First_Response.Mod.API;
 using Rage;
-using Rage.Native;
 
 namespace AutomaticRoadblocks.Utils
 {
@@ -137,11 +136,6 @@ namespace AutomaticRoadblocks.Utils
                 "FBI2"
             };
 
-            public static readonly IReadOnlyList<string> SwatVehicleModels = new List<string>
-            {
-                RiotModelName
-            };
-
             public static readonly IReadOnlyList<string> RaceVehicleModels = new List<string>
             {
                 "penumbra2",
@@ -157,64 +151,6 @@ namespace AutomaticRoadblocks.Utils
                 "paragon2",
                 "italigto",
             };
-
-            /// <summary>
-            /// Get a local vehicle model for the given position.
-            /// </summary>
-            /// <param name="position">Set the position to get the local model for.</param>
-            /// <returns>Returns the local police vehicle model.</returns>
-            public static Model GetLocalPoliceVehicle(Vector3 position)
-            {
-                var zone = GetZone(position);
-                var list = IsCountyZone(zone) ? CountyVehicleModels.ToList() : CityVehicleModels.ToList();
-
-                return new Model(list[Random.Next(list.Count)]);
-            }
-
-            /// <summary>
-            /// Get a state police vehicle.
-            /// </summary>
-            /// <param name="includePoliceBike">Set if the police bike can also be returned as a vehicle model.</param>
-            /// <param name="includePoliceTransporter">Set if the police transporter can also be returned as vehicle model.</param>
-            /// <returns>Returns a state police vehicle.</returns>
-            public static Model GetStatePoliceVehicle(bool includePoliceBike = true, bool includePoliceTransporter = true)
-            {
-                var list = StateVehicleModels.ToList();
-
-                if (!includePoliceBike)
-                    list.Remove(PoliceBikeModelName);
-                if (!includePoliceTransporter)
-                    list.Remove(PoliceTransporterModelName);
-
-                return new Model(list[Random.Next(list.Count)]);
-            }
-
-            /// <summary>
-            /// Get an FBI police vehicle model. 
-            /// </summary>
-            /// <returns>Returns an FBI police vehicle model.</returns>
-            public static Model GetFbiPoliceVehicle()
-            {
-                return new Model(FbiVehicleModels[Random.Next(FbiVehicleModels.Count)]);
-            }
-
-            /// <summary>
-            /// Get an swat police vehicle model. 
-            /// </summary>
-            /// <returns>Returns an swat police vehicle model.</returns>
-            public static Model GetSwatPoliceVehicle()
-            {
-                return new Model(SwatVehicleModels[Random.Next(SwatVehicleModels.Count)]);
-            }
-
-            /// <summary>
-            /// Get an transporter police vehicle model. 
-            /// </summary>
-            /// <returns>Returns an transporter police vehicle model.</returns>
-            public static Model GetTransporterPoliceVehicle()
-            {
-                return new Model(PoliceTransporterModelName);
-            }
 
             /// <summary>
             /// Get a race vehicle model. 
@@ -293,13 +229,6 @@ namespace AutomaticRoadblocks.Utils
         public static Model GetFireTruck()
         {
             return new Model("FIRETRUK");
-        }
-
-        public static void GetDimensions(Model model, out Vector3 minimum, out Vector3 maximum)
-        {
-            Assert.NotNull(model, "model cannot be null");
-            // MISC::GET_MODEL_DIMENSIONS
-            NativeFunction.Natives.GET_MODEL_DIMENSIONS(model.Hash, out minimum, out maximum);
         }
 
         private static bool IsCountyZone(WorldZone zone)

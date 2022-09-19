@@ -209,7 +209,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public void WarpInVehicle()
         {
             CopInstances.ToList()
-                .ForEach(x => x.WarpIntoVehicle(Vehicle, EVehicleSeat.Any));
+                .ForEach(x => x.WarpIntoVehicle(Vehicle, Vehicle.Driver == null ? EVehicleSeat.Driver : EVehicleSeat.Any));
         }
 
         #endregion
