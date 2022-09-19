@@ -13,8 +13,7 @@ namespace AutomaticRoadblocks.ManualPlacement
     public class ManualRoadblockSlot : AbstractRoadblockSlot
     {
         public ManualRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, EBackupUnit backupType,
-            List<LightModel> lightSources, float heading,
-            bool shouldAddLights, bool copsEnabled, float offset)
+            List<LightModel> lightSources, float heading, bool shouldAddLights, bool copsEnabled, float offset)
             : base(lane, mainBarrier, secondaryBarrier, backupType, heading, shouldAddLights, false, offset)
         {
             Assert.NotNull(lightSources, "lightSources cannot be null");

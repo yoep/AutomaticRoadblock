@@ -11,6 +11,7 @@ using AutomaticRoadblocks.Integrations;
 using AutomaticRoadblocks.Integrations.PoliceSmartRadio;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.ManualPlacement.Menu;
 using AutomaticRoadblocks.Menu;
@@ -103,6 +104,7 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<IBarrierData>(typeof(BarrierDataFile))
                 .RegisterSingleton<IRoadblockData>(typeof(RoadblockDataFile))
                 .RegisterSingleton<ILightSourceData>(typeof(LightSourceDataFile))
+                .RegisterSingleton<ILspdfrData>(typeof(LspdfrData))
                 .RegisterSingleton<IModelProvider>(typeof(ModelProvider))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))

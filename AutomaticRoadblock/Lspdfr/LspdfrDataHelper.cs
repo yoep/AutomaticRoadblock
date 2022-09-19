@@ -20,6 +20,8 @@ namespace AutomaticRoadblocks.Lspdfr
         /// <returns>Returns a vehicle model.</returns>
         public static Model RetrieveVehicleModel(EBackupUnit unit, Vector3 position)
         {
+            Assert.NotNull(unit, "unit cannot be null");
+            Assert.NotNull(position, "position cannot be null");
             var backup = unit == EBackupUnit.Transporter ? LspdfrData.BackupUnits.LocalPatrol : LspdfrData.BackupUnits[unit];
             var agency = LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
             var vehicles = unit == EBackupUnit.Transporter
@@ -48,6 +50,7 @@ namespace AutomaticRoadblocks.Lspdfr
 
         public static LocalizationKey ToLocalizationKey(EBackupUnit unit)
         {
+            Assert.NotNull(unit, "unit cannot be null");
             return new LocalizationKey("VehicleType" + unit, unit.ToString());
         }
     }
