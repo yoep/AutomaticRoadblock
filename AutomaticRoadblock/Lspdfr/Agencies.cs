@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 using AutomaticRoadblocks.Xml.Attributes;
+using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Lspdfr
 {
@@ -10,6 +11,7 @@ namespace AutomaticRoadblocks.Lspdfr
     public class Agencies
     {
         [XmlIgnore]
+        [CanBeNull]
         public Agency this[string scriptName] => GetAgencyByScriptName(scriptName);
 
         [XmlUnwrapContents]
@@ -18,7 +20,7 @@ namespace AutomaticRoadblocks.Lspdfr
         private Agency GetAgencyByScriptName(string scriptName)
         {
             Assert.HasText(scriptName, "scriptName cannot be empty");
-            return Items.First(x => x.ScriptName.Equals(scriptName, StringComparison.InvariantCulture));
+            return Items.FirstOrDefault(x => x.ScriptName.Equals(scriptName, StringComparison.InvariantCulture));
         }
     }
 }

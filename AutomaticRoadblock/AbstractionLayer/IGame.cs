@@ -51,6 +51,12 @@ namespace AutomaticRoadblocks.AbstractionLayer
         /// </summary>
         /// <param name="message">Set the message to display in a notification.</param>
         void DisplayNotification(string message);
+        
+        /// <summary>
+        /// Display a notification when debug is activated.
+        /// </summary>
+        /// <param name="message">Set the message to display in a notification.</param>
+        void DisplayNotificationDebug(string message);
 
         void DrawLine(Vector3 start, Vector3 end, Color color);
 
