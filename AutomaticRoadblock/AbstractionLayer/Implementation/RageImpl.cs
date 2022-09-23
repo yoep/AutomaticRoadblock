@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using Rage;
@@ -60,13 +61,21 @@ namespace AutomaticRoadblocks.AbstractionLayer.Implementation
         /// <inheritdoc />
         public void DisplayPluginNotification(string message)
         {
+            Assert.HasText(message, "message cannot be empty");
             Game.DisplayNotification("~b~" + AutomaticRoadblocksPlugin.Name + " ~s~" + message.Trim());
         }
 
         /// <inheritdoc />
         public void DisplayNotification(string message)
         {
+            Assert.HasText(message, "message cannot be empty");
             Game.DisplayNotification(message.Trim());
+        }
+
+        /// <inheritdoc />
+        public void DisplayNotificationDebug(string message)
+        {
+            InternalDebugNotification(message);
         }
 
         public void DrawLine(Vector3 start, Vector3 end, Color color)
@@ -82,6 +91,12 @@ namespace AutomaticRoadblocks.AbstractionLayer.Implementation
         public void DrawSphere(Vector3 position, float radius, Color color)
         {
             Rage.Debug.DrawSphereDebug(position, radius, color);
+        }
+
+        [Conditional("DEBUG")]
+        private void InternalDebugNotification(string message)
+        {
+            Game.DisplayNotification(message.Trim());
         }
     }
 }
