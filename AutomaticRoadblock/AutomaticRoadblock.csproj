@@ -132,11 +132,13 @@
         <Compile Include="Lspdfr\VehicleData.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="ManualPlacement\Menu\AbstractBarrierComponentItem.cs" />
+        <Compile Include="ManualPlacement\Menu\ManualPlacementDirectionComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementRemoveComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableCopsComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableSpeedLimitComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementSecondaryBarrierComponentItem.cs" />
+        <Compile Include="ManualPlacement\PlacementDirection.cs" />
         <Compile Include="ManualPlacement\PlacementType.cs" />
         <Compile Include="ManualPlacement\IManualPlacement.cs" />
         <Compile Include="ManualPlacement\ManualPlacement.cs" />

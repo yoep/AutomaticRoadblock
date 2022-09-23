@@ -20,6 +20,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private EBackupUnit _backupType = EBackupUnit.LocalPatrol;
         private LightModel _lightSourceType = LightModel.None;
         private PlacementType _placementType = PlacementType.All;
+        private PlacementDirection _direction = PlacementDirection.Towards;
         private bool _copsEnabled;
         private float _offset;
 
@@ -64,6 +65,13 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             get => _placementType;
             set => UpdatePlacementType(value);
+        }
+
+        /// <inheritdoc />
+        public PlacementDirection Direction
+        {
+            get => _direction; 
+            set => UpdateDirection(value);
         }
 
         /// <inheritdoc />
@@ -222,6 +230,12 @@ namespace AutomaticRoadblocks.ManualPlacement
         private void UpdateOffset(float value)
         {
             _offset = value;
+            DoInternalPreviewCreation(true);
+        }
+        
+        private void UpdateDirection(PlacementDirection value)
+        {
+            _direction = value;
             DoInternalPreviewCreation(true);
         }
 

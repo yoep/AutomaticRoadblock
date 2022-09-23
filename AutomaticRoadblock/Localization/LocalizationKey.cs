@@ -64,6 +64,10 @@ namespace AutomaticRoadblocks.Localization
 
         public static readonly LocalizationKey Offset = new(nameof(Offset), "Offset");
         public static readonly LocalizationKey OffsetDescription = new(nameof(OffsetDescription), "The offset of the placement in regards to the vehicle node");
+        public static readonly LocalizationKey Direction = new(nameof(Direction), "Direction");
+        public static readonly LocalizationKey DirectionDescription = new(nameof(DirectionDescription), "The roadblock facing direction in regards to the player");
+        public static readonly LocalizationKey DirectionTowardsPlayer = new(nameof(DirectionTowardsPlayer), "Towards");
+        public static readonly LocalizationKey DirectionAwayFromPlayer = new(nameof(DirectionAwayFromPlayer), "Away");
 
         #endregion
 
@@ -155,7 +159,11 @@ namespace AutomaticRoadblocks.Localization
             SpeedLimit,
             SpeedLimitDescription,
             Vehicle,
-            VehicleDescription
+            VehicleDescription,
+            Direction,
+            DirectionDescription,
+            DirectionTowardsPlayer,
+            DirectionAwayFromPlayer
         };
 
         public LocalizationKey(string identifier, string defaultText)

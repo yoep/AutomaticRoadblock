@@ -34,6 +34,11 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// The placement type of the roadblock.
         /// </summary>
         PlacementType PlacementType { get; set; }
+        
+        /// <summary>
+        /// The placement direction of the roadblock.
+        /// </summary>
+        PlacementDirection Direction { get; set; }
 
         /// <summary>
         /// The indication if cops should be added to the roadblock.
