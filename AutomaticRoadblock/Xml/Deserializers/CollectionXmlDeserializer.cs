@@ -19,10 +19,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             if (deserializer == null)
                 throw new XmlException("Could not find deserializer for type " + genericType);
 
-            if (deserializationContext.Nodes == null)
-                return values;
-
-            foreach (XPathNavigator node in DetermineNodesToIterate(deserializationContext))
+            foreach (XPathNavigator node in DetermineNodesToIterate(parser, genericType, deserializationContext))
             {
                 values.Add(deserializationContext.Deserialize(parser, node, genericType));
             }
@@ -35,9 +32,9 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             return typeof(IEnumerable).IsAssignableFrom(type);
         }
 
-        private XPathNodeIterator DetermineNodesToIterate(XmlDeserializationContext deserializationContext)
+        private XPathNodeIterator DetermineNodesToIterate(XmlParser parser, Type property, XmlDeserializationContext deserializationContext)
         {
-            var nodes = deserializationContext.Nodes;
+            var nodes = parser.FetchNodesForMember(new XmlDeserializationContext(deserializationContext, property, deserializationContext.LookupName));
 
             // verify if there is only one node with the same sub-nodes
             // if so, use the children rather than the parent wrapper of the list
@@ -46,7 +43,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
                 return nodes.Current.SelectChildren(XPathNodeType.Element);
             }
 
-            return deserializationContext.Nodes;
+            return parser.FetchNodesForMember(new XmlDeserializationContext(deserializationContext, property, deserializationContext.LookupName));
         }
 
         private bool ChildrenAllHaveTheSameName(XPathNodeIterator parent)

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.XPath;
@@ -15,28 +14,28 @@ namespace AutomaticRoadblocks.Xml.Context
             XPathDocument document,
             XPathNavigator currentNode,
             Type deserializationType,
-            List<IXmlDeserializer> deserializers) : base(document, currentNode)
+            List<IXmlDeserializer> deserializers) : base(document, currentNode, "")
         {
             DeserializationType = deserializationType;
             Deserializers = deserializers;
         }
 
-        internal XmlDeserializationContext(XmlDeserializationContext parent, XPathNavigator currentNode, string value, Type deserializationType)
-            : base(parent.Document, currentNode, value)
+        internal XmlDeserializationContext(XmlDeserializationContext parent, Type deserializationType, string lookupName)
+            : base(parent.Document, parent.CurrentNode, lookupName)
+        {
+            DeserializationType = deserializationType;
+            Deserializers = parent.Deserializers;
+        }
+
+        internal XmlDeserializationContext(XmlDeserializationContext parent, XPathNavigator currentNode, string lookupName, string value,
+            Type deserializationType) : base(parent.Document, currentNode, lookupName, value)
         {
             Deserializers = parent.Deserializers;
             DeserializationType = deserializationType;
         }
 
         private XmlDeserializationContext(XmlDeserializationContext parent, XPathNavigator currentNode, Type deserializationType)
-            : base(parent.Document, currentNode)
-        {
-            Deserializers = parent.Deserializers;
-            DeserializationType = deserializationType;
-        }
-
-        private XmlDeserializationContext(XmlDeserializationContext parent, XPathNodeIterator nodes, Type deserializationType)
-            : base(parent.Document, nodes)
+            : base(parent.Document, currentNode, deserializationType.Name)
         {
             Deserializers = parent.Deserializers;
             DeserializationType = deserializationType;
@@ -67,39 +66,22 @@ namespace AutomaticRoadblocks.Xml.Context
         }
 
         /// <summary>
-        /// Deserialize the given nodes for the given type.
-        /// </summary>
-        /// <param name="parser">Set the parser that is being used.</param>
-        /// <param name="nodes">Set the nodes to deserialize.</param>
-        /// <param name="type">Set the type to which the node must be mapped.</param>
-        /// <returns>Returns an enumerable of the deserialized nodes.</returns>
-        /// <exception cref="XmlException">Is thrown when an error occurs during deserialization of the nodes.</exception>
-        public IEnumerable Deserialize(XmlParser parser, XPathNodeIterator nodes, Type type)
-        {
-            var deserializer = Deserializers.Find(e => e.CanHandle(type));
-
-            if (deserializer == null)
-                throw new XmlException("Could not find deserializer for type " + type);
-
-            return (IEnumerable) deserializer.Deserialize(parser, new XmlDeserializationContext(this, nodes, type));
-        }
-
-        /// <summary>
         /// Deserialize the given value (assuming it's an attribute value) for the current node.
         /// </summary>
         /// <param name="parser">Set the parser that is being used.</param>
+        /// <param name="lookupName">The property name to lookup.</param>
         /// <param name="value">Set the value to deserialize.</param>
         /// <param name="type">Set the type to which the value must be mapped.</param>
         /// <returns>Returns the deserialized value.</returns>
         /// <exception cref="XmlException">Is thrown when an error occurs during deserialization of the value.</exception>
-        public object Deserialize(XmlParser parser, string value, Type type)
+        public object Deserialize(XmlParser parser, Type type, string lookupName, string value = null)
         {
             var deserializer = Deserializers.Find(e => e.CanHandle(type));
 
             if (deserializer == null)
                 throw new XmlException("Could not find deserializer for type " + type);
 
-            return deserializer.Deserialize(parser, new XmlDeserializationContext(this, CurrentNode, value, type));
+            return deserializer.Deserialize(parser, new XmlDeserializationContext(this, CurrentNode, lookupName, value, type));
         }
 
         protected bool Equals(XmlDeserializationContext other)
@@ -112,7 +94,7 @@ namespace AutomaticRoadblocks.Xml.Context
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((XmlDeserializationContext) obj);
+            return Equals((XmlDeserializationContext)obj);
         }
 
         public override int GetHashCode()

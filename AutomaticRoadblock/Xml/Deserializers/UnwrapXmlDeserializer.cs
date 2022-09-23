@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Xml.XPath;
 using AutomaticRoadblocks.Xml.Attributes;
 using AutomaticRoadblocks.Xml.Context;
 using AutomaticRoadblocks.Xml.Parser;
@@ -25,11 +24,12 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             var properties = deserializationContext.DeserializationType.GetProperties();
             var unwrapProperty = properties.First(IsUnwrapProperty);
             var clazz = unwrapProperty.PropertyType;
-            var nodes = parser.FetchNodesForMember(deserializationContext, unwrapProperty, GetLookupName(deserializationContext.DeserializationType));
+            var nodes = parser.FetchNodesForMember(new XmlDeserializationContext(deserializationContext, clazz,
+                GetLookupName(deserializationContext.DeserializationType)));
 
             if (nodes is { Count: >= 1 })
             {
-                ProcessElements(parser, deserializationContext, nodes, clazz, unwrapProperty, instance);
+                ProcessElements(parser, deserializationContext, clazz, unwrapProperty, instance, GetLookupName(deserializationContext.DeserializationType));
             }
             else
             {
@@ -49,10 +49,10 @@ namespace AutomaticRoadblocks.Xml.Deserializers
                 .Deserialize(parser, deserializationContext);
         }
 
-        private static void ProcessElements(XmlParser parser, XmlDeserializationContext deserializationContext, XPathNodeIterator nodes, Type clazz,
-            PropertyInfo unwrapProperty, object instance)
+        private static void ProcessElements(XmlParser parser, XmlDeserializationContext deserializationContext, Type clazz,
+            PropertyInfo unwrapProperty, object instance, string lookupName)
         {
-            var value = deserializationContext.Deserialize(parser, nodes, clazz);
+            var value = deserializationContext.Deserialize(parser, clazz, lookupName);
             unwrapProperty.SetValue(instance, value);
         }
 
@@ -65,7 +65,8 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
             var propertyType = unwrapProperty.PropertyType;
             var deserializer = deserializationContext.Deserializers.First(x => x.CanHandle(propertyType));
-            var value = deserializer.Deserialize(parser, new XmlDeserializationContext(deserializationContext, deserializationContext.CurrentNode, stringValue, propertyType));
+            var value = deserializer.Deserialize(parser, new XmlDeserializationContext(deserializationContext, deserializationContext.CurrentNode,
+                GetLookupName(deserializationContext.DeserializationType), stringValue, propertyType));
 
             unwrapProperty.SetValue(instance, value);
         }
@@ -73,8 +74,8 @@ namespace AutomaticRoadblocks.Xml.Deserializers
         private static string GetValueForOptionalElementName(XmlParser parser, XmlDeserializationContext deserializationContext)
         {
             var lookupName = GetLookupNameFromUnwrapAttribute(deserializationContext.DeserializationType);
-            return string.IsNullOrWhiteSpace(lookupName) 
-                ? null 
+            return string.IsNullOrWhiteSpace(lookupName)
+                ? null
                 : parser.FetchNodeForName(deserializationContext, lookupName)?.Value;
         }
 

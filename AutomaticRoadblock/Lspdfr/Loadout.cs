@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.Lspdfr
 
         public override string ToString()
         {
-            return $"{nameof(Name)}: {Name}, {nameof(Vehicles)}: {Vehicles}";
+            return $"{nameof(Name)}: {Name}, {nameof(Vehicles)}: {string.Join(", ", Vehicles)}";
         }
 
         protected bool Equals(Loadout other)

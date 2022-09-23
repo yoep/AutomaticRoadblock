@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.Lspdfr
             var data = IoC.Instance.GetInstance<ILspdfrData>();
 
             var result = data.BackupUnits;
-            
+
             Xunit.Assert.NotNull(result);
             Xunit.Assert.Equal(localPatrol, result.LocalPatrol);
             Xunit.Assert.Equal(localSwat, result.LocalSWAT);
@@ -30,25 +30,34 @@ namespace AutomaticRoadblocks.Lspdfr
         [Fact]
         public void TestAgenciesDeserialization()
         {
-            var lspdAgency = new Agency("Los Santos Police Department", "LSPD", "lspd", "default", "web_lossantospolicedept", "web_lossantospolicedept", new List<Loadout>
+            var lspdAgency = new Agency("Los Santos Police Department", "LSPD", "lspd", "default", "web_lossantospolicedept", "web_lossantospolicedept",
+                new List<Loadout>
+                {
+                    new Loadout("Patrol Unit", new List<VehicleData>
+                    {
+                        new VehicleData("police"),
+                        new VehicleData("police2"),
+                        new VehicleData("police3"),
+                    }),
+                    new Loadout("Transport Unit", new List<VehicleData>
+                    {
+                        new VehicleData("policet")
+                    })
+                });
+            var highwayAgency = new Agency("San Andreas Highway Patrol", "SAHP", "sahp", "default", "s_m_y_hwaycop_01", "decl_diff_001_a_uni", new List<Loadout>
             {
-                new Loadout("Patrol Unit",new List<VehicleData>
+                new Loadout("Motor Unit", new List<VehicleData>
                 {
-                    new VehicleData("police"),
-                    new VehicleData("police2"),
-                    new VehicleData("police3"),
-                }),
-                new Loadout("Transport Unit",new List<VehicleData>
-                {
-                    new VehicleData("policet")
+                    new VehicleData("policeb")
                 })
             });
             var data = IoC.Instance.GetInstance<ILspdfrData>();
 
             var result = data.Agencies;
-            
+
             Xunit.Assert.NotNull(result);
             Xunit.Assert.Equal(lspdAgency, result.Items.First(x => x.ScriptName.Equals("lspd")));
+            Xunit.Assert.Equal(highwayAgency, result.Items.First(x => x.ScriptName.Equals("sahp")));
         }
     }
 }
