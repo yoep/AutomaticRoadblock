@@ -20,6 +20,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private EBackupUnit _backupType = EBackupUnit.LocalPatrol;
         private LightModel _lightSourceType = LightModel.None;
         private PlacementType _placementType = PlacementType.All;
+        private PlacementDirection _direction = PlacementDirection.Towards;
         private bool _copsEnabled;
         private float _offset;
 
@@ -64,6 +65,13 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             get => _placementType;
             set => UpdatePlacementType(value);
+        }
+
+        /// <inheritdoc />
+        public PlacementDirection Direction
+        {
+            get => _direction; 
+            set => UpdateDirection(value);
         }
 
         /// <inheritdoc />
@@ -162,6 +170,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             if (street.GetType() == typeof(Intersection))
                 return null;
 
+            var targetHeading = Direction == PlacementDirection.Towards ? Game.PlayerHeading : Game.PlayerHeading - 180;
             var request = new ManualRoadblock.Request
             {
                 Road = (Road)street,
@@ -169,7 +178,7 @@ namespace AutomaticRoadblocks.ManualPlacement
                 SecondaryBarrier = _secondaryBarrier,
                 BackupType = _backupType,
                 PlacementType = _placementType,
-                TargetHeading = Game.PlayerHeading,
+                TargetHeading = targetHeading,
                 LimitSpeed = SpeedLimit,
                 AddLights = LightSourceType != LightModel.None,
                 LightSources = new List<LightModel> { LightSourceType },
@@ -222,6 +231,12 @@ namespace AutomaticRoadblocks.ManualPlacement
         private void UpdateOffset(float value)
         {
             _offset = value;
+            DoInternalPreviewCreation(true);
+        }
+        
+        private void UpdateDirection(PlacementDirection value)
+        {
+            _direction = value;
             DoInternalPreviewCreation(true);
         }
 
