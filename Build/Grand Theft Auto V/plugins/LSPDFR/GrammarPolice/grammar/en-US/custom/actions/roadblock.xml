@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Action>
+    <Name>roadblock</Name>
+    <Commands>
+        <string>request</string>
+    </Commands>
+    <Phrases>
+        <string>roadblock</string>
+        <string>roadblock support</string>
+        <string>spike strip</string>
+        <string>spike strip support</string>
+    </Phrases>
+    <Target>AutomaticRoadblocks.Api.Functions.PursuitManager.DispatchNow</Target>
+	<Parameters>
+	    <Parameter>
+		    <Type>System.Boolean</Type>
+			<Value>true</Value>
+		</Parameter>
+	</Parameters>
+</Action>
