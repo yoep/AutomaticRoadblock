@@ -170,6 +170,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             if (street.GetType() == typeof(Intersection))
                 return null;
 
+            var targetHeading = Direction == PlacementDirection.Towards ? Game.PlayerHeading : Game.PlayerHeading - 180;
             var request = new ManualRoadblock.Request
             {
                 Road = (Road)street,
@@ -177,7 +178,7 @@ namespace AutomaticRoadblocks.ManualPlacement
                 SecondaryBarrier = _secondaryBarrier,
                 BackupType = _backupType,
                 PlacementType = _placementType,
-                TargetHeading = Game.PlayerHeading,
+                TargetHeading = targetHeading,
                 LimitSpeed = SpeedLimit,
                 AddLights = LightSourceType != LightModel.None,
                 LightSources = new List<LightModel> { LightSourceType },
