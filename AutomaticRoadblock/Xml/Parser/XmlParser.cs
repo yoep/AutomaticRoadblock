@@ -26,25 +26,13 @@ namespace AutomaticRoadblocks.Xml.Parser
             return context.CurrentNode.SelectSingleNode(name);
         }
 
-        public XPathNodeIterator FetchNodesForMember(XmlContext context, MemberInfo member)
+        public XPathNodeIterator FetchNodesForMember(XmlContext context)
         {
             Assert.NotNull(context, "context cannot be null");
-            Assert.NotNull(member, "member cannot be null");
-            return FetchNodesForMember(context, member, GetXmlLookupName(member));
-        }
-
-        public XPathNodeIterator FetchNodesForMember(XmlContext context, MemberInfo member, string lookupName)
-        {
-            Assert.NotNull(context, "context cannot be null");
-            Assert.NotNull(member, "member cannot be null");
-            Assert.NotNull(lookupName, "lookupName cannot be null");
             var currentNode = context.CurrentNode;
-            var filteredChildNodes = currentNode.Name.Equals(lookupName)
-                ? currentNode.SelectChildren(XPathNodeType.Element)
-                : currentNode.Select(lookupName);
-            var nestedChildNodes = currentNode.SelectSingleNode(lookupName)?.SelectChildren(XPathNodeType.Element);
-            
-            return filteredChildNodes.Count >= 1 || nestedChildNodes?.Count == 0 ? filteredChildNodes : nestedChildNodes;
+            return currentNode.Name.Equals(context.LookupName)
+                ? currentNode.SelectSingleNode(context.XPath)?.SelectChildren(XPathNodeType.Element)
+                : currentNode.Select(context.LookupName);
         }
 
         public string FetchAttributeValue(XmlContext context, MemberInfo member)

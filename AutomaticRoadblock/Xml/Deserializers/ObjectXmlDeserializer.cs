@@ -42,12 +42,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
         {
             if (IsArrayOrCollection(property))
             {
-                var nodes = parser.FetchNodesForMember(deserializationContext, property);
-
-                if (nodes == null && IsRequiredMember(property))
-                    throw new XmlException("Missing xml nodes for " + parser.GetXmlLookupName(property));
-
-                return deserializationContext.Deserialize(parser, nodes, property.PropertyType);
+                return deserializationContext.Deserialize(parser, property.PropertyType, property.Name);
             }
 
             XPathNavigator node;
@@ -88,7 +83,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
 
             return string.IsNullOrWhiteSpace(value) 
                 ? defaultValue 
-                : deserializationContext.Deserialize(parser, value, type);
+                : deserializationContext.Deserialize(parser, type, property.Name, value);
         }
 
         private static object ProcessEnum(string value, Type type)

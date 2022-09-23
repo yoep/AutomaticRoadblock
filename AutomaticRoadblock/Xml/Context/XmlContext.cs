@@ -5,35 +5,67 @@ namespace AutomaticRoadblocks.Xml.Context
 {
     public abstract class XmlContext
     {
-        protected XmlContext(XPathDocument document, XPathNavigator currentNode)
+        private readonly string _xPath;
+
+        protected XmlContext(XPathDocument document, XPathNavigator currentNode, string lookupName)
         {
             Document = document;
             CurrentNode = currentNode;
-            Nodes = null;
+            _xPath = ToXPath(currentNode);
+            LookupName = lookupName;
         }
-        
-        protected XmlContext(XPathDocument document, XPathNavigator currentNode, string value)
+
+        protected XmlContext(XPathDocument document, XPathNavigator currentNode, string lookupName, string value = null)
         {
             Document = document;
             CurrentNode = currentNode;
-            Nodes = null;
+            _xPath = ToXPath(currentNode);
+            LookupName = lookupName;
             Value = value;
         }
 
-        protected XmlContext(XPathDocument document, XPathNodeIterator nodes)
-        {
-            Document = document;
-            CurrentNode = null;
-            Nodes = nodes;
-        }
-
+        /// <summary>
+        /// The XML document that is being parsed.
+        /// </summary>
+        [NotNull]
         public XPathDocument Document { get; }
 
-        public XPathNavigator CurrentNode { get; }
-        
+        [NotNull] public XPathNavigator CurrentNode { get; }
+
+        /// <summary>
+        /// The current xpath navigation of the context.
+        /// </summary>
+        [NotNull]
+        public string XPath => _xPath + LookupName;
+
+        /// <summary>
+        /// The current lookup name for the content in the <see cref="CurrentNode"/>.
+        /// </summary>
         [CanBeNull]
-        public XPathNodeIterator Nodes { get; }
-        
+        public string LookupName { get; }
+
+        /// <summary>
+        /// The current value of the node context.
+        /// </summary>
+        [CanBeNull]
         public string Value { get; }
+
+        private static string ToXPath(XPathNavigator currentNode)
+        {
+            var xPath = "";
+            var nodes = currentNode.SelectAncestors(XPathNodeType.Element, true);
+
+            if (nodes.Count == 1)
+            {
+                return "/";
+            }
+
+            foreach (XPathNavigator node in nodes)
+            {
+                xPath = $"{node.Name}/" + xPath;
+            }
+
+            return xPath;
+        }
     }
 }
