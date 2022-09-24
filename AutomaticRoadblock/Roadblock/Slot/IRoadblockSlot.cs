@@ -32,11 +32,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         EBackupUnit BackupType { get; }
 
         /// <summary>
-        /// Get the vehicle model that will be used in this slot.
-        /// </summary>
-        Model VehicleModel { get; }
-
-        /// <summary>
         /// Retrieve the vehicle instance (nullable) of this slot.
         /// It returns null when <see cref="Spawn"/> has not been called yet.
         /// </summary>
@@ -58,6 +53,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The game instances of this slot.
         /// </summary>
         List<InstanceSlot> Instances { get; }
+        
+        /// <summary>
+        /// The length of the vehicle model in the slot.
+        /// </summary>
+        float VehicleLength { get; }
 
         /// <summary>
         /// Spawn the slot entities into the world.

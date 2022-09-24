@@ -129,7 +129,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         private ISpikeStrip CreateSpikeStripInstance()
         {
-            var offset = VehicleModel.Dimensions.Y + PlacementInFrontOfVehicle;
+            var offset = VehicleLength + PlacementInFrontOfVehicle;
             var spikeStrip = SpikeStripDispatcher.Spawn(Road, Lane, Location, TargetVehicle, offset);
             spikeStrip.StateChanged += SpikeStripStateChanged;
             return spikeStrip;
@@ -213,7 +213,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         private Vector3 CalculateDirectionInFrontOfVehicle(float additionalVerticalOffset)
         {
-            return MathHelper.ConvertHeadingToDirection(Heading) * (VehicleModel.Dimensions.Y + additionalVerticalOffset);
+            return MathHelper.ConvertHeadingToDirection(Heading) * (VehicleLength + additionalVerticalOffset);
         }
 
         private ESpikeStripLocation DetermineLocation()

@@ -11,6 +11,7 @@ using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
+using JetBrains.Annotations;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -23,6 +24,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
     /// <remarks>Make sure that the <see cref="Initialize"/> method is called within the constructor after all properties/fields are set for the slot.</remarks>
     public abstract class AbstractRoadblockSlot : IRoadblockSlot
     {
+        private const float DefaultVehicleWidth = 2.5f;
+        private const float DefaultVehicleLength = 4f;
         protected const int VehicleHeadingMaxOffset = 10;
         protected static readonly Random Random = new();
 
@@ -80,10 +83,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public List<InstanceSlot> Instances { get; } = new();
 
         /// <inheritdoc />
-        public Vehicle Vehicle => VehicleInstance?.GameInstance;
+        public float VehicleLength => VehicleModel != null
+            ? VehicleModel.Value.Dimensions.Y
+            : DefaultVehicleLength;
 
         /// <inheritdoc />
-        public Model VehicleModel { get; }
+        public Vehicle Vehicle => VehicleInstance?.GameInstance;
 
         /// <inheritdoc />
         public Road.Lane Lane { get; }
@@ -106,6 +111,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public BarrierModel SecondaryBarrier { get; }
 
         public EBackupUnit BackupType { get; }
+
+        /// <summary>
+        /// The vehicle model of this slot.
+        /// </summary>
+        [CanBeNull]
+        protected Model? VehicleModel { get; }
 
         /// <summary>
         /// The indication if the spawned vehicle should record collisions.
@@ -227,6 +238,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public void WarpInVehicle()
         {
+            if (Vehicle == null)
+            {
+                Logger.Warn("Unable to warp cops into vehicle, vehicle instance is null");
+                return;
+            }
+            
             CopInstances.ToList()
                 .ForEach(x => x.WarpIntoVehicle(Vehicle, Vehicle.Driver == null ? EVehicleSeat.Driver : EVehicleSeat.Any));
         }
@@ -262,7 +279,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <returns>Returns the position behind the vehicle.</returns>
         protected virtual Vector3 CalculatePositionBehindVehicle()
         {
-            return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading) * (VehicleModel.Dimensions.X + 0.5f);
+            return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading) * (GetVehicleWidth() + 0.5f);
         }
 
         /// <summary>
@@ -304,19 +321,26 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             return OffsetPosition;
         }
 
+        protected float GetVehicleWidth()
+        {
+            return VehicleModel != null
+                ? VehicleModel.Value.Dimensions.X
+                : DefaultVehicleWidth;
+        }
+
         private void InitializeVehicleSlot()
         {
-            if (BackupType == EBackupUnit.None)
+            if (BackupType == EBackupUnit.None || VehicleModel == null)
                 return;
 
-            if (!VehicleModel.IsLoaded)
+            if (VehicleModel is { IsLoaded: false })
             {
-                Logger.Trace($"Loading vehicle slot model {VehicleModel.Name}");
-                VehicleModel.LoadAndWait();
+                Logger.Trace($"Loading vehicle slot model {VehicleModel.Value.Name}");
+                VehicleModel.Value.LoadAndWait();
             }
 
             Instances.Add(new InstanceSlot(EEntityType.CopVehicle, CalculateVehiclePosition(), CalculateVehicleHeading(),
-                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundPosition(position), heading, RecordVehicleCollisions)));
+                (position, heading) => new ARVehicle(VehicleModel.Value, GameUtils.GetOnTheGroundPosition(position), heading, RecordVehicleCollisions)));
         }
 
         private void InitializeCops()

@@ -490,7 +490,7 @@ namespace AutomaticRoadblocks.Roadblock
         private float CalculateSlotVehicleDifference(IRoadblockSlot slot)
         {
             var laneWidth = slot.Lane.Width;
-            var vehicleLength = slot.VehicleModel.Dimensions.Y;
+            var vehicleLength = slot.VehicleLength;
 
             return laneWidth - vehicleLength;
         }
