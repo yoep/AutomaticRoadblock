@@ -129,6 +129,8 @@
         <Compile Include="Lspdfr\Loadout.cs" />
         <Compile Include="Lspdfr\LspdfrData.cs" />
         <Compile Include="Lspdfr\LspdfrDataHelper.cs" />
+        <Compile Include="Lspdfr\NumPeds.cs" />
+        <Compile Include="Lspdfr\PedData.cs" />
         <Compile Include="Lspdfr\VehicleData.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="ManualPlacement\Menu\AbstractBarrierComponentItem.cs" />

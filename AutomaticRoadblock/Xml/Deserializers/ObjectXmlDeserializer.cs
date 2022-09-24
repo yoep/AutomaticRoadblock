@@ -55,7 +55,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
                 switch (node)
                 {
                     case null when IsRequiredMember(property):
-                        throw new XmlException("Missing xml node for " + parser.GetXmlLookupName(property));
+                        throw new XmlException($"missing xml node for {parser.GetXmlLookupName(property)} at {deserializationContext.XPath}");
                     case null:
                         return null;
                 }
@@ -81,8 +81,8 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             if (type == typeof(Array))
                 throw new DeserializationException("Attribute cannot be of type Array");
 
-            return string.IsNullOrWhiteSpace(value) 
-                ? defaultValue 
+            return string.IsNullOrWhiteSpace(value)
+                ? defaultValue
                 : deserializationContext.Deserialize(parser, type, property.Name, value);
         }
 
