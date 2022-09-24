@@ -55,7 +55,7 @@ namespace AutomaticRoadblocks.Roadblock
             Road = street;
             MainBarrier = mainBarrier;
             SecondaryBarrier = secondaryBarrier;
-            TargetHeading = CalculateTargetHeading(targetMatchingHeading);
+            TargetHeading = targetMatchingHeading;
             LightSources = lightSources;
             Flags = flags;
             Offset = offset;
@@ -518,24 +518,6 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 slot.WarpInVehicle();
             }
-        }
-        
-        private float CalculateTargetHeading(float targetMatchingHeading)
-        {
-            var closestHeadingDifference = 9999f;
-            var headingToUse = targetMatchingHeading;
-            
-            foreach (var lane in Road.Lanes)
-            {
-                var headingDifference = Math.Abs(targetMatchingHeading - lane.Heading);
-                if (headingDifference < closestHeadingDifference)
-                {
-                    closestHeadingDifference = headingDifference;
-                    headingToUse = lane.Heading;
-                }
-            }
-
-            return headingToUse;
         }
 
         [Conditional("DEBUG")]
