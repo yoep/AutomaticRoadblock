@@ -51,8 +51,17 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             {
                 VehicleModel = LspdfrDataHelper.RetrieveVehicleModel(backupType, OffsetPosition);
 
-                var loadout = LspdfrDataHelper.RetrieveLoadout(BackupType, Position);
-                NumberOfCops = Random.Next(loadout.NumPeds.Min, loadout.NumPeds.Max + 1);
+                var loadout = LspdfrDataHelper.RetrieveLoadout(backupType, Position);
+                if (loadout != null)
+                {
+                    NumberOfCops = Random.Next(loadout.NumPeds.Min, loadout.NumPeds.Max + 1);
+                }
+                else
+                {
+                    Logger.Warn($"Unable to retrieve a valid loadout for unit type {backupType}");
+                    Game.DisplayNotificationDebug("~o~No valid loadout found, unable to determine number of cops");
+                    NumberOfCops = 1;
+                }
             }
         }
 

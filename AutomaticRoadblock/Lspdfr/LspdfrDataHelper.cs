@@ -35,11 +35,19 @@ namespace AutomaticRoadblocks.Lspdfr
             try
             {
                 var loadout = RetrieveLoadout(unit, position);
-                Logger.Trace($"Retrieved loadout {loadout.Name} for unit type {unit} at position {position}");
-                var vehicles = loadout.Vehicles;
+                if (loadout != null)
+                {
+                    Logger.Trace($"Retrieved loadout {loadout.Name} for unit type {unit} at position {position}");
+                    var vehicles = loadout.Vehicles;
 
-                Logger.Trace($"Found a total of {vehicles.Count} for loadout {loadout}");
-                modelName = vehicles[Random.Next(vehicles.Count)].ModelName;
+                    Logger.Trace($"Found a total of {vehicles.Count} for loadout {loadout}");
+                    modelName = vehicles[Random.Next(vehicles.Count)].ModelName;
+                }
+                else
+                {
+                    Logger.Warn($"Failed to retrieve a valid loadout for unit type {unit} at position {position}");
+                    Game.DisplayNotificationDebug("~o~LSPDFR data failure, unable to find valid loadout");
+                }
             }
             catch (Exception ex)
             {
@@ -90,6 +98,7 @@ namespace AutomaticRoadblocks.Lspdfr
             var backup = GetBackupForUnitType(unit);
             var agency = GetAgency(backup, position);
 
+            Logger.Trace($"Backup unit type {unit} at position {position} will be using agency {{{agency}}}");
             return GetLoadoutForAgency(unit, agency);
         }
 
