@@ -146,7 +146,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                     // delay the undeploy to pop additional tires
                     Game.NewSafeFiber(() =>
                     {
-                        GameFiber.Wait(1000);
+                        GameFiber.Wait(1500);
                         DoUndeploy();
                     }, "SpikeStripStateChanged.Hit");
                     break;

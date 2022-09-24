@@ -319,9 +319,16 @@ namespace AutomaticRoadblocks.Pursuit
             if (!EnableAutomaticLevelIncreases || State != EPursuitState.ActiveChase)
                 return;
 
-            VerifyPursuitLethalForce();
-            VerifyShotsFired();
-            DoLevelIncreaseTick();
+            try
+            {
+                VerifyPursuitLethalForce();
+                VerifyShotsFired();
+                DoLevelIncreaseTick();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to do automatic level increment tick, {ex.Message}", ex);
+            }
         }
 
         private void VerifyPursuitLethalForce()
