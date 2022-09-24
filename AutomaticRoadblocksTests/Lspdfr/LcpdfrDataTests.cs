@@ -85,6 +85,23 @@ namespace AutomaticRoadblocks.Lspdfr
             {
                 new WeaponData("WEAPON_COMBATPISTOL")
             });
+            var swat = new Inventory("SWAT", "swat", new List<WeaponData>
+            {
+                new WeaponData("WEAPON_CARBINERIFLE", 70, new List<string>
+                {
+                    "COMPONENT_AT_AR_FLSH",
+                    "COMPONENT_AT_AR_AFGRIP",
+                    "COMPONENT_AT_SCOPE_MEDIUM"
+                }),
+                new WeaponData("WEAPON_PUMPSHOTGUN", 15, new List<string>
+                {
+                    "COMPONENT_AT_AR_FLSH"
+                }),
+                new WeaponData("WEAPON_COMBATPISTOL", 15, new List<string>
+                {
+                    "COMPONENT_AT_PI_FLSH"
+                })
+            }, new WeaponData("WEAPON_STUNGUN"), 100);
             var data = IoC.Instance.GetInstance<ILspdfrData>();
 
             var result = data.Inventories;
@@ -92,6 +109,7 @@ namespace AutomaticRoadblocks.Lspdfr
             Xunit.Assert.NotNull(result);
             Xunit.Assert.Equal(patrol, result.Items.First(x => x.ScriptName.Equals("patrol")));
             Xunit.Assert.Equal(biker, result.Items.First(x => x.ScriptName.Equals("biker")));
+            Xunit.Assert.Equal(swat, result.Items.First(x => x.ScriptName.Equals("swat")));
         }
     }
 }
