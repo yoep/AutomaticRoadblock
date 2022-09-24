@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.Lspdfr
             StunWeapon = stunWeapon;
             Armor = armor;
         }
-        
+
         #region Properties
 
         public string Name { get; internal set; }
@@ -33,11 +33,11 @@ namespace AutomaticRoadblocks.Lspdfr
         public WeaponData StunWeapon { get; internal set; }
 
         [XmlElement(IsNullable = true)] public int Armor { get; internal set; }
-        
+
         #endregion
 
         #region Methods
-        
+
         public override string ToString()
         {
             return
@@ -67,11 +67,11 @@ namespace AutomaticRoadblocks.Lspdfr
                 hashCode = (hashCode * 397) ^ (ScriptName != null ? ScriptName.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Weapon != null ? Weapon.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (StunWeapon != null ? StunWeapon.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Armor != null ? Armor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ Armor.GetHashCode();
                 return hashCode;
             }
         }
-        
+
         #endregion
     }
 }

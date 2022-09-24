@@ -48,7 +48,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             _shouldAddLights = shouldAddLights;
 
             if (backupType != EBackupUnit.None)
+            {
                 VehicleModel = LspdfrDataHelper.RetrieveVehicleModel(backupType, OffsetPosition);
+
+                var loadout = LspdfrDataHelper.RetrieveLoadout(BackupType, Position);
+                NumberOfCops = Random.Next(loadout.NumPeds.Min, loadout.NumPeds.Max + 1);
+            }
         }
 
         #region Properties
@@ -102,6 +107,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The offset of the position in regards to the node.
         /// </summary>
         protected float Offset { get; }
+
+        /// <summary>
+        /// The total number of cops for this slot.
+        /// </summary>
+        protected int NumberOfCops { get; set; }
 
         /// <summary>
         /// Get the AR vehicle instance of this slot.
@@ -241,15 +251,19 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// This calculation is based on the width of the vehicle model.
         /// </summary>
         /// <returns>Returns the position behind the vehicle.</returns>
-        protected Vector3 CalculatePositionBehindVehicle()
+        protected virtual Vector3 CalculatePositionBehindVehicle()
         {
             return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading) * (VehicleModel.Dimensions.X + 0.5f);
         }
 
         /// <summary>
-        /// Initialize the cop ped slots.
+        /// Calculate the facing heading of the cop instances.
         /// </summary>
-        protected abstract void InitializeCops();
+        /// <returns>Returns the heading for the cop peds.</returns>
+        protected virtual float CalculateCopHeading()
+        {
+            return Heading - 180;
+        }
 
         /// <summary>
         /// Initialize the scenery props of this slot.
@@ -281,16 +295,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             return OffsetPosition;
         }
 
-        /// <summary>
-        /// The number of cops to use for the slot.
-        /// </summary>
-        /// <returns>Returns the number of cops to use.</returns>
-        protected virtual int NumberOfCops()
-        {
-            var loadout = LspdfrDataHelper.RetrieveLoadout(BackupType, Position);
-            return Random.Next(loadout.NumPeds.Min, loadout.NumPeds.Max + 1);
-        }
-
         private void InitializeVehicleSlot()
         {
             if (BackupType == EBackupUnit.None)
@@ -304,6 +308,20 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
             Instances.Add(new InstanceSlot(EEntityType.CopVehicle, CalculateVehiclePosition(), CalculateVehicleHeading(),
                 (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundPosition(position), heading, RecordVehicleCollisions)));
+        }
+
+        private void InitializeCops()
+        {
+            var pedSpawnPosition = CalculatePositionBehindVehicle();
+            var pedHeading = CalculateCopHeading();
+
+            for (var i = 0; i < NumberOfCops; i++)
+            {
+                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), pedHeading,
+                    (position, heading) =>
+                        PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading))));
+                pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
+            }
         }
 
         private void InitializeBarriers(BarrierModel barrierModel, float roadOffset)

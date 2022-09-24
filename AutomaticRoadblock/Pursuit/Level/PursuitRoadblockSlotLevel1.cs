@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit.Level
@@ -23,15 +21,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
         {
             base.Spawn();
             WarpInVehicle();
-        }
-
-        protected override void InitializeCops()
-        {
-            for (var i = 0; i < NumberOfCops(); i++)
-            {
-                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(Position), 0f, (position, heading) =>
-                    PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading))));
-            }
         }
 
         protected override void InitializeScenery()

@@ -24,8 +24,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         private bool _hasBeenDeployed;
 
         public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road street, Road.Lane lane, Vehicle targetVehicle, float heading,
-            bool shouldAddLights,
-            float offset = 0)
+            bool shouldAddLights, float offset = 0)
             : base(lane, BarrierModel.None, BarrierModel.None, EBackupUnit.LocalPatrol, heading, shouldAddLights, false, offset)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
@@ -34,6 +33,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             TargetVehicle = targetVehicle;
             Road = street;
             Location = DetermineLocation();
+            NumberOfCops = 1;
 
             Initialize();
         }
@@ -86,20 +86,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         #region Functions
 
         /// <inheritdoc />
-        protected override void InitializeCops()
-        {
-            var copPosition = CalculateVehiclePositionOnSide() + CalculateDirectionInFrontOfVehicle(PlacementInFrontOfVehicle);
-            var copHeading = Location switch
-            {
-                ESpikeStripLocation.Right => Heading + 90,
-                _ => Heading - 90
-            };
-
-            Instances.Add(new InstanceSlot(EEntityType.CopPed, copPosition, copHeading,
-                (position, heading) => PedFactory.CreateBasicCopWeapons(PedFactory.CreateLocaleCop(position, heading))));
-        }
-
-        /// <inheritdoc />
         protected override void InitializeScenery()
         {
             // create the spike strip
@@ -111,6 +97,22 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         protected override void InitializeLights()
         {
             // no-op
+        }
+
+        /// <inheritdoc />
+        protected override Vector3 CalculatePositionBehindVehicle()
+        {
+            return CalculateVehiclePositionOnSide() + CalculateDirectionInFrontOfVehicle(PlacementInFrontOfVehicle);
+        }
+
+        /// <inheritdoc />
+        protected override float CalculateCopHeading()
+        {
+            return Location switch
+            {
+                ESpikeStripLocation.Right => Heading + 90,
+                _ => Heading - 90
+            };
         }
 
         /// <inheritdoc />

@@ -25,12 +25,6 @@ namespace AutomaticRoadblocks.Utils
             public const string Nightstick = "weapon_nightstick";
             public const string MicroSmg = "weapon_microsmg";
             public const string Smg = "weapon_smg";
-
-            public static class Attachments
-            {
-                public const string PistolFlashlight = "COMPONENT_AT_PI_FLSH";
-                public const string RifleFlashlight = "COMPONENT_AT_AR_FLSH";
-            }
         }
 
         public static class Peds

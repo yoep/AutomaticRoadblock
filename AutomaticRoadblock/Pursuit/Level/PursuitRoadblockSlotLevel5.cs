@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
@@ -27,19 +26,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
             CopInstances
                 .ToList()
                 .ForEach(x => x.FireAt(TargetVehicle, 60000));
-        }
-
-        /// <inheritdoc />
-        protected override void InitializeCops()
-        {
-            var pedSpawnPosition = CalculatePositionBehindVehicle();
-
-            for (var i = 0; i < NumberOfCops(); i++)
-            {
-                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), 0f,
-                    (position, heading) => PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading))));
-                pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
-            }
         }
 
         /// <inheritdoc />
