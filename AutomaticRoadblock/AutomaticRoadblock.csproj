@@ -126,12 +126,15 @@
         <Compile Include="Lspdfr\BackupUnits.cs" />
         <Compile Include="Lspdfr\EBackupUnit.cs" />
         <Compile Include="Lspdfr\ILspdfrData.cs" />
+        <Compile Include="Lspdfr\Inventories.cs" />
+        <Compile Include="Lspdfr\Inventory.cs" />
         <Compile Include="Lspdfr\Loadout.cs" />
         <Compile Include="Lspdfr\LspdfrData.cs" />
         <Compile Include="Lspdfr\LspdfrDataHelper.cs" />
         <Compile Include="Lspdfr\NumPeds.cs" />
         <Compile Include="Lspdfr\PedData.cs" />
         <Compile Include="Lspdfr\VehicleData.cs" />
+        <Compile Include="Lspdfr\WeaponData.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="ManualPlacement\Menu\AbstractBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementDirectionComponentItem.cs" />

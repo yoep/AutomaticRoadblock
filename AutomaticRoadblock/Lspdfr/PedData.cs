@@ -27,7 +27,8 @@ namespace AutomaticRoadblocks.Lspdfr
         }
 
         [XmlUnwrapContents] public string ModelName { get; internal set; }
-
+        
+        /// <inheritdoc />
         [XmlAttribute] public int Chance { get; internal set; } = 100;
 
         [XmlAttribute] [CanBeNull] public string Outfit { get; internal set; }
@@ -35,6 +36,10 @@ namespace AutomaticRoadblocks.Lspdfr
         [XmlAttribute] [CanBeNull] public string Inventory { get; internal set; }
 
         [XmlAttribute] public bool Helmet { get; internal set; }
+
+        /// <inheritdoc />
+        [XmlIgnore]
+        public bool IsNullable => false;
 
         public override string ToString()
         {

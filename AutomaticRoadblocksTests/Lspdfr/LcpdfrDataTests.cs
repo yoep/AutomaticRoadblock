@@ -71,5 +71,27 @@ namespace AutomaticRoadblocks.Lspdfr
             Xunit.Assert.Equal(lspdAgency, result.Items.First(x => x.ScriptName.Equals("lspd")));
             Xunit.Assert.Equal(highwayAgency, result.Items.First(x => x.ScriptName.Equals("sahp")));
         }
+
+        [Fact]
+        public void TestInventoryDeserialization()
+        {
+            var patrol = new Inventory("Patrol", "patrol", new List<WeaponData>
+            {
+                new WeaponData("WEAPON_PUMPSHOTGUN", 10),
+                new WeaponData("WEAPON_COMBATPISTOL", 45),
+                new WeaponData("WEAPON_PISTOL", 45)
+            }, new WeaponData("WEAPON_STUNGUN"));
+            var biker = new Inventory("Motor Patrol", "biker", new List<WeaponData>
+            {
+                new WeaponData("WEAPON_COMBATPISTOL")
+            });
+            var data = IoC.Instance.GetInstance<ILspdfrData>();
+
+            var result = data.Inventories;
+
+            Xunit.Assert.NotNull(result);
+            Xunit.Assert.Equal(patrol, result.Items.First(x => x.ScriptName.Equals("patrol")));
+            Xunit.Assert.Equal(biker, result.Items.First(x => x.ScriptName.Equals("biker")));
+        }
     }
 }

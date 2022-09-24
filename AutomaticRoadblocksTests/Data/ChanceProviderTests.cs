@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.Data
         }
 
         [Fact]
-        public void TestRetrieveItemFromValidList()
+        public void TestRetrieve_WhenListIsValid_ShouldReturnItem()
         {
             var items = new List<Unit>
             {
@@ -31,7 +31,7 @@ namespace AutomaticRoadblocks.Data
         }
 
         [Fact]
-        public void TestRetrieveWhenItemHas100PercentChanceShouldReturnTheItem()
+        public void TestRetrieve_WhenItemHas100PercentChance_ShouldReturnTheItem()
         {
             var expectedItem = new Unit(EBackupUnit.LocalPatrol, 100);
             var items = new List<Unit>
@@ -46,7 +46,7 @@ namespace AutomaticRoadblocks.Data
         }
 
         [Fact]
-        public void TestRetrieveWhenListIsInvalidShouldReturnChanceException()
+        public void TestRetrieve_WhenListIsInvalid_ShouldReturnChanceException()
         {
             var items = new List<Unit>
             {
@@ -54,6 +54,19 @@ namespace AutomaticRoadblocks.Data
             };
 
             Xunit.Assert.Throws<ChanceException<Unit>>(() => ChanceProvider.Retrieve(items));
+        }
+
+        [Fact]
+        public void TestRetrieve_WhenListIsIncompleteAndNullableIsAllowed_ShouldReturnNull()
+        {
+            var items = new List<WeaponData>
+            {
+                new WeaponData("lorem", 0)
+            };
+
+            var result = ChanceProvider.Retrieve(items);
+            
+            Xunit.Assert.Null(result);
         }
     }
 }

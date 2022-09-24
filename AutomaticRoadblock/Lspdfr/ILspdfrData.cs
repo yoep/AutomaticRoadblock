@@ -13,5 +13,10 @@ namespace AutomaticRoadblocks.Lspdfr
         /// The LSPDFR agency config data.
         /// </summary>
         Agencies Agencies { get; }
+        
+        /// <summary>
+        /// The LSPDFR inventory config data.
+        /// </summary>
+        Inventories Inventories { get; }
     }
 }

@@ -1,0 +1,52 @@
+<Inventories>
+    <Inventory>
+        <!-- Simple patrol config with two pistol variants and small chance of a shotgun -->
+        <Name>Patrol</Name>
+        <ScriptName>patrol</ScriptName>
+        <Weapon chance="10">WEAPON_PUMPSHOTGUN</Weapon>
+        <Weapon chance="45">WEAPON_COMBATPISTOL</Weapon>
+        <Weapon chance="45">WEAPON_PISTOL</Weapon>
+        <StunWeapon chance="">WEAPON_STUNGUN</StunWeapon>
+    </Inventory>
+    <Inventory>
+        <!-- Same as above but with a stungun -->
+        <Name>Patrol (Stun)</Name>
+        <ScriptName>patrol_stun</ScriptName>
+        <Weapon chance="10">WEAPON_PUMPSHOTGUN</Weapon>
+        <Weapon chance="45">WEAPON_COMBATPISTOL</Weapon>
+        <StunWeapon>WEAPON_STUNGUN</StunWeapon>
+    </Inventory>
+    <Inventory>
+        <!-- Simple config with just a combat pistol for motor cops -->
+        <Name>Motor Patrol</Name>
+        <ScriptName>biker</ScriptName>
+        <Weapon>WEAPON_COMBATPISTOL</Weapon>
+    </Inventory>
+    <Inventory>
+        <!-- Simple config with only a pistol - good as a default -->
+        <Name>Default</Name>
+        <ScriptName>default</ScriptName>
+        <Weapon>WEAPON_PISTOL</Weapon>
+    </Inventory>
+    <Inventory>
+        <!-- SWAT config with heavier weapons + attachments + armor -->
+        <Name>SWAT</Name>
+        <ScriptName>swat</ScriptName>
+        <Weapon chance="70">
+            <Model>WEAPON_CARBINERIFLE</Model>
+            <Component>COMPONENT_AT_AR_FLSH</Component> <!-- Flashlight -->
+			<Component>COMPONENT_AT_AR_AFGRIP</Component> <!-- Grip -->
+			<Component>COMPONENT_AT_SCOPE_MEDIUM</Component> <!-- Scope -->
+        </Weapon>
+        <Weapon chance="15">
+            <Model>WEAPON_PUMPSHOTGUN</Model>
+            <Component>COMPONENT_AT_AR_FLSH</Component> <!-- Flashlight -->
+        </Weapon>
+        <Weapon chance="15">
+            <Model>WEAPON_COMBATPISTOL</Model>
+            <Component>COMPONENT_AT_PI_FLSH</Component> <!-- Flashlight -->
+        </Weapon>
+        <StunWeapon>WEAPON_STUNGUN</StunWeapon>
+        <Armor>100</Armor>
+    </Inventory>
+</Inventories>
