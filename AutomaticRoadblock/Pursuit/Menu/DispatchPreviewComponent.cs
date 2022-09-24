@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
 
         /// <inheritdoc />
         public UIMenuListScrollerItem<ERoadblockDistance> MenuItem { get; } = new(AutomaticRoadblocksPlugin.DispatchPreview,
-            AutomaticRoadblocksPlugin.DispatchPreviewDescription, new []
+            AutomaticRoadblocksPlugin.DispatchPreviewDescription, new[]
             {
                 ERoadblockDistance.CurrentLocation,
                 ERoadblockDistance.Closely,
@@ -38,7 +38,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         {
             _pursuitManager.DispatchPreview(MenuItem.SelectedItem);
         }
-        
+
         [IoC.PostConstruct]
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()

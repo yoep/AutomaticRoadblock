@@ -12,7 +12,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
     internal class PursuitRoadblockLevel4 : AbstractPursuitRoadblock
     {
         public PursuitRoadblockLevel4(PursuitRoadblockRequest request)
-            : base(request.RoadblockData, request.Road, request.TargetVehicle, request.Flags)
+            : base(request.RoadblockData, request.Road, request.TargetVehicle, request.TargetHeading, request.Flags)
         {
             RoadblockStateChanged += StateChanged;
         }

@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
 
             MenuItem = new UIMenuCheckboxItem(localizer[LocalizationKey.EnableSpikeStrip], true);
         }
-        
+
         /// <inheritdoc />
         public UIMenuCheckboxItem MenuItem { get; }
 

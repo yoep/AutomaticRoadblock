@@ -5,7 +5,7 @@ namespace AutomaticRoadblocks.Pursuit
     public class PursuitLevel
     {
         private const string PursuitLevelAudio = "ROADBLOCK_PURSUIT_LEVEL";
-        
+
         public static readonly PursuitLevel Level1 = new(1, 0.1, 0.20, false);
         public static readonly PursuitLevel Level2 = new(2, 0.15, 0.15, false);
         public static readonly PursuitLevel Level3 = new(3, 0.2, 0.05, true);

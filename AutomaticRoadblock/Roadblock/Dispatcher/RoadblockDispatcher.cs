@@ -261,6 +261,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 Level = actualLevelToUse,
                 Road = road,
                 TargetVehicle = vehicle,
+                TargetHeading = road.Heading,
                 Flags = flags
             });
 

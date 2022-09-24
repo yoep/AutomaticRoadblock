@@ -39,9 +39,8 @@ namespace AutomaticRoadblocks.Roadblock
 
         private float _lastKnownDistanceToRoadblock = 9999f;
 
-        protected AbstractPursuitRoadblock(RoadblockData roadblockData, Road street, Vehicle targetVehicle, ERoadblockFlags flags)
-            : base(street, GetMainBarrier(roadblockData), GetSecondaryBarrier(roadblockData), targetVehicle != null ? targetVehicle.Heading : 0f,
-                GetLightSources(roadblockData), flags)
+        protected AbstractPursuitRoadblock(RoadblockData roadblockData, Road street, Vehicle targetVehicle, float targetHeading, ERoadblockFlags flags)
+            : base(street, GetMainBarrier(roadblockData), GetSecondaryBarrier(roadblockData), targetHeading, GetLightSources(roadblockData), flags)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             RoadblockData = roadblockData;
