@@ -164,7 +164,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
             CreateBlip();
             var result = _instances.All(x => x.Spawn());
 
-            Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
+            if (BackupType != EBackupUnit.None)
+                Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
+            
             Cop.Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
             AnimationHelper.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
             return result;
