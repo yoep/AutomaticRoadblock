@@ -152,6 +152,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 return Instances
                     .Where(x => x.Type == EEntityType.CopPed)
                     .Select(x => x.Instance)
+                    .Where(x => x != null)
                     .Select(x => (ARPed)x);
             }
         }
@@ -243,7 +244,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 Logger.Warn("Unable to warp cops into vehicle, vehicle instance is null");
                 return;
             }
-            
+
             CopInstances.ToList()
                 .ForEach(x => x.WarpIntoVehicle(Vehicle, Vehicle.Driver == null ? EVehicleSeat.Driver : EVehicleSeat.Any));
         }
@@ -351,8 +352,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             for (var i = 0; i < NumberOfCops; i++)
             {
                 Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), pedHeading,
-                    (position, heading) =>
-                        new ARPed(LspdfrDataHelper.RetrieveCop(BackupType, position), heading)));
+                    (position, heading) => new ARPed(LspdfrDataHelper.RetrieveCop(BackupType, position), heading)));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }

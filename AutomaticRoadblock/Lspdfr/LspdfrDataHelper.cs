@@ -63,10 +63,17 @@ namespace AutomaticRoadblocks.Lspdfr
         /// </summary>
         /// <param name="unit">The unit type to create.</param>
         /// <param name="position">the position of the entity.</param>
-        /// <returns>Returns the </returns>
+        /// <returns>Returns the created ped entity for the given unit.</returns>
         public static Ped RetrieveCop(EBackupUnit unit, Vector3 position)
         {
             var loadout = RetrieveLoadout(unit, position);
+
+            if (loadout == null)
+            {
+                Logger.Error($"Unable to create ped, no valid loadout found for unit {unit} at position {position}");
+                throw new LspdfrDataException(unit, position);
+            }
+            
             var pedData = ChanceProvider.Retrieve(loadout.Peds);
             var ped = new Ped(pedData.ModelName, GameUtils.GetOnTheGroundPosition(position), 0f);
 
