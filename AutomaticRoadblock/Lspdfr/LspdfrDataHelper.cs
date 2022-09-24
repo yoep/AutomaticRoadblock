@@ -32,7 +32,7 @@ namespace AutomaticRoadblocks.Lspdfr
             try
             {
                 var backup = GetBackupForUnitType(unit);
-                var agency = LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
+                var agency = GetAgency(backup, position);
 
                 if (agency != null)
                 {
@@ -68,6 +68,22 @@ namespace AutomaticRoadblocks.Lspdfr
         }
 
         /// <summary>
+        /// Retrieve the load for the given unit and position.
+        /// </summary>
+        /// <param name="unit">The backup unit type.</param>
+        /// <param name="position">The position for the agency.</param>
+        /// <returns>Returns the loadout for the unit type at the given location.</returns>
+        public static Loadout RetrieveLoadout(EBackupUnit unit, Vector3 position)
+        {
+            Assert.NotNull(unit, "unit cannot be null");
+            Assert.NotNull(position, "position cannot be null");
+            var backup = GetBackupForUnitType(unit);
+            var agency = GetAgency(backup, position);
+
+            return GetLoadoutForAgency(unit, agency);
+        }
+
+        /// <summary>
         /// The available backup units.
         /// </summary>
         /// <returns>Returns the available units.</returns>
@@ -95,6 +111,11 @@ namespace AutomaticRoadblocks.Lspdfr
             return unit == EBackupUnit.Transporter
                 ? LspdfrData.BackupUnits.LocalPatrol
                 : LspdfrData.BackupUnits[unit];
+        }
+
+        private static Agency GetAgency(Backup backup, Vector3 position)
+        {
+            return LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
         }
 
         private static Loadout GetLoadoutForAgency(EBackupUnit unit, Agency agency)

@@ -33,9 +33,8 @@ namespace AutomaticRoadblocks.Pursuit.Level
         protected override void InitializeCops()
         {
             var pedSpawnPosition = CalculatePositionBehindVehicle();
-            var totalOccupants = Random.Next(3) + 2;
 
-            for (var i = 0; i < totalOccupants; i++)
+            for (var i = 0; i < NumberOfCops(); i++)
             {
                 Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), 0f,
                     (position, heading) => PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading))));

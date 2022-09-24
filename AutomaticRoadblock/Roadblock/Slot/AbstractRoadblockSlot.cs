@@ -281,6 +281,16 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             return OffsetPosition;
         }
 
+        /// <summary>
+        /// The number of cops to use for the slot.
+        /// </summary>
+        /// <returns>Returns the number of cops to use.</returns>
+        protected virtual int NumberOfCops()
+        {
+            var loadout = LspdfrDataHelper.RetrieveLoadout(BackupType, Position);
+            return Random.Next(loadout.NumPeds.Min, loadout.NumPeds.Max + 1);
+        }
+
         private void InitializeVehicleSlot()
         {
             if (BackupType == EBackupUnit.None)
