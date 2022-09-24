@@ -74,7 +74,7 @@ namespace AutomaticRoadblocks.Debug.Menu
                 _currentPursuit = Functions.CreatePursuit();
 
                 var road = (Road)RoadQuery.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f,
-                    EVehicleNodeType.AllNodes);
+                    EVehicleNodeType.MainRoads);
                 var lane = road.Lanes.First();
                 var driver = new Ped(road.Position);
                 var passenger = new Ped(road.Position);
