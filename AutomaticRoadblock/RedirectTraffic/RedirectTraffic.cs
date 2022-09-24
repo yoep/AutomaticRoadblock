@@ -242,9 +242,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private ARPed CreateCop(Vector3 position, float heading)
         {
-            return PedFactory.ToInstance(BackupType != EBackupUnit.None
+            return new ARPed(BackupType != EBackupUnit.None
                 ? LspdfrDataHelper.RetrieveCop(BackupType, position)
-                : LspdfrDataHelper.RetrieveCop(EBackupUnit.LocalPatrol, position), position, heading);
+                : LspdfrDataHelper.RetrieveCop(EBackupUnit.LocalPatrol, position), heading);
         }
 
         private void PlaceConesAlongTheRoad()

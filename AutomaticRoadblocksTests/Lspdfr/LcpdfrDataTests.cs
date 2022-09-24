@@ -111,5 +111,36 @@ namespace AutomaticRoadblocks.Lspdfr
             Xunit.Assert.Equal(biker, result.Items.First(x => x.ScriptName.Equals("biker")));
             Xunit.Assert.Equal(swat, result.Items.First(x => x.ScriptName.Equals("swat")));
         }
+
+        [Fact]
+        public void TestOutfitsDeserialization()
+        {
+            var lspdCop = new Outfit("The Cop", "lspd_cop", new List<Variation>
+            {
+                new Variation(null, "Officer", "m_base", "male", new List<OutfitComponent>
+                {
+                    new OutfitComponent(1, 0, 0),
+                    new OutfitComponent(3, 0, 0),
+                    new OutfitComponent(4, 35, 0),
+                    new OutfitComponent(5, 0, 0),
+                    new OutfitComponent(6, 25, 0),
+                    new OutfitComponent(7, 0, 0),
+                    new OutfitComponent(8, 58, 0),
+                    new OutfitComponent(9, 0, 0),
+                    new OutfitComponent(10, 8, 0),
+                    new OutfitComponent(11, 55, 0),
+                }),
+                new Variation("m_base", "Officer III", null, "male", new List<OutfitComponent>
+                {
+                    new OutfitComponent(10, 8, 1),
+                })
+            });
+            var data = IoC.Instance.GetInstance<ILspdfrData>();
+
+            var result = data.Outfits;
+
+            Xunit.Assert.NotNull(result);
+            Xunit.Assert.Equal(lspdCop, result.Items.First(x => x.ScriptName.Equals("lspd_cop")));
+        }
     }
 }

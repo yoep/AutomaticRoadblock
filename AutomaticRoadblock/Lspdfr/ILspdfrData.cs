@@ -18,5 +18,10 @@ namespace AutomaticRoadblocks.Lspdfr
         /// The LSPDFR inventory config data.
         /// </summary>
         Inventories Inventories { get; }
+        
+        /// <summary>
+        /// The LSPDFR outfit config data.
+        /// </summary>
+        Outfits Outfits { get; }
     }
 }

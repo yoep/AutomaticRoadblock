@@ -4,6 +4,7 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Data;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Utils;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -58,13 +59,13 @@ namespace AutomaticRoadblocks.Lspdfr
         {
             var loadout = RetrieveLoadout(unit, position);
             var pedData = ChanceProvider.Retrieve(loadout.Peds);
-            var ped = new Ped(pedData.ModelName, position, 0f);
+            var ped = new Ped(pedData.ModelName, GameUtils.GetOnTheGroundPosition(position), 0f);
 
             if (pedData.IsInventoryAvailable)
                 DoInternalInventoryCreation(ped, pedData);
 
             if (pedData.Helmet)
-                ped.GiveHelmet(true, HelmetTypes.PoliceMotorcycleHelmet, 0);
+                ped.GiveHelmet(false, HelmetTypes.PoliceMotorcycleHelmet, 0);
 
             // always give the ped a flashlight
             ped.Inventory.GiveFlashlight();

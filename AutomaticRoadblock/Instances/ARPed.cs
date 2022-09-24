@@ -19,12 +19,10 @@ namespace AutomaticRoadblocks.Instances
 
         private readonly List<Entity> _attachments = new();
 
-        public ARPed(Ped ped, Vector3 position, float heading = 0f)
+        public ARPed(Ped ped, float heading = 0f)
         {
             Assert.NotNull(ped, "ped cannot be null");
-            Assert.NotNull(position, "position cannot be null");
             GameInstance = ped;
-            GameInstance.Position = position;
             GameInstance.Heading = heading;
             Initialize();
         }

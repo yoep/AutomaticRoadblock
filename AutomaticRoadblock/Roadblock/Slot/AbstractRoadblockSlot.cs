@@ -319,7 +319,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             {
                 Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), pedHeading,
                     (position, heading) =>
-                        PedFactory.ToInstance(LspdfrDataHelper.RetrieveCop(BackupType, position), position, heading)));
+                        new ARPed(LspdfrDataHelper.RetrieveCop(BackupType, position), heading)));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }

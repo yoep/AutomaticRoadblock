@@ -5,7 +5,6 @@ using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit.Level
@@ -37,7 +36,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override float CalculateVehicleHeading()
         {
-            if (ModelUtils.Vehicles.IsRiot(VehicleModel))
+            if (VehicleModel.Name.Equals("Riot"))
                 return base.CalculateVehicleHeading() + 30;
 
             return base.CalculateVehicleHeading();

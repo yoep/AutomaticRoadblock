@@ -1,0 +1,751 @@
+<Outfits>
+	<Outfit>
+		<Name>The Cop</Name>
+		<ScriptName>lspd_cop</ScriptName>
+		<Variations>
+			<Variation>
+				<Name>Officer</Name>
+				<ScriptName>m_base</ScriptName>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" />
+					<Component id="3" drawable="0" texture="0" />
+					<Component id="4" drawable="35" texture="0" />
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="25" texture="0" />
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="58" texture="0" />
+					<Component id="9" drawable="0" texture="0" />
+					<Component id="10" drawable="8" texture="0" />
+					<Component id="11" drawable="55" texture="0" />
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>Officer III</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="10" drawable="8" texture="1" />
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>Senior Officer</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="10" drawable="8" texture="2" />
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>Detective</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="10" drawable="8" texture="3" />
+				</Components>
+			</Variation>
+			<Variation>
+				<Name>Officer</Name>
+				<ScriptName>f_base</ScriptName>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" />
+					<Component id="3" drawable="14" texture="0" />
+					<Component id="4" drawable="34" texture="0" />
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="25" texture="0" />
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="35" texture="0" />
+					<Component id="9" drawable="0" texture="0" />
+					<Component id="10" drawable="7" texture="0" />
+					<Component id="11" drawable="48" texture="0" />
+				</Components>						
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Officer III</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="10" drawable="7" texture="1" />
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Senior Officer</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="10" drawable="7" texture="2" />
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Detective</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="10" drawable="7" texture="3" />
+				</Components>
+			</Variation>
+		</Variations>
+	</Outfit>
+	<Outfit>
+		<Name>The Spook</Name>
+		<ScriptName>mp_iaa</ScriptName>
+		<Variations>
+			<Variation>
+				<ScriptName>m_base</ScriptName>
+				<Name>IAA Response</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" />
+					<Component id="3" drawable="0" texture="0" />
+					<Component id="4" drawable="47" texture="0" />
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="25" texture="0" />
+					<Component id="7" drawable="125" texture="0" />
+					<Component id="8" drawable="122" texture="0" />
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="0" texture="0" />
+					<Component id="11" drawable="242" texture="0" />
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>IAA Agent</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="7" drawable="128" texture="0" />
+					<Component id="8" drawable="130" texture="0" />
+					<Component id="11" drawable="241" texture="0" />
+				</Components>
+			</Variation>
+			<Variation>
+				<ScriptName>f_base</ScriptName>
+				<Name>IAA Response</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" />
+					<Component id="3" drawable="14" texture="0" />
+					<Component id="4" drawable="49" texture="0" />
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="25" texture="0" />
+					<Component id="7" drawable="95" texture="0" />
+					<Component id="8" drawable="152" texture="0" />
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="0" texture="0" />
+					<Component id="11" drawable="250" texture="0" />
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>IAA Agent</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="7" drawable="98" texture="0" />
+					<Component id="8" drawable="160" texture="0" />
+					<Component id="11" drawable="249" texture="0" />
+				</Components>
+			</Variation>
+		</Variations>
+	</Outfit>
+	<Outfit>
+		<Name>The Suit</Name>
+		<ScriptName>mp_fib</ScriptName>
+		<Variations>
+			<Variation>
+				<ScriptName>m_base</ScriptName>
+				<Name>Blue Tie</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="121" texture="0" /> <!-- Earpiece -->
+					<Component id="3" drawable="4" texture="0" />
+					<Component id="4" drawable="25" texture="0" /> <!-- Black Regular Suit Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="21" texture="0" /> <!-- Black Slip-Ons -->
+					<Component id="7" drawable="115" texture="0" /> <!-- Blue Tie & Flag Pin -->
+					<Component id="8" drawable="31" texture="0" /> <!-- White Cuffed Shirt -->
+					<Component id="9" drawable="53" texture="0" /> <!-- FIB Lanyard -->
+					<Component id="10" drawable="0" texture="0" />
+					<Component id="11" drawable="28" texture="0" /> <!-- Black Tailored Jacket -->
+				</Components>
+				<Props>
+					<Prop id="1" drawable="8" texture="3" /> <!-- Smoke Cop Frames -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>Red Tie</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="7" drawable="115" texture="1" /> <!-- Red Tie & Flag Pin -->
+				</Components>
+				<Props>
+					<Prop id="1" drawable="8" texture="5" /> <!-- Black Cop Frames -->
+				</Props>
+			</Variation>
+		</Variations>
+		<Variations>
+			<Variation>
+				<ScriptName>f_base</ScriptName>
+				<Name>Black Suit</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="3" drawable="1" texture="0" />
+					<Component id="4" drawable="8" texture="0" /> <!-- Black Mini -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="0" texture="0" /> <!-- Charcoal Platforms -->
+					<Component id="7" drawable="0" texture="0" /> 
+					<Component id="8" drawable="151" texture="0" /> <!-- White Undershirt -->
+					<Component id="9" drawable="54" texture="0" /> <!-- FIB Lanyard -->
+					<Component id="10" drawable="0" texture="0" />
+					<Component id="11" drawable="137" texture="6" /> <!-- Black Long Suit -->
+				</Components>
+				<Props>
+					<Prop id="1" drawable="11" texture="3" /> <!-- Black Aviators -->
+					<Prop id="2" drawable="0" texture="0" /> <!-- LCD Earpiece -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Navy Suit</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="11" drawable="137" texture="5" /> <!-- Navy Long Suit -->
+					<Component id="6" drawable="0" texture="3" /> <!-- Navy Platforms -->
+					<Component id="4" drawable="8" texture="2" /> <!-- Navy Mini -->
+				</Components>
+				<Props>
+					<Prop id="1" drawable="11" texture="0" /> <!-- Pewter Aviators -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Gray Suit</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="11" drawable="137" texture="2" /> <!-- Gray Long Suit -->
+					<Component id="6" drawable="0" texture="1" /> <!-- Gray Platforms -->
+					<Component id="4" drawable="8" texture="1" /> <!-- Gray Mini -->
+				</Components>
+				<Props>
+					<Prop id="1" drawable="11" texture="1" /> <!-- Slate Aviators -->
+				</Props>
+			</Variation>
+		</Variations>
+	</Outfit>
+	<Outfit>
+		<Name>The Fed</Name>
+		<ScriptName>mp_fib_shirt</ScriptName>
+		<Variations>
+			<Variation>
+				<ScriptName>m_base</ScriptName>
+				<Name>Blue Shirt</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="121" texture="0" /> <!-- Earpiece -->
+					<Component id="3" drawable="11" texture="0" />
+					<Component id="4" drawable="25" texture="1" /> <!-- Gray Regular Suit Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="21" texture="0" /> <!-- Black Slip-Ons -->
+					<Component id="7" drawable="38" texture="0" /> <!-- Blue Stripy Straight Tie -->
+					<Component id="8" drawable="122" texture="0" /> <!-- Gunbelt -->
+					<Component id="9" drawable="53" texture="0" /> <!-- FIB Lanyard -->
+					<Component id="10" drawable="0" texture="0" />
+					<Component id="11" drawable="13" texture="3" /> <!-- Blue Tucked Shirt -->
+				</Components>
+				<Props>
+					<Prop id="1" drawable="8" texture="5" /> <!-- Black Cop Frames -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>Gray Shirt</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="7" drawable="38" texture="0" /> <!-- Charcoal Straight Tie -->
+					<Component id="4" drawable="25" texture="0" /> <!-- Black Regular Suit Pants -->
+					<Component id="11" drawable="13" texture="1" /> <!-- Gray Tucked Shirt -->
+				</Components>
+				<Props>
+					<Prop id="6" drawable="3" texture="0" /> <!-- Pendulus Sport Black Sports -->
+					<Prop id="1" drawable="8" texture="6" /> <!-- Slate Cop Frames -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>White Shirt</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="7" drawable="38" texture="11" /> <!-- Blue Diamond Straight Tie -->
+					<Component id="4" drawable="25" texture="2" /> <!-- Navy Regular Suit Pants -->
+					<Component id="11" drawable="13" texture="0" /> <!-- White Tucked Shirt -->
+				</Components>
+				<Props>
+					<Prop id="6" drawable="4" texture="1" /> <!-- Silver Watch -->
+					<Prop id="1" drawable="8" texture="3" /> <!-- Smoke Cop Frames -->
+				</Props>
+			</Variation>
+			<Variation>
+				<ScriptName>f_base</ScriptName>
+				<Name>White Blouse</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="1" drawable="121" texture="0" /> <!-- Earpiece -->
+					<Component id="3" drawable="0" texture="0" />
+					<Component id="4" drawable="6" texture="1" /> <!-- Gray Suit Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="13" texture="0" /> <!-- Charcoal Round Toed Pumps -->
+					<Component id="7" drawable="0" texture="0" /> 
+					<Component id="8" drawable="152" texture="0" /> <!-- Gunbelt -->
+					<Component id="9" drawable="55" texture="0" /> <!-- FIB Lanyard -->
+					<Component id="10" drawable="0" texture="0" />
+					<Component id="11" drawable="27" texture="0" /> <!-- White Blouse -->
+				</Components>
+				<Props>
+					<Prop id="6" drawable="19" texture="2" /> <!-- Black Enduring Watch -->
+					<Prop id="1" drawable="11" texture="0" /> <!-- Pewter Aviators -->
+					<Prop id="2" drawable="12" texture="0" /> <!-- Platinum Diamond Studs -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Black Blouse</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="11" drawable="27" texture="1" /> <!-- Black Blouse -->
+					<Component id="4" drawable="6" texture="0" /> <!-- Black Suit Pants -->
+				</Components>
+				<Props>
+					<Prop id="6" drawable="26" texture="2" /> <!-- Black Crowex Round -->
+					<Prop id="1" drawable="11" texture="3" /> <!-- Black Aviators -->
+					<Prop id="2" drawable="12" texture="2" /> <!-- Black Gold Diamond Studs -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Gray Blouse</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="11" drawable="27" texture="5" /> <!-- Gray Blouse -->
+					<Component id="4" drawable="6" texture="2" /> <!-- Navy Suit Pants -->
+				</Components>
+				<Props>
+					<Prop id="6" drawable="9" texture="2" /> <!-- Carbon Anna Rex Prestige -->
+					<Prop id="1" drawable="11" texture="7" /> <!-- Slate Aviators -->
+					<Prop id="2" drawable="12" texture="0" /> <!-- Platinum Diamond Studs -->
+				</Props>
+			</Variation>
+		</Variations>
+	</Outfit>
+	<Outfit>
+		<Name>The Rehabilitator</Name>
+		<ScriptName>mp_saspa</ScriptName>
+		<Variations>
+			<Variation>
+				<ScriptName>m_base</ScriptName>
+				<Name>Beige Uniform</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" />
+					<Component id="3" drawable="1" texture="0" />
+					<Component id="4" drawable="123" texture="0" />  <!-- Correctional Cargos -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="24" texture="0" /> <!-- Black Flight Boots -->
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="154" texture="0" /> <!-- Prison Authority Equipment -->
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="72" texture="0" /> <!-- Prison Authority Badge -->
+					<Component id="11" drawable="317" texture="3" /> <!-- Beige Uniform Open -->
+				</Components>
+				<Props>
+					<Prop id="0" drawable="139" texture="1" /> <!-- Prison Authority Cap -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>Sage Uniform</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="11" drawable="317" texture="4" /> <!-- Sage Uniform Open -->
+				</Components>
+			</Variation>
+			<Variation>
+				<ScriptName>f_base</ScriptName>
+				<Name>Beige Uniform</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" />
+					<Component id="3" drawable="0" texture="0" />
+					<Component id="4" drawable="129" texture="0" /> <!-- Correctional Cargos -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="24" texture="0" /> <!-- Black Flight Boots -->
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="190" texture="0" /> <!-- Prison Authority Equipment -->
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="81" texture="0" /> <!-- Prison Authority Badge -->
+					<Component id="11" drawable="328" texture="3" /> <!-- Beige Uniform Open -->
+				</Components>
+				<Props>
+					<Prop id="0" drawable="138" texture="1" /> <!-- Prison Authority Forwards Cap -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Sage Uniform</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="11" drawable="328" texture="4" /> <!-- Sage Uniform Open -->
+				</Components>
+			</Variation>
+		</Variations>
+	</Outfit>
+	<Outfit>
+		<Name>The Operative</Name>
+		<ScriptName>mp_noose</ScriptName>
+		<Variations>
+			<Variation>
+				<ScriptName>m_base</ScriptName>
+				<Name>NOOSE</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="52" texture="0" /> <!-- Black Tight Ski -->
+					<Component id="3" drawable="17" texture="0" /> <!-- Black Tactical Gloves -->
+					<Component id="4" drawable="121" texture="0" /> <!-- NOOSE Bottom -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="24" texture="0" /> <!-- Black Flight Boots -->
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="15" texture="0" />
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="70" texture="0" /> <!-- NOOSE Decal -->
+					<Component id="11" drawable="320" texture="0" /> <!-- NOOSE Top -->
+				</Components>
+				<Props>
+					<Prop id ="0" drawable="141" texture="0" /> <!-- NOOSE Helmet -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>Police</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="10" drawable="70" texture="1" /> <!-- POLICE Decal -->
+				</Components>
+			</Variation>
+			<Variation>
+				<ScriptName>f_base</ScriptName>
+				<Name>NOOSE</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="1" drawable="52" texture="0" /> <!-- Black Tight Ski -->
+					<Component id="3" drawable="18" texture="0" /> <!-- Black Tactical Gloves -->
+					<Component id="4" drawable="127" texture="0" /> <!-- NOOSE Bottom -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="24" texture="0" /> <!-- Black Flight Boots -->
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="14" texture="0" />
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="79" texture="0" /> <!-- NOOSE Decal -->
+					<Component id="11" drawable="331" texture="0" /> <!-- NOOSE Top -->
+				</Components>
+				<Props>
+					<Prop id ="0" drawable="140" texture="0" /> <!-- NOOSE Helmet -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Police</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="10" drawable="79" texture="1" /> <!-- POLICE Decal -->
+				</Components>
+			</Variation>
+		</Variations>
+	</Outfit>
+	<Outfit>
+		<Name>The Valiant</Name>
+		<ScriptName>mp_fire</ScriptName>
+		<Variations>
+			<Variation>
+				<ScriptName>m_base</ScriptName>
+				<Name>Yellow Turnout</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" /> 
+					<Component id="3" drawable="96" texture="0" /> <!-- Black Rubber Gloves -->
+					<Component id="4" drawable="120" texture="0" /> <!-- Yellow Firefighter Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="56" texture="1" /> <!-- Black Harness Boots -->
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="15" texture="0" />
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="64" texture="0" /> <!-- LSFD Decal -->
+					<Component id="11" drawable="315" texture="0" /> <!-- Yellow Open Firefighter Coat -->
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>Yellow Turnout (Helmet)</Name>
+				<Gender>male</Gender>
+				<Props>
+					<Prop id ="0" drawable="138" texture="0" /> <!-- Yellow Firefighter & Goggles -->
+				</Props>
+			</Variation>	
+			<Variation>
+				<ScriptName>m_brown</ScriptName>
+				<Base>m_base</Base>
+				<Name>Brown Turnout</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="11" drawable="315" texture="1" /> <!-- Brown Open Firefighter Coat -->
+					<Component id="4" drawable="120" texture="1" /> <!-- Brown Firefighter Pants -->
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>m_brown</Base>
+				<Name>Brown Turnout (Helmet)</Name>
+				<Gender>male</Gender>
+				<Props>
+					<Prop id ="0" drawable="138" texture="1" /> <!-- Orange Firefighter & Goggles -->
+				</Props>
+			</Variation>			
+		</Variations>
+		<Variations>
+			<Variation>
+				<ScriptName>f_base</ScriptName>
+				<Name>Yellow Turnout</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" /> 
+					<Component id="3" drawable="111" texture="0" /> <!-- Black Rubber Gloves -->
+					<Component id="4" drawable="126" texture="0" /> <!-- Yellow Firefighter Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="59" texture="1" /> <!-- Black Harness Boots -->
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="14" texture="0" />
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="73" texture="0" /> <!-- LSFD Decal -->
+					<Component id="11" drawable="326" texture="0" /> <!-- Yellow Open Firefighter Coat -->
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Yellow Turnout (Helmet)</Name>
+				<Gender>female</Gender>
+				<Props>
+					<Prop id="0" drawable="137" texture="0" /> <!-- Yellow Firefighter & Goggles -->
+				</Props>
+			</Variation>
+			<Variation>
+				<ScriptName>f_brown</ScriptName>
+				<Base>f_base</Base>
+				<Name>Brown Turnout</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="11" drawable="326" texture="1" /> <!-- Brown Open Firefighter Coat -->
+					<Component id="4" drawable="126" texture="1" /> <!-- Brown Firefighter Pants -->
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>f_brown</Base>
+				<Name>Brown Turnout (Helmet)</Name>
+				<Gender>female</Gender>
+				<Props>
+					<Prop id="0" drawable="137" texture="1" /> <!-- Orange Firefighter & Goggles -->
+				</Props>
+			</Variation>
+		</Variations>
+	</Outfit>
+	<Outfit>
+		<Name>The Dauntless</Name>
+		<ScriptName>mp_fire_scba</ScriptName>
+		<Variations>
+			<Variation>
+				<ScriptName>m_base</ScriptName>
+				<Name>Yellow SCBA</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="122" texture="0" /> <!-- Hood -->
+					<Component id="3" drawable="96" texture="0" /> <!-- Black Rubber Gloves -->
+					<Component id="4" drawable="120" texture="0" /> <!-- Yellow Firefighter Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="56" texture="1" /> <!-- Black Harness Boots -->
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="151" texture="0" /> <!-- SCBA (Light Off) -->
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="64" texture="0" /> <!-- LSFD Decal -->
+					<Component id="11" drawable="314" texture="0" /> <!-- Yellow Closed Firefighter Coat -->
+				</Components>
+				<Props>
+					<Prop id ="0" drawable="138" texture="0" /> <!-- Yellow Firefighter -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>Brown SCBA</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="11" drawable="314" texture="1" /> <!-- Brown Closed Firefighter Coat -->
+					<Component id="4" drawable="120" texture="1" /> <!-- Brown Firefighter Pants -->
+				</Components>
+				<Props>
+					<Prop id ="0" drawable="137" texture="1" /> <!-- Orange Firefighter -->
+				</Props>
+			</Variation>
+		</Variations>
+		<Variations>
+			<Variation>
+				<ScriptName>f_base</ScriptName>
+				<Name>Yellow SCBA</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="1" drawable="122" texture="0" /> <!-- Hood -->
+					<Component id="3" drawable="111" texture="0" /> <!-- Black Rubber Gloves -->
+					<Component id="4" drawable="126" texture="0" /> <!-- Yellow Firefighter Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="59" texture="1" /> <!-- Black Harness Boots -->
+					<Component id="7" drawable="0" texture="0" />
+					<Component id="8" drawable="187" texture="0" /> <!-- SCBA (Light Off) -->
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="73" texture="0" /> <!-- LSFD Decal -->
+					<Component id="11" drawable="325" texture="0" /> <!-- Yellow Closed Firefighter Coat -->
+				</Components>
+				<Props>
+					<Prop id="0" drawable="136" texture="0" /> <!-- Yellow Firefighter -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>Brown SCBA</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="11" drawable="325" texture="1" /> <!-- Brown Open Firefighter Coat -->
+					<Component id="4" drawable="126" texture="1" /> <!-- Brown Firefighter Pants -->
+				</Components>
+				<Props>
+					<Prop id="0" drawable="136" texture="1" /> <!-- Orange Firefighter -->
+				</Props>
+			</Variation>
+		</Variations>
+	</Outfit>
+	<Outfit>
+		<Name>Paramedic Shirt</Name>
+		<ScriptName>mp_ems</ScriptName>
+		<Variations>
+			<Variation>
+				<ScriptName>m_base</ScriptName>
+				<Name>Blue Gloves</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" /> 
+					<Component id="3" drawable="85" texture="0" /> <!-- Blue Surgical Gloves -->
+					<Component id="4" drawable="96" texture="0" /> <!-- Blue Paramedic Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="25" texture="0" /> <!-- Black Tactical Boots -->
+					<Component id="7" drawable="126" texture="0" /> <!-- Paramedic Stethoscope -->
+					<Component id="8" drawable="129" texture="0" /> <!-- Paramedic Utility Belt -->
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="58" texture="0" /> <!-- Paramedic Shirt Decal -->
+					<Component id="11" drawable="250" texture="0" /> <!-- Blue Paramedic Shirt -->
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>White Gloves</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id ="3" drawable="85" texture="1" /> <!-- White Surgical Gloves -->
+				</Components>
+			</Variation>				
+		</Variations>
+		<Variations>
+			<Variation>
+				<ScriptName>f_base</ScriptName>
+				<Name>Blue Gloves</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" /> 
+					<Component id="3" drawable="109" texture="0" /> <!-- Blue Surgical Gloves -->
+					<Component id="4" drawable="99" texture="0" /> <!-- Blue Paramedic Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="25" texture="0" /> <!-- Black Tactical Boots -->
+					<Component id="7" drawable="96" texture="0" /> <!-- Paramedic Stethoscope -->
+					<Component id="8" drawable="159" texture="0" /> <!-- Paramedic Utility Belt -->
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="66" texture="0" /> <!-- Paramedic Shirt Decal -->
+					<Component id="11" drawable="258" texture="0" /> <!-- Blue Paramedic Shirt -->
+				</Components>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>White Gloves</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="3" drawable="109" texture="1" /> <!-- White Surgical Gloves -->
+				</Components>
+			</Variation>
+		</Variations>
+	</Outfit>
+	<Outfit>
+		<Name>Paramedic Jacket</Name>
+		<ScriptName>mp_ems_jacket</ScriptName>
+		<Variations>
+			<Variation>
+				<ScriptName>m_base</ScriptName>
+				<Name>Blue Gloves</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" /> 
+					<Component id="3" drawable="86" texture="0" /> <!-- Blue Surgical Gloves -->
+					<Component id="4" drawable="96" texture="0" /> <!-- Blue Paramedic Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="25" texture="0" /> <!-- Black Tactical Boots -->
+					<Component id="7" drawable="126" texture="0" /> <!-- Paramedic Stethoscope -->
+					<Component id="8" drawable="74" texture="3" /> <!-- Black Turtleneck -->
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="57" texture="0" /> <!-- Paramedic Jacket Decal -->
+					<Component id="11" drawable="249" texture="0" /> <!-- Blue Paramedic Jacket -->
+				</Components>
+				<Props>
+					<Prop id="0" drawable="122" texture="0" /> <!-- Blue Paramedic Cap -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>m_base</Base>
+				<Name>White Gloves</Name>
+				<Gender>male</Gender>
+				<Components>
+					<Component id ="3" drawable="86" texture="1" /> <!-- White Surgical Gloves -->
+				</Components>
+			</Variation>				
+		</Variations>
+		<Variations>
+			<Variation>
+				<ScriptName>f_base</ScriptName>
+				<Name>Blue Gloves</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="1" drawable="0" texture="0" /> 
+					<Component id="3" drawable="105" texture="0" /> <!-- Blue Surgical Gloves -->
+					<Component id="4" drawable="99" texture="0" /> <!-- Blue Paramedic Pants -->
+					<Component id="5" drawable="0" texture="0" />
+					<Component id="6" drawable="25" texture="0" /> <!-- Black Tactical Boots -->
+					<Component id="7" drawable="96" texture="0" /> <!-- Paramedic Stethoscope -->
+					<Component id="8" drawable="76" texture="3" /> <!-- Black Turtleneck -->
+					<Component id="9" drawable="0" texture="0" /> 
+					<Component id="10" drawable="65" texture="0" /> <!-- Paramedic Jacket Decal -->
+					<Component id="11" drawable="257" texture="0" /> <!-- Blue Paramedic Jacket -->
+				</Components>
+				<Props>
+					<Prop id="0" drawable="121" texture="0" /> <!-- Blue Paramedic Cap -->
+				</Props>
+			</Variation>
+			<Variation>
+				<Base>f_base</Base>
+				<Name>White Gloves</Name>
+				<Gender>female</Gender>
+				<Components>
+					<Component id="3" drawable="105" texture="1" /> <!-- White Surgical Gloves -->
+				</Components>
+			</Variation>
+		</Variations>
+	</Outfit>
+</Outfits>

@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -15,6 +15,24 @@ namespace AutomaticRoadblocks.Debug.Menu
 {
     public class DebugPursuitToggleComponent : IMenuComponent<UIMenuItem>
     {
+        private static readonly Random Random = new();
+
+        private static readonly IReadOnlyList<string> RaceVehicleModels = new List<string>
+        {
+            "penumbra2",
+            "coquette4",
+            "sugoi",
+            "sultan2",
+            "imorgon",
+            "komoda",
+            "jugular",
+            "neo",
+            "issi7",
+            "drafter",
+            "paragon2",
+            "italigto",
+        };
+
         private readonly IGame _game;
         private readonly Random _random = new();
 
@@ -60,7 +78,7 @@ namespace AutomaticRoadblocks.Debug.Menu
                 var lane = road.Lanes.First();
                 var driver = new Ped(road.Position);
                 var passenger = new Ped(road.Position);
-                var vehicle = new Vehicle(ModelUtils.Vehicles.GetRaceVehicle(), lane.Position, lane.Heading);
+                var vehicle = new Vehicle(new Model(RaceVehicleModels[Random.Next(RaceVehicleModels.Count)]), lane.Position, lane.Heading);
 
                 driver.RelationshipGroup = RelationshipGroup.Gang1;
                 passenger.RelationshipGroup = RelationshipGroup.Gang1;

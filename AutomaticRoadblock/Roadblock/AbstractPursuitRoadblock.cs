@@ -167,7 +167,7 @@ namespace AutomaticRoadblocks.Roadblock
                     (position, heading) => new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
                 new InstanceSlot(EEntityType.CopPed, roadPosition, TargetHeading,
                     (position, heading) =>
-                        PedFactory.ToInstance(LspdfrDataHelper.RetrieveCop(RetrieveBackupUnitType(), position), position, heading))
+                        new ARPed(LspdfrDataHelper.RetrieveCop(RetrieveBackupUnitType(), position), heading))
             });
 
             // create buffer barrels behind the vehicle

@@ -98,7 +98,6 @@
         <Compile Include="Instances\ARVehicle.cs" />
         <Compile Include="Instances\IPlaceableInstance.cs" />
         <Compile Include="Instances\EInstanceState.cs" />
-        <Compile Include="Instances\PedFactory.cs" />
         <Compile Include="Instances\InstanceSlot.cs" />
         <Compile Include="Instances\InstanceType.cs" />
         <Compile Include="Instances\RemoveType.cs" />
@@ -132,7 +131,11 @@
         <Compile Include="Lspdfr\LspdfrData.cs" />
         <Compile Include="Lspdfr\LspdfrDataHelper.cs" />
         <Compile Include="Lspdfr\NumPeds.cs" />
+        <Compile Include="Lspdfr\Outfit.cs" />
+        <Compile Include="Lspdfr\OutfitComponent.cs" />
+        <Compile Include="Lspdfr\Outfits.cs" />
         <Compile Include="Lspdfr\PedData.cs" />
+        <Compile Include="Lspdfr\Variation.cs" />
         <Compile Include="Lspdfr\VehicleData.cs" />
         <Compile Include="Lspdfr\WeaponData.cs" />
         <Compile Include="Main.cs" />
@@ -268,7 +271,6 @@
         <Compile Include="Utils\EntityUtils.cs" />
         <Compile Include="Utils\GameUtils.cs" />
         <Compile Include="Utils\LspdfrUtils.cs" />
-        <Compile Include="Utils\ModelUtils.cs" />
         <Compile Include="Utils\PreviewUtils.cs" />
         <Compile Include="Utils\PropUtils.cs" />
         <Compile Include="Utils\ETimePeriod.cs" />
