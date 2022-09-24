@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Data;
 using AutomaticRoadblocks.Localization;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -31,32 +32,12 @@ namespace AutomaticRoadblocks.Lspdfr
 
             try
             {
-                var backup = GetBackupForUnitType(unit);
-                var agency = GetAgency(backup, position);
+                var loadout = RetrieveLoadout(unit, position);
+                Logger.Trace($"Retrieved loadout {loadout.Name} for unit type {unit} at position {position}");
+                var vehicles = loadout.Vehicles;
 
-                if (agency != null)
-                {
-                    Logger.Trace($"Found agency {agency} for backup {backup}");
-                    var loadout = GetLoadoutForAgency(unit, agency);
-
-                    if (loadout != null)
-                    {
-                        var vehicles = loadout.Vehicles;
-
-                        Logger.Trace($"Found a total of {vehicles.Count} for loadout {loadout}");
-                        modelName = vehicles[Random.Next(vehicles.Count)].ModelName;
-                    }
-                    else
-                    {
-                        Logger.Warn($"No loadout available for agency {agency}");
-                        Game.DisplayNotificationDebug($"~o~No loadout found for agency {agency.ScriptName}");
-                    }
-                }
-                else
-                {
-                    Logger.Warn($"No agency found for {backup}, using default vehicle instead");
-                    Game.DisplayNotificationDebug($"~o~No agency found for backup unit");
-                }
+                Logger.Trace($"Found a total of {vehicles.Count} for loadout {loadout}");
+                modelName = vehicles[Random.Next(vehicles.Count)].ModelName;
             }
             catch (Exception ex)
             {
@@ -65,6 +46,30 @@ namespace AutomaticRoadblocks.Lspdfr
             }
 
             return new Model(modelName);
+        }
+
+        /// <summary>
+        /// Retrieve a cop ped entity for the given unit type and position.
+        /// </summary>
+        /// <param name="unit">The unit type to create.</param>
+        /// <param name="position">the position of the entity.</param>
+        /// <returns>Returns the </returns>
+        public static Ped RetrieveCop(EBackupUnit unit, Vector3 position)
+        {
+            var loadout = RetrieveLoadout(unit, position);
+            var pedData = ChanceProvider.Retrieve(loadout.Peds);
+            var ped = new Ped(pedData.ModelName, position, 0f);
+
+            if (pedData.IsInventoryAvailable)
+                DoInternalInventoryCreation(ped, pedData);
+
+            if (pedData.Helmet)
+                ped.GiveHelmet(true, HelmetTypes.PoliceMotorcycleHelmet, 0);
+
+            // always give the ped a flashlight
+            ped.Inventory.GiveFlashlight();
+
+            return ped;
         }
 
         /// <summary>
@@ -123,6 +128,28 @@ namespace AutomaticRoadblocks.Lspdfr
             return unit == EBackupUnit.Transporter
                 ? agency.Loadout.FirstOrDefault(x => x.Name.Equals(Agency.TransporterLoadout, StringComparison.InvariantCulture))
                 : agency.Loadout.FirstOrDefault();
+        }
+
+        private static void DoInternalInventoryCreation(Ped ped, PedData pedData)
+        {
+            var inventoryData = LspdfrData.Inventories[pedData.Inventory];
+            var weaponData = ChanceProvider.Retrieve(inventoryData.Weapon);
+
+            if (inventoryData.IsStunWeaponAvailable)
+                ped.Inventory.GiveNewWeapon(new WeaponAsset(inventoryData.StunWeapon.AssetName), -1, false);
+
+            if (weaponData != null)
+            {
+                var weaponAsset = new WeaponAsset(weaponData.AssetName);
+                ped.Inventory.GiveNewWeapon(weaponAsset, -1, true);
+
+                foreach (var component in weaponData.Component)
+                {
+                    ped.Inventory.AddComponentToWeapon(weaponAsset, component);
+                }
+            }
+
+            ped.Armor = inventoryData.Armor;
         }
     }
 }

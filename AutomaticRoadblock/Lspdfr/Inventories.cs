@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
@@ -8,6 +9,12 @@ namespace AutomaticRoadblocks.Lspdfr
     [XmlRoot("Inventories")]
     public class Inventories
     {
+        /// <summary>
+        /// Retrieve the inventory by the given script name.
+        /// </summary>
+        /// <param name="scriptName">The script name of the inventory.</param>
+        [XmlIgnore] public Inventory this[string scriptName] => Items.First(x => x.ScriptName.Equals(scriptName, StringComparison.CurrentCultureIgnoreCase));
+        
         [XmlUnwrapContents]
         public List<Inventory> Items { get; internal set; }
 

@@ -41,6 +41,12 @@ namespace AutomaticRoadblocks.Lspdfr
         [XmlIgnore]
         public bool IsNullable => false;
 
+        /// <summary>
+        /// Verify if the ped has an inventory configured.
+        /// </summary>
+        [XmlIgnore]
+        public bool IsInventoryAvailable => !string.IsNullOrWhiteSpace(Inventory);
+
         public override string ToString()
         {
             return $"{nameof(ModelName)}: {ModelName}, {nameof(Chance)}: {Chance}, {nameof(Outfit)}: {Outfit}, " +

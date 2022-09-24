@@ -34,6 +34,11 @@ namespace AutomaticRoadblocks.Lspdfr
 
         [XmlElement(IsNullable = true)] public int Armor { get; internal set; }
 
+        /// <summary>
+        /// Verify if the stun weapon is configured.
+        /// </summary>
+        [XmlIgnore] public bool IsStunWeaponAvailable => StunWeapon != null;
+
         #endregion
 
         #region Methods
