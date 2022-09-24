@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.Street
     public static class RoadQuery
     {
         private const float NodeHeadingTolerance = 55f;
-        
+
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
         #region Methods
@@ -184,19 +184,11 @@ namespace AutomaticRoadblocks.Street
             var nodes = StreetHelper.FindNearbyVehicleNodes(position, nodeType).ToList();
             var closestNodeDistance = 9999f;
             var closestNode = (VehicleNodeInfo)null;
-            var ignoreHeading = false;
 
             // filter out any nodes which match one or more blacklisted conditions
             var filteredNodes = nodes
                 .Where(x => (x.Flags & blacklistedFlags) == 0)
-                .Where(x => Math.Abs(x.Heading - heading) <= NodeHeadingTolerance)
                 .ToList();
-
-            if (filteredNodes.Count == 0)
-            {
-                ignoreHeading = true;
-                filteredNodes = nodes.Where(x => (x.Flags & blacklistedFlags) == 0).ToList();
-            }
 
             foreach (var node in filteredNodes)
             {
@@ -209,12 +201,15 @@ namespace AutomaticRoadblocks.Street
                 closestNode = node;
             }
 
-            if (closestNode != null && ignoreHeading)
+            // verify if the closest node heading is opposite of the wanted heading
+            // if so, reverse the node information
+            if (closestNode != null && Math.Abs(closestNode.Heading - heading) > 90f)
             {
-                closestNode = new VehicleNodeInfo(closestNode.Position, closestNode.Heading)
+                Logger.Debug($"Reversing the closest matching node ({closestNode}) as it's heading is the opposite of the wanted heading ({heading})");
+                closestNode = new VehicleNodeInfo(closestNode.Position, MathHelper.NormalizeHeading(closestNode.Heading + 180f))
                 {
-                    LanesInSameDirection = closestNode.LanesInSameDirection,
-                    LanesInOppositeDirection = closestNode.LanesInOppositeDirection,
+                    LanesInSameDirection = closestNode.LanesInOppositeDirection,
+                    LanesInOppositeDirection = closestNode.LanesInSameDirection,
                     Density = closestNode.Density,
                     Flags = closestNode.Flags
                 };
