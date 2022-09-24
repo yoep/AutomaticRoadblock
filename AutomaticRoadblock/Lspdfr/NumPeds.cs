@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.Lspdfr
         }
 
         [XmlAttribute] public int Min { get; internal set; } = 1;
-        
+
         [XmlAttribute] public int Max { get; internal set; } = 1;
 
         public override string ToString()

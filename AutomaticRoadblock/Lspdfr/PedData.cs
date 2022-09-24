@@ -7,6 +7,10 @@ namespace AutomaticRoadblocks.Lspdfr
 {
     public class PedData : IChanceData
     {
+        private const char OutfitSeparatorChar = '.';
+
+        #region Constructors
+
         public PedData()
         {
         }
@@ -26,10 +30,15 @@ namespace AutomaticRoadblocks.Lspdfr
             Helmet = helmet;
         }
 
+        #endregion
+
+        #region Properties
+
         [XmlUnwrapContents] public string ModelName { get; internal set; }
-        
+
         /// <inheritdoc />
-        [XmlAttribute] public int Chance { get; internal set; } = 100;
+        [XmlAttribute]
+        public int Chance { get; internal set; } = 100;
 
         [XmlAttribute] [CanBeNull] public string Outfit { get; internal set; }
 
@@ -46,6 +55,34 @@ namespace AutomaticRoadblocks.Lspdfr
         /// </summary>
         [XmlIgnore]
         public bool IsInventoryAvailable => !string.IsNullOrWhiteSpace(Inventory);
+
+        /// <summary>
+        /// Verify if the ped has an outfit configured.
+        /// </summary>
+        [XmlIgnore]
+        public bool IsOutfitAvailable => !string.IsNullOrWhiteSpace(Outfit);
+
+        /// <summary>
+        /// Verify if a specific variation is configured for the outfit.
+        /// </summary>
+        [XmlIgnore]
+        public bool IsOutfitSpecificVariationDefined => IsOutfitAvailable && Outfit.Split(OutfitSeparatorChar).Length > 1;
+
+        /// <summary>
+        /// The base outfit script name to use for this ped.
+        /// </summary>
+        [XmlIgnore]
+        public string OutfitBaseScriptName => Outfit.Split(OutfitSeparatorChar)[0];
+
+        /// <summary>
+        /// The outfit specific variation for this ped.
+        /// </summary>
+        [XmlIgnore]
+        public string OutfitVariationSpecification => Outfit.Split(OutfitSeparatorChar)[1];
+
+        #endregion
+
+        #region Methods
 
         public override string ToString()
         {
@@ -78,5 +115,7 @@ namespace AutomaticRoadblocks.Lspdfr
                 return hashCode;
             }
         }
+
+        #endregion
     }
 }

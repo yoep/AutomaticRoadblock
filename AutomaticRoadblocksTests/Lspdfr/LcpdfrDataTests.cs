@@ -117,7 +117,7 @@ namespace AutomaticRoadblocks.Lspdfr
         {
             var lspdCop = new Outfit("The Cop", "lspd_cop", new List<Variation>
             {
-                new Variation(null, "Officer", "m_base", "male", new List<OutfitComponent>
+                new Variation(null, "Officer", "m_base", Gender.Male, new List<OutfitComponent>
                 {
                     new OutfitComponent(1, 0, 0),
                     new OutfitComponent(3, 0, 0),
@@ -130,9 +130,30 @@ namespace AutomaticRoadblocks.Lspdfr
                     new OutfitComponent(10, 8, 0),
                     new OutfitComponent(11, 55, 0),
                 }),
-                new Variation("m_base", "Officer III", null, "male", new List<OutfitComponent>
+                new Variation("m_base", "Officer III", null, Gender.Male, new List<OutfitComponent>
                 {
                     new OutfitComponent(10, 8, 1),
+                }),
+                new Variation("m_base", "Senior Officer", null, Gender.Male, new List<OutfitComponent>
+                {
+                    new OutfitComponent(10, 8, 2),
+                }),
+                new Variation("m_base", "Detective", null, Gender.Male, new List<OutfitComponent>
+                {
+                    new OutfitComponent(10, 8, 3),
+                }),
+                new Variation(null, "Officer", "f_base", Gender.Female, new List<OutfitComponent>
+                {
+                    new OutfitComponent(1, 0, 0),
+                    new OutfitComponent(3, 14, 0),
+                    new OutfitComponent(4, 34, 0),
+                    new OutfitComponent(5, 0, 0),
+                    new OutfitComponent(6, 25, 0),
+                    new OutfitComponent(7, 0, 0),
+                    new OutfitComponent(8, 35, 0),
+                    new OutfitComponent(9, 0, 0),
+                    new OutfitComponent(10, 7, 0),
+                    new OutfitComponent(11, 48, 0),
                 })
             });
             var data = IoC.Instance.GetInstance<ILspdfrData>();

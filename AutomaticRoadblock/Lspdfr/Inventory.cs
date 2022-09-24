@@ -37,7 +37,8 @@ namespace AutomaticRoadblocks.Lspdfr
         /// <summary>
         /// Verify if the stun weapon is configured.
         /// </summary>
-        [XmlIgnore] public bool IsStunWeaponAvailable => StunWeapon != null;
+        [XmlIgnore]
+        public bool IsStunWeaponAvailable => StunWeapon != null;
 
         #endregion
 

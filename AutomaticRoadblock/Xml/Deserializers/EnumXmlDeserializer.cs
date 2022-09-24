@@ -19,7 +19,12 @@ namespace AutomaticRoadblocks.Xml.Deserializers
                 ? deserializationContext.Value
                 : deserializationContext.CurrentNode.Value;
 
-            return Enum.Parse(deserializationContext.DeserializationType, value);
+            return Enum.Parse(deserializationContext.DeserializationType, UpperCaseFirstLetter(value));
+        }
+
+        private string UpperCaseFirstLetter(string value)
+        {
+            return char.ToUpper(value[0]) + value.Substring(1);
         }
     }
 }

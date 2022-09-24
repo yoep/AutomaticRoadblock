@@ -124,6 +124,7 @@
         <Compile Include="Lspdfr\Backup.cs" />
         <Compile Include="Lspdfr\BackupUnits.cs" />
         <Compile Include="Lspdfr\EBackupUnit.cs" />
+        <Compile Include="Lspdfr\Gender.cs" />
         <Compile Include="Lspdfr\ILspdfrData.cs" />
         <Compile Include="Lspdfr\Inventories.cs" />
         <Compile Include="Lspdfr\Inventory.cs" />

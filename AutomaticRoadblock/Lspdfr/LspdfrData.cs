@@ -24,10 +24,10 @@ namespace AutomaticRoadblocks.Lspdfr
 
         /// <inheritdoc />
         public Agencies Agencies { get; private set; }
-        
+
         /// <inheritdoc />
         public Inventories Inventories { get; private set; }
-        
+
         /// <inheritdoc />
         public Outfits Outfits { get; private set; }
 

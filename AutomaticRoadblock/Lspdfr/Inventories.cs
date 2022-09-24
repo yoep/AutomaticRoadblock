@@ -13,10 +13,10 @@ namespace AutomaticRoadblocks.Lspdfr
         /// Retrieve the inventory by the given script name.
         /// </summary>
         /// <param name="scriptName">The script name of the inventory.</param>
-        [XmlIgnore] public Inventory this[string scriptName] => Items.First(x => x.ScriptName.Equals(scriptName, StringComparison.CurrentCultureIgnoreCase));
-        
-        [XmlUnwrapContents]
-        public List<Inventory> Items { get; internal set; }
+        [XmlIgnore]
+        public Inventory this[string scriptName] => Items.First(x => x.ScriptName.Equals(scriptName, StringComparison.CurrentCultureIgnoreCase));
+
+        [XmlUnwrapContents] public List<Inventory> Items { get; internal set; }
 
         public override string ToString()
         {

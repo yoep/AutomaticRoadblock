@@ -15,14 +15,11 @@ namespace AutomaticRoadblocks.Lspdfr
             Texture = texture;
         }
 
-        [XmlAttribute]
-        public int Id { get; internal set; }
-        
-        [XmlAttribute]
-        public int Drawable { get; internal set; }
-        
-        [XmlAttribute]
-        public int Texture { get; internal set; }
+        [XmlAttribute] public int Id { get; internal set; }
+
+        [XmlAttribute] public int Drawable { get; internal set; }
+
+        [XmlAttribute] public int Texture { get; internal set; }
 
         public override string ToString()
         {

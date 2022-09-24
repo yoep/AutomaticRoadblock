@@ -13,6 +13,7 @@ namespace AutomaticRoadblocks.Lspdfr
     public static class LspdfrDataHelper
     {
         private const string DefaultVehicleName = "police";
+        private const string GenderMaleIdentifier = "mp_m";
 
         private static readonly Random Random = new();
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
@@ -60,6 +61,9 @@ namespace AutomaticRoadblocks.Lspdfr
             var loadout = RetrieveLoadout(unit, position);
             var pedData = ChanceProvider.Retrieve(loadout.Peds);
             var ped = new Ped(pedData.ModelName, GameUtils.GetOnTheGroundPosition(position), 0f);
+
+            if (pedData.IsOutfitAvailable)
+                DoInternalOutfitVariation(ped, pedData);
 
             if (pedData.IsInventoryAvailable)
                 DoInternalInventoryCreation(ped, pedData);
@@ -129,6 +133,51 @@ namespace AutomaticRoadblocks.Lspdfr
             return unit == EBackupUnit.Transporter
                 ? agency.Loadout.FirstOrDefault(x => x.Name.Equals(Agency.TransporterLoadout, StringComparison.InvariantCulture))
                 : agency.Loadout.FirstOrDefault();
+        }
+
+        private static void ApplyVariation(Ped ped, Variation variation)
+        {
+            Assert.NotNull(ped, "ped cannot be null");
+            Assert.NotNull(variation, "variation cannot be null");
+            foreach (var component in variation.Components)
+            {
+                ped.SetVariation(component.Id, component.Drawable, component.Texture);
+            }
+        }
+
+        private static Gender ModelToGender(string modelName)
+        {
+            return modelName.StartsWith(GenderMaleIdentifier)
+                ? Gender.Male
+                : Gender.Female;
+        }
+
+        private static void DoInternalOutfitVariation(Ped ped, PedData pedData)
+        {
+            var mainOutfit = pedData.OutfitBaseScriptName;
+            var gender = ModelToGender(pedData.ModelName);
+            var outfit = LspdfrData.Outfits[mainOutfit];
+            Variation variation;
+
+            // verify if a specific variation is given to apply
+            // if not, select a random variation which isn't a base
+            if (pedData.IsOutfitSpecificVariationDefined)
+            {
+                variation = outfit[pedData.OutfitVariationSpecification];
+            }
+            else
+            {
+                var variations = outfit.RetrieveVariations(gender);
+                variation = variations[Random.Next(variations.Count)];
+            }
+
+            Logger.Trace($"Applying outfit variation {variation}");
+            // apply the base of the variation if defined
+            if (variation.IsBaseDefined)
+                ApplyVariation(ped, outfit[variation.Base]);
+
+            // apply the variation
+            ApplyVariation(ped, variation);
         }
 
         private static void DoInternalInventoryCreation(Ped ped, PedData pedData)
