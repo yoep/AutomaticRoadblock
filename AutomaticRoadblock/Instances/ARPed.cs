@@ -174,6 +174,17 @@ namespace AutomaticRoadblocks.Instances
             _attachments.Clear();
         }
 
+        /// <summary>
+        /// Unequip all weapons from the ped.
+        /// </summary>
+        public void UnequipAllWeapons()
+        {
+            if (IsInvalid)
+                return;
+            
+            GameInstance.Inventory.EquippedWeapon = null;
+        }
+
         public void WarpIntoVehicle(Vehicle vehicle, EVehicleSeat seat)
         {
             Assert.NotNull(vehicle, "vehicle cannot be null");

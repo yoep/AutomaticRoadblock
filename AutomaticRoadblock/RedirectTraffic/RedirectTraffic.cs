@@ -168,6 +168,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
             
             Cop.Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
+            Cop.UnequipAllWeapons();
             AnimationHelper.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
             return result;
         }
