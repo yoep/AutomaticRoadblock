@@ -21,7 +21,6 @@ namespace AutomaticRoadblocks.Roadblock
         internal static void ReleaseInstancesToLspdfr(List<InstanceSlot> instances, Vehicle vehicle)
         {
             Assert.NotNull(instances, "instances cannot be null");
-            Assert.NotNull(vehicle, "vehicle cannot be null");
             var copPeds = instances
                 .Where(x => x.Type == EEntityType.CopPed)
                 .Select(x => x.Instance)
@@ -43,13 +42,27 @@ namespace AutomaticRoadblocks.Roadblock
                 .ForEach(x =>
                 {
                     // make sure the ped is the vehicle or at least entering it
-                    if (!x.IsInVehicle(vehicle, true))
-                        x.Tasks.EnterVehicle(vehicle, 3000, (int)EVehicleSeat.Any);
+                    TryEnteringVehicle(x, vehicle);
                 });
 
             // remove all cop instances so that we don't remove them by accident when disposing
             // these instances are now in control of LSPDFR
             instances.RemoveAll(x => x.Type is EEntityType.CopPed or EEntityType.CopVehicle);
+        }
+
+        private static void TryEnteringVehicle(Ped ped, Vehicle vehicle)
+        {
+            if (vehicle != null && vehicle.IsValid())
+            {
+                if (!ped.IsInVehicle(vehicle, true))
+                {
+                    ped.Tasks.EnterVehicle(vehicle, 3000, (int)EVehicleSeat.Any);
+                }
+            }
+            else
+            {
+                Logger.Error("Unable to release cop instances correctly, cannot enter vehicle as it's null or invalid");
+            }
         }
     }
 }

@@ -359,7 +359,14 @@ namespace AutomaticRoadblocks.Roadblock
 
             foreach (var slot in Slots)
             {
-                copsJoining.AddRange(slot.Cops.Select(x => x.GameInstance));
+                try
+                {
+                    copsJoining.AddRange(slot.Cops.Select(x => x.GameInstance));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed to retrieve slot cops joining the pursuit for {slot}, {ex.Message}", ex);
+                }
             }
 
             return copsJoining;

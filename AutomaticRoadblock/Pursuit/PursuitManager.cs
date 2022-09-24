@@ -521,7 +521,14 @@ namespace AutomaticRoadblocks.Pursuit
             if (State != EPursuitState.ActiveOnFoot)
                 return;
 
-            _roadblockDispatcher.DismissActiveRoadblocks();
+            try
+            {
+                _roadblockDispatcher.DismissActiveRoadblocks();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to dismiss active roadblocks, {ex.Message}", ex);
+            }
         }
 
         private void StartKeyListener()
