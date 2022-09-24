@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Pursuit.Level
@@ -30,20 +28,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
         }
 
         /// <inheritdoc />
-        protected override void InitializeCops()
-        {
-            var pedSpawnPosition = CalculatePositionBehindVehicle();
-            var totalOccupants = Random.Next(3) + 2;
-
-            for (var i = 0; i < totalOccupants; i++)
-            {
-                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), 0f,
-                    (position, heading) => PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(VehicleModel, position, heading))));
-                pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
-            }
-        }
-
-        /// <inheritdoc />
         protected override void InitializeScenery()
         {
             // no-op
@@ -52,7 +36,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override float CalculateVehicleHeading()
         {
-            if (ModelUtils.Vehicles.IsRiot(VehicleModel))
+            if (VehicleModel.Name.Equals("Riot"))
                 return base.CalculateVehicleHeading() + 30;
 
             return base.CalculateVehicleHeading();

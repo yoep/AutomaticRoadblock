@@ -9,6 +9,8 @@ namespace AutomaticRoadblocks.Lspdfr
         private const string LspdfrDataDirectory = @"./lspdfr/data/";
         private const string AgenciesFilename = "agency.xml";
         private const string BackupUnitsFilename = "backup.xml";
+        private const string InventoryFilename = "inventory.xml";
+        private const string OutfitFilename = "outfits.xml";
 
         public LspdfrData(ILogger logger)
             : base(logger, LspdfrDataDirectory)
@@ -23,6 +25,12 @@ namespace AutomaticRoadblocks.Lspdfr
         /// <inheritdoc />
         public Agencies Agencies { get; private set; }
 
+        /// <inheritdoc />
+        public Inventories Inventories { get; private set; }
+
+        /// <inheritdoc />
+        public Outfits Outfits { get; private set; }
+
         #endregion
 
         #region IDataFile
@@ -33,6 +41,8 @@ namespace AutomaticRoadblocks.Lspdfr
             Logger.Trace($"Loading LSPDFR config data from {DataDirectory}");
             BackupUnits = TryToLoadDatafile<BackupUnits>(BackupUnitsFilename);
             Agencies = TryToLoadDatafile<Agencies>(AgenciesFilename);
+            Inventories = TryToLoadDatafile<Inventories>(InventoryFilename);
+            Outfits = TryToLoadDatafile<Outfits>(OutfitFilename);
             Logger.Info("LSPDFR config data has been loaded");
         }
 

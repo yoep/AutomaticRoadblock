@@ -6,8 +6,7 @@ namespace AutomaticRoadblocks.Lspdfr
     [XmlRoot("BackupUnits")]
     public class BackupUnits
     {
-        [XmlIgnore]
-        public Backup this[EBackupUnit unit] => GetBackup(unit);
+        [XmlIgnore] public Backup this[EBackupUnit unit] => GetBackup(unit);
 
         public Backup LocalPatrol { get; internal set; }
 
@@ -48,7 +47,7 @@ namespace AutomaticRoadblocks.Lspdfr
                 return hashCode;
             }
         }
-        
+
         private Backup GetBackup(EBackupUnit unit)
         {
             return unit switch

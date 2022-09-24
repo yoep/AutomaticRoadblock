@@ -10,13 +10,10 @@ namespace AutomaticRoadblocks.Lspdfr
     [XmlRoot("Agencies")]
     public class Agencies
     {
-        [XmlIgnore]
-        [CanBeNull]
-        public Agency this[string scriptName] => GetAgencyByScriptName(scriptName);
+        [XmlIgnore] [CanBeNull] public Agency this[string scriptName] => GetAgencyByScriptName(scriptName);
 
-        [XmlUnwrapContents]
-        public List<Agency> Items { get; internal set; }
-        
+        [XmlUnwrapContents] public List<Agency> Items { get; internal set; }
+
         private Agency GetAgencyByScriptName(string scriptName)
         {
             Assert.HasText(scriptName, "scriptName cannot be empty");

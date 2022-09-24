@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Xml.XPath;
 using AutomaticRoadblocks.Xml.Attributes;
 using AutomaticRoadblocks.Xml.Context;
 using AutomaticRoadblocks.Xml.Parser;
@@ -27,7 +28,7 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             var nodes = parser.FetchNodesForMember(new XmlDeserializationContext(deserializationContext, clazz,
                 GetLookupName(deserializationContext.DeserializationType)));
 
-            if (nodes is { Count: >= 1 })
+            if (nodes is { Count: >= 1 } && ChildrenAllHaveTheSameName(nodes))
             {
                 ProcessElements(parser, deserializationContext, clazz, unwrapProperty, instance, GetLookupName(deserializationContext.DeserializationType));
             }
@@ -108,16 +109,40 @@ namespace AutomaticRoadblocks.Xml.Deserializers
             return x.GetCustomAttribute<XmlUnwrapContentsAttribute>() != null;
         }
 
-        private static bool HasValue(XmlContext xmlDeserializationContext)
-        {
-            return !string.IsNullOrWhiteSpace(xmlDeserializationContext.CurrentNode.Value);
-        }
-
         private static bool IsRequiredMember(MemberInfo member)
         {
             var xmlProperty = member.GetCustomAttribute<XmlElementAttribute>();
 
             return xmlProperty is not { IsNullable: true };
+        }
+
+        private bool ChildrenAllHaveTheSameName(XPathNodeIterator nodes)
+        {
+            string nameToCheck = null;
+
+            foreach (XPathNavigator node in nodes)
+            {
+                var children = node.SelectChildren(XPathNodeType.Element);
+
+                // verify if the parent has any children
+                // if not, we cannot match it for equal names
+                if (children.Count == 0)
+                    return false;
+
+                foreach (XPathNavigator child in children)
+                {
+                    if (nameToCheck == null)
+                    {
+                        nameToCheck = child.Name;
+                        continue;
+                    }
+
+                    if (!child.Name.Equals(nameToCheck))
+                        return false;
+                }
+            }
+
+            return true;
         }
     }
 }

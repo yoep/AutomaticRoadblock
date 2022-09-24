@@ -7,5 +7,11 @@ namespace AutomaticRoadblocks.Data
         /// Where 100 = always and 0 = never.
         /// </summary>
         int Chance { get; }
+
+        /// <summary>
+        /// Verify if incomplete/nullable chances are allowed.
+        /// A chance can return null when the total chance doesn't match 100.
+        /// </summary>
+        bool IsNullable { get; }
     }
 }

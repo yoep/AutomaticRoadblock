@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Data;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Utils;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -11,6 +13,7 @@ namespace AutomaticRoadblocks.Lspdfr
     public static class LspdfrDataHelper
     {
         private const string DefaultVehicleName = "police";
+        private const string GenderMaleIdentifier = "mp_m";
 
         private static readonly Random Random = new();
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
@@ -31,32 +34,12 @@ namespace AutomaticRoadblocks.Lspdfr
 
             try
             {
-                var backup = GetBackupForUnitType(unit);
-                var agency = LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
+                var loadout = RetrieveLoadout(unit, position);
+                Logger.Trace($"Retrieved loadout {loadout.Name} for unit type {unit} at position {position}");
+                var vehicles = loadout.Vehicles;
 
-                if (agency != null)
-                {
-                    Logger.Trace($"Found agency {agency} for backup {backup}");
-                    var loadout = GetLoadoutForAgency(unit, agency);
-
-                    if (loadout != null)
-                    {
-                        var vehicles = loadout.Vehicles;
-
-                        Logger.Trace($"Found a total of {vehicles.Count} for loadout {loadout}");
-                        modelName = vehicles[Random.Next(vehicles.Count)].ModelName;
-                    }
-                    else
-                    {
-                        Logger.Warn($"No loadout available for agency {agency}");
-                        Game.DisplayNotificationDebug($"~o~No loadout found for agency {agency.ScriptName}");
-                    }
-                }
-                else
-                {
-                    Logger.Warn($"No agency found for {backup}, using default vehicle instead");
-                    Game.DisplayNotificationDebug($"~o~No agency found for backup unit");
-                }
+                Logger.Trace($"Found a total of {vehicles.Count} for loadout {loadout}");
+                modelName = vehicles[Random.Next(vehicles.Count)].ModelName;
             }
             catch (Exception ex)
             {
@@ -65,6 +48,49 @@ namespace AutomaticRoadblocks.Lspdfr
             }
 
             return new Model(modelName);
+        }
+
+        /// <summary>
+        /// Retrieve a cop ped entity for the given unit type and position.
+        /// </summary>
+        /// <param name="unit">The unit type to create.</param>
+        /// <param name="position">the position of the entity.</param>
+        /// <returns>Returns the </returns>
+        public static Ped RetrieveCop(EBackupUnit unit, Vector3 position)
+        {
+            var loadout = RetrieveLoadout(unit, position);
+            var pedData = ChanceProvider.Retrieve(loadout.Peds);
+            var ped = new Ped(pedData.ModelName, GameUtils.GetOnTheGroundPosition(position), 0f);
+
+            if (pedData.IsOutfitAvailable)
+                DoInternalOutfitVariation(ped, pedData);
+
+            if (pedData.IsInventoryAvailable)
+                DoInternalInventoryCreation(ped, pedData);
+
+            if (pedData.Helmet)
+                ped.GiveHelmet(false, HelmetTypes.PoliceMotorcycleHelmet, 0);
+
+            // always give the ped a flashlight
+            ped.Inventory.GiveFlashlight();
+
+            return ped;
+        }
+
+        /// <summary>
+        /// Retrieve the load for the given unit and position.
+        /// </summary>
+        /// <param name="unit">The backup unit type.</param>
+        /// <param name="position">The position for the agency.</param>
+        /// <returns>Returns the loadout for the unit type at the given location.</returns>
+        public static Loadout RetrieveLoadout(EBackupUnit unit, Vector3 position)
+        {
+            Assert.NotNull(unit, "unit cannot be null");
+            Assert.NotNull(position, "position cannot be null");
+            var backup = GetBackupForUnitType(unit);
+            var agency = GetAgency(backup, position);
+
+            return GetLoadoutForAgency(unit, agency);
         }
 
         /// <summary>
@@ -97,11 +123,83 @@ namespace AutomaticRoadblocks.Lspdfr
                 : LspdfrData.BackupUnits[unit];
         }
 
+        private static Agency GetAgency(Backup backup, Vector3 position)
+        {
+            return LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
+        }
+
         private static Loadout GetLoadoutForAgency(EBackupUnit unit, Agency agency)
         {
             return unit == EBackupUnit.Transporter
                 ? agency.Loadout.FirstOrDefault(x => x.Name.Equals(Agency.TransporterLoadout, StringComparison.InvariantCulture))
                 : agency.Loadout.FirstOrDefault();
+        }
+
+        private static void ApplyVariation(Ped ped, Variation variation)
+        {
+            Assert.NotNull(ped, "ped cannot be null");
+            Assert.NotNull(variation, "variation cannot be null");
+            foreach (var component in variation.Components)
+            {
+                ped.SetVariation(component.Id, component.Drawable, component.Texture);
+            }
+        }
+
+        private static Gender ModelToGender(string modelName)
+        {
+            return modelName.StartsWith(GenderMaleIdentifier)
+                ? Gender.Male
+                : Gender.Female;
+        }
+
+        private static void DoInternalOutfitVariation(Ped ped, PedData pedData)
+        {
+            var mainOutfit = pedData.OutfitBaseScriptName;
+            var gender = ModelToGender(pedData.ModelName);
+            var outfit = LspdfrData.Outfits[mainOutfit];
+            Variation variation;
+
+            // verify if a specific variation is given to apply
+            // if not, select a random variation which isn't a base
+            if (pedData.IsOutfitSpecificVariationDefined)
+            {
+                variation = outfit[pedData.OutfitVariationSpecification];
+            }
+            else
+            {
+                var variations = outfit.RetrieveVariations(gender);
+                variation = variations[Random.Next(variations.Count)];
+            }
+
+            Logger.Trace($"Applying outfit variation {variation}");
+            // apply the base of the variation if defined
+            if (variation.IsBaseDefined)
+                ApplyVariation(ped, outfit[variation.Base]);
+
+            // apply the variation
+            ApplyVariation(ped, variation);
+        }
+
+        private static void DoInternalInventoryCreation(Ped ped, PedData pedData)
+        {
+            var inventoryData = LspdfrData.Inventories[pedData.Inventory];
+            var weaponData = ChanceProvider.Retrieve(inventoryData.Weapon);
+
+            if (inventoryData.IsStunWeaponAvailable)
+                ped.Inventory.GiveNewWeapon(new WeaponAsset(inventoryData.StunWeapon.AssetName), -1, false);
+
+            if (weaponData != null)
+            {
+                var weaponAsset = new WeaponAsset(weaponData.AssetName);
+                ped.Inventory.GiveNewWeapon(weaponAsset, -1, true);
+
+                foreach (var component in weaponData.Component)
+                {
+                    ped.Inventory.AddComponentToWeapon(weaponAsset, component);
+                }
+            }
+
+            ped.Armor = inventoryData.Armor;
         }
     }
 }

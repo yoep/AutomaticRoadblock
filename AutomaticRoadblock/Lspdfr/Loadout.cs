@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 
 namespace AutomaticRoadblocks.Lspdfr
 {
@@ -9,24 +10,33 @@ namespace AutomaticRoadblocks.Lspdfr
         {
         }
 
-        public Loadout(string name, List<VehicleData> vehicles)
+        public Loadout(string name, List<VehicleData> vehicles, List<PedData> peds, NumPeds numPeds)
         {
             Name = name;
             Vehicles = vehicles;
+            Peds = peds;
+            NumPeds = numPeds;
         }
 
         public string Name { get; internal set; }
 
         public List<VehicleData> Vehicles { get; internal set; } = new();
 
+        public List<PedData> Peds { get; internal set; } = new();
+
+        [XmlElement(IsNullable = true)] public NumPeds NumPeds { get; internal set; } = new();
+
         public override string ToString()
         {
-            return $"{nameof(Name)}: {Name}, {nameof(Vehicles)}: {string.Join(", ", Vehicles)}";
+            return
+                $"{nameof(Name)}: {Name}, {nameof(Vehicles)}: {string.Join(", ", Vehicles)},  {nameof(Peds)}: {string.Join(", ", Peds)}, " +
+                $"{nameof(NumPeds)}: {NumPeds}";
         }
 
         protected bool Equals(Loadout other)
         {
-            return Name == other.Name && Vehicles.All(x => other.Vehicles.Contains(x));
+            return Name == other.Name && Vehicles.All(x => other.Vehicles.Contains(x)) && Peds.All(x => other.Peds.Contains(x))
+                   && Equals(NumPeds, other.NumPeds);
         }
 
         public override bool Equals(object obj)
@@ -41,7 +51,11 @@ namespace AutomaticRoadblocks.Lspdfr
         {
             unchecked
             {
-                return ((Name != null ? Name.GetHashCode() : 0) * 397) ^ (Vehicles != null ? Vehicles.GetHashCode() : 0);
+                var hashCode = (Name != null ? Name.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Vehicles != null ? Vehicles.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Peds != null ? Peds.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (NumPeds != null ? NumPeds.GetHashCode() : 0);
+                return hashCode;
             }
         }
     }

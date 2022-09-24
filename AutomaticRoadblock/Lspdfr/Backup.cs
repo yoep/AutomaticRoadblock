@@ -31,8 +31,7 @@ namespace AutomaticRoadblocks.Lspdfr
             CayoPerico = cayoPerico;
         }
 
-        [XmlIgnore]
-        public string this[EWorldZoneCounty county] => GetAgencyNameForCounty(county);
+        [XmlIgnore] public string this[EWorldZoneCounty county] => GetAgencyNameForCounty(county);
 
         public string LosSantosCity { get; internal set; }
 

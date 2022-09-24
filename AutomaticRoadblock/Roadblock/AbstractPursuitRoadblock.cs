@@ -36,7 +36,6 @@ namespace AutomaticRoadblocks.Roadblock
         private static readonly ILocalizer Localizer = IoC.Instance.GetInstance<ILocalizer>();
         private static readonly ISpikeStripDispatcher SpikeStripDispatcher = IoC.Instance.GetInstance<ISpikeStripDispatcher>();
         private static readonly IModelProvider ModelProvider = IoC.Instance.GetInstance<IModelProvider>();
-        private static readonly ILspdfrData LspdfrData = IoC.Instance.GetInstance<ILspdfrData>();
 
         private float _lastKnownDistanceToRoadblock = 9999f;
 
@@ -168,7 +167,7 @@ namespace AutomaticRoadblocks.Roadblock
                     (position, heading) => new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
                 new InstanceSlot(EEntityType.CopPed, roadPosition, TargetHeading,
                     (position, heading) =>
-                        PedFactory.CreateCopWeaponsForModel(PedFactory.CreateCopForVehicle(vehicleModel, position, heading)))
+                        new ARPed(LspdfrDataHelper.RetrieveCop(RetrieveBackupUnitType(), position), heading))
             });
 
             // create buffer barrels behind the vehicle

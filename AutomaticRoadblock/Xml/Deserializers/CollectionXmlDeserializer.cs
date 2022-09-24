@@ -50,8 +50,14 @@ namespace AutomaticRoadblocks.Xml.Deserializers
         {
             string nameToCheck = null;
             parent.MoveNext();
+            var children = parent.Current.SelectChildren(XPathNodeType.Element);
 
-            foreach (XPathNavigator child in parent.Current.SelectChildren(XPathNodeType.Element))
+            // verify if the parent has any children
+            // if not, we cannot match it for equal names
+            if (children.Count == 0)
+                return false;
+
+            foreach (XPathNavigator child in children)
             {
                 if (nameToCheck == null)
                 {

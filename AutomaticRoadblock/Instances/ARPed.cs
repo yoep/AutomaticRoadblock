@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Type;
 using AutomaticRoadblocks.Vehicles;
-using JetBrains.Annotations;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -16,42 +15,38 @@ namespace AutomaticRoadblocks.Instances
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class ARPed : IARInstance<Ped>
     {
+        private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+
         private readonly List<Entity> _attachments = new();
 
-        public ARPed(Model model, Vector3 position, float heading = 0f)
+        public ARPed(Ped ped, float heading = 0f)
         {
-            Assert.NotNull(model, "model cannot be null");
-            Assert.NotNull(position, "position cannot be null");
-            GameInstance = new Ped(model, position, heading)
-            {
-                IsPersistent = true,
-                KeepTasks = true,
-                RelationshipGroup = RelationshipGroup.Cop
-            };
-            RegisterCopToLspdfr();
+            Assert.NotNull(ped, "ped cannot be null");
+            GameInstance = ped;
+            GameInstance.Heading = heading;
+            Initialize();
         }
 
         #region Properties
 
         /// <inheritdoc />
-        [CanBeNull]
         public Ped GameInstance { get; }
 
         /// <summary>
         /// Get the primary weapon of this ped.
         /// </summary>
-        public WeaponDescriptor PrimaryWeapon { get; private set; }
+        public WeaponDescriptor PrimaryWeapon => GameInstance.Inventory.Weapons.First(x => x.MagazineSize > 0);
 
         /// <inheritdoc />
         public bool IsInvalid => GameInstance == null ||
                                  !GameInstance.IsValid();
 
         #endregion
-        
+
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive { get; private set;  }
+        public bool IsPreviewActive { get; private set; }
 
         /// <inheritdoc />
         public void CreatePreview()
@@ -126,53 +121,12 @@ namespace AutomaticRoadblocks.Instances
         }
 
         /// <summary>
-        /// Give the ped a primary weapon which is added in the inventory.
-        /// For the list of weapon names, see <see cref="ModelUtils.Weapons"/>.
-        /// </summary>
-        /// <param name="name">The weapon name to give.</param>
-        /// <param name="equipNow">Set if the weapon should be instantly equipped.</param>
-        public void GivePrimaryWeapon(string name, bool equipNow = true)
-        {
-            PrimaryWeapon = CreateWeaponInInventory(name, equipNow);
-        }
-
-        /// <summary>
-        /// Give the ped the given weapon name in the inventory.
-        /// </summary>
-        /// <param name="name"></param>
-        public void GiveWeapon(string name)
-        {
-            CreateWeaponInInventory(name);
-        }
-
-        /// <summary>
-        /// Equip the primary weapon if one is set through <see cref="GivePrimaryWeapon"/>.
-        /// </summary>
-        public void EquipPrimaryWeapon()
-        {
-            if (IsInvalid)
-                return;
-
-            GameInstance.Inventory.EquippedWeapon = PrimaryWeapon;
-        }
-
-        /// <summary>
-        /// Let the ped cover behind the closest object.
-        /// </summary>
-        public void Cover()
-        {
-            EntityUtils.CanPeekInCover(GameInstance, true);
-            EntityUtils.LoadCover(GameInstance, true);
-        }
-
-        /// <summary>
         /// Aim at the given entity.
         /// </summary>
         /// <param name="entity">The entity to aim at.</param>
         /// <param name="duration">The duration.</param>
         public void AimAt(Entity entity, int duration)
         {
-            EquipPrimaryWeapon();
             GameInstance.Tasks.AimWeaponAt(entity, duration);
         }
 
@@ -184,7 +138,6 @@ namespace AutomaticRoadblocks.Instances
         public void FireAt(Entity entity, int duration)
         {
             Assert.NotNull(entity, "entity cannot be null");
-            EquipPrimaryWeapon();
             GameInstance.Tasks.FireWeaponAt(entity, duration, FiringPattern.BurstFire);
         }
 
@@ -235,15 +188,17 @@ namespace AutomaticRoadblocks.Instances
 
         #region Functions
 
-        private void RegisterCopToLspdfr()
+        private void Initialize()
         {
-            // Functions.SetPedAsCop(GameInstance);
-            // Functions.SetCopAsBusy(GameInstance, true);
-        }
+            if (IsInvalid)
+            {
+                Logger.Warn($"Unable to initialize {nameof(ARPed)}, {nameof(Ped)} is invalid");
+                return;
+            }
 
-        private WeaponDescriptor CreateWeaponInInventory(string name, bool equipNow = false)
-        {
-            return GameInstance.Inventory.GiveNewWeapon(new WeaponAsset(name), -1, equipNow);
+            GameInstance.IsPersistent = true;
+            GameInstance.KeepTasks = true;
+            GameInstance.RelationshipGroup = RelationshipGroup.Cop;
         }
 
         #endregion

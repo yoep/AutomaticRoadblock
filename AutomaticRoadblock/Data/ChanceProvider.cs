@@ -16,8 +16,8 @@ namespace AutomaticRoadblocks.Data
         /// </summary>
         /// <param name="items">The items to retrieve one from.</param>
         /// <typeparam name="T">The chance data instance.</typeparam>
-        /// <returns>Returns the selected item based on the chance.</returns>
-        /// <exception cref="ChanceException{T}">Is thrown when the chance total is invalid.</exception>
+        /// <returns>Returns the selected item based on the chance or null if allowed.</returns>
+        /// <exception cref="ChanceException{T}">Is thrown when the chance total is invalid and <see cref="IChanceData.IsNullable"/> is false.</exception>
         public static T Retrieve<T>(IList<T> items) where T : IChanceData
         {
             var tressHold = Random.Next(101);
@@ -32,6 +32,9 @@ namespace AutomaticRoadblocks.Data
                     return item;
                 }
             }
+
+            if (items.All(x => x.IsNullable))
+                return default;
 
             throw new ChanceException<T>(items);
         }

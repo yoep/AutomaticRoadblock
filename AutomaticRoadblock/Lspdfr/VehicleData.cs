@@ -21,12 +21,9 @@ namespace AutomaticRoadblocks.Lspdfr
             Livery = livery;
         }
 
-        [XmlUnwrapContents]
-        public string ModelName { get; internal set; }
-        
-        [XmlAttribute]
-        [CanBeNull]
-        public string Livery { get; internal set; }
+        [XmlUnwrapContents] public string ModelName { get; internal set; }
+
+        [XmlAttribute] [CanBeNull] public string Livery { get; internal set; }
 
         public override string ToString()
         {

@@ -26,6 +26,9 @@ namespace AutomaticRoadblocks.Roadblock.Data
 
         [XmlAttribute] public int Chance { get; internal set; } = 100;
 
+        [XmlIgnore]
+        public bool IsNullable => false;
+
         public override string ToString()
         {
             return $"{nameof(Type)}: {Type}, {nameof(Chance)}: {Chance}";
