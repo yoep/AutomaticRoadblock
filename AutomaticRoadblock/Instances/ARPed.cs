@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Type;
 using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
 using LSPD_First_Response.Mod.API;

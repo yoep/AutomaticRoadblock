@@ -4,7 +4,6 @@ using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Street;
-using AutomaticRoadblocks.Street.Info;
 using Rage;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
