@@ -387,7 +387,7 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void InitializeSpeedLimit()
         {
-            Logger.Trace("Creating speed zone at roadblock");
+            Logger.Trace($"Creating speed zone at roadblock location {OffsetPosition}");
             CreateSpeedZoneLimit();
         }
 
@@ -399,7 +399,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to create roadblock speed zone, {ex.Message}", ex);
+                Logger.Error($"Failed to create roadblock speed zone at {OffsetPosition}, {ex.Message}", ex);
             }
         }
 
