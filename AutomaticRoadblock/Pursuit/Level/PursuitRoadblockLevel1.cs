@@ -11,7 +11,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
     internal class PursuitRoadblockLevel1 : AbstractPursuitRoadblock
     {
         public PursuitRoadblockLevel1(PursuitRoadblockRequest request)
-            : base(request.RoadblockData, request.Road, request.TargetVehicle, request.Flags)
+            : base(request.RoadblockData, request.Road, request.TargetVehicle, request.TargetHeading, request.Flags)
         {
         }
 

@@ -25,7 +25,7 @@ namespace AutomaticRoadblocks.Roadblock
     public abstract class AbstractRoadblock : IRoadblock
     {
         protected const float SpeedLimit = 5f;
-        protected const float LaneHeadingTolerance = 40f;
+        protected const float LaneHeadingTolerance = 45f;
         protected const int BlipFlashDuration = 3500;
         protected const float AdditionalClippingSpace = 0.5f;
 
@@ -41,11 +41,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// <param name="street">The road of that the roadblock will block.</param>
         /// <param name="mainBarrier">The main barrier used within the slots.</param>
         /// <param name="secondaryBarrier">The secondary barrier used within the slots.</param>
-        /// <param name="targetHeading">The target heading in which the roadblock should be placed.</param>
+        /// <param name="targetMatchingHeading">The target heading in which the roadblock should be placed.</param>
         /// <param name="lightSources">The light sources to place for this roadblock.</param>
         /// <param name="flags">The roadblock configuration.</param>
         /// <param name="offset">The offset placement in regards to the road node.</param>
-        internal AbstractRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float targetHeading, List<LightModel> lightSources,
+        internal AbstractRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float targetMatchingHeading, List<LightModel> lightSources,
             ERoadblockFlags flags, float offset = 0f)
         {
             Assert.NotNull(street, "road cannot be null");
@@ -55,7 +55,7 @@ namespace AutomaticRoadblocks.Roadblock
             Road = street;
             MainBarrier = mainBarrier;
             SecondaryBarrier = secondaryBarrier;
-            TargetHeading = targetHeading;
+            TargetHeading = CalculateTargetHeading(targetMatchingHeading);
             LightSources = lightSources;
             Flags = flags;
             Offset = offset;
@@ -518,6 +518,24 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 slot.WarpInVehicle();
             }
+        }
+        
+        private float CalculateTargetHeading(float targetMatchingHeading)
+        {
+            var closestHeadingDifference = 9999f;
+            var headingToUse = targetMatchingHeading;
+            
+            foreach (var lane in Road.Lanes)
+            {
+                var headingDifference = Math.Abs(targetMatchingHeading - lane.Heading);
+                if (headingDifference < closestHeadingDifference)
+                {
+                    closestHeadingDifference = headingDifference;
+                    headingToUse = lane.Heading;
+                }
+            }
+
+            return headingToUse;
         }
 
         [Conditional("DEBUG")]

@@ -19,12 +19,12 @@ namespace AutomaticRoadblocks.Pursuit
         /// Enable automatic level increases during a pursuit.
         /// </summary>
         bool EnableAutomaticLevelIncreases { get; set; }
-        
+
         /// <summary>
         /// Enable spike strip to be deployed along the roadblock.
         /// </summary>
         bool EnableSpikeStrips { get; set; }
-        
+
         /// <summary>
         /// The current state of the pursuit.
         /// </summary>

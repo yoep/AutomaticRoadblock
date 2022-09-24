@@ -12,6 +12,8 @@ namespace AutomaticRoadblocks.Street
 {
     public static class RoadQuery
     {
+        private const float NodeHeadingTolerance = 55f;
+        
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
         #region Methods
@@ -86,7 +88,6 @@ namespace AutomaticRoadblocks.Street
             ENodeFlag blacklistedFlags)
         {
             var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags, out _);
-
             var startedAt = DateTime.Now.Ticks;
             var roads = nodeInfos
                 .Select(ToVehicleNode)
@@ -188,7 +189,7 @@ namespace AutomaticRoadblocks.Street
             // filter out any nodes which match one or more blacklisted conditions
             var filteredNodes = nodes
                 .Where(x => (x.Flags & blacklistedFlags) == 0)
-                .Where(x => Math.Abs(x.Heading - heading) <= 45f)
+                .Where(x => Math.Abs(x.Heading - heading) <= NodeHeadingTolerance)
                 .ToList();
 
             if (filteredNodes.Count == 0)
@@ -210,7 +211,7 @@ namespace AutomaticRoadblocks.Street
 
             if (closestNode != null && ignoreHeading)
             {
-                closestNode = new VehicleNodeInfo(closestNode.Position, heading)
+                closestNode = new VehicleNodeInfo(closestNode.Position, closestNode.Heading)
                 {
                     LanesInSameDirection = closestNode.LanesInSameDirection,
                     LanesInOppositeDirection = closestNode.LanesInOppositeDirection,
