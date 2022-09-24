@@ -143,6 +143,13 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                     StartMonitor();
                     break;
                 case ESpikeStripState.Hit:
+                    // delay the undeploy to pop additional tires
+                    Game.NewSafeFiber(() =>
+                    {
+                        GameFiber.Wait(1000);
+                        DoUndeploy();
+                    }, "SpikeStripStateChanged.Hit");
+                    break;
                 case ESpikeStripState.Bypassed:
                     DoUndeploy();
                     break;

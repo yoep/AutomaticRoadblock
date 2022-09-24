@@ -378,7 +378,10 @@ namespace AutomaticRoadblocks.Pursuit
 
         private bool IsAnySuspectAimingOrShooting()
         {
-            return Functions.GetPursuitPeds(PursuitHandle).Any(x => x.IsShooting || x.IsAiming);
+            return Functions.GetPursuitPeds(PursuitHandle)
+                .Where(x => x != null)
+                .Where(x => x.IsValid())
+                .Any(x => x.IsShooting || x.IsAiming);
         }
 
         private bool IsAutomaticLevelIncreaseForShotsFiredAllowed()

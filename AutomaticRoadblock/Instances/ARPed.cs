@@ -93,7 +93,6 @@ namespace AutomaticRoadblocks.Instances
             ClearAllTasks();
             GameInstance.KeepTasks = false;
             GameInstance.IsPersistent = false;
-            Functions.SetPedAsCop(GameInstance);
             Functions.SetCopAsBusy(GameInstance, false);
         }
 
@@ -199,6 +198,8 @@ namespace AutomaticRoadblocks.Instances
             GameInstance.IsPersistent = true;
             GameInstance.KeepTasks = true;
             GameInstance.RelationshipGroup = RelationshipGroup.Cop;
+            Functions.SetPedAsCop(GameInstance);
+            Functions.SetCopAsBusy(GameInstance, true);
         }
 
         #endregion
