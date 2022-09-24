@@ -99,6 +99,8 @@ namespace AutomaticRoadblocks.Pursuit
                 }
 
                 return Functions.GetPursuitPeds(PursuitHandle)
+                    .Where(x => x != null)
+                    .Where(x => x.IsValid())
                     .All(x => x.CurrentVehicle == null);
             }
         }
