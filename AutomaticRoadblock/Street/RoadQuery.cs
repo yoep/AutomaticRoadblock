@@ -202,8 +202,8 @@ namespace AutomaticRoadblocks.Street
             if (closestNode != null)
             {
                 // verify if we're at an intersection
-                // if so, try to update the intersection heading with the closest matching wanted heading for traversal
-                if (closestNode.Flags.HasFlag(ENodeFlag.IsJunction) && Math.Abs(closestNode.Heading - heading) >= 90f)
+                // if so, follow the current heading when the intersection heading difference is too large
+                if (closestNode.Flags.HasFlag(ENodeFlag.IsJunction) && Math.Abs(closestNode.Heading - heading) >= 65f)
                 {
                     closestNode = new VehicleNodeInfo(closestNode.Position, heading)
                     {
@@ -215,7 +215,7 @@ namespace AutomaticRoadblocks.Street
                 }
                 // verify if the closest node heading is opposite of the wanted heading
                 // if so, reverse the node information
-                else if (Math.Abs(closestNode.Heading - heading) > 125f)
+                else if (Math.Abs(closestNode.Heading - heading) > 115f)
                 {
                     Logger.Debug($"Reversing the closest matching node ({closestNode}) as it's heading is the opposite of the wanted heading ({heading})");
                     closestNode = new VehicleNodeInfo(closestNode.Position, MathHelper.NormalizeHeading(closestNode.Heading + 180f))
@@ -262,7 +262,7 @@ namespace AutomaticRoadblocks.Street
 
                 if (nodeTowardsHeading == null
                     || nodeTowardsHeading.Position.Equals(lastFoundNodeInfo.Position)
-                    || nodeInfos.Any(x => x.Equals(nodeTowardsHeading)))
+                    || nodeInfos.Any(x => x.Position.Equals(nodeTowardsHeading.Position)))
                 {
                     distanceToMove *= 1.5f;
                     findNodeAttempt++;
