@@ -10,6 +10,7 @@ using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
+using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Dispatcher
@@ -213,7 +214,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return primaryRoadblock;
         }
 
-        private IRoadblock DoRoadblockCreations(ICollection<IVehicleNode> streetNodes, Vehicle vehicle, ERoadblockLevel level, bool createAsPreview,
+        private IRoadblock DoRoadblockCreations(IList<IVehicleNode> streetNodes, Vehicle vehicle, ERoadblockLevel level, bool createAsPreview,
             DispatchOptions options)
         {
             if (IsJunctionRoadblockEnabled)
@@ -222,7 +223,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     .Where(x => x.Type == EStreetType.Intersection)
                     .Where(x => x.Position.DistanceTo(vehicle.Position) >= MinimumDistanceFromTargetForJunctionRoadblocks)
                     .OfType<Intersection>()
-                    .SelectMany(FilterRoadsTravellingAlongTheRoute)
+                    .SelectMany(x => FilterRoadsTravellingAlongTheRoute(GetPreviousNode(streetNodes, x), x))
                     .ToList();
 
                 junctionRoads.ForEach(x => CreateRoadblock(x, vehicle, ERoadblockLevel.Level3, createAsPreview,
@@ -309,7 +310,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return isThereANearbyRoadblock;
         }
 
-        private ICollection<IVehicleNode> DetermineRoadblockLocation(ERoadblockLevel level, Vehicle vehicle, ERoadblockDistance roadblockDistance)
+        private IList<IVehicleNode> DetermineRoadblockLocation(ERoadblockLevel level, Vehicle vehicle, ERoadblockDistance roadblockDistance)
         {
             var distanceToUse = CalculateRoadblockDistance(vehicle, roadblockDistance);
             var roadType = DetermineAllowedRoadTypes(vehicle, level);
@@ -541,12 +542,20 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// <summary>
         /// Filter out any roads of the intersection which travel in the same heading as the target.
         /// </summary>
-        private IEnumerable<Road> FilterRoadsTravellingAlongTheRoute(Intersection intersection)
+        private IEnumerable<Road> FilterRoadsTravellingAlongTheRoute([CanBeNull] IVehicleNode previousNode, Intersection intersection)
         {
-            _logger.Debug($"Filtering junction roadblocks for intersection {intersection}");
+            _logger.Debug($"Filtering applicable intersection roads for intersection {intersection}");
+            var headingToVerify = previousNode?.Heading ?? intersection.Heading;
             return intersection.Roads
-                .Where(road => Math.Abs(road.Heading - intersection.Heading) > 35f && Math.Abs(road.Heading - intersection.Heading) < 170f)
+                .Where(road => Math.Abs(road.Heading - headingToVerify) > 35f && Math.Abs(road.Heading - headingToVerify) < 170f)
                 .Where(x => (x.Node.Flags & (ENodeFlag.IsAlley | ENodeFlag.IsGravelRoad)) == 0);
+        }
+
+        private static IVehicleNode GetPreviousNode(IList<IVehicleNode> streetNodes, IVehicleNode currentNode)
+        {
+            var previousNodeIndex = streetNodes.IndexOf(currentNode) - 1;
+
+            return previousNodeIndex >= 0 ? streetNodes[previousNodeIndex] : null;
         }
 
         #endregion
