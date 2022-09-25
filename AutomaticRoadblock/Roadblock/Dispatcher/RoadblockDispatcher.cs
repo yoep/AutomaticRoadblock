@@ -541,8 +541,9 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// <summary>
         /// Filter out any roads of the intersection which travel in the same heading as the target.
         /// </summary>
-        private static IEnumerable<Road> FilterRoadsTravellingAlongTheRoute(Intersection intersection)
+        private IEnumerable<Road> FilterRoadsTravellingAlongTheRoute(Intersection intersection)
         {
+            _logger.Debug($"Filtering junction roadblocks for intersection {intersection}");
             return intersection.Roads
                 .Where(road => Math.Abs(road.Heading - intersection.Heading) > 35f && Math.Abs(road.Heading - intersection.Heading) < 170f)
                 .Where(x => (x.Node.Flags & (ENodeFlag.IsAlley | ENodeFlag.IsGravelRoad)) == 0);
