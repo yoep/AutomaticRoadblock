@@ -26,11 +26,12 @@ namespace AutomaticRoadblocks.Roadblock
                 .Select(x => x.Instance)
                 .Select(x => (ARPed)x)
                 .ToList();
-            
+
             // release the cops & cop vehicle instances
             instances
                 .Where(x => x.Type is EEntityType.CopPed or EEntityType.CopVehicle)
                 .Select(x => x.Instance)
+                .Where(x => x is { IsInvalid: false })
                 .ToList()
                 .ForEach(x => x.Release());
 
