@@ -41,7 +41,7 @@ namespace AutomaticRoadblocks.Street.Info
         /// <inheritdoc />
         public void CreatePreview()
         {
-            DoInternalPReviewCreation();
+            DoInternalPreviewCreation();
         }
 
         /// <inheritdoc />
@@ -61,8 +61,11 @@ namespace AutomaticRoadblocks.Street.Info
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}, {nameof(Type)}: {Type}, number of {nameof(Directions)}: {Directions.Count}," +
-                   $"number of {nameof(Roads)}: {Roads.Count}";
+            return
+                $"{nameof(Position)}: {Position}, {nameof(Heading)}: {Heading}, {nameof(Type)}: {Type}, number of {nameof(Directions)}: {Directions.Count}, " +
+                $"number of {nameof(Roads)}: {Roads.Count}\n" +
+                $"--- {nameof(Roads)} ---\n" +
+                $"{string.Join("\n", Roads)}";
         }
 
         #endregion
@@ -70,7 +73,7 @@ namespace AutomaticRoadblocks.Street.Info
         #region Functions
 
         [Conditional("DEBUG")]
-        private void DoInternalPReviewCreation()
+        private void DoInternalPreviewCreation()
         {
             if (IsPreviewActive)
                 return;
@@ -79,10 +82,13 @@ namespace AutomaticRoadblocks.Street.Info
             Roads?.ForEach(x => x.CreatePreview());
             Game.NewSafeFiber(() =>
             {
+                var mainArrowPosition = Position + Vector3.WorldUp * 1.5f;
+                var mainArrowDirection = MathHelper.ConvertHeadingToDirection(Heading);
+
                 while (IsPreviewActive)
                 {
                     Game.DrawSphere(Position, 0.5f, Color.DeepPink);
-                    DrawDirection(Position, Heading);
+                    Game.DrawArrow(mainArrowPosition, mainArrowDirection, Rotator.Zero, 0.5f, Color.DeepPink);
                     Directions?.ForEach(x => DrawDirection(x.Position, x.Heading));
                     GameFiber.Yield();
                 }
@@ -94,7 +100,7 @@ namespace AutomaticRoadblocks.Street.Info
             var direction = MathHelper.ConvertHeadingToDirection(heading);
             var drawPosition = position
                                + Vector3.WorldUp * 1.5f
-                               + direction * 0.4f;
+                               + direction * 0.6f;
             Game.DrawArrow(drawPosition, direction, Rotator.Zero, 0.5f, Color.White);
         }
 

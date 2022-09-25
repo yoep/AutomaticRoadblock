@@ -5,6 +5,7 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Data;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Utils;
+using LSPD_First_Response.Engine.Scripting;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -103,7 +104,7 @@ namespace AutomaticRoadblocks.Lspdfr
             Assert.NotNull(unit, "unit cannot be null");
             Assert.NotNull(position, "position cannot be null");
             var backup = GetBackupForUnitType(unit);
-            var agency = GetAgency(backup, position);
+            var agency = GetAgency(unit, backup, position);
 
             Logger.Trace($"Backup unit type {unit} at position {position} will be using agency {{{agency}}}");
             return GetLoadoutForAgency(unit, agency);
@@ -139,9 +140,11 @@ namespace AutomaticRoadblocks.Lspdfr
                 : LspdfrData.BackupUnits[unit];
         }
 
-        private static Agency GetAgency(Backup backup, Vector3 position)
+        private static Agency GetAgency(EBackupUnit unit, Backup backup, Vector3 position)
         {
-            return LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
+            return unit == EBackupUnit.Transporter 
+                ? LspdfrData.Agencies[backup[EWorldZoneCounty.LosSantos]] 
+                : LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
         }
 
         private static Loadout GetLoadoutForAgency(EBackupUnit unit, Agency agency)

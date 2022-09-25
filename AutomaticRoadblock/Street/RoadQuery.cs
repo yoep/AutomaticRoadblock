@@ -12,8 +12,6 @@ namespace AutomaticRoadblocks.Street
 {
     public static class RoadQuery
     {
-        private const float NodeHeadingTolerance = 55f;
-
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
         #region Methods
@@ -201,18 +199,33 @@ namespace AutomaticRoadblocks.Street
                 closestNode = node;
             }
 
-            // verify if the closest node heading is opposite of the wanted heading
-            // if so, reverse the node information
-            if (closestNode != null && Math.Abs(closestNode.Heading - heading) > 90f)
+            if (closestNode != null)
             {
-                Logger.Debug($"Reversing the closest matching node ({closestNode}) as it's heading is the opposite of the wanted heading ({heading})");
-                closestNode = new VehicleNodeInfo(closestNode.Position, MathHelper.NormalizeHeading(closestNode.Heading + 180f))
+                // verify if we're at an intersection
+                // if so, try to update the intersection heading with the closest matching wanted heading for traversal
+                if (closestNode.Flags.HasFlag(ENodeFlag.IsJunction) && Math.Abs(closestNode.Heading - heading) >= 90f)
                 {
-                    LanesInSameDirection = closestNode.LanesInOppositeDirection,
-                    LanesInOppositeDirection = closestNode.LanesInSameDirection,
-                    Density = closestNode.Density,
-                    Flags = closestNode.Flags
-                };
+                    closestNode = new VehicleNodeInfo(closestNode.Position, heading)
+                    {
+                        LanesInSameDirection = closestNode.LanesInSameDirection,
+                        LanesInOppositeDirection = closestNode.LanesInOppositeDirection,
+                        Density = closestNode.Density,
+                        Flags = closestNode.Flags
+                    };
+                }
+                // verify if the closest node heading is opposite of the wanted heading
+                // if so, reverse the node information
+                else if (Math.Abs(closestNode.Heading - heading) > 125f)
+                {
+                    Logger.Debug($"Reversing the closest matching node ({closestNode}) as it's heading is the opposite of the wanted heading ({heading})");
+                    closestNode = new VehicleNodeInfo(closestNode.Position, MathHelper.NormalizeHeading(closestNode.Heading + 180f))
+                    {
+                        LanesInSameDirection = closestNode.LanesInOppositeDirection,
+                        LanesInOppositeDirection = closestNode.LanesInSameDirection,
+                        Density = closestNode.Density,
+                        Flags = closestNode.Flags
+                    };
+                }
             }
 
             Logger.Debug(closestNode != null
