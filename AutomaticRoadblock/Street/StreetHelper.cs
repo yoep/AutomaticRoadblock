@@ -30,6 +30,7 @@ namespace AutomaticRoadblocks.Street
         {
             const float stopAtMinimumInterval = 0.2f;
             const float maxRoadWidth = 35f;
+            const float minRoadWidth = 3f;
             var intervalCheck = 2f;
             var direction = MathHelper.ConvertHeadingToDirection(heading);
             var roadMaterial = 0U;
@@ -87,7 +88,13 @@ namespace AutomaticRoadblocks.Street
                 positionToCheck = lastPointOnRoad + direction * intervalCheck;
             }
 
-            return true;
+            var distanceFromCenterPosition = position.DistanceTo2D(lastPointOnRoad);
+            if (distanceFromCenterPosition >= minRoadWidth)
+                return true;
+            
+            Logger.Warn($"Failed to calculate road width for {position}, road width ({distanceFromCenterPosition}) is too small");
+            return false;
+
         }
         
         internal static IEnumerable<VehicleNodeInfo> FindNearbyVehicleNodes(Vector3 position, EVehicleNodeType nodeType)
