@@ -67,6 +67,7 @@
         <Compile Include="Debug\DebugReloadDataFilesComponentTests.cs" />
         <Compile Include="LightSources\LightDataFileTests.cs" />
         <Compile Include="Lspdfr\LcpdfrDataTests.cs" />
+        <Compile Include="Lspdfr\LspdfrDataHelperTests.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Roadblock\Data\RoadblockDataFileTests.cs" />
         <Compile Include="TestUtils.cs" />

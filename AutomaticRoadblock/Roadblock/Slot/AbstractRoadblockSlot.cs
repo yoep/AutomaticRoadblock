@@ -96,6 +96,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public IEnumerable<ARPed> Cops => Instances
             .Where(x => x.Type == EEntityType.CopPed)
+            .Where(x => x.Instance is { IsInvalid: false })
             .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .ToList();
