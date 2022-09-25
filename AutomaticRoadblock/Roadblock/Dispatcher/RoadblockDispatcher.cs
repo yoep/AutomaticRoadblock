@@ -58,7 +58,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// <summary>
         /// Verify if junction roadblocks are enabled.
         /// </summary>
-        private bool IsJunctionRoadblockEnabled => Settings.EnableJunctionRoadblocks;
+        private bool IsJunctionRoadblockEnabled => Settings.EnableIntersectionRoadblocks;
 
         #endregion
 
