@@ -45,7 +45,8 @@ namespace AutomaticRoadblocks.Roadblock
         /// <param name="lightSources">The light sources to place for this roadblock.</param>
         /// <param name="flags">The roadblock configuration.</param>
         /// <param name="offset">The offset placement in regards to the road node.</param>
-        internal AbstractRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float targetMatchingHeading, List<LightModel> lightSources,
+        internal AbstractRoadblock(Road street, BarrierModel mainBarrier, BarrierModel secondaryBarrier, float targetMatchingHeading,
+            List<LightModel> lightSources,
             ERoadblockFlags flags, float offset = 0f)
         {
             Assert.NotNull(street, "road cannot be null");
@@ -346,7 +347,15 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         protected void InvokeCopsJoiningPursuit()
         {
-            RoadblockCopsJoiningPursuit?.Invoke(this, RetrieveCopsJoiningThePursuit());
+            switch (State)
+            {
+                case ERoadblockState.Bypassed when !Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass):
+                case ERoadblockState.Hit when !Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit):
+                    return;
+                default:
+                    RoadblockCopsJoiningPursuit?.Invoke(this, RetrieveCopsJoiningThePursuit());
+                    break;
+            }
         }
 
         /// <summary>
