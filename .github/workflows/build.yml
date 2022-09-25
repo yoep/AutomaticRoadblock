@@ -22,7 +22,7 @@ jobs:
         id: cache
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config') }}
       - name: Setup dotnet
         uses: actions/setup-dotnet@v2
         with:
