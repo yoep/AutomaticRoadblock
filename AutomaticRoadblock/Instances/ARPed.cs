@@ -181,8 +181,22 @@ namespace AutomaticRoadblocks.Instances
         {
             if (IsInvalid)
                 return;
-            
-            GameInstance.Inventory.EquippedWeapon = null;
+
+            var pedInventory = GameInstance.Inventory;
+
+            if (pedInventory != null)
+            {
+                var weapon = pedInventory.EquippedWeaponObject;
+
+                if (weapon != null)
+                {
+                    weapon.Delete();
+                }
+            }
+            else
+            {
+                Logger.Warn("Unable to unequip weapon, ped inventory is invalid");
+            }
         }
 
         public void WarpIntoVehicle(Vehicle vehicle, EVehicleSeat seat)
