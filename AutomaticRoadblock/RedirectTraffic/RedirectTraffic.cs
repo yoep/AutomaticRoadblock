@@ -166,7 +166,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             if (BackupType != EBackupUnit.None)
                 Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
-            
+
             Cop.Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
             Cop.UnequipAllWeapons();
             AnimationHelper.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
@@ -233,14 +233,19 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private void InitializeScenery()
         {
-            PlaceConesAlongTheRoad();
-            var coneEndPosition = PlaceConesBehindTheVehicle();
-            PlaceVehiclesStoppedSign(coneEndPosition);
+            if (!ConeType.IsNone)
+            {
+                Logger.Debug($"Placing cone barrier for redirect traffic slot {this}");
+                PlaceConesAlongTheRoad();
+                PlaceConesBehindTheVehicle();
+            }
+
+            PlaceVehiclesStoppedSign();
 
             if (EnableRedirectionArrow)
-                PlaceRedirectionArrow(coneEndPosition);
+                PlaceRedirectionArrow();
             if (EnableLights)
-                InitializeVehicleStoppedLight(coneEndPosition);
+                InitializeVehicleStoppedLight();
         }
 
         private ARPed CreateCop(Vector3 position, float heading)
@@ -268,7 +273,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             }
         }
 
-        private Vector3 PlaceConesBehindTheVehicle()
+        private void PlaceConesBehindTheVehicle()
         {
             var coneDistance = ConeType.Width + ConeType.Spacing;
             var totalCones = (int)Math.Floor(Lane.Width / coneDistance);
@@ -284,24 +289,20 @@ namespace AutomaticRoadblocks.RedirectTraffic
                     (position, heading) => BarrierFactory.Create(ConeType, position, heading)));
                 startPosition += placementDirection * coneDistance;
             }
-
-            return startPosition;
         }
 
-        private void PlaceVehiclesStoppedSign(Vector3 coneEndPosition)
+        private void PlaceVehiclesStoppedSign()
         {
-            var signPosition = VehicleStoppedSignPosition(coneEndPosition);
+            var signPosition = VehicleStoppedSignPosition();
 
             _instances.Add(new InstanceSlot(EEntityType.Scenery, signPosition, Lane.Heading,
                 (position, heading) => new ARScenery(PropUtils.StoppedVehiclesSign(position, heading))));
         }
 
-        private void PlaceRedirectionArrow(Vector3 coneEndPosition)
+        private void PlaceRedirectionArrow()
         {
-            var sideDirection = SignSideDirection();
-            var signPosition = coneEndPosition
-                               + MathHelper.ConvertHeadingToDirection(sideDirection) * 1.5f
-                               + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 1f;
+            var signPosition = PositionBehindTheVehicle()
+                               + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 3f;
 
             _instances.Add(new InstanceSlot(EEntityType.Scenery, signPosition, Lane.Heading,
                 (position, heading) => new ARScenery(IsLeftSideOfLanes
@@ -309,19 +310,16 @@ namespace AutomaticRoadblocks.RedirectTraffic
                     : PropUtils.RedirectTrafficArrowLeft(position, heading))));
         }
 
-        private Vector3 VehicleStoppedSignPosition(Vector3 coneEndPosition)
+        private Vector3 VehicleStoppedSignPosition()
         {
-            var sideDirection = SignSideDirection();
-            var distanceToTheSide = Lane.Width / (Type == RedirectTrafficType.Lane ? 1.5f : 2.5f);
-            var signPosition = coneEndPosition
-                               + MathHelper.ConvertHeadingToDirection(sideDirection) * distanceToTheSide
-                               + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 6f;
+            var signPosition = PositionBehindTheVehicle()
+                               + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 5f;
             return signPosition;
         }
 
-        private void InitializeVehicleStoppedLight(Vector3 coneEndPosition)
+        private void InitializeVehicleStoppedLight()
         {
-            var groundLightPosition = VehicleStoppedSignPosition(coneEndPosition) +
+            var groundLightPosition = VehicleStoppedSignPosition() +
                                       MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 1.5f;
 
             _instances.Add(new InstanceSlot(EEntityType.Scenery, groundLightPosition, Lane.Heading - 180,
@@ -437,6 +435,13 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 lanePosition += MathHelper.ConvertHeadingToDirection(Lane.Heading + shoulderRotation) * (Lane.Width / 2);
 
             return lanePosition;
+        }
+
+        private Vector3 PositionBehindTheVehicle()
+        {
+            var position = IsLeftSideOfLanes ? Lane.LeftSide : Lane.RightSide;
+            return position
+                   + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * GetVehicleLength();
         }
 
         private bool IsLeftSideOfLanesInTheSameHeadingAsTheSelectedLane()
