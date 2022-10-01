@@ -286,7 +286,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 _logger.Trace($"Distance between vehicle and roadblock before spawn {road.Position.DistanceTo(vehicle.Position)}");
                 var result = roadblock.Spawn();
                 if (!result)
+                {
                     _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
+                    _game.DisplayNotificationDebug("~o~Failed to spawn all roadblock instances correctly");
+                }
+
                 _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
             }
 
@@ -361,6 +365,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 {
                     _logger.Trace($"Removing roadblock {roadblock} from dispatcher");
                     RemoveRoadblock(roadblock);
+                    _game.DisplayNotificationDebug("~m~Roadblock has been removed");
                 }
             }, "RoadblockDispatcher.RoadblockStateChanged");
             RoadblockStateChanged?.Invoke(roadblock, newState);
