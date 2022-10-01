@@ -212,10 +212,8 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 Logger.Trace("Spawning roadblock");
 
-                Slots.ToList().ForEach(x => { SpawnSlot(x); });
+                Slots.ToList().ForEach(SpawnSlot);
                 result = Instances.All(x => x.Spawn());
-
-
                 UpdateState(ERoadblockState.Active);
 
                 CreateBlip();

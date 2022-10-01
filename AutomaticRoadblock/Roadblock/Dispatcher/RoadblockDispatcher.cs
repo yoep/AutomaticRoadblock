@@ -284,7 +284,9 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             else
             {
                 _logger.Trace($"Distance between vehicle and roadblock before spawn {road.Position.DistanceTo(vehicle.Position)}");
+                var startedAt = DateTime.Now.Ticks;
                 var result = roadblock.Spawn();
+                var timeTakenToSpawn = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
                 if (!result)
                 {
                     _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
@@ -294,7 +296,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                                                $"Success: {ToColorText(result)}~n~" +
                                                $"Distance: {road.Position.DistanceTo(vehicle.Position)}~n~" +
                                                $"Road width: {roadblock.Road.Width}~n~" +
-                                               $"Slots: {roadblock.NumberOfSlots}");
+                                               $"Slots: {roadblock.NumberOfSlots}~n~" +
+                                               $"Spawn time: {timeTakenToSpawn} millis");
                 _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
             }
 

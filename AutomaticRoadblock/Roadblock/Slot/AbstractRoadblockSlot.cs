@@ -338,7 +338,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             if (VehicleModel is { IsLoaded: false })
             {
                 Logger.Trace($"Loading vehicle slot model {VehicleModel.Value.Name}");
+                var startedAt = DateTime.Now.Ticks;
                 VehicleModel.Value.LoadAndWait();
+                var timeTaken = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
+                Logger.Debug($"Took {timeTaken} millis to load vehicle model {VehicleModel.Value.Name}");
             }
 
             Instances.Add(new InstanceSlot(EEntityType.CopVehicle, CalculateVehiclePosition(), CalculateVehicleHeading(),

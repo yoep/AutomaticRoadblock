@@ -298,7 +298,9 @@ namespace AutomaticRoadblocks.Roadblock
             if (!TargetVehicle.HasBeenDamagedByAnyVehicle)
                 return;
 
-            if (!Slots.Any(HasBeenDamagedBy))
+            if (!Slots
+                    .Where(x => x.Vehicle != null && x.Vehicle.IsValid())
+                    .Any(HasBeenDamagedBy))
                 return;
 
             Logger.Debug("Determined that the collision must have been against a roadblock slot");
