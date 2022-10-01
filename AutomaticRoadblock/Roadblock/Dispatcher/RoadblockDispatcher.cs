@@ -288,9 +288,13 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 if (!result)
                 {
                     _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
-                    _game.DisplayNotificationDebug("~o~Failed to spawn all roadblock instances correctly");
                 }
 
+                _game.DisplayNotificationDebug("Roadblock has been spawned:~n~" +
+                                               $"Success: {ToColorText(result)}~n~" +
+                                               $"Distance: {road.Position.DistanceTo(vehicle.Position)}~n~" +
+                                               $"Road width: {roadblock.Road.Width}~n~" +
+                                               $"Slots: {roadblock.NumberOfSlots}");
                 _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
             }
 
@@ -561,6 +565,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             var previousNodeIndex = streetNodes.IndexOf(currentNode) - 1;
 
             return previousNodeIndex >= 0 ? streetNodes[previousNodeIndex] : null;
+        }
+
+        private static string ToColorText(bool result)
+        {
+            var color = result ? "g" : "r";
+            return $"~{color}~{result}~s~";
         }
 
         #endregion

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
@@ -62,7 +63,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         private ISpikeStrip SpikeStrip => Instances
             .Where(x => x.Type == EEntityType.SpikeStrip)
             .Select(x => (ARSpikeStrip)x.Instance)
-            .Where(x => x.SpikeStrip != null)
+            .Where(x => x is { SpikeStrip: { } })
             .Select(x => x.SpikeStrip)
             .FirstOrDefault();
 
@@ -182,8 +183,8 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             Game.NewSafeFiber(() =>
             {
                 GameFiber.Wait(DelayBetweenStateChangeAndUndeploy);
-                var cop = Cops.First();
-                AnimationHelper.PlayAnimation(cop.GameInstance, Animations.Dictionaries.ObjectDictionary, Animations.ObjectPickup, AnimationFlags.None);
+                ExecuteWithCop(cop =>
+                    AnimationHelper.PlayAnimation(cop.GameInstance, Animations.Dictionaries.ObjectDictionary, Animations.ObjectPickup, AnimationFlags.None));
                 SpikeStrip?.Undeploy();
             }, "SpikeStripSlot.Undeploy");
         }
@@ -195,8 +196,8 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
             Logger.Trace($"Target vehicle is in range of spike strip ({TargetVehicle.DistanceTo2D(Position)}), deploying spike strip");
             var spikeStrip = SpikeStrip;
-            var cop = Cops.First();
-            AnimationHelper.PlayAnimation(cop.GameInstance, Animations.Dictionaries.GrenadeDictionary, Animations.ThrowShortLow, AnimationFlags.None);
+            ExecuteWithCop(cop =>
+                AnimationHelper.PlayAnimation(cop.GameInstance, Animations.Dictionaries.GrenadeDictionary, Animations.ThrowShortLow, AnimationFlags.None));
             spikeStrip?.Deploy();
             _hasBeenDeployed = true;
         }
@@ -241,6 +242,26 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             }
 
             return distanceRight <= distanceLeft ? ESpikeStripLocation.Left : ESpikeStripLocation.Right;
+        }
+
+        private void ExecuteWithCop(Action<ARPed> action)
+        {
+            var cop = Cops.FirstOrDefault();
+            if (cop != null)
+            {
+                try
+                {
+                    action.Invoke(cop);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed to invoke spike strip action, {ex.Message}", ex);
+                }
+            }
+            else
+            {
+                Logger.Warn($"Spike strip slot has no valid cop ped, {this}");
+            }
         }
 
         #endregion

@@ -79,6 +79,9 @@ namespace AutomaticRoadblocks.Roadblock
         public ERoadblockFlags Flags { get; }
 
         /// <inheritdoc />
+        public int NumberOfSlots => Slots?.Count ?? 0;
+
+        /// <inheritdoc />
         public Vector3 Position => Road.Position;
 
         /// <summary>

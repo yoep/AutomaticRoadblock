@@ -36,6 +36,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// The roadblock flags.
         /// </summary>
         ERoadblockFlags Flags { get; }
+        
+        /// <summary>
+        /// The number of slots within the roadblock.
+        /// </summary>
+        int NumberOfSlots { get; }
 
         /// <summary>
         /// Invoked when the roadblock state changes.
