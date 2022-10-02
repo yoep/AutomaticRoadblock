@@ -53,25 +53,6 @@ namespace AutomaticRoadblocks.Street
         }
 
         /// <summary>
-        /// Find a road by traversing the current road position towards the heading.
-        /// </summary>
-        /// <param name="position">The position to start from.</param>
-        /// <param name="heading">The heading to traverse the road from.</param>
-        /// <param name="distance">The distance to traverse.</param>
-        /// <param name="roadType">The road types to follow.</param>
-        /// <param name="blacklistedFlags">The flags of a node which should be ignored if present.</param>
-        /// <returns>Returns the found round traversed from the start position.</returns>
-        public static IVehicleNode FindRoadTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType, ENodeFlag blacklistedFlags)
-        {
-            FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags, out var lastFoundNode);
-            var startedAt = DateTime.Now.Ticks;
-            var road = ToVehicleNode(lastFoundNode);
-            var calculationTime = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
-            Logger.Debug($"Converted the vehicle node into a road in {calculationTime} millis");
-            return road;
-        }
-
-        /// <summary>
         /// Find streets while traversing the given distance from the current location.
         /// This collects each discovered node while it traverses the expected distance.
         /// </summary>
