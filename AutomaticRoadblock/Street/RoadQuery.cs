@@ -66,7 +66,7 @@ namespace AutomaticRoadblocks.Street
         public static ICollection<IVehicleNode> FindRoadsTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType,
             ENodeFlag blacklistedFlags)
         {
-            var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags, out _);
+            var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags);
             var startedAt = DateTime.Now.Ticks;
             var roads = nodeInfos
                 .Select(ToVehicleNode)
@@ -217,7 +217,7 @@ namespace AutomaticRoadblocks.Street
         }
 
         private static List<VehicleNodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float expectedDistance, EVehicleNodeType nodeType,
-            ENodeFlag blacklistedFlags, out VehicleNodeInfo lastFoundNodeInfo)
+            ENodeFlag blacklistedFlags)
         {
             var startedAt = DateTime.Now.Ticks;
             var nextNodeCalculationStartedAt = DateTime.Now.Ticks;
@@ -225,8 +225,7 @@ namespace AutomaticRoadblocks.Street
             var distanceToMove = 5f;
             var findNodeAttempt = 0;
             var nodeInfos = new List<VehicleNodeInfo>();
-
-            lastFoundNodeInfo = new VehicleNodeInfo(position, heading);
+            var lastFoundNodeInfo = new VehicleNodeInfo(position, heading);
 
             // keep traversing the road while the expected distance isn't reached
             // or we've ended at a junction (never end at a junction as it actually never can be used)
@@ -238,8 +237,12 @@ namespace AutomaticRoadblocks.Street
                     break;
                 }
 
+                // never start at an intersection as it causes wrong directions being taken
+                var nodeTypeForThisIteration = nodeInfos.Count == 0 && nodeType is EVehicleNodeType.AllNodes or EVehicleNodeType.MainRoadsWithJunctions
+                    ? EVehicleNodeType.AllRoadNoJunctions
+                    : nodeType;
                 var findNodeAt = lastFoundNodeInfo.Position + MathHelper.ConvertHeadingToDirection(lastFoundNodeInfo.Heading) * distanceToMove;
-                var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNodeInfo.Heading, nodeType, blacklistedFlags);
+                var nodeTowardsHeading = FindVehicleNodeWithHeading(findNodeAt, lastFoundNodeInfo.Heading, nodeTypeForThisIteration, blacklistedFlags);
 
                 if (nodeTowardsHeading == null
                     || nodeTowardsHeading.Position.Equals(lastFoundNodeInfo.Position)
