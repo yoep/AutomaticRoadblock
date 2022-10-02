@@ -36,7 +36,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// It returns null when <see cref="Spawn"/> has not been called yet.
         /// </summary>
         [CanBeNull]
-        Vehicle Vehicle { get; }
+        ARVehicle Vehicle { get; }
 
         /// <summary>
         /// The lane this slot blocks of a certain road.
@@ -48,12 +48,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The cop instances of this roadblock slot.
         /// </summary>
         IEnumerable<ARPed> Cops { get; }
-
-        /// <summary>
-        /// The game instances of this slot.
-        /// </summary>
-        List<InstanceSlot> Instances { get; }
         
+        /// <summary>
+        /// The cop instances of the roadblock slot that will be joining the pursuit.
+        /// </summary>
+        List<ARPed> CopsJoiningThePursuit { get; }
+
         /// <summary>
         /// The length of the vehicle model in the slot.
         /// </summary>
@@ -75,7 +75,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Release the cop entities to LSPDFR.
         /// This allows the cops to join the pursuit.
         /// </summary>
-        void Release();
+        /// <param name="releaseAll">Indicate if all instances should be released. This param is used when the suspect flee on foot.</param>
+        void Release(bool releaseAll = false);
 
         /// <summary>
         /// Warp the cop peds in the slot vehicle.

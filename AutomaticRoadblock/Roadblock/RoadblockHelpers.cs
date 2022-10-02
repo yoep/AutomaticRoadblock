@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instances;
-using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Vehicles;
+using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
@@ -14,46 +14,35 @@ namespace AutomaticRoadblocks.Roadblock
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
-        public static void ReleaseInstancesToLspdfr(IRoadblockSlot slot)
+        /// <summary>
+        /// Release the given instances back to LSPDFR.
+        /// </summary>
+        /// <param name="copInstances">The instances which are allowed to be released.</param>
+        /// <param name="vehicle">The vehicle instance which will be released, can be null.</param>
+        /// <returns>Returns the instances which have been released.</returns>
+        internal static void ReleaseInstancesToLspdfr(IList<ARPed> copInstances, [CanBeNull] ARVehicle vehicle)
         {
-            Assert.NotNull(slot, "slot cannot be null");
-            ReleaseInstancesToLspdfr(slot.Instances, slot.Vehicle);
-        }
-
-        internal static void ReleaseInstancesToLspdfr(List<InstanceSlot> instances, Vehicle vehicle)
-        {
-            Assert.NotNull(instances, "instances cannot be null");
+            Assert.NotNull(copInstances, "copInstances cannot be null");
             try
             {
-                var copPeds = instances
-                    .Where(x => x.Type == EEntityType.CopPed)
-                    .Select(x => x.Instance)
-                    .Select(x => (ARPed)x)
-                    .ToList();
-
                 // release the cops & cop vehicle instances
-                instances
-                    .Where(x => x.Type is EEntityType.CopPed or EEntityType.CopVehicle)
-                    .Select(x => x.Instance)
+                copInstances
                     .Where(x => x is { IsInvalid: false })
                     .ToList()
                     .ForEach(x => x.Release());
 
                 // make sure the cops are in a vehicle when releasing them
-                Logger.Trace($"Releasing a total of {copPeds.Count} cops to LSPDFR");
-                copPeds
-                    .Where(x => x != null)
+                Logger.Trace($"Releasing a total of {copInstances.Count} cops to LSPDFR");
+                copInstances
+                    .Where(x => x is { IsInvalid: false })
                     .Select(x => x.GameInstance)
                     .ToList()
                     .ForEach(x =>
                     {
                         // make sure the ped is the vehicle or at least entering it
-                        TryEnteringVehicle(x, vehicle);
+                        if (vehicle != null)
+                            TryEnteringVehicle(x, vehicle.GameInstance);
                     });
-
-                // remove all cop instances so that we don't remove them by accident when disposing
-                // these instances are now in control of LSPDFR
-                instances.RemoveAll(x => x.Type is EEntityType.CopPed or EEntityType.CopVehicle);
             }
             catch (Exception ex)
             {

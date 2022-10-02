@@ -80,23 +80,25 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public float Heading { get; }
 
         /// <inheritdoc />
-        public List<InstanceSlot> Instances { get; } = new();
-
-        /// <inheritdoc />
         public float VehicleLength => VehicleModel != null
             ? VehicleModel.Value.Dimensions.Y
             : DefaultVehicleLength;
 
         /// <inheritdoc />
-        public Vehicle Vehicle => VehicleInstance?.GameInstance;
+        public ARVehicle Vehicle => VehicleInstance;
 
         /// <inheritdoc />
         public Road.Lane Lane { get; }
 
         /// <inheritdoc />
-        public IEnumerable<ARPed> Cops => Instances
-            .Where(x => x.Type == EEntityType.CopPed)
-            .Where(x => x.Instance is { IsInvalid: false })
+        public IEnumerable<ARPed> Cops => ValidCopInstances
+            .Select(x => x.Instance)
+            .Select(x => (ARPed)x)
+            .ToList();
+
+        /// <inheritdoc />
+        public virtual List<ARPed> CopsJoiningThePursuit => ValidCopInstances
+            .Where(x => x.IsAllowedToJoinPursuit)
             .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .ToList();
@@ -112,6 +114,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public BarrierModel SecondaryBarrier { get; }
 
         public EBackupUnit BackupType { get; }
+
+        /// <summary>
+        /// The instances of this slot.
+        /// </summary>
+        protected List<InstanceSlot> Instances { get; } = new();
 
         /// <summary>
         /// The vehicle model of this slot.
@@ -157,6 +164,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                     .Select(x => (ARPed)x);
             }
         }
+
+        /// <summary>
+        /// The list of valid cop instance slots.
+        /// </summary>
+        protected IEnumerable<InstanceSlot> ValidCopInstances => Instances
+            .Where(x => x.Type == EEntityType.CopPed)
+            .Where(x => x.Instance is { IsInvalid: false });
 
         #endregion
 
@@ -232,22 +246,34 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         /// <inheritdoc />
-        public virtual void Release()
+        public virtual void Release(bool releaseAll = false)
         {
-            RoadblockHelpers.ReleaseInstancesToLspdfr(this);
+            var instances = releaseAll
+                ? ValidCopInstances
+                    .Select(x => x.Instance)
+                    .Select(x => (ARPed)x)
+                    .ToList()
+                : CopsJoiningThePursuit;
+            var vehicleInstance = Instances.FirstOrDefault(x => x.Type == EEntityType.CopVehicle);
+            RoadblockHelpers.ReleaseInstancesToLspdfr(instances, Vehicle);
+
+            if (vehicleInstance != null)
+                Instances.Remove(vehicleInstance);
+
+            Instances.RemoveAll(x => instances.Any(instance => x.Instance == instance));
         }
 
         /// <inheritdoc />
         public void WarpInVehicle()
         {
-            if (Vehicle == null)
+            if (Vehicle == null || Vehicle.IsInvalid)
             {
-                Logger.Warn("Unable to warp cops into vehicle, vehicle instance is null");
+                Logger.Warn("Unable to warp cops into vehicle, vehicle instance is invalid");
                 return;
             }
 
             CopInstances.ToList()
-                .ForEach(x => x.WarpIntoVehicle(Vehicle, Vehicle.Driver == null ? EVehicleSeat.Driver : EVehicleSeat.Any));
+                .ForEach(x => x.WarpIntoVehicle(Vehicle.GameInstance, Vehicle.GameInstance.Driver == null ? EVehicleSeat.Driver : EVehicleSeat.Any));
         }
 
         #endregion
@@ -323,11 +349,32 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             return OffsetPosition;
         }
 
+        /// <summary>
+        /// Get the width of the vehicle model.
+        /// When no vehicle model is present, it will use a default value.
+        /// </summary>
+        /// <returns>Returns the vehicle model width.</returns>
         protected float GetVehicleWidth()
         {
             return VehicleModel != null
                 ? VehicleModel.Value.Dimensions.X
                 : DefaultVehicleWidth;
+        }
+
+        /// <summary>
+        /// Initialize the cop instances of this slot.
+        /// </summary>
+        protected virtual void InitializeCops()
+        {
+            var pedSpawnPosition = CalculatePositionBehindVehicle();
+            var pedHeading = CalculateCopHeading();
+
+            for (var i = 0; i < NumberOfCops; i++)
+            {
+                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), pedHeading, true,
+                    (position, heading) => new ARPed(LspdfrDataHelper.RetrieveCop(BackupType, position), heading)));
+                pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
+            }
         }
 
         private void InitializeVehicleSlot()
@@ -346,19 +393,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
             Instances.Add(new InstanceSlot(EEntityType.CopVehicle, CalculateVehiclePosition(), CalculateVehicleHeading(),
                 (position, heading) => new ARVehicle(VehicleModel.Value, GameUtils.GetOnTheGroundPosition(position), heading, RecordVehicleCollisions)));
-        }
-
-        private void InitializeCops()
-        {
-            var pedSpawnPosition = CalculatePositionBehindVehicle();
-            var pedHeading = CalculateCopHeading();
-
-            for (var i = 0; i < NumberOfCops; i++)
-            {
-                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), pedHeading,
-                    (position, heading) => new ARPed(LspdfrDataHelper.RetrieveCop(BackupType, position), heading)));
-                pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
-            }
         }
 
         private void InitializeBarriers(BarrierModel barrierModel, float roadOffset)

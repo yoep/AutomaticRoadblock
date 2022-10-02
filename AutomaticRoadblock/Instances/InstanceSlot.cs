@@ -21,6 +21,18 @@ namespace AutomaticRoadblocks.Instances
             Heading = heading;
         }
 
+        public InstanceSlot(EEntityType type, Vector3 position, float heading, bool joinPursuit, Func<Vector3, float, IARInstance<Entity>> factory)
+        {
+            Assert.NotNull(type, "type cannot be null");
+            Assert.NotNull(position, "position cannot be null");
+            Assert.NotNull(factory, "factory cannot be null");
+            _factory = factory;
+            Type = type;
+            Position = position;
+            Heading = heading;
+            IsAllowedToJoinPursuit = joinPursuit;
+        }
+
         #region Properties
 
         /// <summary>
@@ -48,6 +60,11 @@ namespace AutomaticRoadblocks.Instances
         /// The state of the instance slot.
         /// </summary>
         public EInstanceState State { get; private set; } = EInstanceState.Inactive;
+        
+        /// <summary>
+        /// The indication if the instance is allowed to join the pursuit.
+        /// </summary>
+        public bool IsAllowedToJoinPursuit { get; set; }
 
         /// <summary>
         /// Verify if the slot instance is invalidated by the game engine.

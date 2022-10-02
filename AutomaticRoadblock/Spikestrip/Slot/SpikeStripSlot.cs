@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
@@ -41,6 +42,9 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         #region Properties
 
+        /// <inheritdoc />
+        public override List<ARPed> CopsJoiningThePursuit => new();
+
         /// <summary>
         /// The road this spike strip slot is placed on.
         /// </summary>
@@ -77,7 +81,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         #region Methods
 
         /// <inheritdoc />
-        public override void Release()
+        public override void Release(bool releaseAll = false)
         {
             SpikeStrip?.Undeploy();
         }
@@ -98,6 +102,16 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         protected override void InitializeLights()
         {
             // no-op
+        }
+
+        /// <inheritdoc />
+        protected override void InitializeCops()
+        {
+            base.InitializeCops();
+            Instances
+                .Where(x => x.Type == EEntityType.CopPed)
+                .ToList()
+                .ForEach(x => x.IsAllowedToJoinPursuit = false);
         }
 
         /// <inheritdoc />
@@ -231,17 +245,14 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             var distanceRight = Road.RightSide.DistanceTo2D(Lane.Position);
             var totalLanes = Road.NumberOfLanesSameDirection + Road.NumberOfLanesOppositeDirection;
 
+            Logger.Trace($"Spike strip location data, {nameof(Lane.IsOppositeHeadingOfRoadNodeHeading)}: {Lane.IsOppositeHeadingOfRoadNodeHeading}, " +
+                         $"{nameof(distanceMiddle)}: {distanceMiddle},  {nameof(distanceLeft)}: {distanceLeft},  {nameof(distanceRight)}: {distanceRight}");
             if (totalLanes > 2 && distanceMiddle < distanceRight && distanceMiddle < distanceLeft)
             {
                 return ESpikeStripLocation.Middle;
             }
 
-            if (!Lane.IsOppositeHeadingOfRoadNodeHeading)
-            {
-                return distanceRight <= distanceLeft ? ESpikeStripLocation.Right : ESpikeStripLocation.Left;
-            }
-
-            return distanceRight <= distanceLeft ? ESpikeStripLocation.Left : ESpikeStripLocation.Right;
+            return distanceRight <= distanceLeft ? ESpikeStripLocation.Right : ESpikeStripLocation.Left;
         }
 
         private void ExecuteWithCop(Action<ARPed> action)

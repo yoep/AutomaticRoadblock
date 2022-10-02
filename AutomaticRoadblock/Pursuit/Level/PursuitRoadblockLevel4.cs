@@ -75,14 +75,12 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 shouldAddLights);
         }
 
+        /// <param name="releaseAll"></param>
         /// <inheritdoc />
-        protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit()
+        protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
         {
             // only the chase vehicle will join the pursuit
-            return Instances
-                .Where(x => x.Type == EEntityType.CopPed)
-                .Select(x => x.Instance)
-                .Select(x => (ARPed)x)
+            return GetValidCopInstances()
                 .Select(x => x.GameInstance)
                 .ToList();
         }
@@ -90,7 +88,25 @@ namespace AutomaticRoadblocks.Pursuit.Level
         private void StateChanged(IRoadblock roadblock, ERoadblockState newState)
         {
             if (newState is ERoadblockState.Bypassed or ERoadblockState.Hit)
-                RoadblockHelpers.ReleaseInstancesToLspdfr(Instances, TargetVehicle);
+            {
+                var instances = GetValidCopInstances().ToList();
+                var vehicleInstance = Instances
+                    .Where(x => x.Type == EEntityType.CopVehicle)
+                    .Select(x => x.Instance)
+                    .Select(x => (ARVehicle)x)
+                    .FirstOrDefault();
+
+                RoadblockHelpers.ReleaseInstancesToLspdfr(instances, vehicleInstance);
+            }
+        }
+
+        private IEnumerable<ARPed> GetValidCopInstances()
+        {
+            return Instances
+                .Where(x => x.Type == EEntityType.CopPed)
+                .Select(x => x.Instance)
+                .Where(x => x is { IsInvalid: false })
+                .Select(x => (ARPed)x);
         }
 
         #endregion

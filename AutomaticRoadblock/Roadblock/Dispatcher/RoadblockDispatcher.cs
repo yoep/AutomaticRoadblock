@@ -131,7 +131,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // only release the roadblock and don't remove it yet
             // this will change the state of the roadblock to released state allowing
             // it to be picked up by the cleanup thread which will dispose the roadblock correctly
-            roadblocksToRelease.ForEach(x => x.Release());
+            roadblocksToRelease.ForEach(x => x.Release(true));
             _logger.Info($"Released a total of {roadblocksToRelease.Count} roadblocks which were still active");
         }
 
@@ -193,7 +193,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 DenyUserRequestForRoadblock(options.IsUserRequested, "user requested roadblock is currently being dispatched");
                 return null;
             }
-            
+
+            // update the flag that a user requested roadblock is being calculated
+            if (options.IsUserRequested)
+                _userRequestedRoadblockDispatching = true;
+
             // calculate the roadblock location
             _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
             var discoveredVehicleNodes = DetermineRoadblockLocation(level, vehicle, options.RoadblockDistance);
@@ -201,12 +205,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             if (primaryRoadblockNode.Width < 1f)
             {
-                if (options.IsUserRequested) 
-                    DenyUserRequestForRoadblock(options.IsUserRequested, $"roadblock location is invalid for {primaryRoadblockNode}");
-                
+                DenyUserRequestForRoadblock(options.IsUserRequested, $"roadblock location is invalid for {primaryRoadblockNode}");
+                _userRequestedRoadblockDispatching = false;
                 return null;
             }
-            
+
             if (options.IsUserRequested)
                 AllowUserRequestForRoadblock();
 
@@ -215,6 +218,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             if (IsRoadblockNearby(primaryRoadblockNode))
             {
                 DenyUserRequestForRoadblock(options.IsUserRequested, $"a roadblock is already present in the vicinity for {discoveredVehicleNodes}");
+                _userRequestedRoadblockDispatching = false;
                 return null;
             }
 
@@ -301,12 +305,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
                 }
 
-                _game.DisplayNotificationDebug("Roadblock has been spawned:~n~" +
-                                               $"Success: {ToColorText(result)}~n~" +
+                _game.DisplayNotificationDebug($"Roadblock spawned {ToColorText(result)}:~n~" +
                                                $"Distance: {road.Position.DistanceTo(vehicle.Position)}~n~" +
                                                $"Road width: {roadblock.Road.Width}~n~" +
                                                $"Slots: {roadblock.NumberOfSlots}~n~" +
-                                               $"Spawn time: {timeTakenToSpawn} millis");
+                                               $"Spawn time: {timeTakenToSpawn} millis~n~" +
+                                               $"Flags: {roadblock.Flags}");
                 _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
             }
 
@@ -427,7 +431,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             {
                 _logger.Trace($"Roadblock cleanup will check a total of {_roadblocks.Count} roadblocks");
                 _roadblocks
-                    .Where(x => !x.Roadblock.IsPreviewActive && x.State is not ERoadblockState.Active or ERoadblockState.Preparing or ERoadblockState.Disposing)
+                    .Where(x => !x.Roadblock.IsPreviewActive)
+                    .Where(x => x.State is not (ERoadblockState.Active or ERoadblockState.Preparing or ERoadblockState.Disposing))
                     // verify if the player if far enough away for the roadblock to be cleaned
                     // if not, we auto clean roadblocks after AutoCleanRoadblockAfterSeconds
                     .Where(x => IsPlayerFarAwayFromRoadblock(x) || IsAutoRoadblockCleaningAllowed(x.Roadblock))
@@ -468,7 +473,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private void AllowUserRequestForRoadblock()
         {
             _logger.Trace("Playing roadblock requested by user audio");
-            _userRequestedRoadblockDispatching = true;
             LspdfrUtils.PlayScannerAudio(AudioRequestConfirmed, true);
         }
 

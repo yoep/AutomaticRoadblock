@@ -52,7 +52,7 @@ namespace AutomaticRoadblocks.Street.Factory
             // if so, correct the left side
             if (rightSide.Equals(leftSide))
             {
-                leftSide = nodeInfo.Position + MathHelper.ConvertHeadingToDirection(leftSideHeading) * nodeInfo.Position.DistanceTo(rightSide);
+                leftSide = nodeInfo.Position + MathHelper.ConvertHeadingToDirection(leftSideHeading) * nodeInfo.Position.DistanceTo2D(rightSide);
             }
 
             // verify if the lane was calculated correctly

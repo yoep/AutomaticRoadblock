@@ -228,15 +228,15 @@ namespace AutomaticRoadblocks.Roadblock
         }
 
         /// <inheritdoc />
-        public void Release()
+        public void Release(bool releaseAll = false)
         {
             // verify if the roadblock is still active
             // otherwise, we cannot release the entities
             if (State != ERoadblockState.Active)
                 return;
 
-            InvokeCopsJoiningPursuit();
-            ReleaseEntitiesToLspdfr();
+            InvokeCopsJoiningPursuit(releaseAll);
+            ReleaseEntitiesToLspdfr(releaseAll);
             UpdateState(ERoadblockState.Released);
         }
 
@@ -346,7 +346,8 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Indicate that the cops of this roadblock can join the pursuit.
         /// </summary>
-        protected void InvokeCopsJoiningPursuit()
+        /// <param name="releaseAll"></param>
+        protected void InvokeCopsJoiningPursuit(bool releaseAll)
         {
             switch (State)
             {
@@ -354,7 +355,7 @@ namespace AutomaticRoadblocks.Roadblock
                 case ERoadblockState.Hit when !Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit):
                     return;
                 default:
-                    RoadblockCopsJoiningPursuit?.Invoke(this, RetrieveCopsJoiningThePursuit());
+                    RoadblockCopsJoiningPursuit?.Invoke(this, RetrieveCopsJoiningThePursuit(releaseAll));
                     break;
             }
         }
@@ -362,24 +363,42 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Retrieve a list of cops who will join the pursuit.
         /// </summary>
+        /// <param name="releaseAll"></param>
         /// <returns>Returns the cops joining the pursuit.</returns>
-        protected virtual IEnumerable<Ped> RetrieveCopsJoiningThePursuit()
+        protected virtual IEnumerable<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
         {
             var copsJoining = new List<Ped>();
 
-            foreach (var slot in Slots)
+            if (IsAllowedToJoinPursuit() || releaseAll)
             {
-                try
+                Logger.Debug($"Cops joining pursuit for roadblock {this}");
+                foreach (var slot in Slots)
                 {
-                    copsJoining.AddRange(slot.Cops.Select(x => x.GameInstance));
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"Failed to retrieve slot cops joining the pursuit for {slot}, {ex.Message}", ex);
+                    try
+                    {
+                        var slotCops = releaseAll ? slot.Cops : slot.CopsJoiningThePursuit;
+                        copsJoining.AddRange(slotCops.Select(x => x.GameInstance));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to retrieve slot cops joining the pursuit for {slot}, {ex.Message}", ex);
+                        Game.DisplayNotificationDebug("~r~Cops are unable to join the pursuit");
+                    }
                 }
             }
 
             return copsJoining;
+        }
+
+        /// <summary>
+        /// Verify if the cops are allowed to join the pursuit.
+        /// </summary>
+        /// <returns>Returns true if the cops are allowed to join.</returns>
+        protected bool IsAllowedToJoinPursuit()
+        {
+            return (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass) && State == ERoadblockState.Bypassed) ||
+                   (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit) && State == ERoadblockState.Hit) ||
+                   IsPreviewActive;
         }
 
         private void InitializeRoadblockSlots()
@@ -512,12 +531,15 @@ namespace AutomaticRoadblocks.Roadblock
             return laneWidth - vehicleLength;
         }
 
-        private void ReleaseEntitiesToLspdfr()
+        private void ReleaseEntitiesToLspdfr(bool releaseAll)
         {
-            Logger.Debug("Releasing cop peds to LSPDFR");
-            foreach (var slot in Slots)
+            if (IsAllowedToJoinPursuit() || releaseAll)
             {
-                slot.Release();
+                Logger.Debug($"Releasing cops to LSPDFR for roadblock {this}");
+                foreach (var slot in Slots)
+                {
+                    slot.Release(releaseAll);
+                }
             }
 
             Game.NewSafeFiber(() =>
@@ -544,9 +566,17 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 while (IsPreviewActive)
                 {
-                    foreach (var ped in RetrieveCopsJoiningThePursuit())
+                    var color = Flags switch
                     {
-                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.Lime, 1f, 1f, false);
+                        ERoadblockFlags.JoinPursuit => Color.Lime,
+                        ERoadblockFlags.JoinPursuitOnHit => Color.Coral,
+                        ERoadblockFlags.JoinPursuitOnBypass => Color.Gold,
+                        _ => Color.DarkRed
+                    };
+
+                    foreach (var ped in RetrieveCopsJoiningThePursuit(false))
+                    {
+                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, color, 1f, 1f, false);
                     }
 
                     Game.FiberYield();
