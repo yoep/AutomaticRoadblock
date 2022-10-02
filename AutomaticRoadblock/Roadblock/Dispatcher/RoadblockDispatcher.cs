@@ -301,8 +301,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
                 }
 
-                _game.DisplayNotificationDebug("Roadblock has been spawned:~n~" +
-                                               $"Success: {ToColorText(result)}~n~" +
+                _game.DisplayNotificationDebug($"Roadblock spawned {ToColorText(result)}:~n~" +
                                                $"Distance: {road.Position.DistanceTo(vehicle.Position)}~n~" +
                                                $"Road width: {roadblock.Road.Width}~n~" +
                                                $"Slots: {roadblock.NumberOfSlots}~n~" +
