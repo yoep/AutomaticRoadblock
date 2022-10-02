@@ -371,7 +371,7 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 try
                 {
-                    copsJoining.AddRange(slot.Cops.Select(x => x.GameInstance));
+                    copsJoining.AddRange(slot.CopsJoiningThePursuit.Select(x => x.GameInstance));
                 }
                 catch (Exception ex)
                 {

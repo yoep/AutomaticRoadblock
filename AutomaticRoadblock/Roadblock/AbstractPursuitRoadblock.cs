@@ -299,7 +299,7 @@ namespace AutomaticRoadblocks.Roadblock
                 return;
 
             if (!Slots
-                    .Where(x => x.Vehicle != null && x.Vehicle.IsValid())
+                    .Where(x => x.Vehicle is { IsInvalid: false })
                     .Any(HasBeenDamagedBy))
                 return;
 
@@ -323,8 +323,8 @@ namespace AutomaticRoadblocks.Roadblock
 
         private bool HasBeenDamagedBy(IRoadblockSlot slot)
         {
-            if (slot.Vehicle != null)
-                return slot.Vehicle.HasBeenDamagedBy(TargetVehicle);
+            if (slot.Vehicle is { IsInvalid: false })
+                return slot.Vehicle.GameInstance.HasBeenDamagedBy(TargetVehicle);
 
             Logger.Warn($"Unable to verify the vehicle collision for slot {slot}, vehicle is null");
             return false;
