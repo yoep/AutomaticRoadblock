@@ -236,7 +236,7 @@ namespace AutomaticRoadblocks.Roadblock
                 return;
 
             InvokeCopsJoiningPursuit(releaseAll);
-            ReleaseEntitiesToLspdfr();
+            ReleaseEntitiesToLspdfr(releaseAll);
             UpdateState(ERoadblockState.Released);
         }
 
@@ -369,8 +369,9 @@ namespace AutomaticRoadblocks.Roadblock
         {
             var copsJoining = new List<Ped>();
 
-            if (IsAllowedToJoinPursuit())
+            if (IsAllowedToJoinPursuit() || releaseAll)
             {
+                Logger.Debug($"Cops joining pursuit for roadblock {this}");
                 foreach (var slot in Slots)
                 {
                     try
@@ -530,12 +531,15 @@ namespace AutomaticRoadblocks.Roadblock
             return laneWidth - vehicleLength;
         }
 
-        private void ReleaseEntitiesToLspdfr()
+        private void ReleaseEntitiesToLspdfr(bool releaseAll)
         {
-            Logger.Debug("Releasing cop peds to LSPDFR");
-            foreach (var slot in Slots)
+            if (IsAllowedToJoinPursuit() || releaseAll)
             {
-                slot.Release();
+                Logger.Debug($"Releasing cops to LSPDFR for roadblock {this}");
+                foreach (var slot in Slots)
+                {
+                    slot.Release(releaseAll);
+                }
             }
 
             Game.NewSafeFiber(() =>
