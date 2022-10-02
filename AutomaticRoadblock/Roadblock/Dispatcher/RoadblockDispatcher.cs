@@ -131,7 +131,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // only release the roadblock and don't remove it yet
             // this will change the state of the roadblock to released state allowing
             // it to be picked up by the cleanup thread which will dispose the roadblock correctly
-            roadblocksToRelease.ForEach(x => x.Release());
+            roadblocksToRelease.ForEach(x => x.Release(true));
             _logger.Info($"Released a total of {roadblocksToRelease.Count} roadblocks which were still active");
         }
 
@@ -306,7 +306,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                                                $"Distance: {road.Position.DistanceTo(vehicle.Position)}~n~" +
                                                $"Road width: {roadblock.Road.Width}~n~" +
                                                $"Slots: {roadblock.NumberOfSlots}~n~" +
-                                               $"Spawn time: {timeTakenToSpawn} millis");
+                                               $"Spawn time: {timeTakenToSpawn} millis~n~" +
+                                               $"Flags: {roadblock.Flags}");
                 _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
             }
 
@@ -427,7 +428,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             {
                 _logger.Trace($"Roadblock cleanup will check a total of {_roadblocks.Count} roadblocks");
                 _roadblocks
-                    .Where(x => !x.Roadblock.IsPreviewActive && x.State is not ERoadblockState.Active or ERoadblockState.Preparing or ERoadblockState.Disposing)
+                    .Where(x => !x.Roadblock.IsPreviewActive)
+                    .Where(x => x.State is not (ERoadblockState.Active or ERoadblockState.Preparing or ERoadblockState.Disposing))
                     // verify if the player if far enough away for the roadblock to be cleaned
                     // if not, we auto clean roadblocks after AutoCleanRoadblockAfterSeconds
                     .Where(x => IsPlayerFarAwayFromRoadblock(x) || IsAutoRoadblockCleaningAllowed(x.Roadblock))
