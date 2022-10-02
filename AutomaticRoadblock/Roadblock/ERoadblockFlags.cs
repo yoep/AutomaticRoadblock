@@ -10,11 +10,13 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Detect if the target vehicle has bypassed the roadblock.
         /// </summary>
+        // 0001
         DetectBypass = 1,
 
         /// <summary>
         /// Detect if the target vehicle has hit the roadblock.
         /// </summary>
+        // 0010
         DetectHit = 2,
         
         DetectAll = DetectBypass | DetectHit,
@@ -23,14 +25,17 @@ namespace AutomaticRoadblocks.Roadblock
         /// Indicates if the roadblock is allowed to join the pursuit on hit.
         /// Auto enables the <see cref="DetectHit"/>.
         /// </summary>
+        // 0110
         JoinPursuitOnHit = 6,
         
         /// <summary>
         /// Indicates if the roadblock is allowed to join the pursuit on bypass.
         /// Auto enables the <see cref="DetectBypass"/>.
         /// </summary>
+        // 1001
         JoinPursuitOnBypass = 9,
         
+        // 1111
         JoinPursuit = JoinPursuitOnHit | JoinPursuitOnBypass,
 
         /// <summary>

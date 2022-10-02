@@ -67,6 +67,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// Release the roadblock instance back to the world.
         /// This can only be used when the <see cref="State"/> is <see cref="ERoadblockState.Active"/>.
         /// </summary>
-        void Release();
+        /// <param name="releaseAll">Indicates of all cop instances should be released.</param>
+        void Release(bool releaseAll = false);
     }
 }

@@ -49,8 +49,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 shouldAddLights);
         }
 
+        /// <param name="releaseAll"></param>
         /// <inheritdoc />
-        protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit()
+        protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
         {
             // only the chase vehicle will join the pursuit
             return Instances
