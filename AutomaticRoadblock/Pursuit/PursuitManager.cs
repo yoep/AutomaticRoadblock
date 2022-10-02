@@ -428,7 +428,7 @@ namespace AutomaticRoadblocks.Pursuit
 
             _timeLastDispatchedRoadblock = _game.GameTime;
             _totalRoadblocksDeployed++;
-            _logger.Info("Pursuit roadblock has been dispatched");
+            _logger.Info($"Pursuit roadblock has been dispatched at {roadblock.Position} with state {roadblock.State}");
             return true;
         }
 
@@ -523,6 +523,7 @@ namespace AutomaticRoadblocks.Pursuit
 
             try
             {
+                _logger.Debug($"Releasing active roadblocks action by pursuit manager due to state {State}");
                 _roadblockDispatcher.DismissActiveRoadblocks();
             }
             catch (Exception ex)

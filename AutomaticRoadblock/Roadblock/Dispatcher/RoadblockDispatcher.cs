@@ -178,6 +178,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return enableSpikeStrips && spawnChance >= threshold;
         }
 
+        [CanBeNull]
         private IRoadblock DoInternalDispatch(ERoadblockLevel level, Vehicle vehicle, DispatchOptions options)
         {
             // start the cleaner if it's not yet running
@@ -192,14 +193,22 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 DenyUserRequestForRoadblock(options.IsUserRequested, "user requested roadblock is currently being dispatched");
                 return null;
             }
-
-            if (options.IsUserRequested)
-                AllowUserRequestForRoadblock();
-
+            
             // calculate the roadblock location
             _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
             var discoveredVehicleNodes = DetermineRoadblockLocation(level, vehicle, options.RoadblockDistance);
-            var primaryRoadblockNode = discoveredVehicleNodes.Last();
+            var primaryRoadblockNode = discoveredVehicleNodes.OfType<Road>().Last();
+
+            if (primaryRoadblockNode.Width < 1f)
+            {
+                if (options.IsUserRequested) 
+                    DenyUserRequestForRoadblock(options.IsUserRequested, $"roadblock location is invalid for {primaryRoadblockNode}");
+                
+                return null;
+            }
+            
+            if (options.IsUserRequested)
+                AllowUserRequestForRoadblock();
 
             // verify if another roadblock is already present nearby
             // if so, deny the roadblock request
@@ -284,9 +293,20 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             else
             {
                 _logger.Trace($"Distance between vehicle and roadblock before spawn {road.Position.DistanceTo(vehicle.Position)}");
+                var startedAt = DateTime.Now.Ticks;
                 var result = roadblock.Spawn();
+                var timeTakenToSpawn = (DateTime.Now.Ticks - startedAt) / TimeSpan.TicksPerMillisecond;
                 if (!result)
+                {
                     _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
+                }
+
+                _game.DisplayNotificationDebug("Roadblock has been spawned:~n~" +
+                                               $"Success: {ToColorText(result)}~n~" +
+                                               $"Distance: {road.Position.DistanceTo(vehicle.Position)}~n~" +
+                                               $"Road width: {roadblock.Road.Width}~n~" +
+                                               $"Slots: {roadblock.NumberOfSlots}~n~" +
+                                               $"Spawn time: {timeTakenToSpawn} millis");
                 _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
             }
 
@@ -414,6 +434,10 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     .ToList()
                     .ForEach(x =>
                     {
+                        _game.DisplayNotificationDebug("~c~Roadblock is being disposed~n~" +
+                                                       $"State: {x.State}~n~" +
+                                                       $"Last state change: {_game.GameTime - x.Roadblock.LastStateChange}millis~n~" +
+                                                       $"Distance from player: {x.Position.DistanceTo2D(_game.PlayerPosition)}");
                         x.Roadblock.Dispose();
                         _logger.Debug($"Roadblock cleanup has disposed roadblock {x}");
                     });
@@ -556,6 +580,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             var previousNodeIndex = streetNodes.IndexOf(currentNode) - 1;
 
             return previousNodeIndex >= 0 ? streetNodes[previousNodeIndex] : null;
+        }
+
+        private static string ToColorText(bool result)
+        {
+            var color = result ? "g" : "r";
+            return $"~{color}~{result}~s~";
         }
 
         #endregion

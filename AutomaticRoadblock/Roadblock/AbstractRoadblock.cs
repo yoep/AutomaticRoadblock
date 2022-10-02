@@ -79,6 +79,9 @@ namespace AutomaticRoadblocks.Roadblock
         public ERoadblockFlags Flags { get; }
 
         /// <inheritdoc />
+        public int NumberOfSlots => Slots?.Count ?? 0;
+
+        /// <inheritdoc />
         public Vector3 Position => Road.Position;
 
         /// <summary>
@@ -209,10 +212,8 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 Logger.Trace("Spawning roadblock");
 
-                Slots.ToList().ForEach(x => { SpawnSlot(x); });
+                Slots.ToList().ForEach(SpawnSlot);
                 result = Instances.All(x => x.Spawn());
-
-
                 UpdateState(ERoadblockState.Active);
 
                 CreateBlip();

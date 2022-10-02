@@ -7,7 +7,7 @@ namespace AutomaticRoadblocks.Street.Factory
 {
     internal static class RoadFactory
     {
-        private const float MinLaneDistance = 4f;
+        private const float MinLaneDistance = 3f;
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
         internal static Road Create(VehicleNodeInfo nodeInfo)
@@ -56,14 +56,18 @@ namespace AutomaticRoadblocks.Street.Factory
             }
 
             // verify if the lane was calculated correctly
-            if (nodeInfo.Position.DistanceTo(rightSide) < MinLaneDistance)
+            if (nodeInfo.Position.DistanceTo2D(rightSide) < MinLaneDistance)
             {
-                rightSide = nodeInfo.Position + MathHelper.ConvertHeadingToDirection(rightSideHeading) * MinLaneDistance;
+                var numberOfLanes = nodeInfo.LanesInSameDirection == 0 ? 1 : nodeInfo.LanesInSameDirection;
+                rightSide = nodeInfo.Position + MathHelper.ConvertHeadingToDirection(rightSideHeading) * (MinLaneDistance * numberOfLanes);
+                Logger.Warn("Used default lane width for right side as road width calculation failed");
             }
 
-            if (nodeInfo.Position.DistanceTo(leftSide) < MinLaneDistance)
+            if (nodeInfo.Position.DistanceTo2D(leftSide) < MinLaneDistance)
             {
-                leftSide = nodeInfo.Position + MathHelper.ConvertHeadingToDirection(leftSideHeading) * MinLaneDistance;
+                var numberOfLanes = nodeInfo.LanesInOppositeDirection == 0 ? 1 : nodeInfo.LanesInOppositeDirection;
+                leftSide = nodeInfo.Position + MathHelper.ConvertHeadingToDirection(leftSideHeading) * (MinLaneDistance * numberOfLanes);
+                Logger.Warn("Used default lane width for left side as road width calculation failed");
             }
         }
 
