@@ -178,6 +178,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return enableSpikeStrips && spawnChance >= threshold;
         }
 
+        [CanBeNull]
         private IRoadblock DoInternalDispatch(ERoadblockLevel level, Vehicle vehicle, DispatchOptions options)
         {
             // start the cleaner if it's not yet running
@@ -192,14 +193,22 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 DenyUserRequestForRoadblock(options.IsUserRequested, "user requested roadblock is currently being dispatched");
                 return null;
             }
-
-            if (options.IsUserRequested)
-                AllowUserRequestForRoadblock();
-
+            
             // calculate the roadblock location
             _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
             var discoveredVehicleNodes = DetermineRoadblockLocation(level, vehicle, options.RoadblockDistance);
-            var primaryRoadblockNode = discoveredVehicleNodes.Last();
+            var primaryRoadblockNode = discoveredVehicleNodes.OfType<Road>().Last();
+
+            if (primaryRoadblockNode.Width < 1f)
+            {
+                if (options.IsUserRequested) 
+                    DenyUserRequestForRoadblock(options.IsUserRequested, $"roadblock location is invalid for {primaryRoadblockNode}");
+                
+                return null;
+            }
+            
+            if (options.IsUserRequested)
+                AllowUserRequestForRoadblock();
 
             // verify if another roadblock is already present nearby
             // if so, deny the roadblock request
@@ -372,7 +381,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 {
                     _logger.Trace($"Removing roadblock {roadblock} from dispatcher");
                     RemoveRoadblock(roadblock);
-                    _game.DisplayNotificationDebug("~m~Roadblock has been removed");
                 }
             }, "RoadblockDispatcher.RoadblockStateChanged");
             RoadblockStateChanged?.Invoke(roadblock, newState);
@@ -426,6 +434,10 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     .ToList()
                     .ForEach(x =>
                     {
+                        _game.DisplayNotificationDebug("~c~Roadblock is being disposed~n~" +
+                                                       $"State: {x.State}~n~" +
+                                                       $"Last state change: {_game.GameTime - x.Roadblock.LastStateChange}millis~n~" +
+                                                       $"Distance from player: {x.Position.DistanceTo2D(_game.PlayerPosition)}");
                         x.Roadblock.Dispose();
                         _logger.Debug($"Roadblock cleanup has disposed roadblock {x}");
                     });
