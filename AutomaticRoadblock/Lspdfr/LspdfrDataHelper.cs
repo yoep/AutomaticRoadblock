@@ -103,11 +103,19 @@ namespace AutomaticRoadblocks.Lspdfr
         {
             Assert.NotNull(unit, "unit cannot be null");
             Assert.NotNull(position, "position cannot be null");
-            var backup = GetBackupForUnitType(unit);
-            var agency = GetAgency(unit, backup, position);
+            try
+            {
+                var backup = GetBackupForUnitType(unit);
+                var agency = GetAgency(unit, backup, position);
 
-            Logger.Trace($"Backup unit type {unit} at position {position} will be using agency {{{agency}}}");
-            return GetLoadoutForAgency(unit, agency);
+                Logger.Trace($"Backup unit type {unit} at position {position} will be using agency {{{agency}}}");
+                return GetLoadoutForAgency(unit, agency);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to retrieve loadout (using default loadout instead), {ex.Message}", ex);
+                return Loadout.Defaults;
+            }
         }
 
         /// <summary>
