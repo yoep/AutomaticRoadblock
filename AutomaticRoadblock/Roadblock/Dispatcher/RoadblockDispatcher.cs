@@ -23,6 +23,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private const float RoadblockCleanupDistanceFromPlayer = 100f;
         private const float MinimumDistanceBetweenRoadblocks = 10f;
         private const float MinimumDistanceFromTargetForJunctionRoadblocks = 60f;
+        private const float MinimumDistanceSpawningAwayFromSuspect = 45f;
         private const string AudioRequestDenied = "ROADBLOCK_REQUEST_DENIED";
         private const string AudioRequestConfirmed = "ROADBLOCK_REQUEST_CONFIRMED";
 
@@ -89,7 +90,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             if (options.Force || options.IsUserRequested || IsRoadblockDispatchingAllowed(vehicle))
                 return DoInternalDispatch(level, vehicle, options);
 
-            _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(options)}: {options}");
+            _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(options)}: {options}, " +
+                         $"{nameof(IsRoadblockDispatchingAllowed)}: {IsRoadblockDispatchingAllowed(vehicle)}");
             return null;
         }
 
@@ -198,6 +200,9 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             if (options.IsUserRequested)
                 _userRequestedRoadblockDispatching = true;
 
+            // wait for all audio to complete before doing the initial calculation
+            LspdfrUtils.WaitForAudioCompletion();
+
             // calculate the roadblock location
             _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
             var discoveredVehicleNodes = DetermineRoadblockLocation(level, vehicle, options.RoadblockDistance);
@@ -205,7 +210,14 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             if (primaryRoadblockNode.Width < 1f)
             {
-                DenyUserRequestForRoadblock(options.IsUserRequested, $"roadblock location is invalid for {primaryRoadblockNode}");
+                DenyUserRequestForRoadblock(options.IsUserRequested, $"roadblock location is invalid for {primaryRoadblockNode} (road width too small)");
+                _userRequestedRoadblockDispatching = false;
+                return null;
+            }
+
+            if (primaryRoadblockNode.Position.DistanceTo2D(vehicle.Position) < MinimumDistanceSpawningAwayFromSuspect)
+            {
+                DenyUserRequestForRoadblock(options.IsUserRequested, $"roadblock location is invalid for {primaryRoadblockNode} (min spawn distance not met)");
                 _userRequestedRoadblockDispatching = false;
                 return null;
             }
@@ -535,10 +547,15 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         private ENodeFlag DetermineBlacklistedFlagsForType(EVehicleNodeType vehicleNodeType)
         {
-            if (vehicleNodeType == EVehicleNodeType.MainRoads)
-                return ENodeFlag.IsBackroad | ENodeFlag.IsGravelRoad | ENodeFlag.IsOffRoad;
+            var flags = ENodeFlag.IsOnWater;
 
-            return ENodeFlag.None;
+            if (vehicleNodeType == EVehicleNodeType.MainRoads)
+            {
+                flags |= ENodeFlag.IsBackroad | ENodeFlag.IsGravelRoad | ENodeFlag.IsOffRoad;
+            }
+
+            _logger.Debug($"Following node flags are blacklisted for determining the location {flags}");
+            return flags;
         }
 
         private void RemoveRoadblock(IRoadblock roadblock)
