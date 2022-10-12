@@ -74,7 +74,7 @@ namespace AutomaticRoadblocks.Lspdfr
                 Logger.Error($"Unable to create ped, no valid loadout found for unit {unit} at position {position}");
                 throw new LspdfrDataException(unit, position);
             }
-            
+
             var pedData = ChanceProvider.Retrieve(loadout.Peds);
             var ped = new Ped(pedData.ModelName, GameUtils.GetOnTheGroundPosition(position), 0f);
 
@@ -113,7 +113,7 @@ namespace AutomaticRoadblocks.Lspdfr
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to retrieve loadout (using default loadout instead), {ex.Message}", ex);
+                Logger.Error($"Failed to retrieve loadout for unit {unit} at position {position}, using default loadout instead, {ex.Message}", ex);
                 return Loadout.Defaults;
             }
         }
@@ -143,20 +143,30 @@ namespace AutomaticRoadblocks.Lspdfr
 
         private static Backup GetBackupForUnitType(EBackupUnit unit)
         {
-            return unit == EBackupUnit.Transporter
-                ? LspdfrData.BackupUnits.LocalPatrol
-                : LspdfrData.BackupUnits[unit];
+            try
+            {
+                return unit == EBackupUnit.Transporter
+                    ? LspdfrData.BackupUnits.LocalPatrol
+                    : LspdfrData.BackupUnits[unit];
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to retrieve backup unit for unit type {unit}, using LocalPatrol instead, {ex.Message}", ex);
+                return LspdfrData.BackupUnits.LocalPatrol;
+            }
         }
 
         private static Agency GetAgency(EBackupUnit unit, Backup backup, Vector3 position)
         {
-            return unit == EBackupUnit.Transporter 
-                ? LspdfrData.Agencies[backup[EWorldZoneCounty.LosSantos]] 
+            return unit == EBackupUnit.Transporter
+                ? LspdfrData.Agencies[backup[EWorldZoneCounty.LosSantos]]
                 : LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
         }
 
         private static Loadout GetLoadoutForAgency(EBackupUnit unit, Agency agency)
         {
+            Assert.NotNull(unit, "unit cannot be null");
+            Assert.NotNull(agency, "agency cannot be null");
             return unit == EBackupUnit.Transporter
                 ? agency.Loadout.FirstOrDefault(x => x.Name.Equals(Agency.TransporterLoadout, StringComparison.InvariantCulture))
                 : agency.Loadout.FirstOrDefault();
