@@ -8,7 +8,7 @@ namespace AutomaticRoadblocks.Lspdfr
     {
         public static Loadout Defaults = new(
             "Default unit",
-            new List<VehicleData> { new("police"), new("police2") },
+            new List<VehicleData> { new("police"), new("police2"), new("police3") },
             new List<PedData> { new("s_m_y_cop_01", 70), new("s_f_y_cop_01", 30) },
             new NumPeds(1, 2));
 
