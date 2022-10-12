@@ -90,7 +90,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             if (options.Force || options.IsUserRequested || IsRoadblockDispatchingAllowed(vehicle))
                 return DoInternalDispatch(level, vehicle, options);
 
-            _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(options)}: {options}");
+            _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(options)}: {options}, " +
+                         $"{nameof(IsRoadblockDispatchingAllowed)}: {IsRoadblockDispatchingAllowed(vehicle)}");
             return null;
         }
 
@@ -198,7 +199,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // update the flag that a user requested roadblock is being calculated
             if (options.IsUserRequested)
                 _userRequestedRoadblockDispatching = true;
-            
+
             // wait for all audio to complete before doing the initial calculation
             LspdfrUtils.WaitForAudioCompletion();
 
@@ -213,6 +214,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 _userRequestedRoadblockDispatching = false;
                 return null;
             }
+
             if (primaryRoadblockNode.Position.DistanceTo2D(vehicle.Position) < MinimumDistanceSpawningAwayFromSuspect)
             {
                 DenyUserRequestForRoadblock(options.IsUserRequested, $"roadblock location is invalid for {primaryRoadblockNode} (min spawn distance not met)");
