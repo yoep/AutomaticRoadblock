@@ -20,11 +20,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// The indication if the roadblock dispatching needs to be forced and all condition checks should be ignored.
         /// </summary>
         public bool Force { get; set; }
-        
+
         /// <summary>
         /// The roadblock placement distance in regards to the target. 
         /// </summary>
-        public ERoadblockDistance RoadblockDistance { get; set; }
+        public ERoadblockDistance RoadblockDistance { get; set; } = ERoadblockDistance.Default;
 
         public override string ToString()
         {

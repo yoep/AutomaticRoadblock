@@ -51,7 +51,7 @@ namespace AutomaticRoadblocks.Utils
         /// Wait for LSPDFR to complete playing the current audio (if any is playing at the moment).
         /// This will pause the current game fiber.
         /// </summary>
-        private static void WaitForAudioCompletion()
+        public static void WaitForAudioCompletion()
         {
             while (Functions.GetIsAudioEngineBusy())
             {

@@ -198,6 +198,9 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // update the flag that a user requested roadblock is being calculated
             if (options.IsUserRequested)
                 _userRequestedRoadblockDispatching = true;
+            
+            // wait for all audio to complete before doing the initial calculation
+            LspdfrUtils.WaitForAudioCompletion();
 
             // calculate the roadblock location
             _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
