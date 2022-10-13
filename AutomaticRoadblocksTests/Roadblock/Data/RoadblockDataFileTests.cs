@@ -27,7 +27,7 @@ namespace AutomaticRoadblocks.Roadblock.Data
                 {
                     new Unit(EBackupUnit.LocalPatrol)
                 });
-            var expectedLevel5Result = new RoadblockData(5, "police_do_not_cross", "work_barrier_high", "barrel_traffic_catcher",
+            var expectedLevel5Result = new RoadblockData(5, "police_do_not_cross", "work_barrier_with_sign", "barrel_traffic_catcher",
                 new List<string>
                 {
                     Light.SpotsScriptName
