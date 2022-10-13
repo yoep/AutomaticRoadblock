@@ -215,7 +215,9 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 return null;
             }
 
-            if (primaryRoadblockNode.Position.DistanceTo2D(vehicle.Position) < MinimumDistanceSpawningAwayFromSuspect)
+            var distanceFromSuspect = primaryRoadblockNode.Position.DistanceTo2D(vehicle.Position);
+            _logger.Trace($"Roadblock calculated distance from suspect {distanceFromSuspect}");
+            if (distanceFromSuspect < MinimumDistanceSpawningAwayFromSuspect)
             {
                 DenyUserRequestForRoadblock(options.IsUserRequested, $"roadblock location is invalid for {primaryRoadblockNode} (min spawn distance not met)");
                 _userRequestedRoadblockDispatching = false;
@@ -485,7 +487,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private void AllowUserRequestForRoadblock()
         {
             _logger.Trace("Playing roadblock requested by user audio");
-            LspdfrUtils.PlayScannerAudio(AudioRequestConfirmed, true);
+            // #93: don't wait for this audio to complete as it sometimes causes too long delays between calculation and placement
+            LspdfrUtils.PlayScannerAudio(AudioRequestConfirmed);
         }
 
         private void DenyUserRequestForRoadblock(bool userRequest, string reason)
