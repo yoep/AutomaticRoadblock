@@ -74,7 +74,7 @@ namespace AutomaticRoadblocks.Lspdfr
                 Logger.Error($"Unable to create ped, no valid loadout found for unit {unit} at position {position}");
                 throw new LspdfrDataException(unit, position);
             }
-            
+
             var pedData = ChanceProvider.Retrieve(loadout.Peds);
             var ped = new Ped(pedData.ModelName, GameUtils.GetOnTheGroundPosition(position), 0f);
 
@@ -103,11 +103,19 @@ namespace AutomaticRoadblocks.Lspdfr
         {
             Assert.NotNull(unit, "unit cannot be null");
             Assert.NotNull(position, "position cannot be null");
-            var backup = GetBackupForUnitType(unit);
-            var agency = GetAgency(unit, backup, position);
+            try
+            {
+                var backup = GetBackupForUnitType(unit);
+                var agency = GetAgency(unit, backup, position);
 
-            Logger.Trace($"Backup unit type {unit} at position {position} will be using agency {{{agency}}}");
-            return GetLoadoutForAgency(unit, agency);
+                Logger.Trace($"Backup unit type {unit} at position {position} will be using agency {{{agency}}}");
+                return GetLoadoutForAgency(unit, agency);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to retrieve loadout for unit {unit} at position {position}, using default loadout instead, {ex.Message}", ex);
+                return Loadout.Defaults;
+            }
         }
 
         /// <summary>
@@ -135,20 +143,33 @@ namespace AutomaticRoadblocks.Lspdfr
 
         private static Backup GetBackupForUnitType(EBackupUnit unit)
         {
-            return unit == EBackupUnit.Transporter
-                ? LspdfrData.BackupUnits.LocalPatrol
-                : LspdfrData.BackupUnits[unit];
+            try
+            {
+                return unit == EBackupUnit.Transporter
+                    ? LspdfrData.BackupUnits.LocalPatrol
+                    : LspdfrData.BackupUnits[unit];
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to retrieve backup unit for unit type {unit}, using LocalPatrol instead, {ex.Message}", ex);
+                return LspdfrData.BackupUnits.LocalPatrol;
+            }
         }
 
         private static Agency GetAgency(EBackupUnit unit, Backup backup, Vector3 position)
         {
-            return unit == EBackupUnit.Transporter 
-                ? LspdfrData.Agencies[backup[EWorldZoneCounty.LosSantos]] 
-                : LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
+            var agencyScriptName = unit == EBackupUnit.Transporter
+                ? backup[EWorldZoneCounty.LosSantos]
+                : backup[Functions.GetZoneAtPosition(position).County];
+            
+            Logger.Trace($"Retrieving agency by script name {agencyScriptName}");
+            return LspdfrData.Agencies[agencyScriptName];
         }
 
         private static Loadout GetLoadoutForAgency(EBackupUnit unit, Agency agency)
         {
+            Assert.NotNull(unit, "unit cannot be null");
+            Assert.NotNull(agency, "agency cannot be null");
             return unit == EBackupUnit.Transporter
                 ? agency.Loadout.FirstOrDefault(x => x.Name.Equals(Agency.TransporterLoadout, StringComparison.InvariantCulture))
                 : agency.Loadout.FirstOrDefault();

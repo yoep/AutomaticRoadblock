@@ -45,6 +45,8 @@ namespace AutomaticRoadblocks.Lspdfr
         [CanBeNull]
         public string MountChiliad { get; internal set; }
 
+        [XmlElement(IsNullable = true)]
+        [CanBeNull]
         public string CayoPerico { get; internal set; }
 
         public override string ToString()
