@@ -158,9 +158,12 @@ namespace AutomaticRoadblocks.Lspdfr
 
         private static Agency GetAgency(EBackupUnit unit, Backup backup, Vector3 position)
         {
-            return unit == EBackupUnit.Transporter
-                ? LspdfrData.Agencies[backup[EWorldZoneCounty.LosSantos]]
-                : LspdfrData.Agencies[backup[Functions.GetZoneAtPosition(position).County]];
+            var agencyScriptName = unit == EBackupUnit.Transporter
+                ? backup[EWorldZoneCounty.LosSantos]
+                : backup[Functions.GetZoneAtPosition(position).County];
+            
+            Logger.Trace($"Retrieving agency by script name {agencyScriptName}");
+            return LspdfrData.Agencies[agencyScriptName];
         }
 
         private static Loadout GetLoadoutForAgency(EBackupUnit unit, Agency agency)
