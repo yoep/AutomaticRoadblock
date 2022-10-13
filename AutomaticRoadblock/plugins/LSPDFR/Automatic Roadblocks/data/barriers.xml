@@ -40,6 +40,24 @@
         </Flags>
     </Barrier>
     <Barrier>
+        <Name>Long pole</Name>
+        <ScriptName>roadpole</ScriptName>
+        <Model>prop_roadpole_01a</Model>
+        <Spacing>0.5</Spacing>
+        <Flags>
+            <Flag>ManualPlacement</Flag>
+        </Flags>
+    </Barrier>
+    <Barrier>
+        <Name>Long pole with light</Name>
+        <ScriptName>roadpole_light</ScriptName>
+        <Model>prop_roadpole_01b</Model>
+        <Spacing>0.5</Spacing>
+        <Flags>
+            <Flag>ManualPlacement</Flag>
+        </Flags>
+    </Barrier>
+    <Barrier>
         <Name>Police do not cross</Name>
         <ScriptName>police_do_not_cross</ScriptName>
         <Model>prop_barrier_work05</Model>
