@@ -88,7 +88,10 @@ namespace AutomaticRoadblocks.Lspdfr
                     DoInternalInventoryCreation(ped, pedData);
 
                 if (pedData.Helmet)
+                {
+                    Logger.Trace($"Applying PoliceMotorcycleHelmet for {pedData}");
                     ped.GiveHelmet(false, HelmetTypes.PoliceMotorcycleHelmet, 0);
+                }
 
                 // always give the ped a flashlight
                 ped.Inventory.GiveFlashlight();
