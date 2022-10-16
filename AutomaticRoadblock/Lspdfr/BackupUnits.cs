@@ -1,19 +1,34 @@
 using System;
 using System.Xml.Serialization;
+using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Lspdfr
 {
     [XmlRoot("BackupUnits")]
     public class BackupUnits
     {
+        public static readonly BackupUnits Defaults = new()
+        {
+            LocalPatrol = new Backup("lspd", "lssd", "lssd", "nysp", "sapr", "sapr"),
+            StatePatrol = new Backup("sahp", "sahp", "sahp", "nysp", "sapr"),
+            LocalSWAT = new Backup("lspd_swat", "lssd_swat", "lssd_swat", "nysp", "sapr"),
+            NooseSWAT = new Backup("noose", "noose", "noose", "noose", "noose")
+        };
+
         [XmlIgnore] public Backup this[EBackupUnit unit] => GetBackup(unit);
 
         public Backup LocalPatrol { get; internal set; }
 
+        [XmlElement(IsNullable = true)]
+        [CanBeNull]
         public Backup StatePatrol { get; internal set; }
 
+        [XmlElement(IsNullable = true)]
+        [CanBeNull]
         public Backup LocalSWAT { get; internal set; }
 
+        [XmlElement(IsNullable = true)]
+        [CanBeNull]
         public Backup NooseSWAT { get; internal set; }
 
         public override string ToString()
