@@ -157,9 +157,15 @@ namespace AutomaticRoadblocks.Lspdfr
         {
             try
             {
-                return unit == EBackupUnit.Transporter
+                var backupUnit = unit == EBackupUnit.Transporter
                     ? LspdfrData.BackupUnits.LocalPatrol
                     : LspdfrData.BackupUnits[unit];
+
+                if (backupUnit != null)
+                    return backupUnit;
+
+                Logger.Warn($"Backup unit is null for type {unit}, using LocalPatrol instead");
+                return LspdfrData.BackupUnits.LocalPatrol;
             }
             catch (Exception ex)
             {

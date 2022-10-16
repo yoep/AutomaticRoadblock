@@ -39,7 +39,7 @@ namespace AutomaticRoadblocks.Lspdfr
         public override void Reload()
         {
             Logger.Trace($"Loading LSPDFR config data from {DataDirectory}");
-            BackupUnits = TryToLoadDatafile<BackupUnits>(BackupUnitsFilename);
+            BackupUnits = TryToLoadDatafile(BackupUnitsFilename, BackupUnits.Defaults);
             Agencies = TryToLoadDatafile<Agencies>(AgenciesFilename);
             Inventories = TryToLoadDatafile<Inventories>(InventoryFilename);
             Outfits = TryToLoadDatafile<Outfits>(OutfitFilename);
