@@ -36,6 +36,7 @@ namespace AutomaticRoadblocks.Localization
             new(nameof(PursuitLevelDescription), "The pursuit level which determines the roadblock type");
 
         public static readonly LocalizationKey EnableSpikeStrip = new(nameof(EnableSpikeStrip), "Enable spikes");
+        public static readonly LocalizationKey EnableSpikeStripDescription = new(nameof(EnableSpikeStripDescription), "Enable spike strip deployment during roadblock placement");
         
         #endregion
 
