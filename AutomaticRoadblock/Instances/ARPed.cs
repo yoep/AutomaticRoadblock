@@ -32,11 +32,6 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public Ped GameInstance { get; }
 
-        /// <summary>
-        /// Get the primary weapon of this ped.
-        /// </summary>
-        public WeaponDescriptor PrimaryWeapon => GameInstance.Inventory.Weapons.First(x => x.MagazineSize > 0);
-
         /// <inheritdoc />
         public bool IsInvalid => GameInstance == null ||
                                  !GameInstance.IsValid();
@@ -91,7 +86,6 @@ namespace AutomaticRoadblocks.Instances
 
             DeleteAttachments();
             ClearAllTasks();
-            GameInstance.KeepTasks = false;
             GameInstance.IsPersistent = false;
             Functions.SetCopAsBusy(GameInstance, false);
         }
@@ -220,11 +214,11 @@ namespace AutomaticRoadblocks.Instances
                 return;
             }
 
-            Functions.SetPedAsCop(GameInstance);
-            Functions.SetCopAsBusy(GameInstance, true);
             GameInstance.IsPersistent = true;
             GameInstance.KeepTasks = true;
             GameInstance.RelationshipGroup = RelationshipGroup.Cop;
+            Functions.SetPedAsCop(GameInstance);
+            Functions.SetCopAsBusy(GameInstance, true);
         }
 
         #endregion
