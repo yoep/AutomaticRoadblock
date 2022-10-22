@@ -105,16 +105,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         }
 
         /// <inheritdoc />
-        protected override void InitializeCops()
-        {
-            base.InitializeCops();
-            Instances
-                .Where(x => x.Type == EEntityType.CopPed)
-                .ToList()
-                .ForEach(x => x.IsAllowedToJoinPursuit = false);
-        }
-
-        /// <inheritdoc />
         protected override Vector3 CalculatePositionBehindVehicle()
         {
             return CalculateVehiclePositionOnSide() + CalculateDirectionInFrontOfVehicle(PlacementInFrontOfVehicle);

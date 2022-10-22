@@ -566,13 +566,7 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 while (IsPreviewActive)
                 {
-                    var color = Flags switch
-                    {
-                        ERoadblockFlags.JoinPursuit => Color.Lime,
-                        ERoadblockFlags.JoinPursuitOnHit => Color.Coral,
-                        ERoadblockFlags.JoinPursuitOnBypass => Color.Gold,
-                        _ => Color.DarkRed
-                    };
+                    var color = PursuitIndicatorColor();
 
                     foreach (var ped in RetrieveCopsJoiningThePursuit(false))
                     {
@@ -582,6 +576,26 @@ namespace AutomaticRoadblocks.Roadblock
                     Game.FiberYield();
                 }
             }, "Roadblock.Preview");
+        }
+
+        private Color PursuitIndicatorColor()
+        {
+            var color = Color.DarkRed;
+            
+            if (Flags.HasFlag(ERoadblockFlags.JoinPursuit))
+            {
+                color = Color.Lime;
+            }
+            else if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass))
+            {
+                color = Color.Gold;
+            }
+            else if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
+            {
+                color = Color.Coral;
+            }
+
+            return color;
         }
 
         #endregion

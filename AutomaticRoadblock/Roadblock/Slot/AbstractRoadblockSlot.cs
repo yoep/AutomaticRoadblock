@@ -98,7 +98,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         /// <inheritdoc />
         public virtual List<ARPed> CopsJoiningThePursuit => ValidCopInstances
-            .Where(x => x.IsAllowedToJoinPursuit)
             .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .ToList();
@@ -371,7 +370,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
             for (var i = 0; i < NumberOfCops; i++)
             {
-                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), pedHeading, true,
+                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), pedHeading,
                     (position, heading) => new ARPed(LspdfrDataHelper.RetrieveCop(BackupType, position), heading)));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }

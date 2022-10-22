@@ -488,7 +488,14 @@ namespace AutomaticRoadblocks.Pursuit
             if (!IsPursuitActive)
                 return;
 
-            cops.ToList().ForEach(x => Functions.AddCopToPursuit(PursuitHandle, x));
+            _logger.Debug($"Adding a total of {cops.Count()} to the pursuit for roadblock {roadblock}");
+            foreach (var cop in cops)
+            {
+                if (IsPursuitActive)
+                {
+                    Functions.AddCopToPursuit(PursuitHandle, cop);
+                }
+            }
         }
 
         private bool IsSuspectVehicleOnRoad()
