@@ -220,11 +220,11 @@ namespace AutomaticRoadblocks.Instances
                 return;
             }
 
+            Functions.SetPedAsCop(GameInstance);
+            Functions.SetCopAsBusy(GameInstance, true);
             GameInstance.IsPersistent = true;
             GameInstance.KeepTasks = true;
             GameInstance.RelationshipGroup = RelationshipGroup.Cop;
-            Functions.SetPedAsCop(GameInstance);
-            Functions.SetCopAsBusy(GameInstance, true);
         }
 
         #endregion

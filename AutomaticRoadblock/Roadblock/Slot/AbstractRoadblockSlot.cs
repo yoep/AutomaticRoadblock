@@ -247,19 +247,22 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public virtual void Release(bool releaseAll = false)
         {
+            Logger.Trace($"Releasing roadblock slot {this}");
             var instances = releaseAll
                 ? ValidCopInstances
                     .Select(x => x.Instance)
                     .Select(x => (ARPed)x)
                     .ToList()
                 : CopsJoiningThePursuit;
-            var vehicleInstance = Instances.FirstOrDefault(x => x.Type == EEntityType.CopVehicle);
-            RoadblockHelpers.ReleaseInstancesToLspdfr(instances, Vehicle);
 
-            if (vehicleInstance != null)
-                Instances.Remove(vehicleInstance);
-
+            Instances
+                .Where(x => x.Type == EEntityType.CopVehicle)
+                .ToList()
+                .ForEach(x => Instances.Remove(x));
             Instances.RemoveAll(x => instances.Any(instance => x.Instance == instance));
+            Logger.Trace($"Roadblock slot state after release {this}");
+
+            RoadblockHelpers.ReleaseInstancesToLspdfr(instances, Vehicle);
         }
 
         /// <inheritdoc />
