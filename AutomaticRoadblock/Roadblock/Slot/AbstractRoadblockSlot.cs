@@ -91,16 +91,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public Road.Lane Lane { get; }
 
         /// <inheritdoc />
-        public IEnumerable<ARPed> Cops => ValidCopInstances
+        public IList<ARPed> Cops => ValidCopInstances
             .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .ToList();
 
         /// <inheritdoc />
-        public virtual List<ARPed> CopsJoiningThePursuit => ValidCopInstances
-            .Select(x => x.Instance)
-            .Select(x => (ARPed)x)
-            .ToList();
+        public virtual IList<ARPed> CopsJoiningThePursuit => Cops;
 
         /// <summary>
         /// The main barrier that is used within this slot as first row.
@@ -249,10 +246,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Logger.Trace($"Releasing roadblock slot {this}");
             var instances = releaseAll
-                ? ValidCopInstances
-                    .Select(x => x.Instance)
-                    .Select(x => (ARPed)x)
-                    .ToList()
+                ? Cops
                 : CopsJoiningThePursuit;
 
             Instances

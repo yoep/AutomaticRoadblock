@@ -422,7 +422,7 @@ namespace AutomaticRoadblocks.Pursuit
 
             if (roadblock == null)
             {
-                _logger.Warn("Pursuit roadblock was not dispatched");
+                _logger.Warn("Pursuit manager could not dispatch a new roadblock");
                 return false;
             }
 
@@ -434,8 +434,15 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void DoDispatchTick()
         {
-            if (IsDispatchingAllowed() && ShouldDispatchRoadblock())
-                DispatchNow();
+            if (!IsDispatchingAllowed() || !ShouldDispatchRoadblock()) 
+                return;
+            
+            if (!DispatchNow())
+            {
+                // if the dispatching failed
+                // wait a short interval before retrying
+                GameFiber.Wait(3 * 1000);
+            }
         }
 
         private bool DispatchForNonActivePursuit(bool userRequest, bool force, ERoadblockDistance roadblockDistance)

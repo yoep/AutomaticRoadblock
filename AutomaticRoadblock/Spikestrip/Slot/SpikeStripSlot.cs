@@ -43,7 +43,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         #region Properties
 
         /// <inheritdoc />
-        public override List<ARPed> CopsJoiningThePursuit => new();
+        public override IList<ARPed> CopsJoiningThePursuit => new List<ARPed>();
 
         /// <summary>
         /// The road this spike strip slot is placed on.
