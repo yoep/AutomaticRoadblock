@@ -171,13 +171,14 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                    GameUtils.TimePeriod is ETimePeriod.Evening or ETimePeriod.Night;
         }
 
-        private bool ShouldPlaceSpikeStripInRoadblock(bool enableSpikeStrips)
+        private bool ShouldPlaceSpikeStripInRoadblock(bool enableSpikeStrips, RoadblockData roadblockData)
         {
             var spawnChance = _settingsManager.AutomaticRoadblocksSettings.SpikeStripChance * 100;
             var threshold = Random.Next(101);
 
-            _logger.Trace($"Spike strip change Enabled: {enableSpikeStrips}, {nameof(spawnChance)}: {spawnChance}, {nameof(threshold)}: {threshold}");
-            return enableSpikeStrips && spawnChance >= threshold;
+            _logger.Trace($"Spike strip change Enabled: {enableSpikeStrips}, data SpikeStripsEnabled: {roadblockData.SpikeStripsEnabled}, " +
+                          $"{nameof(spawnChance)}: {spawnChance}, {nameof(threshold)}: {threshold}");
+            return enableSpikeStrips && roadblockData.SpikeStripsEnabled && spawnChance >= threshold;
         }
 
         [CanBeNull]
@@ -253,39 +254,40 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     .SelectMany(x => FilterRoadsTravellingAlongTheRoute(GetPreviousNode(streetNodes, x), x))
                     .ToList();
 
-                junctionRoads.ForEach(x => CreateRoadblock(x, vehicle, ERoadblockLevel.Level3, createAsPreview,
+                junctionRoads.ForEach(x => CreateRoadblock(x, vehicle, ERoadblockLevel.Level3, createAsPreview, false,
                     ERoadblockFlags.DetectBypass | ERoadblockFlags.JoinPursuitOnHit | ERoadblockFlags.ForceInVehicle));
                 _logger.Info($"Deployed an additional {junctionRoads.Count} junction roadblocks along the road");
             }
 
-            var flags = ERoadblockFlags.JoinPursuit | ERoadblockFlags.PlayAudio;
-
-            if (options.EnableSpikeStrips)
-                flags |= ERoadblockFlags.EnableSpikeStrips;
-
-            return CreateRoadblock(streetNodes.OfType<Road>().Last(), vehicle, level, createAsPreview, flags);
+            return CreateRoadblock(streetNodes.OfType<Road>().Last(), vehicle, level, createAsPreview, options.EnableSpikeStrips,
+                ERoadblockFlags.JoinPursuit | ERoadblockFlags.PlayAudio);
         }
 
-        private IRoadblock CreateRoadblock(Road road, Vehicle vehicle, ERoadblockLevel level, bool createAsPreview, ERoadblockFlags flags)
+        private IRoadblock CreateRoadblock(Road road, Vehicle vehicle, ERoadblockLevel level, bool createAsPreview, bool spikeStripsEnabled,
+            ERoadblockFlags flags)
         {
+            var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
+            var roadblockData = GetRoadblockConfigDataForLevel(actualLevelToUse);
+
             // add additional flags based on settings & world data
             if (Settings.SlowTraffic)
+            {
                 flags |= ERoadblockFlags.LimitSpeed;
+            }
+
             if (ShouldAddLightsToRoadblock())
+            {
                 flags |= ERoadblockFlags.EnableLights;
-            if (ShouldPlaceSpikeStripInRoadblock(flags.HasFlag(ERoadblockFlags.EnableSpikeStrips)))
+            }
+
+            if (ShouldPlaceSpikeStripInRoadblock(spikeStripsEnabled, roadblockData))
             {
                 flags |= ERoadblockFlags.EnableSpikeStrips;
             }
-            else
-            {
-                flags &= ~ERoadblockFlags.EnableSpikeStrips;
-            }
 
-            var actualLevelToUse = DetermineRoadblockLevelBasedOnTheRoadLocation(level, road);
             var roadblock = PursuitRoadblockFactory.Create(new PursuitRoadblockRequest
             {
-                RoadblockData = GetRoadblockConfigDataForLevel(actualLevelToUse),
+                RoadblockData = roadblockData,
                 Level = actualLevelToUse,
                 Road = road,
                 TargetVehicle = vehicle,

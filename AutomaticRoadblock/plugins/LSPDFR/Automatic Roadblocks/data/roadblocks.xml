@@ -8,6 +8,9 @@
         <Units>
             <Unit>LocalPatrol</Unit> <!-- The LSPDFR patrol unit type which is used within the roadblock (see lspdfr/data/backup.xml for possible types) -->
         </Units>
+        <!-- Enable the deployment of spike strips for this roadblock level -->
+        <!-- If spike strips are disabled through the settings file or in-game menu, spike strips will never be deployed even if this value is true -->
+        <SpikeStripsEnabled>false</SpikeStripsEnabled>
     </Roadblock>
     <Roadblock>
         <Level>2</Level>
@@ -19,6 +22,7 @@
             <Unit chance="70">LocalPatrol</Unit> <!-- 70% chance a patrol unit is used -->
             <Unit chance="30">StatePatrol</Unit> <!-- 30% chance a state unit is used -->
         </Units>
+        <SpikeStripsEnabled>true</SpikeStripsEnabled>
     </Roadblock>
     <Roadblock>
         <Level>3</Level>
@@ -34,6 +38,7 @@
             <!-- This unit uses the config of lspdfr/data/agency.xml with the loadout name "Transport Unit" -->
             <Unit chance="10">Transporter</Unit> 
         </Units>
+        <SpikeStripsEnabled>true</SpikeStripsEnabled>
     </Roadblock>
     <Roadblock>
         <Level>4</Level>
@@ -47,6 +52,7 @@
             <Unit chance="20">StatePatrol</Unit>
             <Unit chance="10">NooseSWAT</Unit>
         </Units>
+        <SpikeStripsEnabled>true</SpikeStripsEnabled>
     </Roadblock>
     <Roadblock>
         <Level>5</Level>
@@ -60,5 +66,6 @@
             <Unit chance="70">NooseSWAT</Unit>
             <Unit chance="30">LocalSWAT</Unit>
         </Units>
+        <SpikeStripsEnabled>true</SpikeStripsEnabled>
     </Roadblock>
 </Roadblocks>
