@@ -218,6 +218,38 @@ namespace AutomaticRoadblocks.Roadblock
             return ChanceProvider.Retrieve(RoadblockData.Units).Type;
         }
 
+        /// <summary>
+        /// Get valid cop instances from this roadblock.
+        /// These instances are from the <see cref="IRoadblock"/> itself and not from any slots.
+        /// </summary>
+        /// <returns>Returns a list of valid cop instances.</returns>
+        protected List<ARPed> GetValidCopInstances()
+        {
+            return Instances
+                .Where(x => x.Type == EEntityType.CopPed)
+                .Select(x => x.Instance)
+                .Where(x => x is { IsInvalid: false })
+                .Select(x => (ARPed)x)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Retrieve the chase vehicle cop instances.
+        /// This also releases all chase vehicle instances from the <see cref="IRoadblock"/>.
+        /// </summary>
+        /// <returns>Returns the instances to chase the suspect.</returns>
+        protected List<Ped> RetrieveAndReleaseChaseVehicle()
+        {
+            // only the chase vehicle will join the pursuit
+            var cops = GetValidCopInstances();
+            Instances.RemoveAll(x => x.Type == EEntityType.CopVehicle);
+            Instances.RemoveAll(x => cops.Contains(x.Instance));
+            
+            return cops
+                .Select(x => x.GameInstance)
+                .ToList();
+        }
+
         private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
         {
             var rowPosition = chasePosition + MathHelper.ConvertHeadingToDirection(TargetHeading - 180) * 4f;

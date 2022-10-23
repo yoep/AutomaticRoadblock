@@ -235,9 +235,9 @@ namespace AutomaticRoadblocks.Roadblock
             if (State != ERoadblockState.Active)
                 return;
 
+            Logger.Trace($"Releasing roadblock instance {this}");
             InvokeCopsJoiningPursuit(releaseAll);
-            ReleaseEntitiesToLspdfr(releaseAll);
-            UpdateState(ERoadblockState.Released);
+            ReleaseEntities(releaseAll);
         }
 
         /// <inheritdoc />
@@ -371,7 +371,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             if (IsAllowedToJoinPursuit() || releaseAll)
             {
-                Logger.Debug($"Cops joining pursuit for roadblock {this}");
+                Logger.Trace($"Cops joining pursuit for roadblock {this}");
                 foreach (var slot in Slots)
                 {
                     try
@@ -385,6 +385,12 @@ namespace AutomaticRoadblocks.Roadblock
                         Game.DisplayNotificationDebug("~r~Cops are unable to join the pursuit");
                     }
                 }
+
+                Logger.Debug($"A total of {copsJoining.Count} cops are joining the pursuit for {this}");
+            }
+            else
+            {
+                Logger.Debug($"Cops are not allowed to join pursuit for {this}");
             }
 
             return copsJoining;
@@ -396,7 +402,8 @@ namespace AutomaticRoadblocks.Roadblock
         /// <returns>Returns true if the cops are allowed to join.</returns>
         protected bool IsAllowedToJoinPursuit()
         {
-            return (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass) && State == ERoadblockState.Bypassed) ||
+            return Flags.HasFlag(ERoadblockFlags.JoinPursuit) ||
+                   (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass) && State == ERoadblockState.Bypassed) ||
                    (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit) && State == ERoadblockState.Hit) ||
                    IsPreviewActive;
         }
@@ -531,15 +538,19 @@ namespace AutomaticRoadblocks.Roadblock
             return laneWidth - vehicleLength;
         }
 
-        private void ReleaseEntitiesToLspdfr(bool releaseAll)
+        private void ReleaseEntities(bool releaseAll)
         {
             if (IsAllowedToJoinPursuit() || releaseAll)
             {
-                Logger.Debug($"Releasing cops to LSPDFR for roadblock {this}");
+                Logger.Trace($"Releasing slot cops to LSPDFR for roadblock {this}");
                 foreach (var slot in Slots)
                 {
                     slot.Release(releaseAll);
                 }
+            }
+            else
+            {
+                Logger.Debug($"Slot cops won't be released to LSPDFR for {this}");
             }
 
             Game.NewSafeFiber(() =>
@@ -566,22 +577,46 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 while (IsPreviewActive)
                 {
-                    var color = Flags switch
-                    {
-                        ERoadblockFlags.JoinPursuit => Color.Lime,
-                        ERoadblockFlags.JoinPursuitOnHit => Color.Coral,
-                        ERoadblockFlags.JoinPursuitOnBypass => Color.Gold,
-                        _ => Color.DarkRed
-                    };
-
-                    foreach (var ped in RetrieveCopsJoiningThePursuit(false))
+                    var color = PursuitIndicatorColor();
+                    var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
+                    var remainingCops = Slots
+                        .SelectMany(x => x.Cops)
+                        .Where(x => !copsJoiningThePursuit.Contains(x.GameInstance))
+                        .Select(x => x.GameInstance)
+                        .ToList();
+                    
+                    foreach (var ped in copsJoiningThePursuit)
                     {
                         GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, color, 1f, 1f, false);
+                    }
+                    foreach (var ped in remainingCops)
+                    {
+                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.DarkRed, 1f, 1f, false);
                     }
 
                     Game.FiberYield();
                 }
             }, "Roadblock.Preview");
+        }
+
+        private Color PursuitIndicatorColor()
+        {
+            var color = Color.DarkRed;
+
+            if (Flags.HasFlag(ERoadblockFlags.JoinPursuit))
+            {
+                color = Color.Lime;
+            }
+            else if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass))
+            {
+                color = Color.Gold;
+            }
+            else if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
+            {
+                color = Color.Coral;
+            }
+
+            return color;
         }
 
         #endregion

@@ -47,12 +47,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <summary>
         /// The cop instances of this roadblock slot.
         /// </summary>
-        IEnumerable<ARPed> Cops { get; }
+        IList<ARPed> Cops { get; }
         
         /// <summary>
         /// The cop instances of the roadblock slot that will be joining the pursuit.
         /// </summary>
-        List<ARPed> CopsJoiningThePursuit { get; }
+        IList<ARPed> CopsJoiningThePursuit { get; }
 
         /// <summary>
         /// The length of the vehicle model in the slot.

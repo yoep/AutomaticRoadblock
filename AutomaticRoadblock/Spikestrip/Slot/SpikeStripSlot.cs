@@ -43,7 +43,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         #region Properties
 
         /// <inheritdoc />
-        public override List<ARPed> CopsJoiningThePursuit => new();
+        public override IList<ARPed> CopsJoiningThePursuit => new List<ARPed>();
 
         /// <summary>
         /// The road this spike strip slot is placed on.
@@ -102,16 +102,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         protected override void InitializeLights()
         {
             // no-op
-        }
-
-        /// <inheritdoc />
-        protected override void InitializeCops()
-        {
-            base.InitializeCops();
-            Instances
-                .Where(x => x.Type == EEntityType.CopPed)
-                .ToList()
-                .ForEach(x => x.IsAllowedToJoinPursuit = false);
         }
 
         /// <inheritdoc />

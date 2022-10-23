@@ -12,7 +12,6 @@ using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
-using LSPD_First_Response.Mod.API;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
@@ -91,17 +90,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public Road.Lane Lane { get; }
 
         /// <inheritdoc />
-        public IEnumerable<ARPed> Cops => ValidCopInstances
+        public IList<ARPed> Cops => ValidCopInstances
             .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .ToList();
 
         /// <inheritdoc />
-        public virtual List<ARPed> CopsJoiningThePursuit => ValidCopInstances
-            .Where(x => x.IsAllowedToJoinPursuit)
-            .Select(x => x.Instance)
-            .Select(x => (ARPed)x)
-            .ToList();
+        public virtual IList<ARPed> CopsJoiningThePursuit => Cops;
 
         /// <summary>
         /// The main barrier that is used within this slot as first row.
@@ -227,14 +222,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 DeletePreview();
 
             Instances.ForEach(x => x.Spawn());
-            CopInstances
-                .Select(x => x.GameInstance)
-                .ToList()
-                .ForEach(x =>
-                {
-                    Functions.SetPedAsCop(x);
-                    Functions.SetCopAsBusy(x, true);
-                });
         }
 
         /// <inheritdoc />
@@ -248,19 +235,19 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public virtual void Release(bool releaseAll = false)
         {
+            Logger.Trace($"Releasing roadblock slot {this}");
             var instances = releaseAll
-                ? ValidCopInstances
-                    .Select(x => x.Instance)
-                    .Select(x => (ARPed)x)
-                    .ToList()
+                ? Cops
                 : CopsJoiningThePursuit;
-            var vehicleInstance = Instances.FirstOrDefault(x => x.Type == EEntityType.CopVehicle);
-            RoadblockHelpers.ReleaseInstancesToLspdfr(instances, Vehicle);
 
-            if (vehicleInstance != null)
-                Instances.Remove(vehicleInstance);
-
+            Instances
+                .Where(x => x.Type == EEntityType.CopVehicle)
+                .ToList()
+                .ForEach(x => Instances.Remove(x));
             Instances.RemoveAll(x => instances.Any(instance => x.Instance == instance));
+            Logger.Trace($"Roadblock slot state after release {this}");
+
+            RoadblockHelpers.ReleaseInstancesToLspdfr(instances, Vehicle);
         }
 
         /// <inheritdoc />
@@ -371,7 +358,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
             for (var i = 0; i < NumberOfCops; i++)
             {
-                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), pedHeading, true,
+                Instances.Add(new InstanceSlot(EEntityType.CopPed, GameUtils.GetOnTheGroundPosition(pedSpawnPosition), pedHeading,
                     (position, heading) => new ARPed(LspdfrDataHelper.RetrieveCop(BackupType, position), heading)));
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }

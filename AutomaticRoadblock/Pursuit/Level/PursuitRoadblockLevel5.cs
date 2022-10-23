@@ -1,6 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
@@ -53,13 +52,18 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
         {
-            // only the chase vehicle will join the pursuit
-            return Instances
-                .Where(x => x.Type == EEntityType.CopPed)
-                .Select(x => x.Instance)
-                .Select(x => (ARPed)x)
-                .Select(x => x.GameInstance)
-                .ToList();
+            if (releaseAll)
+            {
+                return base.RetrieveCopsJoiningThePursuit(true);
+            }
+
+            if (IsAllowedToJoinPursuit())
+            {
+                // only the chase vehicle will join the pursuit
+                return RetrieveAndReleaseChaseVehicle();
+            }
+
+            return Array.Empty<Ped>();
         }
 
         #endregion

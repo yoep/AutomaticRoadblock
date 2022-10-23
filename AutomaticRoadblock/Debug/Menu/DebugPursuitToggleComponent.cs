@@ -11,11 +11,11 @@ using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
-    public class DebugPursuitToggleComponent : IMenuComponent<UIMenuItem>
+    public class DebugPursuitToggleComponent : IMenuComponent<UIMenuListScrollerItem<DebugPursuitToggleComponent.PursuitType>>
     {
         private static readonly Random Random = new();
 
-        private static readonly IReadOnlyList<string> RaceVehicleModels = new List<string>
+        private static readonly IReadOnlyList<string> VehicleModels = new List<string>
         {
             "penumbra2",
             "coquette4",
@@ -29,6 +29,10 @@ namespace AutomaticRoadblocks.Debug.Menu
             "drafter",
             "paragon2",
             "italigto",
+            "landstalker",
+            "baller6",
+            "oracle2",
+            "pounder2"
         };
 
         private readonly IGame _game;
@@ -43,7 +47,8 @@ namespace AutomaticRoadblocks.Debug.Menu
         }
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.StartPursuit);
+        public UIMenuListScrollerItem<PursuitType> MenuItem { get; } = new(AutomaticRoadblocksPlugin.StartPursuit,
+            AutomaticRoadblocksPlugin.StartPursuitDescription, PursuitType.Values);
 
         /// <inheritdoc />
         public EMenuType Type => EMenuType.Debug;
@@ -71,11 +76,12 @@ namespace AutomaticRoadblocks.Debug.Menu
             {
                 _currentPursuit = Functions.CreatePursuit();
 
+                var type = MenuItem.SelectedItem;
                 var vehicleNode = RoadQuery.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f,
                     EVehicleNodeType.AllNodes);
                 var driver = new Ped(vehicleNode.Position);
                 var passenger = new Ped(vehicleNode.Position);
-                var vehicle = new Vehicle(new Model(RaceVehicleModels[Random.Next(RaceVehicleModels.Count)]), vehicleNode.Position, vehicleNode.Heading);
+                var vehicle = new Vehicle(new Model(VehicleModels[Random.Next(VehicleModels.Count)]), vehicleNode.Position, vehicleNode.Heading);
 
                 driver.RelationshipGroup = RelationshipGroup.Gang1;
                 passenger.RelationshipGroup = RelationshipGroup.Gang1;
@@ -90,11 +96,10 @@ namespace AutomaticRoadblocks.Debug.Menu
 
                 Functions.AddPedToPursuit(_currentPursuit, driver);
                 Functions.AddPedToPursuit(_currentPursuit, passenger);
-                Functions.GetPedPursuitAttributes(driver).MaxDrivingSpeed = 80f;
-                Functions.GetPedPursuitAttributes(driver).MinDrivingSpeed = 20f;
+                Functions.GetPedPursuitAttributes(driver).MinDrivingSpeed = 10f;
+                Functions.GetPedPursuitAttributes(driver).MaxDrivingSpeed = type.MaxDrivingSpeed;
 
-                // randomize if the suspect will be shooting at the cops or not
-                if (_random.Next(2) == 1)
+                if (type.Aggressive)
                 {
                     Functions.GetPedPursuitAttributes(driver).AverageFightTime = 0;
                     Functions.GetPedPursuitAttributes(passenger).AverageFightTime = 0;
@@ -127,6 +132,44 @@ namespace AutomaticRoadblocks.Debug.Menu
             ped.Inventory.GiveNewWeapon(new WeaponAsset("weapon_microsmg"), -1, false);
             ped.Inventory.GiveNewWeapon(new WeaponAsset("weapon_smg"), -1, false);
             ped.Inventory.EquippedWeapon = weaponDescriptor;
+        }
+
+        public class PursuitType
+        {
+            public static readonly PursuitType Slow = new("Slow",15f, false);
+            public static readonly PursuitType SlowAggressive = new("Slow aggressive",15f, true);
+            public static readonly PursuitType Normal = new("Normal",45f, false);
+            public static readonly PursuitType NormalAggressive = new("Normal aggressive",45f, true);
+            public static readonly PursuitType Fast = new("Fast",80f, false);
+            public static readonly PursuitType FastAggressive = new("Fast aggressive",80f, true);
+
+            public static readonly IEnumerable<PursuitType> Values = new[]
+            {
+                Slow,
+                SlowAggressive,
+                Normal,
+                NormalAggressive,
+                Fast,
+                FastAggressive
+            };
+            
+            private PursuitType(string displayText, float maxDrivingSpeed, bool aggressive)
+            {
+                DisplayText = displayText;
+                MaxDrivingSpeed = maxDrivingSpeed;
+                Aggressive = aggressive;
+            }
+
+            public string DisplayText { get; }
+            
+            public float MaxDrivingSpeed { get; }
+
+            public bool Aggressive { get; }
+
+            public override string ToString()
+            {
+                return $"{DisplayText}";
+            }
         }
     }
 }
