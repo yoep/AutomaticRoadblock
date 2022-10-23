@@ -500,6 +500,7 @@ namespace AutomaticRoadblocks.Pursuit
             {
                 if (IsPursuitActive)
                 {
+                    Functions.SetCopAsBusy(cop, false);
                     Functions.AddCopToPursuit(PursuitHandle, cop);
                 }
             }

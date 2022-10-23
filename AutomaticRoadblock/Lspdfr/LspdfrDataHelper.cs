@@ -62,6 +62,7 @@ namespace AutomaticRoadblocks.Lspdfr
 
         /// <summary>
         /// Retrieve a cop ped entity for the given unit type and position.
+        /// This ped is NOT registered to LSPDFR when calling this method so it won't be recognised as a cop.
         /// </summary>
         /// <param name="unit">The unit type to create.</param>
         /// <param name="position">the position of the entity.</param>
