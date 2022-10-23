@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         {
             _pursuitManager = pursuitManager;
 
-            MenuItem = new UIMenuCheckboxItem(localizer[LocalizationKey.EnableSpikeStrip], true);
+            MenuItem = new UIMenuCheckboxItem(localizer[LocalizationKey.EnableSpikeStrip], true, localizer[LocalizationKey.EnableSpikeStripDescription]);
         }
 
         /// <inheritdoc />

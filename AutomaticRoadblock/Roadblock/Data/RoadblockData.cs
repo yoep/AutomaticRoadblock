@@ -24,6 +24,15 @@ namespace AutomaticRoadblocks.Roadblock.Data
             Units = units;
         }
 
+        public RoadblockData(int level, string mainBarrier, List<string> lights, List<Unit> units, bool spikeStripsEnabled)
+        {
+            Level = level;
+            MainBarrier = mainBarrier;
+            Lights = lights;
+            Units = units;
+            SpikeStripsEnabled = spikeStripsEnabled;
+        }
+
         public RoadblockData(int level, string mainBarrier, string secondaryBarrier, List<Unit> units)
         {
             Level = level;
@@ -42,6 +51,18 @@ namespace AutomaticRoadblocks.Roadblock.Data
             Units = units;
         }
 
+        public RoadblockData(int level, string mainBarrier, string secondaryBarrier, string chaseVehicleBarrier, List<string> lights, List<Unit> units,
+            bool spikeStripsEnabled)
+        {
+            Level = level;
+            MainBarrier = mainBarrier;
+            SecondaryBarrier = secondaryBarrier;
+            ChaseVehicleBarrier = chaseVehicleBarrier;
+            Lights = lights;
+            Units = units;
+            SpikeStripsEnabled = spikeStripsEnabled;
+        }
+
         public int Level { get; internal set; }
 
         public string MainBarrier { get; internal set; }
@@ -54,17 +75,20 @@ namespace AutomaticRoadblocks.Roadblock.Data
 
         public List<Unit> Units { get; internal set; }
 
+        [XmlElement(IsNullable = true)] public bool SpikeStripsEnabled { get; private set; } = true;
+
         public override string ToString()
         {
             return $"{nameof(Level)}: {Level}, {nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, " +
-                   $"{nameof(ChaseVehicleBarrier)}: {ChaseVehicleBarrier}, {nameof(Lights)}: [{string.Join(", ", Lights)}], " +
-                   $"{nameof(Units)}: [{string.Join(", ", Units)}]";
+                   $"{nameof(ChaseVehicleBarrier)}: {ChaseVehicleBarrier}, {nameof(SpikeStripsEnabled)}: {SpikeStripsEnabled}, " +
+                   $"{nameof(Lights)}: [{string.Join(", ", Lights)}], {nameof(Units)}: [{string.Join(", ", Units)}]";
         }
 
         protected bool Equals(RoadblockData other)
         {
             return Level == other.Level && MainBarrier == other.MainBarrier && SecondaryBarrier == other.SecondaryBarrier &&
-                   ChaseVehicleBarrier == other.ChaseVehicleBarrier && Lights.All(x => other.Lights.Contains(x)) && Units.All(x => other.Units.Contains(x));
+                   ChaseVehicleBarrier == other.ChaseVehicleBarrier && Lights.All(x => other.Lights.Contains(x)) && Units.All(x => other.Units.Contains(x)) &&
+                   SpikeStripsEnabled == other.SpikeStripsEnabled;
         }
 
         public override bool Equals(object obj)
@@ -84,6 +108,8 @@ namespace AutomaticRoadblocks.Roadblock.Data
                 hashCode = (hashCode * 397) ^ (SecondaryBarrier != null ? SecondaryBarrier.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (ChaseVehicleBarrier != null ? ChaseVehicleBarrier.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Lights != null ? Lights.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Units != null ? Units.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ SpikeStripsEnabled.GetHashCode();
                 return hashCode;
             }
         }
