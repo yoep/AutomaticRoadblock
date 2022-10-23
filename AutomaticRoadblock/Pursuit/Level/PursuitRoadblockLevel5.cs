@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
@@ -62,25 +60,10 @@ namespace AutomaticRoadblocks.Pursuit.Level
             if (IsAllowedToJoinPursuit())
             {
                 // only the chase vehicle will join the pursuit
-                var cops = GetValidCopInstances();
-                Instances.RemoveAll(x => x.Type == EEntityType.CopVehicle);
-                Instances.RemoveAll(x => cops.Contains(x.Instance));
-                return cops
-                    .Select(x => x.GameInstance)
-                    .ToList();
+                return RetrieveAndReleaseChaseVehicle();
             }
 
             return Array.Empty<Ped>();
-        }
-
-        private List<ARPed> GetValidCopInstances()
-        {
-            return Instances
-                .Where(x => x.Type == EEntityType.CopPed)
-                .Select(x => x.Instance)
-                .Where(x => x is { IsInvalid: false })
-                .Select(x => (ARPed)x)
-                .ToList();
         }
 
         #endregion
