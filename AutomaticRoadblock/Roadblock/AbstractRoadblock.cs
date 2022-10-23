@@ -578,10 +578,20 @@ namespace AutomaticRoadblocks.Roadblock
                 while (IsPreviewActive)
                 {
                     var color = PursuitIndicatorColor();
-
-                    foreach (var ped in RetrieveCopsJoiningThePursuit(false))
+                    var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
+                    var remainingCops = Slots
+                        .SelectMany(x => x.Cops)
+                        .Where(x => !copsJoiningThePursuit.Contains(x.GameInstance))
+                        .Select(x => x.GameInstance)
+                        .ToList();
+                    
+                    foreach (var ped in copsJoiningThePursuit)
                     {
                         GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, color, 1f, 1f, false);
+                    }
+                    foreach (var ped in remainingCops)
+                    {
+                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.DarkRed, 1f, 1f, false);
                     }
 
                     Game.FiberYield();
