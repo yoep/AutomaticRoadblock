@@ -12,7 +12,6 @@ using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
-using LSPD_First_Response.Mod.API;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
@@ -223,14 +222,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 DeletePreview();
 
             Instances.ForEach(x => x.Spawn());
-            CopInstances
-                .Select(x => x.GameInstance)
-                .ToList()
-                .ForEach(x =>
-                {
-                    Functions.SetPedAsCop(x);
-                    Functions.SetCopAsBusy(x, true);
-                });
         }
 
         /// <inheritdoc />

@@ -22,6 +22,8 @@ namespace AutomaticRoadblocks.Instances
         public ARPed(Ped ped, float heading = 0f)
         {
             Assert.NotNull(ped, "ped cannot be null");
+            Functions.SetPedAsCop(ped);
+            Functions.SetCopAsBusy(ped, true);
             GameInstance = ped;
             GameInstance.Heading = heading;
             Initialize();
@@ -87,6 +89,7 @@ namespace AutomaticRoadblocks.Instances
             DeleteAttachments();
             ClearAllTasks();
             GameInstance.IsPersistent = false;
+            Functions.SetPedAsCop(GameInstance);
             Functions.SetCopAsBusy(GameInstance, false);
         }
 
@@ -217,8 +220,6 @@ namespace AutomaticRoadblocks.Instances
             GameInstance.IsPersistent = true;
             GameInstance.KeepTasks = true;
             GameInstance.RelationshipGroup = RelationshipGroup.Cop;
-            Functions.SetPedAsCop(GameInstance);
-            Functions.SetCopAsBusy(GameInstance, true);
         }
 
         #endregion

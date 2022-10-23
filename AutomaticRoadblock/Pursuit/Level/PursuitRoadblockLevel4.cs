@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
@@ -79,10 +80,20 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
         {
-            // only the chase vehicle will join the pursuit
-            return GetValidCopInstances()
-                .Select(x => x.GameInstance)
-                .ToList();
+            if (releaseAll)
+            {
+                return base.RetrieveCopsJoiningThePursuit(true);
+            }
+            
+            if (IsAllowedToJoinPursuit())
+            {
+                // only the chase vehicle will join the pursuit
+                return GetValidCopInstances()
+                    .Select(x => x.GameInstance)
+                    .ToList();
+            }
+
+            return Array.Empty<Ped>();
         }
 
         private void StateChanged(IRoadblock roadblock, ERoadblockState newState)

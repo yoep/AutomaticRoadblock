@@ -545,7 +545,7 @@ namespace AutomaticRoadblocks.Roadblock
                 Logger.Trace($"Releasing slot cops to LSPDFR for roadblock {this}");
                 foreach (var slot in Slots)
                 {
-                    
+                    slot.Release(releaseAll);
                 }
             }
             else

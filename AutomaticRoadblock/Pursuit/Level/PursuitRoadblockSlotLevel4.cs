@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
@@ -17,6 +18,13 @@ namespace AutomaticRoadblocks.Pursuit.Level
             : base(lane, mainBarrier, secondaryBarrier, backupUnit, heading, targetVehicle, lightSources, shouldAddLights)
         {
         }
+
+        #region Properties
+
+        /// <inheritdoc />
+        public override IList<ARPed> CopsJoiningThePursuit { get; } = new List<ARPed>();
+
+        #endregion
 
         public override void Spawn()
         {
