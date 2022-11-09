@@ -240,12 +240,17 @@
         <Compile Include="Roadblock\Slot\AbstractRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IRoadblockSlot.cs" />
+        <Compile Include="Street\Calculation\IRoadStrategy.cs" />
+        <Compile Include="Street\Calculation\IsPointOnRoadStrategy.cs" />
+        <Compile Include="Street\Calculation\RayTracingRoadStrategy.cs" />
+        <Compile Include="Street\Calculation\RoadBoundaryRoadStrategy.cs" />
         <Compile Include="Street\ENodeFlag.cs" />
         <Compile Include="Street\ERoadType.cs" />
         <Compile Include="Street\EStreetType.cs" />
         <Compile Include="Street\ETraceFlags.cs" />
         <Compile Include="Street\EVehicleNodeType.cs" />
         <Compile Include="Street\Factory\IntersectionFactory.cs" />
+        <Compile Include="Street\Factory\LastPointOnRoadStrategy.cs" />
         <Compile Include="Street\Factory\RoadFactory.cs" />
         <Compile Include="Street\ILane.cs" />
         <Compile Include="Street\Info\Intersection.cs" />

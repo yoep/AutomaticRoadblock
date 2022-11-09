@@ -30,23 +30,8 @@ namespace AutomaticRoadblocks.Street.Factory
             var rightSideHeading = nodeHeading - 90f;
             var leftSideHeading = nodeHeading + 90f;
 
-            if (!StreetHelper.LastPointOnRoadUsingRaytracing(nodeInfo.Position, rightSideHeading, out rightSide))
-            {
-                Logger.Debug($"Using native to calculate the right side for Position: {nodeInfo.Position}");
-                if (!StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, rightSideHeading, out rightSide))
-                {
-                    Logger.Warn("Native road right side calculation failed");
-                }
-            }
-
-            if (!StreetHelper.LastPointOnRoadUsingRaytracing(nodeInfo.Position, leftSideHeading, out leftSide))
-            {
-                Logger.Debug($"Using native to calculate the left side for Position: {nodeInfo.Position}");
-                if (!StreetHelper.LastPointOnRoadUsingNative(nodeInfo.Position, leftSideHeading, out leftSide))
-                {
-                    Logger.Warn("Native road left side calculation failed");
-                }
-            }
+            rightSide = LastPointOnRoadStrategy.CalculateLastPointOnRoad(nodeInfo.Position, rightSideHeading);
+            leftSide = LastPointOnRoadStrategy.CalculateLastPointOnRoad(nodeInfo.Position, leftSideHeading);
 
             // verify if the points are not the same
             // if so, correct the left side
