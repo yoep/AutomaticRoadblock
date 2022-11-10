@@ -94,9 +94,6 @@ namespace AutomaticRoadblocks.Lspdfr
                     ped.GiveHelmet(false, HelmetTypes.PoliceMotorcycleHelmet, 0);
                 }
 
-                // always give the ped a flashlight
-                ped.Inventory.GiveFlashlight();
-
                 return ped;
             }
             catch (Exception ex)
