@@ -125,9 +125,6 @@ namespace AutomaticRoadblocks.ManualPlacement
             if (previewRoadblocks.Count == 1)
             {
                 roadblockToSpawn = previewRoadblocks[0];
-
-                // make sure the preview is deleted
-                previewRoadblocks[0].DeletePreview();
             }
             else
             {

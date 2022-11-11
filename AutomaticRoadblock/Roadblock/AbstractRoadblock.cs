@@ -154,6 +154,9 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public void CreatePreview()
         {
+            if (IsPreviewActive)
+                return;
+
             Logger.Trace($"Creating roadblock preview for {this}");
             CreateBlip();
             Logger.Debug($"Creating a total of {Slots.Count} slot previews for the roadblock preview");
@@ -171,6 +174,9 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public void DeletePreview()
         {
+            if (!IsPreviewActive)
+                return;
+
             DeleteBlip();
             Slots.ToList().ForEach(x => x.DeletePreview());
             Road.DeletePreview();
@@ -186,9 +192,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             UpdateState(ERoadblockState.Disposing);
 
-            if (IsPreviewActive)
-                DeletePreview();
-
+            DeletePreview();
             DeleteBlip();
             DeleteSpeedZone();
             Slots.ToList().ForEach(x => x.Dispose());
@@ -208,6 +212,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             try
             {
+                DeletePreview();
                 Slots.ToList().ForEach(SpawnSlot);
                 UpdateState(ERoadblockState.Active);
 
