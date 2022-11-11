@@ -366,7 +366,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         /// <param name="releaseAll"></param>
         /// <returns>Returns the cops joining the pursuit.</returns>
-        protected virtual IEnumerable<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
+        protected virtual IList<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
         {
             var copsJoining = new List<Ped>();
 
@@ -576,10 +576,11 @@ namespace AutomaticRoadblocks.Roadblock
         {
             Game.NewSafeFiber(() =>
             {
+                var color = PursuitIndicatorColor();
+                var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
+
                 while (IsPreviewActive)
                 {
-                    var color = PursuitIndicatorColor();
-                    var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
                     var remainingCops = Slots
                         .SelectMany(x => x.Cops)
                         .Where(x => !copsJoiningThePursuit.Contains(x.GameInstance))

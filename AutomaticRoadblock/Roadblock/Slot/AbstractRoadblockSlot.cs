@@ -149,11 +149,15 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive => Instances.Count > 0 && Instances.First().IsPreviewActive;
+        public bool IsPreviewActive { get; private set; }
 
         /// <inheritdoc />
         public void CreatePreview()
         {
+            if (IsPreviewActive)
+                return;
+
+            IsPreviewActive = true;
             Logger.Debug($"Creating a total of {Instances.Count} instances for the roadblock slot preview");
             Logger.Trace($"Roadblock slot instances: \n{string.Join("\n", Instances.Select(x => x.ToString()).ToList())}");
             Instances.ForEach(x => DoSafeOperation(x.CreatePreview, $"create instance slot {x} preview"));
@@ -163,7 +167,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public void DeletePreview()
         {
+            if (!IsPreviewActive)
+                return;
+
             Instances.ForEach(x => DoSafeOperation(x.DeletePreview, $"delete instance slot {x} preview"));
+            IsPreviewActive = false;
         }
 
         #endregion
@@ -173,6 +181,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public virtual void Dispose()
         {
+            DeletePreview();
             Instances.ForEach(x => DoSafeOperation(x.Dispose, $"dispose instance slot {x}"));
         }
 

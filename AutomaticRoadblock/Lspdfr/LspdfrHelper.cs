@@ -44,6 +44,7 @@ namespace AutomaticRoadblocks.Lspdfr
         /// <param name="recordCollisions">Set if the vehicle collisions should be recorded.</param>
         public static bool CreateBackupUnit(Vector3 position, float heading, EBackupUnit backupUnit, int? numberOfOccupants, out ARVehicle vehicle, out ARPed[] cops, bool recordCollisions = false)
         {
+            Assert.True(numberOfOccupants != 0, "numberOfOccupants cannot be 0");
             var instance = Functions.RequestBackup(position, EBackupResponseType.Code3, LspdfrBackupUnit(backupUnit), null, true, true, numberOfOccupants);
 
             if (instance != null)

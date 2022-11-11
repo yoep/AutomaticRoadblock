@@ -59,10 +59,10 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public void DeletePreview()
         {
-            LastDeterminedStreet = null;
-
             lock (Instances)
             {
+                LastDeterminedStreet = null;
+
                 var instancesToRemove = Instances.Where(x => x.IsPreviewActive).ToList();
 
                 foreach (var redirectTraffic in instancesToRemove)
@@ -113,6 +113,9 @@ namespace AutomaticRoadblocks.Instances
 
             if (IsHologramPreviewEnabled)
             {
+                if (force)
+                    Logger.Info($"Forcing creation of preview placement for type {GetType()}");
+                
                 DoHologramPreviewCreation(road, force);
             }
             else
@@ -175,10 +178,11 @@ namespace AutomaticRoadblocks.Instances
             // remove any existing previews first
             DeletePreview();
 
-            LastDeterminedStreet = street;
-            Game.NewSafeFiber(() =>
+            lock (Instances)
             {
-                Logger.Trace($"Creating new instance hologram preview at {street}");
+                Logger.Trace($"Creating new instance hologram preview at {street} for type {GetType()}");
+                LastDeterminedStreet = street;
+
                 var instance = CreateInstance(RoadQuery.ToVehicleNode(street));
                 if (instance == null)
                 {
@@ -186,14 +190,10 @@ namespace AutomaticRoadblocks.Instances
                     return;
                 }
 
-                Logger.Debug($"Created instance {instance}");
+                Logger.Debug($"Created instance {instance} for type {GetType()}");
                 instance.CreatePreview();
-
-                lock (Instances)
-                {
-                    Instances.Add(instance);
-                }
-            }, "AbstractInstancePlacement.DoHologramPreviewCreation");
+                Instances.Add(instance);
+            }
         }
 
         private T FindInstanceClosestToPlayer()

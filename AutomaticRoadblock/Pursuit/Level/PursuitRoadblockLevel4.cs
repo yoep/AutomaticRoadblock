@@ -77,7 +77,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
+        protected override IList<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
         {
             if (releaseAll)
             {

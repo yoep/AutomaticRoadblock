@@ -231,7 +231,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// This also releases all chase vehicle instances from the <see cref="IRoadblock"/>.
         /// </summary>
         /// <returns>Returns the instances to chase the suspect.</returns>
-        protected IEnumerable<Ped> RetrieveAndReleaseChaseVehicle()
+        protected IList<Ped> RetrieveAndReleaseChaseVehicle()
         {
             // only the chase vehicle will join the pursuit
             var cops = GetValidCopInstances();
