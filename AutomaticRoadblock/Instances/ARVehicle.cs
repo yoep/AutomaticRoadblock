@@ -11,11 +11,11 @@ namespace AutomaticRoadblocks.Instances
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class ARVehicle : IARInstance<Vehicle>
     {
-        public ARVehicle(Model model, Vector3 position, float heading = 0f, bool recordCollisions = false)
+        public ARVehicle(Vehicle instance, float heading = 0f, bool recordCollisions = false)
         {
-            Assert.NotNull(model, "model cannot be null");
-            Assert.NotNull(position, "position cannot be null");
-            GameInstance = EntityUtils.CreateVehicle(model, position, heading);
+            Assert.NotNull(instance, "instance cannot be null");
+            GameInstance = instance;
+            GameInstance.Heading = heading;
             GameInstance.IsPersistent = true;
             GameInstance.NeedsCollision = true;
             GameInstance.IsRecordingCollisions = recordCollisions;
@@ -23,22 +23,44 @@ namespace AutomaticRoadblocks.Instances
             GameInstance.IsSirenOn = true;
             EntityUtils.VehicleLights(GameInstance, EVehicleLightState.AlwaysOn);
         }
-        
+
         #region Properties
 
         /// <inheritdoc />
+        public EEntityType Type => EEntityType.CopVehicle;
+
+        /// <inheritdoc />
         public Vehicle GameInstance { get; }
+
+        /// <inheritdoc />
+        public Vector3 Position
+        {
+            get => GameInstance.Position;
+            set => GameInstance.Position = value;
+        }
+
+        /// <inheritdoc />
+        public float Heading
+        {
+            get => GameInstance.Heading;
+            set => GameInstance.Heading = value;
+        }
+
+        /// <summary>
+        /// The vehicle model.
+        /// </summary>
+        public Model Model => GameInstance.Model;
 
         /// <inheritdoc />
         public bool IsInvalid => GameInstance == null ||
                                  !GameInstance.IsValid();
 
         #endregion
-        
+
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive { get; private set;  }
+        public bool IsPreviewActive { get; private set; }
 
         /// <inheritdoc />
         public void CreatePreview()
@@ -55,9 +77,9 @@ namespace AutomaticRoadblocks.Instances
         {
             if (!IsPreviewActive || IsInvalid)
                 return;
-            
+
             IsPreviewActive = false;
-            EntityUtils.Remove(GameInstance);
+            PreviewUtils.TransformToNormal(GameInstance);
         }
 
         #endregion
@@ -67,6 +89,7 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public void Dispose()
         {
+            DeletePreview();
             EntityUtils.Remove(GameInstance);
         }
 

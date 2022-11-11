@@ -22,7 +22,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        private readonly List<InstanceSlot> _instances = new();
+        private readonly List<IARInstance<Entity>> _instances = new();
 
         private Blip _blip;
 
@@ -103,11 +103,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
         public float Offset { get; }
 
         /// <summary>
-        /// The vehicle model to use for the vehicle within this instance.
-        /// </summary>
-        private Model VehicleModel { get; set; }
-
-        /// <summary>
         /// Check if the current traffic redirection is on the most left lane of the road
         /// (for the lanes heading in the same direction as <see cref="Lane"/>).
         /// </summary>
@@ -118,7 +113,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// </summary>
         private ARPed Cop => _instances
             .Where(x => x.Type == EEntityType.CopPed)
-            .Select(x => x.Instance)
             .Select(x => (ARPed)x)
             .First();
 
@@ -127,7 +121,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// </summary>
         private ARVehicle Vehicle => _instances
             .Where(x => x.Type == EEntityType.CopVehicle)
-            .Select(x => x.Instance)
             .Select(x => (ARVehicle)x)
             .First();
 
@@ -141,6 +134,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void CreatePreview()
         {
+            if (IsPreviewActive)
+                return;
+
             _instances.ForEach(x => x.CreatePreview());
             Road.CreatePreview();
             CreateBlip();
@@ -149,6 +145,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void DeletePreview()
         {
+            if (!IsPreviewActive)
+                return;
+
             _instances.ForEach(x => x.DeletePreview());
             Road.DeletePreview();
             DeleteBlip();
@@ -161,16 +160,24 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public bool Spawn()
         {
-            CreateBlip();
-            var result = _instances.All(x => x.Spawn());
+            try
+            {
+                DeletePreview();
+                CreateBlip();
 
-            if (BackupType != EBackupUnit.None)
-                Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
+                if (BackupType != EBackupUnit.None)
+                    Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
 
-            Cop.Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
-            Cop.UnequipAllWeapons();
-            AnimationHelper.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
-            return result;
+                Cop.Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
+                Cop.UnequipAllWeapons();
+                AnimationHelper.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to spawn pursuit roadblock, {ex.Message}", ex);
+                return false;
+            }
         }
 
         #endregion
@@ -193,6 +200,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void Dispose()
         {
+            DeletePreview();
             Cop.DeleteAttachments();
             _instances.ForEach(x => x.Dispose());
             DeleteBlip();
@@ -204,31 +212,38 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private void Init()
         {
-            InitializeVehicle();
-            InitializeCop();
+            var rotation = IsLeftSideOfLanes ? -35 : 35;
+            LspdfrHelper.CreateBackupUnit(OffsetPosition, Lane.Heading + rotation, BackupType, 1, out var vehicle, out var cops);
+
+            InitializeVehicle(vehicle);
+            InitializeCop(cops);
             InitializeScenery();
         }
 
-        private void InitializeVehicle()
+        private void InitializeVehicle(ARVehicle vehicle)
         {
             if (BackupType == EBackupUnit.None)
-                return;
-
-            var rotation = IsLeftSideOfLanes ? -35 : 35;
-            VehicleModel = LspdfrDataHelper.RetrieveVehicleModel(BackupType, OffsetPosition);
-
-            _instances.Add(new InstanceSlot(EEntityType.CopVehicle, OffsetPosition, Lane.Heading + rotation,
-                (position, heading) => new ARVehicle(VehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)));
+            {
+                vehicle.Dispose();
+            }
+            else
+            {
+                EntityUtils.PlaceVehicleOnTheGround(vehicle.GameInstance);
+                _instances.Add(vehicle);
+            }
         }
 
-        private void InitializeCop()
+        private void InitializeCop(IEnumerable<ARPed> cops)
         {
             var distanceBehindVehicle = GetVehicleLength() - 1f;
             var copPedHeading = Lane.Heading - 180;
             var positionBehindVehicle = OffsetPosition + MathHelper.ConvertHeadingToDirection(copPedHeading) * distanceBehindVehicle;
+            var cop = cops.First();
 
-            _instances.Add(new InstanceSlot(EEntityType.CopPed, positionBehindVehicle, copPedHeading,
-                (position, heading) => CreateCop(position, heading)));
+            cop.PlaceOnGroundAt(positionBehindVehicle);
+            cop.Heading = copPedHeading;
+
+            _instances.Add(cop);
         }
 
         private void InitializeScenery()
@@ -248,13 +263,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 InitializeVehicleStoppedLight();
         }
 
-        private ARPed CreateCop(Vector3 position, float heading)
-        {
-            return new ARPed(BackupType != EBackupUnit.None
-                ? LspdfrDataHelper.RetrieveCop(BackupType, position)
-                : LspdfrDataHelper.RetrieveCop(EBackupUnit.LocalPatrol, position), heading);
-        }
-
         private void PlaceConesAlongTheRoad()
         {
             var placementDirection = MathHelper.ConvertHeadingToDirection(Lane.Heading);
@@ -267,8 +275,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 $"Creating a total of {totalCones} cones along the road with type {ConeType} for a length of {coneDistance} (ConeTypeWidth: {ConeType.Width}, ConeTypeSpacing: {ConeType.Spacing})");
             for (var i = 0; i < totalCones; i++)
             {
-                _instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, ConeHeading(),
-                    (position, heading) => BarrierFactory.Create(ConeType, position, heading)));
+                _instances.Add(BarrierFactory.Create(ConeType, startPosition, ConeHeading()));
                 startPosition += placementDirection * actualConeLength;
             }
         }
@@ -285,8 +292,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             Logger.Trace($"Creating a total of {totalCones} cones behind the vehicle for a lane width of {Lane.Width}");
             for (var i = 0; i < totalCones; i++)
             {
-                _instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, ConeHeading(),
-                    (position, heading) => BarrierFactory.Create(ConeType, position, heading)));
+                _instances.Add(BarrierFactory.Create(ConeType, startPosition, ConeHeading()));
                 startPosition += placementDirection * coneDistance;
             }
         }
@@ -295,8 +301,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             var signPosition = VehicleStoppedSignPosition();
 
-            _instances.Add(new InstanceSlot(EEntityType.Scenery, signPosition, Lane.Heading,
-                (position, heading) => new ARScenery(PropUtils.StoppedVehiclesSign(position, heading))));
+            _instances.Add(new ARScenery(PropUtils.StoppedVehiclesSign(signPosition, Lane.Heading)));
         }
 
         private void PlaceRedirectionArrow()
@@ -304,10 +309,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var signPosition = PositionBehindTheVehicle()
                                + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 3f;
 
-            _instances.Add(new InstanceSlot(EEntityType.Scenery, signPosition, Lane.Heading,
-                (position, heading) => new ARScenery(IsLeftSideOfLanes
-                    ? PropUtils.CreateWorkerBarrierArrowRight(position, heading)
-                    : PropUtils.RedirectTrafficArrowLeft(position, heading))));
+            _instances.Add(new ARScenery(IsLeftSideOfLanes
+                ? PropUtils.CreateWorkerBarrierArrowRight(signPosition, Lane.Heading)
+                : PropUtils.RedirectTrafficArrowLeft(signPosition, Lane.Heading)));
         }
 
         private Vector3 VehicleStoppedSignPosition()
@@ -322,8 +326,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var groundLightPosition = VehicleStoppedSignPosition() +
                                       MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 1.5f;
 
-            _instances.Add(new InstanceSlot(EEntityType.Scenery, groundLightPosition, Lane.Heading - 180,
-                (position, heading) => new ARScenery(PropUtils.CreateGroundFloodLight(position, heading))));
+            _instances.Add(new ARScenery(PropUtils.CreateGroundFloodLight(groundLightPosition, Lane.Heading - 180)));
         }
 
         private void CreateBlip()
@@ -396,8 +399,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
             if (BackupType != EBackupUnit.None)
             {
-                vehicleWidth = VehicleModel.Dimensions.X;
-                vehicleLength = VehicleModel.Dimensions.Y;
+                vehicleWidth = Vehicle.Model.Dimensions.X;
+                vehicleLength = Vehicle.Model.Dimensions.Y;
             }
             else
             {
@@ -418,12 +421,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private float GetVehicleWidth()
         {
-            return BackupType == EBackupUnit.None ? DefaultVehicleWidth : VehicleModel.Dimensions.X;
+            return BackupType == EBackupUnit.None ? DefaultVehicleWidth : Vehicle.Model.Dimensions.X;
         }
 
         private float GetVehicleLength()
         {
-            return BackupType == EBackupUnit.None ? DefaultVehicleLength : VehicleModel.Dimensions.Y;
+            return BackupType == EBackupUnit.None ? DefaultVehicleLength : Vehicle.Model.Dimensions.Y;
         }
 
         private Vector3 PositionBasedOnType()

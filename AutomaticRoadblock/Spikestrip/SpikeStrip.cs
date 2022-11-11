@@ -127,7 +127,7 @@ namespace AutomaticRoadblocks.SpikeStrip
                 return;
 
             Road.DeletePreview();
-            DoInternalCleanup();
+            PreviewUtils.TransformToNormal(GameInstance);
         }
 
         #endregion
@@ -165,6 +165,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// <inheritdoc />
         public void Dispose()
         {
+            DeletePreview();
             DoInternalCleanup();
         }
 

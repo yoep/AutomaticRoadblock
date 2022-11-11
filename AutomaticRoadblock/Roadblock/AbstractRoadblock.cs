@@ -128,7 +128,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Get the scenery slots for this roadblock.
         /// </summary>
-        protected List<InstanceSlot> Instances { get; } = new();
+        protected List<IARInstance<Entity>> Instances { get; } = new();
 
         #endregion
 
@@ -154,6 +154,9 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public void CreatePreview()
         {
+            if (IsPreviewActive)
+                return;
+
             Logger.Trace($"Creating roadblock preview for {this}");
             CreateBlip();
             Logger.Debug($"Creating a total of {Slots.Count} slot previews for the roadblock preview");
@@ -171,6 +174,9 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public void DeletePreview()
         {
+            if (!IsPreviewActive)
+                return;
+
             DeleteBlip();
             Slots.ToList().ForEach(x => x.DeletePreview());
             Road.DeletePreview();
@@ -186,9 +192,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             UpdateState(ERoadblockState.Disposing);
 
-            if (IsPreviewActive)
-                DeletePreview();
-
+            DeletePreview();
             DeleteBlip();
             DeleteSpeedZone();
             Slots.ToList().ForEach(x => x.Dispose());
@@ -206,25 +210,22 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         public virtual bool Spawn()
         {
-            var result = false;
-
             try
             {
-                Logger.Trace("Spawning roadblock");
-
+                DeletePreview();
                 Slots.ToList().ForEach(SpawnSlot);
-                result = Instances.All(x => x.Spawn());
                 UpdateState(ERoadblockState.Active);
 
                 CreateBlip();
+                return true;
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to spawn roadblock", ex);
+                Logger.Error($"Failed to spawn roadblock, {ex.Message}", ex);
                 UpdateState(ERoadblockState.Error);
             }
 
-            return result;
+            return false;
         }
 
         /// <inheritdoc />
@@ -365,7 +366,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         /// <param name="releaseAll"></param>
         /// <returns>Returns the cops joining the pursuit.</returns>
-        protected virtual IEnumerable<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
+        protected virtual IList<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
         {
             var copsJoining = new List<Ped>();
 
@@ -575,20 +576,22 @@ namespace AutomaticRoadblocks.Roadblock
         {
             Game.NewSafeFiber(() =>
             {
+                var color = PursuitIndicatorColor();
+                var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
+
                 while (IsPreviewActive)
                 {
-                    var color = PursuitIndicatorColor();
-                    var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
                     var remainingCops = Slots
                         .SelectMany(x => x.Cops)
                         .Where(x => !copsJoiningThePursuit.Contains(x.GameInstance))
                         .Select(x => x.GameInstance)
                         .ToList();
-                    
+
                     foreach (var ped in copsJoiningThePursuit)
                     {
                         GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, color, 1f, 1f, false);
                     }
+
                     foreach (var ped in remainingCops)
                     {
                         GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.DarkRed, 1f, 1f, false);

@@ -89,33 +89,25 @@ namespace AutomaticRoadblocks.RedirectTraffic
             lock (Instances)
             {
                 redirectTraffic = Instances.FirstOrDefault(x => x.IsPreviewActive);
-                redirectTraffic?.DeletePreview();
-            }
 
-            if (redirectTraffic == null)
-            {
-                redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
-
-                lock (Instances)
+                if (redirectTraffic == null)
                 {
+                    redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
                     Instances.Add(redirectTraffic);
                 }
             }
 
-            Game.NewSafeFiber(() =>
-            {
-                Logger.Trace($"Spawning traffic redirection {redirectTraffic}");
-                var success = redirectTraffic.Spawn();
+            Logger.Trace($"Spawning traffic redirection {redirectTraffic}");
+            var success = redirectTraffic.Spawn();
 
-                if (success)
-                {
-                    Logger.Info($"Traffic redirection has been spawned with success, {redirectTraffic}");
-                }
-                else
-                {
-                    Logger.Warn($"Traffic redirection was unable to be spawned correctly, {redirectTraffic}");
-                }
-            }, "RedirectTrafficDispatcher.DispatchRedirection");
+            if (success)
+            {
+                Logger.Info($"Traffic redirection has been spawned with success, {redirectTraffic}");
+            }
+            else
+            {
+                Logger.Warn($"Traffic redirection was unable to be spawned correctly, {redirectTraffic}");
+            }
         }
 
         /// <inheritdoc />

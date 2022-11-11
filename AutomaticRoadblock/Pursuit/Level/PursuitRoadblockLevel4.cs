@@ -66,7 +66,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeAdditionalVehicles()
         {
-            CreateChaseVehicle(RetrieveVehicleModel());
+            CreateChaseVehicle();
         }
 
         /// <inheritdoc />
@@ -77,7 +77,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
+        protected override IList<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
         {
             if (releaseAll)
             {
@@ -100,7 +100,6 @@ namespace AutomaticRoadblocks.Pursuit.Level
                 var instances = GetValidCopInstances().ToList();
                 var vehicleInstance = Instances
                     .Where(x => x.Type == EEntityType.CopVehicle)
-                    .Select(x => x.Instance)
                     .Select(x => (ARVehicle)x)
                     .FirstOrDefault();
 

@@ -30,7 +30,24 @@ namespace AutomaticRoadblocks.Instances
         #region Properties
 
         /// <inheritdoc />
+        public EEntityType Type => EEntityType.CopPed;
+
+        /// <inheritdoc />
         public Ped GameInstance { get; }
+
+        /// <inheritdoc />
+        public Vector3 Position
+        {
+            get => GameInstance.Position;
+            set => GameInstance.Position = value;
+        }
+
+        /// <inheritdoc />
+        public float Heading
+        {
+            get => GameInstance.Heading;
+            set => GameInstance.Heading = value;
+        }
 
         /// <inheritdoc />
         public bool IsInvalid => GameInstance == null ||
@@ -60,7 +77,7 @@ namespace AutomaticRoadblocks.Instances
                 return;
 
             IsPreviewActive = false;
-            EntityUtils.Remove(GameInstance);
+            PreviewUtils.TransformToNormal(GameInstance);
         }
 
         #endregion
@@ -70,6 +87,7 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public void Dispose()
         {
+            DeletePreview();
             DeleteAttachments();
             EntityUtils.Remove(GameInstance);
         }
@@ -202,6 +220,15 @@ namespace AutomaticRoadblocks.Instances
             GameInstance?.WarpIntoVehicle(vehicle, (int)seat);
         }
 
+        /// <summary>
+        /// Place this ped on the ground at the given position.
+        /// </summary>
+        /// <param name="position">The position the ped should be placed.</param>
+        public void PlaceOnGroundAt(Vector3 position)
+        {
+            Position = GameUtils.GetOnTheGroundPosition(position) + Vector3.WorldUp * (GameInstance.Model.Dimensions.Z / 2f);
+        }
+
         #endregion
 
         #region Functions
@@ -214,7 +241,10 @@ namespace AutomaticRoadblocks.Instances
                 return;
             }
 
-            Functions.SetPedAsCop(GameInstance);
+            // warp cop outside the vehicle
+            // this should prevent the instance from being deleted when the backup unit is none
+            GameInstance.Tasks.LeaveVehicle(LeaveVehicleFlags.WarpOut);
+
             GameInstance.IsPersistent = true;
             GameInstance.KeepTasks = true;
             GameInstance.RelationshipGroup = RelationshipGroup.Cop;

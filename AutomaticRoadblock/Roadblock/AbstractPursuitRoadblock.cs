@@ -70,6 +70,11 @@ namespace AutomaticRoadblocks.Roadblock
         protected BarrierModel ChaseVehicleBarrier { get; }
 
         /// <summary>
+        /// The backup unit type of the roadblock.
+        /// </summary>
+        protected EBackupUnit BackupUnit { get; }
+
+        /// <summary>
         /// Verify if the <see cref="TargetVehicle"/> instance is invalidated by the game.
         /// This might be the case by the pursuit suddenly being (forcefully) ended.
         /// </summary>
@@ -120,9 +125,8 @@ namespace AutomaticRoadblocks.Roadblock
 
             foreach (var position in conePositions)
             {
-                Instances.Add(new InstanceSlot(EEntityType.Scenery, position + direction * 3.5f, 0f,
-                    (conePosition, _) =>
-                        BarrierFactory.Create(ModelProvider.RetrieveModelByScriptName<BarrierModel>(Barrier.BigConeStripesScriptName), conePosition)));
+                Instances.Add(BarrierFactory.Create(ModelProvider.RetrieveModelByScriptName<BarrierModel>(Barrier.BigConeStripesScriptName),
+                    position + direction * 3.5f));
             }
         }
 
@@ -155,22 +159,19 @@ namespace AutomaticRoadblocks.Roadblock
         /// Create a chase vehicle for this roadblock.
         /// The chase vehicle will be created on the right side of the road.
         /// </summary>
-        protected void CreateChaseVehicle(Model vehicleModel)
+        protected void CreateChaseVehicle()
         {
-            Assert.NotNull(vehicleModel, "vehicleModel cannot be null");
-            var roadPosition = Road.RightSide + ChaseVehiclePositionDirection(vehicleModel);
+            LspdfrHelper.CreateBackupUnit(Road.RightSide, TargetHeading + 25, BackupUnit, 1, out var vehicle, out var cops);
 
-            Instances.AddRange(new[]
-            {
-                new InstanceSlot(EEntityType.CopVehicle, roadPosition, TargetHeading + 25,
-                    (position, heading) => new ARVehicle(vehicleModel, GameUtils.GetOnTheGroundPosition(position), heading)),
-                new InstanceSlot(EEntityType.CopPed, roadPosition, TargetHeading,
-                    (position, heading) =>
-                        new ARPed(LspdfrDataHelper.RetrieveCop(RetrieveBackupUnitType(), position), heading))
-            });
+            vehicle.Position = Road.RightSide + ChaseVehiclePositionDirection(vehicle.Model);
+            vehicle.Heading = TargetHeading + 25;
+            EntityUtils.PlaceVehicleOnTheGround(vehicle.GameInstance);
+            Instances.Add(vehicle);
+
+            Instances.AddRange(cops);
 
             // create buffer barrels behind the vehicle
-            CreateChaseVehicleBufferBarrels(roadPosition);
+            CreateChaseVehicleBufferBarrels(vehicle.Position);
         }
 
         /// <summary>
@@ -180,14 +181,12 @@ namespace AutomaticRoadblocks.Roadblock
         {
             var vehicle = Instances
                 .Where(x => x.Type == EEntityType.CopVehicle)
-                .Select(x => x.Instance)
                 .Select(x => (ARVehicle)x)
                 .Select(x => x.GameInstance)
                 .First();
 
             Instances
                 .Where(x => x.Type == EEntityType.CopPed)
-                .Select(x => x.Instance)
                 .Select(x => (ARPed)x)
                 .Select(x => x.GameInstance)
                 .ToList()
@@ -208,11 +207,6 @@ namespace AutomaticRoadblocks.Roadblock
                 .ToList();
         }
 
-        protected Model RetrieveVehicleModel()
-        {
-            return LspdfrDataHelper.RetrieveVehicleModel(RetrieveBackupUnitType(), OffsetPosition);
-        }
-
         protected EBackupUnit RetrieveBackupUnitType()
         {
             return ChanceProvider.Retrieve(RoadblockData.Units).Type;
@@ -227,7 +221,6 @@ namespace AutomaticRoadblocks.Roadblock
         {
             return Instances
                 .Where(x => x.Type == EEntityType.CopPed)
-                .Select(x => x.Instance)
                 .Where(x => x is { IsInvalid: false })
                 .Select(x => (ARPed)x)
                 .ToList();
@@ -238,13 +231,13 @@ namespace AutomaticRoadblocks.Roadblock
         /// This also releases all chase vehicle instances from the <see cref="IRoadblock"/>.
         /// </summary>
         /// <returns>Returns the instances to chase the suspect.</returns>
-        protected List<Ped> RetrieveAndReleaseChaseVehicle()
+        protected IList<Ped> RetrieveAndReleaseChaseVehicle()
         {
             // only the chase vehicle will join the pursuit
             var cops = GetValidCopInstances();
             Instances.RemoveAll(x => x.Type == EEntityType.CopVehicle);
-            Instances.RemoveAll(x => cops.Contains(x.Instance));
-            
+            Instances.RemoveAll(x => cops.Contains(x));
+
             return cops
                 .Select(x => x.GameInstance)
                 .ToList();
@@ -259,8 +252,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             for (var i = 0; i < 5; i++)
             {
-                Instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, TargetHeading,
-                    (position, heading) => BarrierFactory.Create(ChaseVehicleBarrier, position, heading)));
+                Instances.Add(BarrierFactory.Create(ChaseVehicleBarrier, startPosition, TargetHeading));
                 startPosition += nextPositionDirection * nextPositionDistance;
             }
         }

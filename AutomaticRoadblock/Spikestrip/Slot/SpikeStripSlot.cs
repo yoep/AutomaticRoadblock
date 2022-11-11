@@ -66,7 +66,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         [CanBeNull]
         private ISpikeStrip SpikeStrip => Instances
             .Where(x => x.Type == EEntityType.SpikeStrip)
-            .Select(x => (ARSpikeStrip)x.Instance)
+            .Select(x => (ARSpikeStrip)x)
             .Where(x => x is { SpikeStrip: { } })
             .Select(x => x.SpikeStrip)
             .FirstOrDefault();
@@ -94,8 +94,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         protected override void InitializeScenery()
         {
             // create the spike strip
-            Instances.Add(new InstanceSlot(EEntityType.SpikeStrip, Position, Heading,
-                (_, _) => new ARSpikeStrip(CreateSpikeStripInstance())));
+            Instances.Add(new ARSpikeStrip(CreateSpikeStripInstance()));
         }
 
         /// <inheritdoc />

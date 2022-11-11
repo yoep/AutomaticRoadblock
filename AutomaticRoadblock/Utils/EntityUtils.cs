@@ -1,4 +1,5 @@
 using System.Linq;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 using Rage.Native;
@@ -7,29 +8,24 @@ namespace AutomaticRoadblocks.Utils
 {
     public static class EntityUtils
     {
-        /// <summary>
-        /// Create a vehicle which is placed on the ground correctly.
-        /// </summary>
-        /// <param name="model">The model of the vehicle.</param>
-        /// <param name="position">The position of the vehicle.</param>
-        /// <param name="heading">The heading of the vehicle.</param>
-        /// <returns>Returns the created vehicle.</returns>
-        public static Vehicle CreateVehicle(Model model, Vector3 position, float heading)
-        {
-            Assert.NotNull(model, "model cannot be null");
-            Assert.NotNull(position, "position cannot be null");
-            return new Vehicle(model, position, heading);
-        }
+        private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
         /// <summary>
         /// Put the vehicle correctly on the ground.
         /// This prevents a vehicle from jumping up when it is being spawned.
         /// </summary>
         /// <param name="vehicle">The vehicle to put on the ground.</param>
-        public static Vehicle PutVehicleOnTheGround(Vehicle vehicle)
+        public static Vehicle PlaceVehicleOnTheGround(Vehicle vehicle)
         {
             Assert.NotNull(vehicle, "vehicle cannot be null");
-            NativeFunction.Natives.SET_VEHICLE_ON_GROUND_PROPERLY(vehicle);
+            // VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY
+            var result = NativeFunction.CallByHash<bool>(0x49733E92263139D1, vehicle, 5.0f);
+
+            if (!result)
+            {
+                Logger.Warn($"Failed to place the vehicle correctly on the ground at {vehicle.Position}");
+            }
+
             return vehicle;
         }
 

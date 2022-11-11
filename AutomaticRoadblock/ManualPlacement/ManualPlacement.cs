@@ -70,7 +70,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         public PlacementDirection Direction
         {
-            get => _direction; 
+            get => _direction;
             set => UpdateDirection(value);
         }
 
@@ -90,15 +90,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             get => _offset;
             set => UpdateOffset(value);
         }
-
-        /// <summary>
-        /// Get a list of roadblocks which are previewed.
-        /// <remarks>Make sure this property is called in a lock statement.</remarks>
-        /// </summary>
-        private List<ManualRoadblock> PreviewRoadblocks => Instances
-            .Where(x => x.IsPreviewActive)
-            .ToList();
-
+        
         /// <inheritdoc />
         protected override bool IsHologramPreviewEnabled => _settingsManager.ManualPlacementSettings.EnablePreview;
 
@@ -113,45 +105,29 @@ namespace AutomaticRoadblocks.ManualPlacement
         public void PlaceRoadblock()
         {
             ManualRoadblock roadblockToSpawn;
-            List<ManualRoadblock> previewRoadblocks;
 
             lock (Instances)
             {
-                previewRoadblocks = PreviewRoadblocks;
-            }
+                roadblockToSpawn = Instances.FirstOrDefault(x => x.IsPreviewActive);
 
-            // verify if a roadblock preview is available,
-            // if so, we'll actually spawn it
-            if (previewRoadblocks.Count == 1)
-            {
-                roadblockToSpawn = previewRoadblocks[0];
-
-                // make sure the preview is deleted
-                previewRoadblocks[0].DeletePreview();
-            }
-            else
-            {
-                roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
-                lock (Instances)
+                if (roadblockToSpawn == null)
                 {
+                    roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
                     Instances.Add(roadblockToSpawn);
                 }
             }
 
-            Game.NewSafeFiber(() =>
-            {
-                Logger.Trace($"Spawning manual roadblock {roadblockToSpawn}");
-                var success = roadblockToSpawn.Spawn();
+            Logger.Trace($"Spawning manual roadblock {roadblockToSpawn}");
+            var success = roadblockToSpawn.Spawn();
 
-                if (success)
-                {
-                    Logger.Info($"Manual roadblock has been spawned with success, {roadblockToSpawn}");
-                }
-                else
-                {
-                    Logger.Warn($"Manual roadblock was unable to be spawned correctly, {roadblockToSpawn}");
-                }
-            }, "ManualPlacement.PlaceRoadblock");
+            if (success)
+            {
+                Logger.Info($"Manual roadblock has been spawned with success, {roadblockToSpawn}");
+            }
+            else
+            {
+                Logger.Warn($"Manual roadblock was unable to be spawned correctly, {roadblockToSpawn}");
+            }
         }
 
         /// <inheritdoc />
@@ -164,16 +140,16 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         #region Functions
 
-        protected override ManualRoadblock CreateInstance(IVehicleNode street)
+        protected override ManualRoadblock CreateInstance(IVehicleNode node)
         {
-            Assert.NotNull(street, "road cannot be null");
-            if (street.GetType() == typeof(Intersection))
+            Assert.NotNull(node, "road cannot be null");
+            if (node.GetType() == typeof(Intersection))
                 return null;
 
             var targetHeading = Direction == PlacementDirection.Towards ? Game.PlayerHeading : Game.PlayerHeading - 180;
             var request = new ManualRoadblock.Request
             {
-                Road = (Road)street,
+                Road = (Road)node,
                 MainBarrier = _mainBarrier,
                 SecondaryBarrier = _secondaryBarrier,
                 BackupType = _backupType,
@@ -233,7 +209,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             _offset = value;
             DoInternalPreviewCreation(true);
         }
-        
+
         private void UpdateDirection(PlacementDirection value)
         {
             _direction = value;

@@ -13,7 +13,26 @@ namespace AutomaticRoadblocks.Instances
         #region Properties
 
         /// <inheritdoc />
+        public EEntityType Type => EEntityType.SpikeStrip;
+
+        /// <inheritdoc />
         public Object GameInstance => SpikeStrip?.GameInstance;
+
+       
+
+        /// <inheritdoc />
+        public Vector3 Position
+        {
+            get => GameInstance.Position;
+            set => GameInstance.Position = value;
+        }
+
+        /// <inheritdoc />
+        public float Heading
+        {
+            get => GameInstance.Heading;
+            set => GameInstance.Heading = value;
+        }
 
         /// <inheritdoc />
         public bool IsInvalid => SpikeStrip.State is ESpikeStripState.Preparing or ESpikeStripState.Disposed;

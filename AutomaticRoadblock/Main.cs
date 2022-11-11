@@ -11,7 +11,6 @@ using AutomaticRoadblocks.Integrations;
 using AutomaticRoadblocks.Integrations.PoliceSmartRadio;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Localization;
-using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.ManualPlacement.Menu;
 using AutomaticRoadblocks.Menu;
@@ -45,13 +44,13 @@ namespace AutomaticRoadblocks
         {
             InitializeIoC();
         }
-        
+
         #region Properties
 
         private static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
-        
+
         #endregion
-        
+
         #region Plugin
 
         public override void Initialize()
@@ -89,7 +88,7 @@ namespace AutomaticRoadblocks
                 game.DisplayPluginNotification("~r~failed to correctly unload the plugin, see logs for more info");
             }
         }
-        
+
         #endregion
 
         private static void InitializeIoC()
@@ -104,7 +103,6 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<IBarrierData>(typeof(BarrierDataFile))
                 .RegisterSingleton<IRoadblockData>(typeof(RoadblockDataFile))
                 .RegisterSingleton<ILightSourceData>(typeof(LightSourceDataFile))
-                .RegisterSingleton<ILspdfrData>(typeof(LspdfrData))
                 .RegisterSingleton<IModelProvider>(typeof(ModelProvider))
                 .RegisterSingleton<IPursuitManager>(typeof(PursuitManager))
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
@@ -217,11 +215,11 @@ namespace AutomaticRoadblocks
             {
                 pursuitListener.StartListener();
                 ioC.GetInstance<IMenu>().Activate();
-                
+
                 game.NewSafeFiber(() =>
                 {
                     logger.Info($"Loaded version {Version}");
-                    
+
                     GameFiber.Wait(2 * 1000);
                     game.DisplayPluginNotification($"{Version}, by ~b~yoep~s~, has been loaded");
                 }, "Main.DisplayPluginNotification");
@@ -231,7 +229,7 @@ namespace AutomaticRoadblocks
                 pursuitListener.StopListener();
             }
         }
-        
+
         private static Assembly LSPDFRResolveEventHandler(object sender, ResolveEventArgs args)
         {
             return Functions.GetAllUserPlugins()
@@ -273,7 +271,8 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugZoneInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugCleanEntitiesComponent));
         }
     }
 }

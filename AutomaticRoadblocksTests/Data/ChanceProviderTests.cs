@@ -59,14 +59,26 @@ namespace AutomaticRoadblocks.Data
         [Fact]
         public void TestRetrieve_WhenListIsIncompleteAndNullableIsAllowed_ShouldReturnNull()
         {
-            var items = new List<WeaponData>
+            var items = new List<TestChance>
             {
-                new WeaponData("lorem", 0)
+                new TestChance(0)
             };
 
             var result = ChanceProvider.Retrieve(items);
-            
+
             Xunit.Assert.Null(result);
+        }
+
+        public class TestChance : IChanceData
+        {
+            public TestChance(int chance)
+            {
+                Chance = chance;
+            }
+
+            public int Chance { get; }
+
+            public bool IsNullable => true;
         }
     }
 }
