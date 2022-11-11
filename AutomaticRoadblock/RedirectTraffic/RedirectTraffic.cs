@@ -136,7 +136,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             if (IsPreviewActive)
                 return;
-            
+
             _instances.ForEach(x => x.CreatePreview());
             Road.CreatePreview();
             CreateBlip();
@@ -228,6 +228,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             }
             else
             {
+                EntityUtils.PlaceVehicleOnTheGround(vehicle.GameInstance);
                 _instances.Add(vehicle);
             }
         }
@@ -239,7 +240,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             var positionBehindVehicle = OffsetPosition + MathHelper.ConvertHeadingToDirection(copPedHeading) * distanceBehindVehicle;
             var cop = cops.First();
 
-            cop.Position = positionBehindVehicle;
+            cop.PlaceOnGroundAt(positionBehindVehicle);
             cop.Heading = copPedHeading;
 
             _instances.Add(cop);

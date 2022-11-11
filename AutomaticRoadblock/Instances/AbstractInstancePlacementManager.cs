@@ -67,7 +67,7 @@ namespace AutomaticRoadblocks.Instances
 
                 foreach (var redirectTraffic in instancesToRemove)
                 {
-                    redirectTraffic.DeletePreview();
+                    redirectTraffic.Dispose();
                     Instances.Remove(redirectTraffic);
                 }
             }

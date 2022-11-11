@@ -30,6 +30,7 @@ namespace AutomaticRoadblocks.Utils
             entity.IsPositionFrozen = isPreview;
             entity.NeedsCollision = !isPreview;
             entity.IsCollisionEnabled = !isPreview;
+            entity.IsPersistent = isPreview;
             NativeFunction.Natives.SET_ENTITY_COLLISION(entity, !isPreview, !isPreview);
 
             if (entity.GetType() == typeof(Ped))

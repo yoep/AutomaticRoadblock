@@ -220,6 +220,15 @@ namespace AutomaticRoadblocks.Instances
             GameInstance?.WarpIntoVehicle(vehicle, (int)seat);
         }
 
+        /// <summary>
+        /// Place this ped on the ground at the given position.
+        /// </summary>
+        /// <param name="position">The position the ped should be placed.</param>
+        public void PlaceOnGroundAt(Vector3 position)
+        {
+            Position = GameUtils.GetOnTheGroundPosition(position) + Vector3.WorldUp * (GameInstance.Model.Dimensions.Z / 2f);
+        }
+
         #endregion
 
         #region Functions
