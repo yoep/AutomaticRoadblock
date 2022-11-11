@@ -87,6 +87,7 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public void Dispose()
         {
+            DeletePreview();
             DeleteAttachments();
             EntityUtils.Remove(GameInstance);
         }

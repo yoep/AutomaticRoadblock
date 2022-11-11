@@ -89,6 +89,7 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public void Dispose()
         {
+            DeletePreview();
             EntityUtils.Remove(GameInstance);
         }
 

@@ -165,6 +165,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// <inheritdoc />
         public void Dispose()
         {
+            DeletePreview();
             DoInternalCleanup();
         }
 
