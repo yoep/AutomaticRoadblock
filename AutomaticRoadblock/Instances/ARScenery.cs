@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Utils;
-using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Instances
@@ -23,8 +22,26 @@ namespace AutomaticRoadblocks.Instances
         #region Properties
 
         /// <inheritdoc />
-        [CanBeNull]
+        public EEntityType Type => EEntityType.Scenery;
+
+        /// <inheritdoc />
         public Entity GameInstance { get; }
+
+       
+
+        /// <inheritdoc />
+        public Vector3 Position
+        {
+            get => GameInstance.Position;
+            set => GameInstance.Position = value;
+        }
+
+        /// <inheritdoc />
+        public float Heading
+        {
+            get => GameInstance.Heading;
+            set => GameInstance.Heading = value;
+        }
 
         /// <inheritdoc />
         public bool IsInvalid => GameInstance == null ||

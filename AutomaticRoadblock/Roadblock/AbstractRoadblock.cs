@@ -128,7 +128,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// Get the scenery slots for this roadblock.
         /// </summary>
-        protected List<InstanceSlot> Instances { get; } = new();
+        protected List<IARInstance<Entity>> Instances { get; } = new();
 
         #endregion
 
@@ -206,25 +206,21 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         public virtual bool Spawn()
         {
-            var result = false;
-
             try
             {
-                Logger.Trace("Spawning roadblock");
-
                 Slots.ToList().ForEach(SpawnSlot);
-                result = Instances.All(x => x.Spawn());
                 UpdateState(ERoadblockState.Active);
 
                 CreateBlip();
+                return true;
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to spawn roadblock", ex);
+                Logger.Error($"Failed to spawn roadblock, {ex.Message}", ex);
                 UpdateState(ERoadblockState.Error);
             }
 
-            return result;
+            return false;
         }
 
         /// <inheritdoc />
@@ -584,11 +580,12 @@ namespace AutomaticRoadblocks.Roadblock
                         .Where(x => !copsJoiningThePursuit.Contains(x.GameInstance))
                         .Select(x => x.GameInstance)
                         .ToList();
-                    
+
                     foreach (var ped in copsJoiningThePursuit)
                     {
                         GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, color, 1f, 1f, false);
                     }
+
                     foreach (var ped in remainingCops)
                     {
                         GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.DarkRed, 1f, 1f, false);

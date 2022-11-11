@@ -38,7 +38,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         /// <inheritdoc />
         protected override void InitializeAdditionalVehicles()
         {
-            CreateChaseVehicle(RetrieveVehicleModel());
+            CreateChaseVehicle();
         }
 
         /// <inheritdoc />

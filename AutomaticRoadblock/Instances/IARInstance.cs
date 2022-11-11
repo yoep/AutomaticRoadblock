@@ -14,9 +14,24 @@ namespace AutomaticRoadblocks.Instances
     public interface IARInstance<out TType> : IPreviewSupport, IDisposable where TType : Entity
     {
         /// <summary>
+        /// The instance type.
+        /// </summary>
+        EEntityType Type { get; }
+        
+        /// <summary>
         /// Get the game instance of this ARInstance.
         /// </summary>
         TType GameInstance { get; }
+        
+        /// <summary>
+        /// The position of the instance.
+        /// </summary>
+        Vector3 Position { get; set; }
+        
+        /// <summary>
+        /// The heading of the instance.
+        /// </summary>
+        float Heading { get; set; }
         
         /// <summary>
         /// Verify if the instance is no longer valid.

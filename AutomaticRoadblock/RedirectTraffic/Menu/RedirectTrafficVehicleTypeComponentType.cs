@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
             _localizer = localizer;
 
             MenuItem = new UIMenuListScrollerItem<EBackupUnit>(localizer[LocalizationKey.Vehicle], localizer[LocalizationKey.VehicleDescription],
-                LspdfrDataHelper.BackupUnits());
+                LspdfrHelper.BackupUnits());
         }
 
         /// <inheritdoc />
@@ -39,7 +39,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            MenuItem.Formatter = type => _localizer[LspdfrDataHelper.ToLocalizationKey(type)];
+            MenuItem.Formatter = type => _localizer[LspdfrHelper.ToLocalizationKey(type)];
             MenuItem.SelectedItem = _redirectTrafficDispatcher.BackupType;
             MenuItem.IndexChanged += MenuIndexChanged;
         }

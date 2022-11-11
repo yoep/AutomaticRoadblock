@@ -17,11 +17,11 @@ namespace AutomaticRoadblocks.LightSources
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         private static readonly Random Random = new();
 
-        public static IEnumerable<InstanceSlot> Create(LightModel lightModel, IRoadblock roadblock)
+        public static IEnumerable<ARScenery> Create(LightModel lightModel, IRoadblock roadblock)
         {
             Assert.NotNull(lightModel, "lightModel cannot be null");
             Assert.NotNull(roadblock, "roadblock cannot be null");
-            var instances = new List<InstanceSlot>();
+            var instances = new List<ARScenery>();
             var flags = lightModel.Light.Flags;
 
             if (flags.HasFlag(ELightSourceFlags.RoadLeft))
@@ -42,11 +42,11 @@ namespace AutomaticRoadblocks.LightSources
             return instances;
         }
 
-        public static IEnumerable<InstanceSlot> Create(LightModel lightModel, IRoadblockSlot roadblockSlot)
+        public static IEnumerable<ARScenery> Create(LightModel lightModel, IRoadblockSlot roadblockSlot)
         {
             Assert.NotNull(lightModel, "lightModel cannot be null");
             Assert.NotNull(roadblockSlot, "roadblockSlot cannot be null");
-            var instances = new List<InstanceSlot>();
+            var instances = new List<ARScenery>();
             var flags = lightModel.Light.Flags;
 
             if (flags.HasFlag(ELightSourceFlags.RoadLeft))
@@ -69,7 +69,7 @@ namespace AutomaticRoadblocks.LightSources
             return instances;
         }
 
-        private static InstanceSlot CreateSideInstance(LightModel lightModel, Vector3 sidePosition, Vector3 targetPoint, float travelHeading,
+        private static ARScenery CreateSideInstance(LightModel lightModel, Vector3 sidePosition, Vector3 targetPoint, float travelHeading,
             float placementHeading)
         {
             Logger.Trace($"Creating side instance at {sidePosition} for {lightModel}");
@@ -77,24 +77,22 @@ namespace AutomaticRoadblocks.LightSources
             var targetPosition = targetPoint + MathHelper.ConvertHeadingToDirection(placementHeading - 180) * PlacementDistanceRoadSides;
             var heading = MathHelper.ConvertDirectionToHeading(targetPosition - position) + lightModel.Rotation;
 
-            return new InstanceSlot(EEntityType.Scenery, position, heading,
-                (iPosition, iHeading) => new ARScenery(CreateInstance(lightModel, iPosition, iHeading)));
+            return new ARScenery(CreateInstance(lightModel, position, heading));
         }
 
-        private static IList<InstanceSlot> CreateLineOfInstances(LightModel lightModel, Vector3 leftPosition, Vector3 rightPosition, float placementHeading)
+        private static IEnumerable<ARScenery> CreateLineOfInstances(LightModel lightModel, Vector3 leftPosition, Vector3 rightPosition, float placementHeading)
         {
             Logger.Trace($"Creating light source instances from {leftPosition} to {rightPosition} for {lightModel}");
             var startPosition = CalculateRowPosition(leftPosition, placementHeading);
             var direction = MathHelper.ConvertHeadingToDirection(MathHelper.ConvertDirectionToHeading(rightPosition - leftPosition));
             var totalWidth = lightModel.Width + lightModel.Spacing;
             var totalLights = (int)(leftPosition.DistanceTo(rightPosition) / totalWidth);
-            var instances = new List<InstanceSlot>();
+            var instances = new List<ARScenery>();
 
             Logger.Trace($"Creating a total of {totalLights} light source instances");
             for (var i = 0; i < totalLights; i++)
             {
-                instances.Add(new InstanceSlot(EEntityType.Scenery, startPosition, 0f,
-                    (position, _) => new ARScenery(CreateInstance(lightModel, position, Random.Next(360)))));
+                instances.Add(new ARScenery(CreateInstance(lightModel, startPosition, Random.Next(360))));
                 startPosition += direction * totalWidth;
             }
 

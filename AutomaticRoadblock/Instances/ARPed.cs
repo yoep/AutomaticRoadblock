@@ -30,7 +30,24 @@ namespace AutomaticRoadblocks.Instances
         #region Properties
 
         /// <inheritdoc />
+        public EEntityType Type => EEntityType.CopPed;
+
+        /// <inheritdoc />
         public Ped GameInstance { get; }
+
+        /// <inheritdoc />
+        public Vector3 Position
+        {
+            get => GameInstance.Position;
+            set => GameInstance.Position = value;
+        }
+
+        /// <inheritdoc />
+        public float Heading
+        {
+            get => GameInstance.Heading;
+            set => GameInstance.Heading = value;
+        }
 
         /// <inheritdoc />
         public bool IsInvalid => GameInstance == null ||
@@ -213,6 +230,10 @@ namespace AutomaticRoadblocks.Instances
                 Logger.Warn($"Unable to initialize {nameof(ARPed)}, {nameof(Ped)} is invalid");
                 return;
             }
+
+            // warp cop outside the vehicle
+            // this should prevent the instance from being deleted when the backup unit is none
+            GameInstance.Tasks.LeaveVehicle(LeaveVehicleFlags.WarpOut);
 
             Functions.SetPedAsCop(GameInstance);
             GameInstance.IsPersistent = true;

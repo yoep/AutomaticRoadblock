@@ -42,7 +42,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         /// <inheritdoc />
         public bool HasCopBeenKilledByTarget => Instances.Where(x => x.Type == EEntityType.CopPed)
-            .Select(x => (ARPed)x.Instance)
+            .Select(x => (ARPed)x)
             .Where(x => x is { IsInvalid: false })
             .Select(x => x.GameInstance)
             .Where(x => x.IsDead)

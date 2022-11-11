@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             _localizer = localizer;
 
             MenuItem = new UIMenuListScrollerItem<EBackupUnit>(localizer[LocalizationKey.Vehicle], localizer[LocalizationKey.VehicleDescription],
-                LspdfrDataHelper.BackupUnits());
+                LspdfrHelper.BackupUnits());
         }
 
         /// <inheritdoc />
@@ -39,7 +39,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            MenuItem.Formatter = type => _localizer[LspdfrDataHelper.ToLocalizationKey(type)];
+            MenuItem.Formatter = type => _localizer[LspdfrHelper.ToLocalizationKey(type)];
             MenuItem.SelectedItem = _manualPlacement.BackupType;
             MenuItem.IndexChanged += MenuIndexChanged;
         }
