@@ -575,7 +575,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 }
                 else
                 {
-                    _logger.Warn($"Unable to remove roadblock from dispatcher, roadblock not found: {roadblock}");
+                    _logger.Debug($"Unable to remove roadblock from dispatcher, roadblock not found: {roadblock}");
                 }
             }
         }

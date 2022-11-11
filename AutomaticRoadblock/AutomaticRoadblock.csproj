@@ -81,6 +81,7 @@
         <Compile Include="Data\ChanceProvider.cs" />
         <Compile Include="Data\IChanceData.cs" />
         <Compile Include="Data\IDataFile.cs" />
+        <Compile Include="Debug\Menu\DebugCleanEntitiesComponent.cs" />
         <Compile Include="Debug\Menu\DebugDeploySpikeStripComponent.cs" />
         <Compile Include="Debug\Menu\DebugMenuSwitchItem.cs" />
         <Compile Include="Debug\Menu\DebugPursuitForceOnFootComponent.cs" />

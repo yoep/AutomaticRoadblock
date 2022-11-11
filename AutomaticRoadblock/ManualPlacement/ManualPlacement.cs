@@ -70,7 +70,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         public PlacementDirection Direction
         {
-            get => _direction; 
+            get => _direction;
             set => UpdateDirection(value);
         }
 
@@ -118,37 +118,31 @@ namespace AutomaticRoadblocks.ManualPlacement
             lock (Instances)
             {
                 previewRoadblocks = PreviewRoadblocks;
-            }
 
-            // verify if a roadblock preview is available,
-            // if so, we'll actually spawn it
-            if (previewRoadblocks.Count == 1)
-            {
-                roadblockToSpawn = previewRoadblocks[0];
-            }
-            else
-            {
-                roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
-                lock (Instances)
+                // verify if a roadblock preview is available,
+                // if so, we'll actually spawn it
+                if (previewRoadblocks.Count == 1)
                 {
+                    roadblockToSpawn = previewRoadblocks[0];
+                }
+                else
+                {
+                    roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
                     Instances.Add(roadblockToSpawn);
                 }
             }
 
-            Game.NewSafeFiber(() =>
-            {
-                Logger.Trace($"Spawning manual roadblock {roadblockToSpawn}");
-                var success = roadblockToSpawn.Spawn();
+            Logger.Trace($"Spawning manual roadblock {roadblockToSpawn}");
+            var success = roadblockToSpawn.Spawn();
 
-                if (success)
-                {
-                    Logger.Info($"Manual roadblock has been spawned with success, {roadblockToSpawn}");
-                }
-                else
-                {
-                    Logger.Warn($"Manual roadblock was unable to be spawned correctly, {roadblockToSpawn}");
-                }
-            }, "ManualPlacement.PlaceRoadblock");
+            if (success)
+            {
+                Logger.Info($"Manual roadblock has been spawned with success, {roadblockToSpawn}");
+            }
+            else
+            {
+                Logger.Warn($"Manual roadblock was unable to be spawned correctly, {roadblockToSpawn}");
+            }
         }
 
         /// <inheritdoc />
@@ -230,7 +224,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             _offset = value;
             DoInternalPreviewCreation(true);
         }
-        
+
         private void UpdateDirection(PlacementDirection value)
         {
             _direction = value;

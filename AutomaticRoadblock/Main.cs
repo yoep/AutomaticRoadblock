@@ -271,7 +271,8 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugZoneInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugCleanEntitiesComponent));
         }
     }
 }

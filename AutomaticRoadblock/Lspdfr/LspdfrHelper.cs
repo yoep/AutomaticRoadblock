@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Localization;
 using LSPD_First_Response;
@@ -11,6 +12,8 @@ namespace AutomaticRoadblocks.Lspdfr
 {
     public static class LspdfrHelper
     {
+        private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+        
         /// <summary>
         /// The available backup units.
         /// </summary>
@@ -38,15 +41,25 @@ namespace AutomaticRoadblocks.Lspdfr
         /// <param name="numberOfOccupants">The number of cop peds.</param>
         /// <param name="vehicle">The vehicle that was created.</param>
         /// <param name="cops">The cops that were created.</param>
-        /// <param name="recordCollisions"></param>
-        public static void CreateBackupUnit(Vector3 position, float heading, EBackupUnit backupUnit, int? numberOfOccupants, out ARVehicle vehicle, out ARPed[] cops, bool recordCollisions = false)
+        /// <param name="recordCollisions">Set if the vehicle collisions should be recorded.</param>
+        public static bool CreateBackupUnit(Vector3 position, float heading, EBackupUnit backupUnit, int? numberOfOccupants, out ARVehicle vehicle, out ARPed[] cops, bool recordCollisions = false)
         {
             var instance = Functions.RequestBackup(position, EBackupResponseType.Code3, LspdfrBackupUnit(backupUnit), null, true, true, numberOfOccupants);
 
-            vehicle = new ARVehicle(instance, heading, recordCollisions);
-            cops = instance.Occupants
-                .Select(x => new ARPed(x))
-                .ToArray();
+            if (instance != null)
+            {
+                vehicle = new ARVehicle(instance, heading, recordCollisions);
+                cops = instance.Occupants
+                    .Select(x => new ARPed(x))
+                    .ToArray();
+                
+                return true;
+            }
+
+            Logger.Error("Failed to create backup unit, LSPDFR returned null instance");
+            vehicle = null;
+            cops = null;
+            return false;
         }
 
         /// <summary>

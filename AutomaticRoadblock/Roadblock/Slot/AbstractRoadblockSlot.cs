@@ -8,6 +8,7 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Street.Info;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
 using Rage;
@@ -198,8 +199,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public void ModifyVehiclePosition(Vector3 newPosition)
         {
             Assert.NotNull(newPosition, "newPosition cannot be null");
-            var vehicleSlot = Instances.First(x => x.Type == EEntityType.CopVehicle);
-            vehicleSlot.Position = newPosition;
+            var vehicleInstance = Instances
+                .Where(x => x.Type == EEntityType.CopVehicle)
+                .Select(x => (ARVehicle)x)
+                .First();
+
+            vehicleInstance.Position = newPosition;
+            EntityUtils.PlaceVehicleOnTheGround(vehicleInstance.GameInstance);
         }
 
         /// <inheritdoc />
@@ -243,8 +249,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// </summary>
         protected void Initialize()
         {
-            LspdfrHelper.CreateBackupUnit(CalculateVehiclePosition(), CalculateVehicleHeading(), BackupType, NumberOfCops, out var vehicle, out var cops,
-                RecordVehicleCollisions);
+            if (!LspdfrHelper.CreateBackupUnit(CalculateVehiclePosition(), CalculateVehicleHeading(), BackupType, NumberOfCops, out var vehicle, out var cops,
+                    RecordVehicleCollisions))
+            {
+                Logger.Error("Unable to initialize roadblock slot, LSPDFR backup unit creation failed");
+                return;
+            }
 
             InitializeVehicleSlot(vehicle);
             InitializeCops(cops);
@@ -331,7 +341,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
             foreach (var cop in cops)
             {
-                cop.Position = pedSpawnPosition;
+                cop.PlaceOnGroundAt(pedSpawnPosition);
                 cop.Heading = pedHeading;
                 Instances.Add(cop);
 
@@ -347,6 +357,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             }
             else
             {
+                vehicle.Heading = CalculateVehicleHeading();
+                EntityUtils.PlaceVehicleOnTheGround(vehicle.GameInstance);
                 Instances.Add(vehicle);
             }
         }
