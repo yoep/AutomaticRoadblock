@@ -7,6 +7,7 @@ using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
+using Rage;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -47,6 +48,18 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         /// <inheritdoc />
         public override ERoadblockLevel Level => ERoadblockLevel.None;
+
+        /// <inheritdoc />
+        public override void Release(bool releaseAll = false)
+        {
+            // no-op
+        }
+
+        /// <inheritdoc />
+        protected override IList<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
+        {
+            return new List<Ped>();
+        }
 
         #endregion
 
