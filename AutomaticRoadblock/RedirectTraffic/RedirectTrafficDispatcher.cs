@@ -89,7 +89,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
             lock (Instances)
             {
                 redirectTraffic = Instances.FirstOrDefault(x => x.IsPreviewActive);
-                redirectTraffic?.DeletePreview();
             }
 
             if (redirectTraffic == null)

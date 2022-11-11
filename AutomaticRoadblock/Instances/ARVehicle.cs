@@ -79,7 +79,7 @@ namespace AutomaticRoadblocks.Instances
                 return;
 
             IsPreviewActive = false;
-            EntityUtils.Remove(GameInstance);
+            PreviewUtils.TransformToNormal(GameInstance);
         }
 
         #endregion

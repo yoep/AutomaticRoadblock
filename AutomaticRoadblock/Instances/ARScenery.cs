@@ -27,8 +27,6 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public Entity GameInstance { get; }
 
-       
-
         /// <inheritdoc />
         public Vector3 Position
         {
@@ -71,7 +69,7 @@ namespace AutomaticRoadblocks.Instances
                 return;
 
             IsPreviewActive = false;
-            EntityUtils.Remove(GameInstance);
+            PreviewUtils.TransformToNormal(GameInstance);
         }
 
         #endregion

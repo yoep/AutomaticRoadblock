@@ -134,6 +134,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void CreatePreview()
         {
+            if (IsPreviewActive)
+                return;
+            
             _instances.ForEach(x => x.CreatePreview());
             Road.CreatePreview();
             CreateBlip();
@@ -142,6 +145,9 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void DeletePreview()
         {
+            if (!IsPreviewActive)
+                return;
+
             _instances.ForEach(x => x.DeletePreview());
             Road.DeletePreview();
             DeleteBlip();
@@ -156,6 +162,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             try
             {
+                DeletePreview();
                 CreateBlip();
 
                 if (BackupType != EBackupUnit.None)
@@ -193,6 +200,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void Dispose()
         {
+            DeletePreview();
             Cop.DeleteAttachments();
             _instances.ForEach(x => x.Dispose());
             DeleteBlip();

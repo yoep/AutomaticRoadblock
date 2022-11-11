@@ -14,6 +14,15 @@ namespace AutomaticRoadblocks.Utils
             SetToPreviewState(entity, true);
         }
 
+        /// <summary>
+        /// Transform the given entity back to it's normal state.
+        /// </summary>
+        /// <param name="entity">The entity to transform.</param>
+        public static void TransformToNormal(Entity entity)
+        {
+            SetToPreviewState(entity, false);
+        }
+
         private static void SetToPreviewState(Entity entity, bool isPreview)
         {
             Assert.NotNull(entity, "entity cannot be null");

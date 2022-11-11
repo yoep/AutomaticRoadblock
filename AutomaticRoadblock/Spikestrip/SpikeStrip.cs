@@ -127,7 +127,7 @@ namespace AutomaticRoadblocks.SpikeStrip
                 return;
 
             Road.DeletePreview();
-            DoInternalCleanup();
+            PreviewUtils.TransformToNormal(GameInstance);
         }
 
         #endregion
