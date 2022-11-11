@@ -229,7 +229,7 @@ namespace AutomaticRoadblocks.Roadblock
         }
 
         /// <inheritdoc />
-        public void Release(bool releaseAll = false)
+        public virtual void Release(bool releaseAll = false)
         {
             // verify if the roadblock is still active
             // otherwise, we cannot release the entities
@@ -372,7 +372,6 @@ namespace AutomaticRoadblocks.Roadblock
 
             if (IsAllowedToJoinPursuit() || releaseAll)
             {
-                Logger.Trace($"Cops joining pursuit for roadblock {this}");
                 foreach (var slot in Slots)
                 {
                     try
