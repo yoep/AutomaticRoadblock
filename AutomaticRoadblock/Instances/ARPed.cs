@@ -245,7 +245,6 @@ namespace AutomaticRoadblocks.Instances
             // this should prevent the instance from being deleted when the backup unit is none
             GameInstance.Tasks.LeaveVehicle(LeaveVehicleFlags.WarpOut);
 
-            Functions.SetPedAsCop(GameInstance);
             GameInstance.IsPersistent = true;
             GameInstance.KeepTasks = true;
             GameInstance.RelationshipGroup = RelationshipGroup.Cop;

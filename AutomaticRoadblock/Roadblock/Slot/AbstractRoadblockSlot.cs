@@ -159,7 +159,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
             IsPreviewActive = true;
             Logger.Debug($"Creating a total of {Instances.Count} instances for the roadblock slot preview");
-            Logger.Trace($"Roadblock slot instances: \n{string.Join("\n", Instances.Select(x => x.ToString()).ToList())}");
             Instances.ForEach(x => DoSafeOperation(x.CreatePreview, $"create instance slot {x} preview"));
             DrawRoadblockDebugInfo();
         }
