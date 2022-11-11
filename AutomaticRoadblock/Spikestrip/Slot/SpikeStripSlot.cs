@@ -167,9 +167,9 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             Game.NewSafeFiber(() =>
             {
                 var spikeStrip = SpikeStrip;
-                while (spikeStrip?.State == ESpikeStripState.Undeployed)
+                while (spikeStrip?.State != ESpikeStripState.Deploying && spikeStrip?.State != ESpikeStripState.Deployed)
                 {
-                    if (TargetVehicle.DistanceTo2D(Position) <= DeploySpikeStripRange)
+                    if (TargetVehicle != null && TargetVehicle.DistanceTo2D(Position) <= DeploySpikeStripRange)
                     {
                         DoSpikeStripDeploy();
                     }
