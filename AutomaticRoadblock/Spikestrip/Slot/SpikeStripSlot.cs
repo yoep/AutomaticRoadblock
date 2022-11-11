@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
     /// </summary>
     public class SpikeStripSlot : AbstractRoadblockSlot
     {
-        private const float DeploySpikeStripRange = 55f;
+        private const float DeploySpikeStripRange = 60f;
         private const int DelayBetweenStateChangeAndUndeploy = 2 * 1000;
         private const float PlacementInFrontOfVehicle = 0.1f;
 
@@ -38,6 +38,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             NumberOfCops = 1;
 
             Initialize();
+            StartMonitor();
         }
 
         #region Properties
@@ -143,9 +144,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         {
             switch (newState)
             {
-                case ESpikeStripState.Undeployed:
-                    StartMonitor();
-                    break;
                 case ESpikeStripState.Hit:
                     // delay the undeploy to pop additional tires
                     Game.NewSafeFiber(() =>
