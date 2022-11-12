@@ -262,7 +262,6 @@ namespace AutomaticRoadblocks
                 .Register<IMenuSwitchItem>(typeof(DebugMenuSwitchItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitToggleComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitForceOnFootComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugDeploySpikeStripComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPreviewSpikeStripComponent))

@@ -87,7 +87,6 @@
         <Compile Include="Debug\Menu\DebugPursuitForceOnFootComponent.cs" />
         <Compile Include="Debug\Menu\DebugReloadDataFilesComponent.cs" />
         <Compile Include="Debug\Menu\DebugReloadSettingsComponent.cs" />
-        <Compile Include="Debug\Menu\DebugRoadInfoComponent.cs" />
         <Compile Include="Debug\Menu\DebugRoadPreviewComponent.cs" />
         <Compile Include="Debug\Menu\DebugPursuitToggleComponent.cs" />
         <Compile Include="Debug\Menu\DebugZoneInfoComponent.cs" />
