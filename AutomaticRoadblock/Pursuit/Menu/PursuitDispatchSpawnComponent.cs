@@ -1,23 +1,31 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Roadblock;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
 {
-    public class DispatchPreviewComponent : IMenuComponent<UIMenuListScrollerItem<ERoadblockDistance>>
+    /// <summary>
+    /// Dispatch spawn option for debugging which will spawn in a roadblock as it would during a pursuit.
+    /// This will target the player vehicle instead of an actual suspect.
+    /// </summary>
+    public class PursuitDispatchSpawnComponent : IMenuComponent<UIMenuListScrollerItem<ERoadblockDistance>>
     {
+        private readonly IGame _game;
         private readonly IPursuitManager _pursuitManager;
 
-        public DispatchPreviewComponent(IPursuitManager pursuitManager)
+        public PursuitDispatchSpawnComponent(IPursuitManager pursuitManager, IGame game)
         {
             _pursuitManager = pursuitManager;
+            _game = game;
         }
 
         /// <inheritdoc />
-        public UIMenuListScrollerItem<ERoadblockDistance> MenuItem { get; } = new(AutomaticRoadblocksPlugin.DispatchPreview,
-            AutomaticRoadblocksPlugin.DispatchPreviewDescription, new[]
+        public UIMenuListScrollerItem<ERoadblockDistance> MenuItem { get; } = new(AutomaticRoadblocksPlugin.DispatchSpawn,
+            AutomaticRoadblocksPlugin.DispatchSpawnDescription,
+            new[]
             {
                 ERoadblockDistance.CurrentLocation,
                 ERoadblockDistance.Closely,
@@ -36,7 +44,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _pursuitManager.DispatchPreview(MenuItem.SelectedItem);
+            _game.NewSafeFiber(() => _pursuitManager.DispatchNow(false, true, MenuItem.SelectedItem), "DispatchSpawnComponent.OnMenuActivation");
         }
 
         [IoC.PostConstruct]

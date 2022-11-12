@@ -165,7 +165,6 @@ namespace AutomaticRoadblocks.Roadblock
                 roadblockSlot.CreatePreview();
             }
 
-            Logger.Trace($"Creating roadblock road preview");
             Road.CreatePreview();
             Instances.ForEach(x => x.CreatePreview());
             DoInternalDebugPreviewCreation();
@@ -575,6 +574,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             Game.NewSafeFiber(() =>
             {
+                Logger.Trace($"Creating roadblock debug preview for {GetType()}");
                 var color = PursuitIndicatorColor();
                 var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
 

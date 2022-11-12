@@ -37,6 +37,8 @@ namespace AutomaticRoadblocks
         public const string PreviewSpikeStripDescription = "Create a preview of the spike strip on the nearby road";
         public const string RemoveSpikeStripPreview = "Remove spike strip preview " + DebugIndicatorText;
         public const string ReloadDataFiles = "Reload data files" + DebugIndicatorText;
+        public const string ReloadSettings = "Reload settings" + DebugIndicatorText;
+        public const string ReloadSettingsDescription = "Reload the settings from the ini file";
         public const string RemoveEntities = "Remove entities" + DebugIndicatorText;
         public const string RemoveEntitiesDescription = "Cleanup all world entities";
 

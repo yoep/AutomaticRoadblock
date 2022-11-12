@@ -23,7 +23,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
             base.Spawn();
             CopInstances
                 .ToList()
-                .ForEach(x => x.AimAt(TargetVehicle, 45000));
+                .ForEach(x => x
+                    .EquipWeapon()
+                    .AimAt(TargetVehicle, 45000));
         }
 
         protected override void InitializeScenery()
