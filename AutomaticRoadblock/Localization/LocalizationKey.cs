@@ -26,7 +26,7 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey EnableAutoPursuitLevelIncrease = new(nameof(EnableAutoPursuitLevelIncrease), "Level increase");
 
         public static readonly LocalizationKey EnableAutoPursuitLevelIncreaseDescription =
-            new(nameof(EnableAutoPursuitLevelIncrease), "Enable automatic level increases during a pursuit");
+            new(nameof(EnableAutoPursuitLevelIncreaseDescription), "Enable automatic level increases during a pursuit");
 
         public static readonly LocalizationKey DispatchNow = new(nameof(DispatchNow), "Dispatch now");
         public static readonly LocalizationKey DispatchNowDescription = new(nameof(DispatchNowDescription), "Dispatch a roadblock now for the current pursuit");

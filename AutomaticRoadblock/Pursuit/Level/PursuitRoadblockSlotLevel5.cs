@@ -32,7 +32,9 @@ namespace AutomaticRoadblocks.Pursuit.Level
             base.Spawn();
             CopInstances
                 .ToList()
-                .ForEach(x => x.FireAt(TargetVehicle, 60000));
+                .ForEach(x => x
+                    .EquipWeapon()
+                    .FireAt(TargetVehicle, 60000));
         }
 
         /// <inheritdoc />

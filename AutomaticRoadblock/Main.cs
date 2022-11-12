@@ -149,7 +149,7 @@ namespace AutomaticRoadblocks
                 .Register<IMenuSwitchItem>(typeof(RedirectTrafficMenuSwitchItem))
                 // pursuit components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchNowComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchNowComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitEnableDuringPursuitComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitEnableAutomaticLevelIncreaseComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitEnableSpikeStripComponentItem))
@@ -262,15 +262,14 @@ namespace AutomaticRoadblocks
                 .Register<IMenuSwitchItem>(typeof(DebugMenuSwitchItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitToggleComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitForceOnFootComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadInfoComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugDeploySpikeStripComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPreviewSpikeStripComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugReloadSettingsComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugReloadDataFilesComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugZoneInfoComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DispatchPreviewComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(DebugCleanEntitiesComponent));
         }

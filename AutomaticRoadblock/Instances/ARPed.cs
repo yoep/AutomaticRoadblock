@@ -136,9 +136,13 @@ namespace AutomaticRoadblocks.Instances
         /// </summary>
         /// <param name="entity">The entity to aim at.</param>
         /// <param name="duration">The duration.</param>
-        public void AimAt(Entity entity, int duration)
+        public ARPed AimAt(Entity entity, int duration)
         {
+            if (IsInvalid)
+                return this;
+            
             GameInstance.Tasks.AimWeaponAt(entity, duration);
+            return this;
         }
 
         /// <summary>
@@ -146,10 +150,14 @@ namespace AutomaticRoadblocks.Instances
         /// </summary>
         /// <param name="entity">The entity to fire at.</param>
         /// <param name="duration">The duration.</param>
-        public void FireAt(Entity entity, int duration)
+        public ARPed FireAt(Entity entity, int duration)
         {
             Assert.NotNull(entity, "entity cannot be null");
+            if (IsInvalid)
+                return this;
+            
             GameInstance.Tasks.FireWeaponAt(entity, duration, FiringPattern.BurstFire);
+            return this;
         }
 
         /// <summary>
@@ -184,6 +192,27 @@ namespace AutomaticRoadblocks.Instances
             }
 
             _attachments.Clear();
+        }
+
+        /// <summary>
+        /// Equip a weapon which doesn't include the stun gun.
+        /// </summary>
+        public ARPed EquipWeapon()
+        {
+            if (IsInvalid)
+                return this;
+
+            foreach (var weapon in GameInstance.Inventory.Weapons)
+            {
+                if (weapon.MagazineSize <= 0) 
+                    continue;
+                
+                Logger.Trace($"Equipping weapon {weapon} for cop");
+                GameInstance.Inventory.EquippedWeapon = weapon;
+                break;
+            }
+
+            return this;
         }
 
         /// <summary>

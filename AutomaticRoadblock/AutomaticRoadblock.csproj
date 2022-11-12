@@ -87,7 +87,6 @@
         <Compile Include="Debug\Menu\DebugPursuitForceOnFootComponent.cs" />
         <Compile Include="Debug\Menu\DebugReloadDataFilesComponent.cs" />
         <Compile Include="Debug\Menu\DebugReloadSettingsComponent.cs" />
-        <Compile Include="Debug\Menu\DebugRoadInfoComponent.cs" />
         <Compile Include="Debug\Menu\DebugRoadPreviewComponent.cs" />
         <Compile Include="Debug\Menu\DebugPursuitToggleComponent.cs" />
         <Compile Include="Debug\Menu\DebugZoneInfoComponent.cs" />
@@ -171,9 +170,9 @@
         <Compile Include="Pursuit\Level\PursuitRoadblockSlotLevel3.cs" />
         <Compile Include="Pursuit\Level\PursuitRoadblockSlotLevel4.cs" />
         <Compile Include="Pursuit\Level\PursuitRoadblockSlotLevel5.cs" />
-        <Compile Include="Pursuit\Menu\DispatchNowComponent.cs" />
-        <Compile Include="Pursuit\Menu\DispatchPreviewComponent.cs" />
-        <Compile Include="Pursuit\Menu\PursuitDispatchSpawnComponentItem.cs" />
+        <Compile Include="Pursuit\Menu\PursuitDispatchNowComponent.cs" />
+        <Compile Include="Pursuit\Menu\PursuitDispatchPreviewComponent.cs" />
+        <Compile Include="Pursuit\Menu\PursuitDispatchSpawnComponent.cs" />
         <Compile Include="Pursuit\Menu\PursuitEnableAutomaticLevelIncreaseComponent.cs" />
         <Compile Include="Pursuit\Menu\PursuitEnableDuringPursuitComponentItem.cs" />
         <Compile Include="Pursuit\Menu\PursuitEnableSpikeStripComponentItem.cs" />

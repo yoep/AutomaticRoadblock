@@ -9,12 +9,12 @@ namespace AutomaticRoadblocks.Pursuit.Menu
     /// <summary>
     /// Dispatch now menu item for when the user is in a pursuit.
     /// </summary>
-    public class DispatchNowComponent : IMenuComponent<UIMenuItem>
+    public class PursuitDispatchNowComponent : IMenuComponent<UIMenuItem>
     {
         private readonly IGame _game;
         private readonly IPursuitManager _pursuitManager;
 
-        public DispatchNowComponent(IPursuitManager pursuitManager, IGame game, ILocalizer localizer)
+        public PursuitDispatchNowComponent(IPursuitManager pursuitManager, IGame game, ILocalizer localizer)
         {
             _pursuitManager = pursuitManager;
             _game = game;

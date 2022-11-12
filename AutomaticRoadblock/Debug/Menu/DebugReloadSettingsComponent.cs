@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         }
 
         /// <inheritdoc />
-        public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.ReloadDataFiles);
+        public UIMenuItem MenuItem { get; } = new(AutomaticRoadblocksPlugin.ReloadSettings, AutomaticRoadblocksPlugin.ReloadSettingsDescription);
 
         /// <inheritdoc />
         public EMenuType Type => EMenuType.Debug;
