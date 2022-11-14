@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Roadblock;
@@ -207,13 +206,7 @@ namespace AutomaticRoadblocks.Pursuit
         private bool IsDispatchNowPressed()
         {
             var roadblocksSettings = _settingsManager.AutomaticRoadblocksSettings;
-            var secondKey = roadblocksSettings.DispatchNowModifierKey;
-            var secondKeyDown = secondKey == Keys.None;
-
-            if (!secondKeyDown && Game.IsKeyDownRightNow(secondKey))
-                secondKeyDown = true;
-
-            return Game.IsKeyDown(roadblocksSettings.DispatchNowKey) && secondKeyDown;
+            return GameUtils.IsKeyPressed(roadblocksSettings.DispatchNowKey, roadblocksSettings.DispatchNowModifierKey);
         }
 
         private void UpdatePursuitLevel(PursuitLevel level)
@@ -434,9 +427,9 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void DoDispatchTick()
         {
-            if (!IsDispatchingAllowed() || !ShouldDispatchRoadblock()) 
+            if (!IsDispatchingAllowed() || !ShouldDispatchRoadblock())
                 return;
-            
+
             if (!DispatchNow())
             {
                 // if the dispatching failed
