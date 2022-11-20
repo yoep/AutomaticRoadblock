@@ -136,7 +136,8 @@ namespace AutomaticRoadblocks.Pursuit
 
         #region Methods
 
-        public void StartListener()
+        /// <inheritdoc />
+        public void OnDutyStarted()
         {
             _logger.Trace("Registering pursuit listener to LSPD_First_Response Api");
             Events.OnPursuitStarted += PursuitStarted;
@@ -144,7 +145,8 @@ namespace AutomaticRoadblocks.Pursuit
             StartKeyListener();
         }
 
-        public void StopListener()
+        /// <inheritdoc />
+        public void OnDutyEnded()
         {
             _logger.Trace("Removing pursuit listener from LSPD_First_Response Api");
             Events.OnPursuitStarted -= PursuitStarted;

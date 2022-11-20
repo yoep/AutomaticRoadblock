@@ -79,18 +79,14 @@ namespace AutomaticRoadblocks.Utils
         /// Verify if the given key is pressed.
         /// </summary>
         /// <param name="key">The primary key.</param>
-        /// <param name="secondKey">The optional secondary key.</param>
+        /// <param name="modifierKey">The optional modifier key which should be pressed at the same time.</param>
         /// <returns>Returns true when the key/key-combo is pressed.</returns>
-        public static bool IsKeyPressed(Keys key, Keys secondKey = Keys.None) 
+        public static bool IsKeyPressed(Keys key, Keys modifierKey = Keys.None)
         {
             Assert.NotNull(key, "key cannot be null");
-            Assert.NotNull(secondKey, "secondKey cannot be null");
-            var secondKeyDown = secondKey == Keys.None;
+            Assert.NotNull(modifierKey, "secondKey cannot be null");
 
-            if (!secondKeyDown && Game.IsKeyDownRightNow(secondKey))
-                secondKeyDown = true;
-
-            return Game.IsKeyDown(key) && secondKeyDown;
+            return Game.IsKeyDown(key) && (modifierKey == Keys.None || Game.IsKeyDownRightNow(modifierKey));
         }
     }
 }

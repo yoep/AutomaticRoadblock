@@ -108,6 +108,7 @@
         <Compile Include="Integrations\PoliceSmartRadio\PoliceSmartRadioIntegration.cs" />
         <Compile Include="IoC.cs" />
         <Compile Include="IoCException.cs" />
+        <Compile Include="IOnDutyListener.cs" />
         <Compile Include="LightSources\ELightSourceFlags.cs" />
         <Compile Include="LightSources\ILightSourceData.cs" />
         <Compile Include="LightSources\Light.cs" />
@@ -220,6 +221,8 @@
         <Compile Include="Roadblock\Slot\AbstractRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IRoadblockSlot.cs" />
+        <Compile Include="ShortKeys\CleanAll.cs" />
+        <Compile Include="ShortKeys\ICleanAll.cs" />
         <Compile Include="Street\Calculation\IRoadStrategy.cs" />
         <Compile Include="Street\Calculation\IsPointOnRoadStrategy.cs" />
         <Compile Include="Street\Calculation\RayTracingRoadStrategy.cs" />

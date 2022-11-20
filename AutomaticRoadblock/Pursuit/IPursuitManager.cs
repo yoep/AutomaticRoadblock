@@ -3,7 +3,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.Pursuit
 {
-    public interface IPursuitManager
+    public interface IPursuitManager : IOnDutyListener
     {
         /// <summary>
         /// Verify if there is currently an active pursuit which is tracked by this manager.
@@ -44,16 +44,6 @@ namespace AutomaticRoadblocks.Pursuit
         /// Invoked when the pursuit level changes.
         /// </summary>
         event PursuitEvents.PursuitLevelChangedEventHandler PursuitLevelChanged;
-
-        /// <summary>
-        /// Start listening for pursuits on the LSPDFR api.
-        /// </summary>
-        void StartListener();
-
-        /// <summary>
-        /// Stop listening for pursuits on the LSPDFR api.
-        /// </summary>
-        void StopListener();
 
         /// <summary>
         /// Retrieve a vehicle of one of the suspects within the pursuit.

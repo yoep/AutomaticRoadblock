@@ -24,6 +24,7 @@ using AutomaticRoadblocks.Roadblock.Data;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.ShortKeys;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -108,7 +109,8 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<IRoadblockDispatcher>(typeof(RoadblockDispatcher))
                 .RegisterSingleton<IManualPlacement>(typeof(ManualPlacement.ManualPlacement))
                 .RegisterSingleton<IRedirectTrafficDispatcher>(typeof(RedirectTrafficDispatcher))
-                .RegisterSingleton<ISpikeStripDispatcher>(typeof(SpikeStripDispatcher));
+                .RegisterSingleton<ISpikeStripDispatcher>(typeof(SpikeStripDispatcher))
+                .RegisterSingleton<ICleanAll>(typeof(CleanAll));
         }
 
         private static void InitializeDutyListener()
@@ -208,12 +210,12 @@ namespace AutomaticRoadblocks
             var ioC = IoC.Instance;
             var logger = ioC.GetInstance<ILogger>();
             var game = ioC.GetInstance<IGame>();
-            var pursuitListener = ioC.GetInstance<IPursuitManager>();
+            var listeners = ioC.GetInstances<IOnDutyListener>();
             logger.Trace($"On duty state changed to {onDuty}");
 
             if (onDuty)
             {
-                pursuitListener.StartListener();
+                listeners.ToList().ForEach(x => x.OnDutyStarted());
                 ioC.GetInstance<IMenu>().Activate();
 
                 game.NewSafeFiber(() =>
@@ -226,7 +228,7 @@ namespace AutomaticRoadblocks
             }
             else
             {
-                pursuitListener.StopListener();
+                listeners.ToList().ForEach(x => x.OnDutyEnded());
             }
         }
 
