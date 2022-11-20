@@ -70,7 +70,9 @@ namespace AutomaticRoadblocks.Settings
             GeneralSettings = new GeneralSettings
             {
                 OpenMenuKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuKey", "X")),
-                OpenMenuModifierKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuModifierKey", "ShiftKey")),
+                OpenMenuModifierKey = ValueToKey(file.ReadString(GeneralSection, "OpenMenuModifierKey", "None")),
+                CleanAllKey = ValueToKey(file.ReadString(GeneralSection, "CleanAllKey", "C")),
+                CleanAllModifierKey = ValueToKey(file.ReadString(GeneralSection, "CleanAllModifierKey", "ControlKey")),
                 LogLevel = file.ReadEnum(GeneralSection, "Logging", ELogLevel.Info)
             };
         }

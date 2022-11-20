@@ -109,6 +109,12 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey None = new(nameof(None), "None");
 
         #endregion
+        
+        #region ShortKeys
+        
+        public static readonly LocalizationKey InstancesCleaned = new(nameof(InstancesCleaned), "Instances have been cleaned");
+        
+        #endregion
 
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {

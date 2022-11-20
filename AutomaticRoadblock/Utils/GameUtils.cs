@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Windows.Forms;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 using Rage.Native;
@@ -72,6 +73,20 @@ namespace AutomaticRoadblocks.Utils
             Assert.NotNull(color, "color cannot be null");
             NativeFunction.CallByName<uint>("DRAW_MARKER", (int)markerType, position.X, position.Y, position.Z, position.X, position.Y, position.Z, 0f, 0f, 0f,
                 size, size, height, color.R, color.G, color.B, 100, false, rotate, "", "", false);
+        }
+
+        /// <summary>
+        /// Verify if the given key is pressed.
+        /// </summary>
+        /// <param name="key">The primary key.</param>
+        /// <param name="modifierKey">The optional modifier key which should be pressed at the same time.</param>
+        /// <returns>Returns true when the key/key-combo is pressed.</returns>
+        public static bool IsKeyPressed(Keys key, Keys modifierKey = Keys.None)
+        {
+            Assert.NotNull(key, "key cannot be null");
+            Assert.NotNull(modifierKey, "secondKey cannot be null");
+
+            return Game.IsKeyDown(key) && (modifierKey == Keys.None || Game.IsKeyDownRightNow(modifierKey));
         }
     }
 }

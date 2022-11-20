@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Windows.Forms;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu.Switcher;
 using AutomaticRoadblocks.Settings;
-using Rage;
+using AutomaticRoadblocks.Utils;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
 
@@ -152,13 +151,7 @@ namespace AutomaticRoadblocks.Menu
         private bool IsMenuKeyPressed()
         {
             var generalSettings = _settingsManager.GeneralSettings;
-            var secondKey = generalSettings.OpenMenuModifierKey;
-            var secondKeyDown = secondKey == Keys.None;
-
-            if (!secondKeyDown && Game.IsKeyDownRightNow(secondKey))
-                secondKeyDown = true;
-
-            return Game.IsKeyDown(generalSettings.OpenMenuKey) && secondKeyDown;
+            return GameUtils.IsKeyPressed(generalSettings.OpenMenuKey, generalSettings.OpenMenuModifierKey);
         }
 
         private void CloseMenu()
