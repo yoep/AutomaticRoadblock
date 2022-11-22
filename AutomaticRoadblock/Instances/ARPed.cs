@@ -159,6 +159,19 @@ namespace AutomaticRoadblocks.Instances
             GameInstance.Tasks.FireWeaponAt(entity, duration, FiringPattern.BurstFire);
             return this;
         }
+        
+        /// <summary>
+        /// Stand still for the given amount of time.
+        /// </summary>
+        /// <param name="duration">The duration of the action.</param>
+        public ARPed StandStill(int duration)
+        {
+            if (IsInvalid)
+                return this;
+            
+            GameInstance.Tasks.StandStill(duration);
+            return this;
+        }
 
         /// <summary>
         /// Attach the given entity to this ped.
