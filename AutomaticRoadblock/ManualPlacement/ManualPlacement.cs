@@ -34,6 +34,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             _modelProvider = modelProvider;
             _mainBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
             _secondaryBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultSecondaryBarrier);
+            _copsEnabled = settingsManager.ManualPlacementSettings.EnableCops;
         }
 
         #region Properties

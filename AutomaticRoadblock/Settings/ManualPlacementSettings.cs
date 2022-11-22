@@ -17,6 +17,11 @@ namespace AutomaticRoadblocks.Settings
         public float DistanceFromPlayer { get; internal set; }
         
         /// <summary>
+        /// Enable cops when placing a manual barrier (this can be changed through the in-game menu)
+        /// </summary>
+        public bool EnableCops { get; internal set; }
+        
+        /// <summary>
         /// The default main barrier to use when placing manual roadblocks
         /// This barrier will be selected when opening the menu section for the first time
         /// </summary>

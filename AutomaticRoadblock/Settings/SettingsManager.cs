@@ -102,6 +102,7 @@ namespace AutomaticRoadblocks.Settings
             {
                 EnablePreview = file.ReadBoolean(ManualPlacementSection, "EnablePreview", true),
                 DistanceFromPlayer = (float)file.ReadDouble(ManualPlacementSection, "DistanceFromPlayer", 8.0),
+                EnableCops = file.ReadBoolean(ManualPlacementSection, "EnableCops", false),
                 DefaultMainBarrier = file.ReadString(ManualPlacementSection, "DefaultMainBarrier"),
                 DefaultSecondaryBarrier = file.ReadString(ManualPlacementSection, "DefaultSecondaryBarrier"),
             };
