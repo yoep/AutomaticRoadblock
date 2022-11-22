@@ -40,6 +40,15 @@ namespace AutomaticRoadblocks.ManualPlacement
         #region Methods
 
         /// <inheritdoc />
+        public override void Spawn()
+        {
+            base.Spawn();
+            CopInstances
+                .ToList()
+                .ForEach(x => x.StandStill(180000));
+        }
+
+        /// <inheritdoc />
         public override string ToString()
         {
             return "{" +
@@ -75,6 +84,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             }
             else
             {
+                Logger.Trace("No cops wanted for the manual roadblock, disposing the cop instances");
                 foreach (var cop in cops)
                 {
                     cop.Dispose();
