@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         private readonly IModelProvider _modelProvider;
 
         private BarrierModel _mainBarrier;
-        private BarrierModel _secondaryBarrier = BarrierModel.None;
+        private BarrierModel _secondaryBarrier;
         private EBackupUnit _backupType = EBackupUnit.LocalPatrol;
         private LightModel _lightSourceType = LightModel.None;
         private PlacementType _placementType = PlacementType.All;
@@ -32,7 +32,8 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             _settingsManager = settingsManager;
             _modelProvider = modelProvider;
-            _mainBarrier = FromSettings(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
+            _mainBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
+            _secondaryBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultSecondaryBarrier);
         }
 
         #region Properties
@@ -221,11 +222,11 @@ namespace AutomaticRoadblocks.ManualPlacement
             DoInternalPreviewCreation(true);
         }
 
-        private BarrierModel FromSettings(string defaultMainBarrier)
+        private BarrierModel BarrierModelFromSettings(string defaultBarrier)
         {
-            Logger.Debug($"Using main barrier {defaultMainBarrier} for manual placement");
+            Logger.Debug($"Using barrier {defaultBarrier} for manual placement if found");
             return _modelProvider.BarrierModels
-                .Where(x => string.Equals(x.ScriptName, defaultMainBarrier, StringComparison.OrdinalIgnoreCase))
+                .Where(x => string.Equals(x.ScriptName, defaultBarrier, StringComparison.OrdinalIgnoreCase))
                 .DefaultIfEmpty(BarrierModel.None)
                 .First();
         }
