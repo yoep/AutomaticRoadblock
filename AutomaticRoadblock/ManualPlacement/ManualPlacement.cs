@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -5,6 +6,7 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
+using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
@@ -14,9 +16,10 @@ namespace AutomaticRoadblocks.ManualPlacement
     internal class ManualPlacement : AbstractInstancePlacementManager<ManualRoadblock>, IManualPlacement
     {
         private readonly ISettingsManager _settingsManager;
+        private readonly IModelProvider _modelProvider;
 
-        private BarrierModel _mainBarrier = BarrierModel.None;
-        private BarrierModel _secondaryBarrier = BarrierModel.None;
+        private BarrierModel _mainBarrier;
+        private BarrierModel _secondaryBarrier;
         private EBackupUnit _backupType = EBackupUnit.LocalPatrol;
         private LightModel _lightSourceType = LightModel.None;
         private PlacementType _placementType = PlacementType.All;
@@ -24,10 +27,14 @@ namespace AutomaticRoadblocks.ManualPlacement
         private bool _copsEnabled;
         private float _offset;
 
-        public ManualPlacement(ILogger logger, IGame game, ISettingsManager settingsManager)
+        public ManualPlacement(ILogger logger, IGame game, ISettingsManager settingsManager, IModelProvider modelProvider)
             : base(game, logger)
         {
             _settingsManager = settingsManager;
+            _modelProvider = modelProvider;
+            _mainBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
+            _secondaryBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultSecondaryBarrier);
+            _copsEnabled = settingsManager.ManualPlacementSettings.EnableCops;
         }
 
         #region Properties
@@ -90,7 +97,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             get => _offset;
             set => UpdateOffset(value);
         }
-        
+
         /// <inheritdoc />
         protected override bool IsHologramPreviewEnabled => _settingsManager.ManualPlacementSettings.EnablePreview;
 
@@ -214,6 +221,15 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             _direction = value;
             DoInternalPreviewCreation(true);
+        }
+
+        private BarrierModel BarrierModelFromSettings(string defaultBarrier)
+        {
+            Logger.Debug($"Using barrier {defaultBarrier} for manual placement if found");
+            return _modelProvider.BarrierModels
+                .Where(x => string.Equals(x.ScriptName, defaultBarrier, StringComparison.OrdinalIgnoreCase))
+                .DefaultIfEmpty(BarrierModel.None)
+                .First();
         }
 
         #endregion
