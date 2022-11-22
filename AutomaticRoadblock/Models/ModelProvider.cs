@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
@@ -11,17 +10,18 @@ namespace AutomaticRoadblocks.Models
 {
     public class ModelProvider : IModelProvider
     {
-        private readonly IGame _game;
         private readonly ILogger _logger;
         private readonly IBarrierData _barrierModelData;
         private readonly ILightSourceData _lightSourceData;
 
-        public ModelProvider(IGame game, ILogger logger, IBarrierData barrierModelData, ILightSourceData lightSourceData)
+        public ModelProvider(ILogger logger, IBarrierData barrierModelData, ILightSourceData lightSourceData)
         {
-            _game = game;
             _logger = logger;
             _barrierModelData = barrierModelData;
             _lightSourceData = lightSourceData;
+
+            // do an initial load as some components might depend on them
+            Reload();
         }
 
         #region Properties
@@ -89,13 +89,6 @@ namespace AutomaticRoadblocks.Models
         #endregion
 
         #region Functions
-
-        [IoC.PostConstruct]
-        [SuppressMessage("ReSharper", "UnusedMember.Local")]
-        private void Init()
-        {
-            _game.NewSafeFiber(Reload, "ModelProvider.Load");
-        }
 
         [CanBeNull]
         private IEnumerable<T> TrySafeModelLoading<T>(string property, Func<List<T>> action, Action<IEnumerable<T>> invokeEvent, List<T> defaults = null)

@@ -101,7 +101,8 @@ namespace AutomaticRoadblocks.Settings
             ManualPlacementSettings = new ManualPlacementSettings
             {
                 EnablePreview = file.ReadBoolean(ManualPlacementSection, "EnablePreview", true),
-                DistanceFromPlayer = (float)file.ReadDouble(ManualPlacementSection, "DistanceFromPlayer", 8.0)
+                DistanceFromPlayer = (float)file.ReadDouble(ManualPlacementSection, "DistanceFromPlayer", 8.0),
+                DefaultMainBarrier = file.ReadString(ManualPlacementSection, "DefaultMainBarrier"),
             };
         }
 

@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+
 namespace AutomaticRoadblocks.Settings
 {
     public class ManualPlacementSettings
@@ -13,5 +15,12 @@ namespace AutomaticRoadblocks.Settings
         /// This distance is used to find the road closest in front of the player
         /// </summary>
         public float DistanceFromPlayer { get; internal set; }
+        
+        /// <summary>
+        /// The default main barrier to use when placing manual roadblocks
+        /// This barrier will be selected when opening the menu section for the first time
+        /// </summary>
+        [CanBeNull]
+        public string DefaultMainBarrier { get; internal set; }
     }
 }
