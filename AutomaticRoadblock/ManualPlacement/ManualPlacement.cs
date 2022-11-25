@@ -163,7 +163,7 @@ namespace AutomaticRoadblocks.ManualPlacement
                 BackupType = _backupType,
                 PlacementType = _placementType,
                 TargetHeading = targetHeading,
-                LimitSpeed = SlowTraffic,
+                SlowTraffic = SlowTraffic,
                 AddLights = LightSourceType != LightModel.None,
                 LightSources = new List<LightModel> { LightSourceType },
                 CopsEnabled = CopsEnabled,

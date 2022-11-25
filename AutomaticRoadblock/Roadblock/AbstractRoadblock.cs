@@ -24,7 +24,6 @@ namespace AutomaticRoadblocks.Roadblock
     /// </summary>
     public abstract class AbstractRoadblock : IRoadblock
     {
-        protected const float SpeedLimit = 5f;
         protected const float LaneHeadingTolerance = 45f;
         protected const int BlipFlashDuration = 3500;
         protected const float AdditionalClippingSpace = 0.5f;
@@ -129,6 +128,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// Get the scenery slots for this roadblock.
         /// </summary>
         protected List<IARInstance<Entity>> Instances { get; } = new();
+
+        /// <summary>
+        /// The speed zone limit to apply when flag <see cref="ERoadblockFlags.SlowTraffic"/> is set.
+        /// </summary>
+        protected virtual float SpeedZoneLimit => 5f;
 
         #endregion
 
@@ -328,8 +332,8 @@ namespace AutomaticRoadblocks.Roadblock
             InitializeAdditionalVehicles();
             InitializeScenery();
 
-            if (Flags.HasFlag(ERoadblockFlags.LimitSpeed))
-                InitializeSpeedLimit();
+            if (Flags.HasFlag(ERoadblockFlags.SlowTraffic))
+                InitializeSpeedZoneLimit();
 
             if (Flags.HasFlag(ERoadblockFlags.EnableLights))
                 InitializeLights();
@@ -427,17 +431,12 @@ namespace AutomaticRoadblocks.Roadblock
             PreventSlotVehiclesClipping();
         }
 
-        private void InitializeSpeedLimit()
+        private void InitializeSpeedZoneLimit()
         {
-            Logger.Trace($"Creating speed zone at roadblock location {OffsetPosition}");
-            CreateSpeedZoneLimit();
-        }
-
-        private void CreateSpeedZoneLimit()
-        {
+            Logger.Trace($"Creating speed zone limit at roadblock location {OffsetPosition}");
             try
             {
-                _speedZoneId = RoadQuery.CreateSpeedZone(OffsetPosition, 10f, SpeedLimit);
+                _speedZoneId = RoadQuery.CreateSpeedZone(OffsetPosition, 10f, SpeedZoneLimit);
             }
             catch (Exception ex)
             {
