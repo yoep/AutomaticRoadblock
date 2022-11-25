@@ -45,7 +45,6 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         private void Init()
         {
             MenuItem.Formatter = model => _localizer[model.LocalizationKey];
-            MenuItem.Items = new List<LightModel> { LightModel.None };
             MenuItem.SelectedItem = _manualPlacement.LightSourceType;
             MenuItem.IndexChanged += MenuIndexChanged;
             _modelProvider.LightModelsChanged += LightModelsChanged;
