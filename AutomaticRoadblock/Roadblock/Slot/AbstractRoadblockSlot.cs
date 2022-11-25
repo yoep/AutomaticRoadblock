@@ -269,10 +269,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             InitializeScenery();
 
             if (!MainBarrier.IsNone)
-                InitializeBarriers(MainBarrier, 3f);
+                InitializeBarriers(MainBarrier, 2f);
 
             if (!SecondaryBarrier.IsNone)
-                InitializeBarriers(SecondaryBarrier, -3f);
+                InitializeBarriers(SecondaryBarrier, -4f);
 
             if (_shouldAddLights)
                 InitializeLights();

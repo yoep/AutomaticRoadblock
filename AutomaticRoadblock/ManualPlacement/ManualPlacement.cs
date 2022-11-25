@@ -89,9 +89,6 @@ namespace AutomaticRoadblocks.ManualPlacement
         }
 
         /// <inheritdoc />
-        public bool SpeedLimit { get; set; }
-
-        /// <inheritdoc />
         public float Offset
         {
             get => _offset;
@@ -162,11 +159,10 @@ namespace AutomaticRoadblocks.ManualPlacement
                 BackupType = _backupType,
                 PlacementType = _placementType,
                 TargetHeading = targetHeading,
-                LimitSpeed = SpeedLimit,
                 AddLights = LightSourceType != LightModel.None,
                 LightSources = new List<LightModel> { LightSourceType },
                 CopsEnabled = CopsEnabled,
-                Offset = Offset
+                Offset = Offset,
             };
 
             Logger.Trace($"Creating new manual roadblock for request {request}");

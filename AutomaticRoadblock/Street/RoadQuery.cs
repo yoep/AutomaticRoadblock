@@ -95,30 +95,6 @@ namespace AutomaticRoadblocks.Street
         }
 
         /// <summary>
-        /// Create a new speed zone.
-        /// </summary>
-        /// <param name="position">The position of the zone.</param>
-        /// <param name="radius">The radius of the zone.</param>
-        /// <param name="speed">The max speed within the zone.</param>
-        /// <returns>Returns the created zone ID.</returns>
-        public static int CreateSpeedZone(Vector3 position, float radius, float speed)
-        {
-            Assert.NotNull(position, "position cannot be null");
-            //VEHICLE::_ADD_SPEED_ZONE_FOR_COORD
-            return NativeFunction.CallByHash<int>(0x2CE544C68FB812A0, position.X, position.Y, position.Z, radius, speed, false);
-        }
-
-        /// <summary>
-        /// Remove a speed zone.
-        /// </summary>
-        /// <param name="zoneId">The zone id to remove.</param>
-        public static void RemoveSpeedZone(int zoneId)
-        {
-            Assert.NotNull(zoneId, "zoneId cannot be null");
-            NativeFunction.CallByHash<int>(0x2CE544C68FB812A0, zoneId);
-        }
-
-        /// <summary>
         /// Verify if the given point is on a road.
         /// </summary>
         /// <param name="position">The point position to check.</param>

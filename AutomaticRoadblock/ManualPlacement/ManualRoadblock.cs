@@ -42,6 +42,9 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// </summary>
         public bool CopsEnabled { get; }
 
+        /// <inheritdoc />
+        protected override float SpeedZoneLimit => 0f;
+
         #endregion
 
         #region IRoadblock
@@ -113,10 +116,8 @@ namespace AutomaticRoadblocks.ManualPlacement
 
         private static ERoadblockFlags RequestToFlags(Request request)
         {
-            var flags = ERoadblockFlags.None;
+            var flags = ERoadblockFlags.SlowTraffic;
 
-            if (request.LimitSpeed)
-                flags |= ERoadblockFlags.LimitSpeed;
             if (request.AddLights)
                 flags |= ERoadblockFlags.EnableLights;
 
@@ -136,7 +137,6 @@ namespace AutomaticRoadblocks.ManualPlacement
             public EBackupUnit BackupType { get; set; }
             public PlacementType PlacementType { get; set; }
             public float TargetHeading { get; set; }
-            public bool LimitSpeed { get; set; }
             public bool AddLights { get; set; }
             public bool CopsEnabled { get; set; }
             public float Offset { get; set; }
@@ -147,7 +147,7 @@ namespace AutomaticRoadblocks.ManualPlacement
                 return
                     $"{nameof(Road)}: {Road}, {nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, " +
                     $"{nameof(BackupType)}: {BackupType}, {nameof(PlacementType)}: {PlacementType}, " +
-                    $"{nameof(TargetHeading)}: {TargetHeading}, {nameof(LimitSpeed)}: {LimitSpeed}, {nameof(AddLights)}: {AddLights}, " +
+                    $"{nameof(TargetHeading)}: {TargetHeading}, {nameof(AddLights)}: {AddLights}, " +
                     $"{nameof(CopsEnabled)}: {CopsEnabled}, {nameof(Offset)}: {Offset}, {nameof(LightSources)}: {LightSources}";
             }
         }

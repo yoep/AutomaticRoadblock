@@ -272,7 +272,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // add additional flags based on settings & world data
             if (Settings.SlowTraffic)
             {
-                flags |= ERoadblockFlags.LimitSpeed;
+                flags |= ERoadblockFlags.SlowTraffic;
             }
 
             if (ShouldAddLightsToRoadblock())

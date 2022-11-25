@@ -45,8 +45,9 @@ namespace AutomaticRoadblocks.Roadblock
         
         /// <summary>
         /// Indicates if the speed around the roadblock should be limited.
+        /// This will slow down the traffic in the area.
         /// </summary>
-        LimitSpeed = 32,
+        SlowTraffic = 32,
         
         /// <summary>
         /// Enable lights within the roadblock.

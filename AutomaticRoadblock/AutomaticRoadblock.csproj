@@ -92,6 +92,7 @@
         <Compile Include="Debug\Menu\DebugZoneInfoComponent.cs" />
         <Compile Include="Debug\Menu\DebugPreviewSpikeStripComponent.cs" />
         <Compile Include="Instances\AbstractInstancePlacementManager.cs" />
+        <Compile Include="Instances\ARSpeedZone.cs" />
         <Compile Include="Instances\ARSpikeStrip.cs" />
         <Compile Include="Instances\IARInstance.cs" />
         <Compile Include="Instances\ARPed.cs" />
@@ -128,7 +129,6 @@
         <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementRemoveComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableCopsComponentItem.cs" />
-        <Compile Include="ManualPlacement\Menu\EnableSpeedLimitComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementSecondaryBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\PlacementDirection.cs" />
         <Compile Include="ManualPlacement\PlacementType.cs" />
