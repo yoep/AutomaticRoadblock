@@ -171,17 +171,6 @@ namespace AutomaticRoadblocks.ManualPlacement
             return roadblock;
         }
 
-        protected override void DisposeInstance(ManualRoadblock instance, bool preview)
-        {
-            if (!preview)
-            {
-                Logger.Debug($"Releasing manual roadblock placement to LSPDFR for {instance}");
-                instance.Release(true);
-            }
-
-            base.DisposeInstance(instance, preview);
-        }
-
         private void UpdateMainBarrier(BarrierModel newType)
         {
             _mainBarrier = newType;

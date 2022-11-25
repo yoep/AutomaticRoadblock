@@ -16,5 +16,11 @@ namespace AutomaticRoadblocks.Instances
         /// </summary>
         /// <returns>Returns true when all instances spawned with success, else false.</returns>
         bool Spawn();
+
+        /// <summary>
+        /// Release the instance back to the world.
+        /// </summary>
+        /// <param name="releaseAll">Indicates of all cop instances should be released.</param>
+        void Release(bool releaseAll = false);
     }
 }

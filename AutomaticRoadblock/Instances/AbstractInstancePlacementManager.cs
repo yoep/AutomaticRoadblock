@@ -100,16 +100,6 @@ namespace AutomaticRoadblocks.Instances
         protected abstract T CreateInstance(IVehicleNode street);
 
         /// <summary>
-        /// Dispose the given instance.
-        /// </summary>
-        /// <param name="instance">The instance to dispose.</param>
-        /// <param name="preview">Indicates if a preview is being disposed.</param>
-        protected virtual void DisposeInstance(T instance, bool preview)
-        {
-            instance.Dispose();
-        }
-
-        /// <summary>
         /// Create a preview for the current properties.
         /// </summary>
         /// <param name="force">Force a redraw of the preview.</param>
@@ -224,6 +214,22 @@ namespace AutomaticRoadblocks.Instances
             }
 
             return closestInstance;
+        }
+
+        /// <summary>
+        /// Dispose the given instance.
+        /// </summary>
+        /// <param name="instance">The instance to dispose.</param>
+        /// <param name="preview">Indicates if a preview is being disposed.</param>
+        private void DisposeInstance(T instance, bool preview)
+        {
+            if (!preview)
+            {
+                Logger.Debug($"Releasing manual roadblock placement to LSPDFR for {instance}");
+                instance.Release(true);
+            }
+            
+            instance.Dispose();
         }
 
         private static void CreatePreviewMarker(VehicleNodeInfo street)
