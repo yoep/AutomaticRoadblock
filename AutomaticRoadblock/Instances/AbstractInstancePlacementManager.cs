@@ -65,10 +65,10 @@ namespace AutomaticRoadblocks.Instances
 
                 var instancesToRemove = Instances.Where(x => x.IsPreviewActive).ToList();
 
-                foreach (var redirectTraffic in instancesToRemove)
+                foreach (var instance in instancesToRemove)
                 {
-                    redirectTraffic.Dispose();
-                    Instances.Remove(redirectTraffic);
+                    DisposeInstance(instance, true);
+                    Instances.Remove(instance);
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace AutomaticRoadblocks.Instances
         {
             lock (Instances)
             {
-                Instances.ForEach(x => x.Dispose());
+                Instances.ForEach(x => DisposeInstance(x, false));
                 Instances.Clear();
             }
         }
@@ -100,6 +100,16 @@ namespace AutomaticRoadblocks.Instances
         protected abstract T CreateInstance(IVehicleNode street);
 
         /// <summary>
+        /// Dispose the given instance.
+        /// </summary>
+        /// <param name="instance">The instance to dispose.</param>
+        /// <param name="preview">Indicates if a preview is being disposed.</param>
+        protected virtual void DisposeInstance(T instance, bool preview)
+        {
+            instance.Dispose();
+        }
+
+        /// <summary>
         /// Create a preview for the current properties.
         /// </summary>
         /// <param name="force">Force a redraw of the preview.</param>
@@ -115,7 +125,7 @@ namespace AutomaticRoadblocks.Instances
             {
                 if (force)
                     Logger.Info($"Forcing creation of preview placement for type {GetType()}");
-                
+
                 DoHologramPreviewCreation(road, force);
             }
             else
@@ -160,7 +170,7 @@ namespace AutomaticRoadblocks.Instances
                 Instances.RemoveAll(x => toBoRemoved.Contains(x));
             }
 
-            toBoRemoved.ForEach(x => x.Dispose());
+            toBoRemoved.ForEach(x => DisposeInstance(x, false));
         }
 
         protected VehicleNodeInfo CalculateNewLocationForInstance()
