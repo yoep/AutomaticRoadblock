@@ -19,7 +19,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
     /// </summary>
     public class SpikeStripSlot : AbstractRoadblockSlot
     {
-        private const float DeploySpikeStripRange = 60f;
+        private const float DeploySpikeStripRange = 50f;
         private const int DelayBetweenStateChangeAndUndeploy = 2 * 1000;
         private const float PlacementInFrontOfVehicle = 0.1f;
 
@@ -38,7 +38,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             NumberOfCops = 1;
 
             Initialize();
-            StartMonitor();
         }
 
         #region Properties
@@ -80,6 +79,12 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         #endregion
 
         #region Methods
+
+        public override void Spawn()
+        {
+            base.Spawn();
+            StartMonitor();
+        }
 
         /// <inheritdoc />
         public override void Release(bool releaseAll = false)
@@ -166,10 +171,9 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             Logger.Trace("Starting spike strip slot monitor");
             Game.NewSafeFiber(() =>
             {
-                var spikeStrip = SpikeStrip;
-                while (spikeStrip?.State != ESpikeStripState.Deploying && spikeStrip?.State != ESpikeStripState.Deployed)
+                while (!_hasBeenDeployed)
                 {
-                    if (TargetVehicle != null && TargetVehicle.DistanceTo2D(Position) <= DeploySpikeStripRange)
+                    if (TargetVehicle != null && TargetVehicle.DistanceTo(Position) <= DeploySpikeStripRange)
                     {
                         DoSpikeStripDeploy();
                     }
@@ -193,9 +197,15 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         private void DoSpikeStripDeploy()
         {
             if (_hasBeenDeployed)
+            {
+                Game.DisplayNotificationDebug($"~r~Unable to deploy {GetType()}, has already been deployed");
                 return;
+            }
 
-            Logger.Trace($"Target vehicle is in range of spike strip ({TargetVehicle.DistanceTo2D(Position)}), deploying spike strip");
+            var distanceToTarget = TargetVehicle.DistanceTo(Position);
+            Logger.Trace($"Target vehicle is in range of spike strip ({distanceToTarget}), deploying spike strip");
+            Game.DisplayNotificationDebug($"Deploying spike strip (distance from target: {distanceToTarget})");
+            
             var spikeStrip = SpikeStrip;
             ExecuteWithCop(cop =>
                 AnimationHelper.PlayAnimation(cop.GameInstance, Animations.Dictionaries.GrenadeDictionary, Animations.ThrowShortLow, AnimationFlags.None));
