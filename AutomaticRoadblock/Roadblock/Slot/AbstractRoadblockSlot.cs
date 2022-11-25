@@ -24,7 +24,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
     {
         private const float DefaultVehicleWidth = 2.5f;
         private const float DefaultVehicleLength = 4f;
-        protected const int VehicleHeadingMaxOffset = 10;
+        protected const int VehicleHeadingMaxOffset = 25;
         protected static readonly Random Random = new();
 
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();

@@ -8,13 +8,11 @@ namespace AutomaticRoadblocks.Instances
     /// A ped which is controlled by the Automatic Roadblock plugin.
     /// </summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class ARScenery : IARInstance<Entity>
+    public class ARScenery : AbstractInstance<Entity>
     {
-        public ARScenery(Entity gameInstance)
+        public ARScenery(Entity instance)
+            : base(instance)
         {
-            Assert.NotNull(gameInstance, "gameInstance cannot be null");
-            GameInstance = gameInstance;
-
             if (!IsInvalid)
                 GameInstance.IsPersistent = true;
         }
@@ -22,38 +20,14 @@ namespace AutomaticRoadblocks.Instances
         #region Properties
 
         /// <inheritdoc />
-        public EEntityType Type => EEntityType.Scenery;
-
-        /// <inheritdoc />
-        public Entity GameInstance { get; }
-
-        /// <inheritdoc />
-        public Vector3 Position
-        {
-            get => GameInstance.Position;
-            set => GameInstance.Position = value;
-        }
-
-        /// <inheritdoc />
-        public float Heading
-        {
-            get => GameInstance.Heading;
-            set => GameInstance.Heading = value;
-        }
-
-        /// <inheritdoc />
-        public bool IsInvalid => GameInstance == null ||
-                                 !GameInstance.IsValid();
+        public override EEntityType Type => EEntityType.Scenery;
 
         #endregion
 
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive { get; private set; }
-
-        /// <inheritdoc />
-        public void CreatePreview()
+        public override void CreatePreview()
         {
             if (IsPreviewActive || IsInvalid)
                 return;
@@ -63,7 +37,7 @@ namespace AutomaticRoadblocks.Instances
         }
 
         /// <inheritdoc />
-        public void DeletePreview()
+        public override void DeletePreview()
         {
             if (!IsPreviewActive || IsInvalid)
                 return;
@@ -77,8 +51,9 @@ namespace AutomaticRoadblocks.Instances
         #region IDisposable
 
         /// <inheritdoc />
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
             DeletePreview();
             EntityUtils.Remove(GameInstance);
         }
@@ -88,8 +63,9 @@ namespace AutomaticRoadblocks.Instances
         #region IARInstance
 
         /// <inheritdoc />
-        public void Release()
+        public override void Release()
         {
+            base.Release();
             if (GameInstance == null || !GameInstance.IsValid())
                 return;
 

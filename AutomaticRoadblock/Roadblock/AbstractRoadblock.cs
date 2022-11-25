@@ -347,8 +347,8 @@ namespace AutomaticRoadblocks.Roadblock
 
             if (Flags.HasFlag(ERoadblockFlags.EnableLights))
                 InitializeLights();
-
-            SpeedZone = new ARSpeedZone(OffsetPosition, 10f, SpeedZoneLimit);
+            
+            SpeedZone = new ARSpeedZone(OffsetPosition, Road.Width, SpeedZoneLimit);
         }
 
         /// <summary>
