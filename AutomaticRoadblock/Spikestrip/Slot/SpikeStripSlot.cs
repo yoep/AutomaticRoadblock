@@ -254,22 +254,18 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         private void ExecuteWithCop(Action<ARPed> action)
         {
-            var cop = Cops.FirstOrDefault();
-            if (cop != null)
+            Game.NewSafeFiber(() =>
             {
-                try
+                var cop = Cops.FirstOrDefault();
+                if (cop != null)
                 {
                     action.Invoke(cop);
                 }
-                catch (Exception ex)
+                else
                 {
-                    Logger.Error($"Failed to invoke spike strip action, {ex.Message}", ex);
+                    Logger.Warn($"Spike strip slot has no valid cop ped, {this}");
                 }
-            }
-            else
-            {
-                Logger.Warn($"Spike strip slot has no valid cop ped, {this}");
-            }
+            }, $"{GetType()}.ExecuteWithCop");
         }
 
         #endregion

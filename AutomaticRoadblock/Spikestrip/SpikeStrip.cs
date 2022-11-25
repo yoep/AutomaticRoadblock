@@ -218,14 +218,15 @@ namespace AutomaticRoadblocks.SpikeStrip
         {
             if (IsInvalid)
                 DoInternalSpawn();
-
+            
+            Logger.Trace($"Starting deployment of spike strip {this}");
             // wait for the spike strip to become available
             while (State != ESpikeStripState.Undeployed)
             {
                 Game.FiberYield();
             }
 
-            Logger.Trace($"Deploying spike strip {this}");
+            Logger.Debug($"Deploying spike strip {this}");
             UpdateState(ESpikeStripState.Deploying);
             StopCurrentAnimation();
             DoDeployAnimation();
