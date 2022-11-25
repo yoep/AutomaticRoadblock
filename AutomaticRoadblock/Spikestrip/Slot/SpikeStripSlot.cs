@@ -202,13 +202,12 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                 return;
             }
 
-            var distanceToTarget = TargetVehicle.DistanceTo(Position);
-            Logger.Trace($"Target vehicle is in range of spike strip ({distanceToTarget}), deploying spike strip");
-            Game.DisplayNotificationDebug($"Deploying spike strip (distance from target: {distanceToTarget})");
-            
+            Logger.Trace($"Starting deployment of spike strip as target is in range ({TargetVehicle.DistanceTo(Position)}), deploying spike strip");
             var spikeStrip = SpikeStrip;
             ExecuteWithCop(cop =>
                 AnimationHelper.PlayAnimation(cop.GameInstance, Animations.Dictionaries.GrenadeDictionary, Animations.ThrowShortLow, AnimationFlags.None));
+            
+            Game.DisplayNotificationDebug($"Deploying spike strip (distance from target: {TargetVehicle.DistanceTo(Position)})");
             spikeStrip?.Deploy();
             _hasBeenDeployed = true;
         }
@@ -259,6 +258,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                 var cop = Cops.FirstOrDefault();
                 if (cop != null)
                 {
+                    Logger.Trace($"Playing throw animation for spike strip {this}");
                     action.Invoke(cop);
                 }
                 else

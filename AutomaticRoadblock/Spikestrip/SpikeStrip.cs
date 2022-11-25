@@ -323,6 +323,7 @@ namespace AutomaticRoadblocks.SpikeStrip
             if (IsInvalid)
                 return;
 
+            Logger.Trace($"Playing spike strip deploy animation for {this}");
             SoundHelper.PlaySound(GameInstance, Sounds.StingerDrop, Sounds.StingerDropRef);
             _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
                 AnimationFlags.None);
