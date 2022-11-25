@@ -9,7 +9,6 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
-using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
@@ -32,7 +31,6 @@ namespace AutomaticRoadblocks.Roadblock
         protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         protected Blip Blip;
-        private int _speedZoneId;
 
         /// <summary>
         /// Initialize a new roadblock instance.
@@ -134,6 +132,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         protected virtual float SpeedZoneLimit => 5f;
 
+        /// <summary>
+        /// The speed zone for this roadblock.
+        /// </summary>
+        private ARSpeedZone SpeedZone { get; set; }
+
         #endregion
 
         #region Events
@@ -170,6 +173,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
 
             Road.CreatePreview();
+            SpeedZone.CreatePreview();
             Instances.ForEach(x => x.CreatePreview());
             DoInternalDebugPreviewCreation();
         }
@@ -183,6 +187,7 @@ namespace AutomaticRoadblocks.Roadblock
             DeleteBlip();
             Slots.ToList().ForEach(x => x.DeletePreview());
             Road.DeletePreview();
+            SpeedZone.DeletePreview();
             Instances.ForEach(x => x.DeletePreview());
         }
 
@@ -197,7 +202,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             DeletePreview();
             DeleteBlip();
-            DeleteSpeedZone();
+            SpeedZone.Dispose();
             Slots.ToList().ForEach(x => x.Dispose());
             Instances.ForEach(x => x.Dispose());
 
@@ -219,7 +224,7 @@ namespace AutomaticRoadblocks.Roadblock
 
                 // check if a speed zone needs to be created
                 if (Flags.HasFlag(ERoadblockFlags.SlowTraffic))
-                    SpawnSpeedZoneLimit();
+                    SpeedZone.Spawn();
 
                 Slots.ToList().ForEach(SpawnSlot);
                 UpdateState(ERoadblockState.Active);
@@ -339,6 +344,8 @@ namespace AutomaticRoadblocks.Roadblock
 
             if (Flags.HasFlag(ERoadblockFlags.EnableLights))
                 InitializeLights();
+
+            SpeedZone = new ARSpeedZone(OffsetPosition, 10f, SpeedZoneLimit);
         }
 
         /// <summary>
@@ -431,37 +438,6 @@ namespace AutomaticRoadblocks.Roadblock
             Logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
             Slots = CreateRoadblockSlots(lanesToBlock);
             PreventSlotVehiclesClipping();
-        }
-
-        private void SpawnSpeedZoneLimit()
-        {
-            // verify if a speed zone was already created
-            // if so, ignore this action
-            if (_speedZoneId != 0)
-                return;
-
-            Logger.Trace($"Creating speed zone limit at roadblock location {OffsetPosition}");
-            try
-            {
-                _speedZoneId = RoadQuery.CreateSpeedZone(OffsetPosition, 10f, SpeedZoneLimit);
-                Logger.Debug($"Created speed zone at {OffsetPosition} with ID {_speedZoneId}");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Failed to create roadblock speed zone at {OffsetPosition}, {ex.Message}", ex);
-            }
-        }
-
-        private void DeleteSpeedZone()
-        {
-            if (RoadQuery.RemoveSpeedZone(_speedZoneId))
-            {
-                Logger.Debug($"Removed speed zone at {OffsetPosition} with ID {_speedZoneId}");
-            }
-            else
-            {
-                Logger.Warn($"Failed to remove speed zone at {OffsetPosition} with ID {_speedZoneId}");
-            }
         }
 
         private void CreateBlip()
