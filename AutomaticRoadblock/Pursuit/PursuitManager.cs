@@ -281,7 +281,7 @@ namespace AutomaticRoadblocks.Pursuit
                     DoAutoLevelIncrementTick();
                     DoDispatchTick();
 
-                    _game.FiberYield();
+                    GameFiber.Wait(500);
                 }
             }, "PursuitManager.PursuitMonitor");
         }
@@ -432,11 +432,20 @@ namespace AutomaticRoadblocks.Pursuit
             if (!IsDispatchingAllowed() || !ShouldDispatchRoadblock())
                 return;
 
-            if (!DispatchNow())
+            try
             {
-                // if the dispatching failed
-                // wait a short interval before retrying
-                GameFiber.Wait(3 * 1000);
+                if (!DispatchNow())
+                {
+                    // if the dispatching failed
+                    // wait a short interval before retrying
+                    GameFiber.Wait(3 * 1000);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to dispatch pursuit roadblock, {ex.Message}", ex);
+                _game.DisplayNotificationDebug("~r~Pursuit roadblock dispatch failed");
+                GameFiber.Wait(5 * 1000);
             }
         }
 
