@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Lspdfr;
+using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
@@ -13,18 +15,21 @@ namespace AutomaticRoadblocks.RedirectTraffic
     internal class RedirectTrafficDispatcher : AbstractInstancePlacementManager<RedirectTraffic>, IRedirectTrafficDispatcher
     {
         private readonly ISettingsManager _settingsManager;
+        private readonly IModelProvider _modelProvider;
 
         private float _coneDistance = 2f;
         private EBackupUnit _backupType = EBackupUnit.LocalPatrol;
-        private BarrierModel _coneType = BarrierModel.None;
+        private BarrierModel _coneType;
         private RedirectTrafficType _type = RedirectTrafficType.Lane;
         private bool _enableRedirectionArrow = true;
         private float _offset;
 
-        public RedirectTrafficDispatcher(IGame game, ILogger logger, ISettingsManager settingsManager)
+        public RedirectTrafficDispatcher(IGame game, ILogger logger, ISettingsManager settingsManager, IModelProvider modelProvider)
             : base(game, logger)
         {
             _settingsManager = settingsManager;
+            _modelProvider = modelProvider;
+            _coneType = ConeTypeFromSettings(settingsManager.RedirectTrafficSettings.DefaultCone);
         }
 
         #region Properties
@@ -183,6 +188,15 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             _offset = offset;
             DoInternalPreviewCreation(true);
+        }
+
+        private BarrierModel ConeTypeFromSettings(string defaultCone)
+        {
+            Logger.Debug($"Using cone {defaultCone} for traffic redirection if found");
+            return _modelProvider.BarrierModels
+                .Where(x => string.Equals(x.ScriptName, defaultCone, StringComparison.OrdinalIgnoreCase))
+                .DefaultIfEmpty(BarrierModel.None)
+                .First();
         }
 
         #endregion

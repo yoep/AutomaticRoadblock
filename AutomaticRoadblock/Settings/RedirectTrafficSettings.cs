@@ -18,5 +18,10 @@ namespace AutomaticRoadblocks.Settings
         /// Set if lights should be added to the traffic redirection during evening/night time
         /// </summary>
         public bool EnableLights { get; internal set; }
+        
+        /// <summary>
+        /// The default cone type to use when placing a traffic redirection
+        /// </summary>
+        public string DefaultCone { get; internal set; }
     }
 }
