@@ -129,7 +129,6 @@
         <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementRemoveComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\EnableCopsComponentItem.cs" />
-        <Compile Include="ManualPlacement\Menu\EnableSpeedLimitComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementSecondaryBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\PlacementDirection.cs" />
         <Compile Include="ManualPlacement\PlacementType.cs" />

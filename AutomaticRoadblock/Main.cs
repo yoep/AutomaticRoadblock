@@ -160,7 +160,6 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementRemoveComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PlacementTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(EnableCopsComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableSpeedLimitComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementDirectionComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementMainBarrierComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementSecondaryBarrierComponentItem))

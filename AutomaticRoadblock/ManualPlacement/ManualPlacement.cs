@@ -35,7 +35,6 @@ namespace AutomaticRoadblocks.ManualPlacement
             _mainBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
             _secondaryBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultSecondaryBarrier);
             _copsEnabled = settingsManager.ManualPlacementSettings.EnableCops;
-            SlowTraffic = settingsManager.ManualPlacementSettings.SlowTraffic;
         }
 
         #region Properties
@@ -88,9 +87,6 @@ namespace AutomaticRoadblocks.ManualPlacement
             get => _copsEnabled;
             set => UpdateCopsEnabled(value);
         }
-
-        /// <inheritdoc />
-        public bool SlowTraffic { get; set; }
 
         /// <inheritdoc />
         public float Offset
@@ -163,7 +159,6 @@ namespace AutomaticRoadblocks.ManualPlacement
                 BackupType = _backupType,
                 PlacementType = _placementType,
                 TargetHeading = targetHeading,
-                SlowTraffic = SlowTraffic,
                 AddLights = LightSourceType != LightModel.None,
                 LightSources = new List<LightModel> { LightSourceType },
                 CopsEnabled = CopsEnabled,

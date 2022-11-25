@@ -46,11 +46,6 @@ namespace AutomaticRoadblocks.ManualPlacement
         bool CopsEnabled { get; set; }
 
         /// <summary>
-        /// Set if the speed should be limited around the roadblock.
-        /// </summary>
-        bool SlowTraffic { get; set; }
-
-        /// <summary>
         /// The offset of the placement in regards to the node.
         /// </summary>
         float Offset { get; set; }
