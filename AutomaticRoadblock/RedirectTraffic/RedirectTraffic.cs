@@ -7,6 +7,7 @@ using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Lspdfr;
+using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using Rage;
@@ -180,6 +181,20 @@ namespace AutomaticRoadblocks.RedirectTraffic
             }
         }
 
+        public void Release(bool releaseAll = false)
+        {
+            var instancesToRelease = _instances
+                .Where(x => x.Type is EEntityType.CopPed or EEntityType.CopVehicle)
+                .ToList();
+            Cop.DeleteAttachments();
+            _instances.RemoveAll(x => instancesToRelease.Contains(x));
+
+            RoadblockHelpers.ReleaseInstancesToLspdfr(instancesToRelease
+                .Where(x => x.Type == EEntityType.CopPed)
+                .Select(x => (ARPed)x)
+                .ToList(), (ARVehicle)instancesToRelease.First(x => x.Type == EEntityType.CopVehicle));
+        }
+
         #endregion
 
         #region Methods
@@ -200,8 +215,13 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void Dispose()
         {
+            _instances
+                .Where(x => x.Type == EEntityType.CopPed)
+                .Select(x => (ARPed)x)
+                .ToList()
+                .ForEach(x => x.DeleteAttachments());
+
             DeletePreview();
-            Cop.DeleteAttachments();
             _instances.ForEach(x => x.Dispose());
             DeleteBlip();
         }

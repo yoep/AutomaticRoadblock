@@ -247,7 +247,10 @@ namespace AutomaticRoadblocks.Roadblock
             // verify if the roadblock is still active
             // otherwise, we cannot release the entities
             if (State != ERoadblockState.Active)
+            {
+                Logger.Trace($"Unable to release roadblock instance, instance is not active for {this}");
                 return;
+            }
 
             Logger.Trace($"Releasing roadblock instance {this}");
             InvokeCopsJoiningPursuit(releaseAll);

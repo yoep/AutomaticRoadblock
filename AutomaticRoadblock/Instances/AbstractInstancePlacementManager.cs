@@ -65,10 +65,10 @@ namespace AutomaticRoadblocks.Instances
 
                 var instancesToRemove = Instances.Where(x => x.IsPreviewActive).ToList();
 
-                foreach (var redirectTraffic in instancesToRemove)
+                foreach (var instance in instancesToRemove)
                 {
-                    redirectTraffic.Dispose();
-                    Instances.Remove(redirectTraffic);
+                    DisposeInstance(instance, true);
+                    Instances.Remove(instance);
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace AutomaticRoadblocks.Instances
         {
             lock (Instances)
             {
-                Instances.ForEach(x => x.Dispose());
+                Instances.ForEach(x => DisposeInstance(x, false));
                 Instances.Clear();
             }
         }
@@ -115,7 +115,7 @@ namespace AutomaticRoadblocks.Instances
             {
                 if (force)
                     Logger.Info($"Forcing creation of preview placement for type {GetType()}");
-                
+
                 DoHologramPreviewCreation(road, force);
             }
             else
@@ -160,7 +160,7 @@ namespace AutomaticRoadblocks.Instances
                 Instances.RemoveAll(x => toBoRemoved.Contains(x));
             }
 
-            toBoRemoved.ForEach(x => x.Dispose());
+            toBoRemoved.ForEach(x => DisposeInstance(x, false));
         }
 
         protected VehicleNodeInfo CalculateNewLocationForInstance()
@@ -214,6 +214,22 @@ namespace AutomaticRoadblocks.Instances
             }
 
             return closestInstance;
+        }
+
+        /// <summary>
+        /// Dispose the given instance.
+        /// </summary>
+        /// <param name="instance">The instance to dispose.</param>
+        /// <param name="preview">Indicates if a preview is being disposed.</param>
+        private void DisposeInstance(T instance, bool preview)
+        {
+            if (!preview)
+            {
+                Logger.Debug($"Releasing manual roadblock placement to LSPDFR for {instance}");
+                instance.Release(true);
+            }
+            
+            instance.Dispose();
         }
 
         private static void CreatePreviewMarker(VehicleNodeInfo street)
