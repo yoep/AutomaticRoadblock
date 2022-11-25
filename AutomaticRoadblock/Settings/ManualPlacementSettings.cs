@@ -34,10 +34,5 @@ namespace AutomaticRoadblocks.Settings
         /// </summary>
         [CanBeNull]
         public string DefaultSecondaryBarrier { get; internal set; }
-        
-        /// <summary>
-        /// Set if the traffic needs to be slowed down at the placed roadblocks
-        /// </summary>
-        public bool SlowTraffic { get; internal set; }
     }
 }
