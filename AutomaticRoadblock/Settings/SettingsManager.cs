@@ -105,6 +105,7 @@ namespace AutomaticRoadblocks.Settings
                 EnableCops = file.ReadBoolean(ManualPlacementSection, "EnableCops", false),
                 DefaultMainBarrier = file.ReadString(ManualPlacementSection, "DefaultMainBarrier"),
                 DefaultSecondaryBarrier = file.ReadString(ManualPlacementSection, "DefaultSecondaryBarrier"),
+                SlowTraffic = file.ReadBoolean(ManualPlacementSection, "DefaultSecondaryBarrier", true),
             };
         }
 

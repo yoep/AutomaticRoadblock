@@ -36,13 +36,13 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            MenuItem.Checked = _manualPlacement.SpeedLimit;
+            MenuItem.Checked = _manualPlacement.SlowTraffic;
             MenuItem.CheckboxEvent += CheckedStateChanged;
         }
 
         private void CheckedStateChanged(UIMenuCheckboxItem sender, bool @checked)
         {
-            _manualPlacement.SpeedLimit = MenuItem.Checked;
+            _manualPlacement.SlowTraffic = MenuItem.Checked;
         }
     }
 }

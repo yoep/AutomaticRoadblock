@@ -141,6 +141,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             public bool CopsEnabled { get; set; }
             public float Offset { get; set; }
             public List<LightModel> LightSources { get; set; }
+            public bool SlowTraffic { get; set; }
 
             public override string ToString()
             {
@@ -148,7 +149,8 @@ namespace AutomaticRoadblocks.ManualPlacement
                     $"{nameof(Road)}: {Road}, {nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, " +
                     $"{nameof(BackupType)}: {BackupType}, {nameof(PlacementType)}: {PlacementType}, " +
                     $"{nameof(TargetHeading)}: {TargetHeading}, {nameof(LimitSpeed)}: {LimitSpeed}, {nameof(AddLights)}: {AddLights}, " +
-                    $"{nameof(CopsEnabled)}: {CopsEnabled}, {nameof(Offset)}: {Offset}, {nameof(LightSources)}: {LightSources}";
+                    $"{nameof(CopsEnabled)}: {CopsEnabled}, {nameof(Offset)}: {Offset}, {nameof(LightSources)}: {LightSources}, " +
+                    $"{nameof(SlowTraffic)}: {SlowTraffic}";
             }
         }
     }

@@ -11,14 +11,16 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
     public class ManualPlacementMenuSwitchItem : IMenuSwitchItem, IDisposable
     {
         private readonly IGame _game;
+        private readonly ILogger _logger;
         private readonly IManualPlacement _manualPlacement;
         private readonly ILocalizer _localizer;
 
         private bool _running = true;
 
-        public ManualPlacementMenuSwitchItem(IGame game, IManualPlacement manualPlacement, ILocalizer localizer)
+        public ManualPlacementMenuSwitchItem(IGame game, ILogger logger, IManualPlacement manualPlacement, ILocalizer localizer)
         {
             _game = game;
+            _logger = logger;
             _manualPlacement = manualPlacement;
             _localizer = localizer;
 
@@ -55,17 +57,29 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
                 while (_running)
                 {
                     _game.FiberYield();
-
-                    if (Menu.Visible)
-                    {
-                        _manualPlacement.CreatePreview();
-                    }
-                    else
-                    {
-                        _manualPlacement.DeletePreview();
-                    }
+                    DoPreviewTick();
                 }
             }, "ManualPlacementMenuSwitchItem.Process");
+        }
+
+        private void DoPreviewTick()
+        {
+            try
+            {
+                if (Menu.Visible)
+                {
+                    _manualPlacement.CreatePreview();
+                }
+                else
+                {
+                    _manualPlacement.DeletePreview();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Manual placement preview failed, {ex.Message}", ex);
+                _game.DisplayNotification("~r~An unexpected error occurred while handling the manual roadblock placement");
+            }
         }
     }
 }
