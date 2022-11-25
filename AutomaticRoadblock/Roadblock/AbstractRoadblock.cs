@@ -216,6 +216,11 @@ namespace AutomaticRoadblocks.Roadblock
             try
             {
                 DeletePreview();
+
+                // check if a speed zone needs to be created
+                if (Flags.HasFlag(ERoadblockFlags.SlowTraffic))
+                    SpawnSpeedZoneLimit();
+
                 Slots.ToList().ForEach(SpawnSlot);
                 UpdateState(ERoadblockState.Active);
 
@@ -332,9 +337,6 @@ namespace AutomaticRoadblocks.Roadblock
             InitializeAdditionalVehicles();
             InitializeScenery();
 
-            if (Flags.HasFlag(ERoadblockFlags.SlowTraffic))
-                InitializeSpeedZoneLimit();
-
             if (Flags.HasFlag(ERoadblockFlags.EnableLights))
                 InitializeLights();
         }
@@ -431,12 +433,18 @@ namespace AutomaticRoadblocks.Roadblock
             PreventSlotVehiclesClipping();
         }
 
-        private void InitializeSpeedZoneLimit()
+        private void SpawnSpeedZoneLimit()
         {
+            // verify if a speed zone was already created
+            // if so, ignore this action
+            if (_speedZoneId != 0)
+                return;
+
             Logger.Trace($"Creating speed zone limit at roadblock location {OffsetPosition}");
             try
             {
                 _speedZoneId = RoadQuery.CreateSpeedZone(OffsetPosition, 10f, SpeedZoneLimit);
+                Logger.Debug($"Created speed zone at {OffsetPosition} with ID {_speedZoneId}");
             }
             catch (Exception ex)
             {
@@ -446,8 +454,14 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void DeleteSpeedZone()
         {
-            if (_speedZoneId != 0)
-                RoadQuery.RemoveSpeedZone(_speedZoneId);
+            if (RoadQuery.RemoveSpeedZone(_speedZoneId))
+            {
+                Logger.Debug($"Removed speed zone at {OffsetPosition} with ID {_speedZoneId}");
+            }
+            else
+            {
+                Logger.Warn($"Failed to remove speed zone at {OffsetPosition} with ID {_speedZoneId}");
+            }
         }
 
         private void CreateBlip()

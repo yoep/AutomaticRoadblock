@@ -104,7 +104,7 @@ namespace AutomaticRoadblocks.Street
         public static int CreateSpeedZone(Vector3 position, float radius, float speed)
         {
             Assert.NotNull(position, "position cannot be null");
-            //VEHICLE::_ADD_SPEED_ZONE_FOR_COORD
+            // VEHICLE::ADD_ROAD_NODE_SPEED_ZONE
             return NativeFunction.CallByHash<int>(0x2CE544C68FB812A0, position.X, position.Y, position.Z, radius, speed, false);
         }
 
@@ -112,10 +112,10 @@ namespace AutomaticRoadblocks.Street
         /// Remove a speed zone.
         /// </summary>
         /// <param name="zoneId">The zone id to remove.</param>
-        public static void RemoveSpeedZone(int zoneId)
+        public static bool RemoveSpeedZone(int zoneId)
         {
             Assert.NotNull(zoneId, "zoneId cannot be null");
-            NativeFunction.CallByHash<int>(0x2CE544C68FB812A0, zoneId);
+            return NativeFunction.CallByHash<bool>(0x2CE544C68FB812A0, zoneId);
         }
 
         /// <summary>
