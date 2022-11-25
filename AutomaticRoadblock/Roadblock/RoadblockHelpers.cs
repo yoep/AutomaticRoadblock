@@ -43,6 +43,7 @@ namespace AutomaticRoadblocks.Roadblock
                         if (vehicle != null)
                             TryEnteringVehicle(x, vehicle.GameInstance);
                     });
+                Logger.Info("Instances have been released to LSPDFR");
             }
             catch (Exception ex)
             {

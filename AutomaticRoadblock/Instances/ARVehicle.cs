@@ -100,9 +100,9 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public void Release()
         {
-            if (GameInstance == null || !GameInstance.IsValid())
+            if (IsInvalid)
                 return;
-
+            
             GameInstance.IsPersistent = false;
             GameInstance.IsRecordingCollisions = false;
         }
