@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
@@ -13,16 +12,13 @@ namespace AutomaticRoadblocks.Instances
     /// A ped which is controlled by the Automatic Roadblock plugin.
     /// </summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class ARPed : IARInstance<Ped>
+    public class ARPed : AbstractInstance<Ped>
     {
-        private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-
         private readonly List<Entity> _attachments = new();
 
-        public ARPed(Ped ped, float heading = 0f)
+        public ARPed(Ped instance, float heading = 0f)
+            : base(instance)
         {
-            Assert.NotNull(ped, "ped cannot be null");
-            GameInstance = ped;
             GameInstance.Heading = heading;
             Initialize();
         }
@@ -30,38 +26,14 @@ namespace AutomaticRoadblocks.Instances
         #region Properties
 
         /// <inheritdoc />
-        public EEntityType Type => EEntityType.CopPed;
-
-        /// <inheritdoc />
-        public Ped GameInstance { get; }
-
-        /// <inheritdoc />
-        public Vector3 Position
-        {
-            get => GameInstance.Position;
-            set => GameInstance.Position = value;
-        }
-
-        /// <inheritdoc />
-        public float Heading
-        {
-            get => GameInstance.Heading;
-            set => GameInstance.Heading = value;
-        }
-
-        /// <inheritdoc />
-        public bool IsInvalid => GameInstance == null ||
-                                 !GameInstance.IsValid();
+        public override EEntityType Type => EEntityType.CopPed;
 
         #endregion
 
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive { get; private set; }
-
-        /// <inheritdoc />
-        public void CreatePreview()
+        public override void CreatePreview()
         {
             if (IsPreviewActive || IsInvalid)
                 return;
@@ -71,7 +43,7 @@ namespace AutomaticRoadblocks.Instances
         }
 
         /// <inheritdoc />
-        public void DeletePreview()
+        public override void DeletePreview()
         {
             if (!IsPreviewActive || IsInvalid)
                 return;
@@ -85,8 +57,9 @@ namespace AutomaticRoadblocks.Instances
         #region IDisposable
 
         /// <inheritdoc />
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
             DeletePreview();
             DeleteAttachments();
             EntityUtils.Remove(GameInstance);
@@ -97,14 +70,14 @@ namespace AutomaticRoadblocks.Instances
         #region IARInstance
 
         /// <inheritdoc />
-        public void Release()
+        public override void Release()
         {
+            base.Release();
             if (IsInvalid)
                 return;
 
             DeleteAttachments();
             ClearAllTasks();
-            GameInstance.IsPersistent = false;
             Functions.SetCopAsBusy(GameInstance, false);
         }
 
@@ -140,7 +113,7 @@ namespace AutomaticRoadblocks.Instances
         {
             if (IsInvalid)
                 return this;
-            
+
             GameInstance.Tasks.AimWeaponAt(entity, duration);
             return this;
         }
@@ -155,11 +128,11 @@ namespace AutomaticRoadblocks.Instances
             Assert.NotNull(entity, "entity cannot be null");
             if (IsInvalid)
                 return this;
-            
+
             GameInstance.Tasks.FireWeaponAt(entity, duration, FiringPattern.BurstFire);
             return this;
         }
-        
+
         /// <summary>
         /// Stand still for the given amount of time.
         /// </summary>
@@ -168,7 +141,7 @@ namespace AutomaticRoadblocks.Instances
         {
             if (IsInvalid)
                 return this;
-            
+
             GameInstance.Tasks.StandStill(duration);
             return this;
         }
@@ -217,9 +190,9 @@ namespace AutomaticRoadblocks.Instances
 
             foreach (var weapon in GameInstance.Inventory.Weapons)
             {
-                if (weapon.MagazineSize <= 0) 
+                if (weapon.MagazineSize <= 0)
                     continue;
-                
+
                 Logger.Trace($"Equipping weapon {weapon} for cop");
                 GameInstance.Inventory.EquippedWeapon = weapon;
                 break;
@@ -271,6 +244,14 @@ namespace AutomaticRoadblocks.Instances
             Position = GameUtils.GetOnTheGroundPosition(position) + Vector3.WorldUp * (GameInstance.Model.Dimensions.Z / 2f);
         }
 
+        public override string ToString()
+        {
+            return $"{nameof(GameInstance.Heading)}: {GameInstance.Heading}, " +
+                   $"{nameof(GameInstance.IsPersistent)}: {GameInstance.IsPersistent}, " +
+                   $"{nameof(GameInstance.RelationshipGroup)}: {GameInstance.RelationshipGroup}, " +
+                   $"{nameof(GameInstance.IsAlive)}: {GameInstance.IsAlive}";
+        }
+
         #endregion
 
         #region Functions
@@ -287,7 +268,6 @@ namespace AutomaticRoadblocks.Instances
             // this should prevent the instance from being deleted when the backup unit is none
             GameInstance.Tasks.LeaveVehicle(LeaveVehicleFlags.WarpOut);
 
-            GameInstance.IsPersistent = true;
             GameInstance.KeepTasks = true;
             GameInstance.RelationshipGroup = RelationshipGroup.Cop;
             Functions.SetCopAsBusy(GameInstance, true);

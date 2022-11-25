@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
 namespace AutomaticRoadblocks.Instances
@@ -9,61 +8,35 @@ namespace AutomaticRoadblocks.Instances
     /// A vehicle which is controlled by the Automatic Roadblock plugin.
     /// </summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class ARVehicle : IARInstance<Vehicle>
+    public class ARVehicle : AbstractInstance<Vehicle>
     {
         public ARVehicle(Vehicle instance, float heading = 0f, bool recordCollisions = false)
+            : base(instance)
         {
             Assert.NotNull(instance, "instance cannot be null");
-            GameInstance = instance;
             GameInstance.Heading = heading;
-            GameInstance.IsPersistent = true;
             GameInstance.NeedsCollision = true;
             GameInstance.IsRecordingCollisions = recordCollisions;
             GameInstance.IsEngineOn = true;
             GameInstance.IsSirenOn = true;
-            EntityUtils.VehicleLights(GameInstance, EVehicleLightState.AlwaysOn);
         }
 
         #region Properties
 
         /// <inheritdoc />
-        public EEntityType Type => EEntityType.CopVehicle;
-
-        /// <inheritdoc />
-        public Vehicle GameInstance { get; }
-
-        /// <inheritdoc />
-        public Vector3 Position
-        {
-            get => GameInstance.Position;
-            set => GameInstance.Position = value;
-        }
-
-        /// <inheritdoc />
-        public float Heading
-        {
-            get => GameInstance.Heading;
-            set => GameInstance.Heading = value;
-        }
+        public override EEntityType Type => EEntityType.CopVehicle;
 
         /// <summary>
         /// The vehicle model.
         /// </summary>
         public Model Model => GameInstance.Model;
 
-        /// <inheritdoc />
-        public bool IsInvalid => GameInstance == null ||
-                                 !GameInstance.IsValid();
-
         #endregion
 
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive { get; private set; }
-
-        /// <inheritdoc />
-        public void CreatePreview()
+        public override void CreatePreview()
         {
             if (IsPreviewActive || IsInvalid)
                 return;
@@ -73,7 +46,7 @@ namespace AutomaticRoadblocks.Instances
         }
 
         /// <inheritdoc />
-        public void DeletePreview()
+        public override void DeletePreview()
         {
             if (!IsPreviewActive || IsInvalid)
                 return;
@@ -87,9 +60,11 @@ namespace AutomaticRoadblocks.Instances
         #region IDisposable
 
         /// <inheritdoc />
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
             DeletePreview();
+            GameInstance.Dismiss();
             EntityUtils.Remove(GameInstance);
         }
 
@@ -98,15 +73,25 @@ namespace AutomaticRoadblocks.Instances
         #region IARInstance
 
         /// <inheritdoc />
-        public void Release()
+        public override void Release()
         {
+            base.Release();
             if (IsInvalid)
                 return;
-            
-            GameInstance.IsPersistent = false;
+
             GameInstance.IsRecordingCollisions = false;
+            Logger.Trace($"{GetType()} release state: {this}");
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return $"{nameof(GameInstance.Heading)}: {GameInstance.Heading}, " +
+                   $"{nameof(GameInstance.IsPersistent)}: {GameInstance.IsPersistent}, " +
+                   $"{nameof(GameInstance.IsRecordingCollisions)}: {GameInstance.IsRecordingCollisions}, " +
+                   $"{nameof(GameInstance.IsEngineOn)}: {GameInstance.IsEngineOn}, " +
+                   $"{nameof(GameInstance.IsSirenOn)}: {GameInstance.IsSirenOn}";
+        }
     }
 }
