@@ -218,14 +218,15 @@ namespace AutomaticRoadblocks.SpikeStrip
         {
             if (IsInvalid)
                 DoInternalSpawn();
-
+            
+            Logger.Trace($"Starting deployment of spike strip {this}");
             // wait for the spike strip to become available
             while (State != ESpikeStripState.Undeployed)
             {
                 Game.FiberYield();
             }
 
-            Logger.Trace($"Deploying spike strip {this}");
+            Logger.Debug($"Deploying spike strip {this}");
             UpdateState(ESpikeStripState.Deploying);
             StopCurrentAnimation();
             DoDeployAnimation();
@@ -322,10 +323,11 @@ namespace AutomaticRoadblocks.SpikeStrip
             if (IsInvalid)
                 return;
 
+            Logger.Trace($"Playing spike strip deploy animation for {this}");
             SoundHelper.PlaySound(GameInstance, Sounds.StingerDrop, Sounds.StingerDropRef);
             _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
                 AnimationFlags.None);
-            _animation.Speed = 1.5f;
+            _animation.Speed = 2.5f;
             _animation.WaitForCompletion();
         }
 

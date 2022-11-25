@@ -98,6 +98,7 @@ namespace AutomaticRoadblocks.Menu
 
             try
             {
+                
                 _logger.Trace("Creating sub-menu's");
                 _menuSwitchItems
                     .Select(x => x.Menu)
@@ -109,7 +110,8 @@ namespace AutomaticRoadblocks.Menu
 
                 _logger.Trace("Initializing sub-menu's");
                 AddMenuSwitcherToEachMenu();
-
+                
+                DisableMenuMouse();
                 Activate();
             }
             catch (Exception ex)
@@ -206,6 +208,17 @@ namespace AutomaticRoadblocks.Menu
 
                 _logger.Debug("Menu key listener has been stopped");
             }, "MenuImpl.KeyListener");
+        }
+
+        private void DisableMenuMouse()
+        {
+            MenuPool.MouseEdgeEnabled = false;
+            MenuPool.ControlDisablingEnabled = false;
+            
+            foreach (var item in _menuSwitchItems)
+            {
+                item.Menu.MouseControlsEnabled = false;
+            }
         }
 
         #endregion
