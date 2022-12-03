@@ -97,7 +97,6 @@
         <Compile Include="Debug\Menu\DebugReloadSettingsComponent.cs" />
         <Compile Include="Debug\Menu\DebugRoadPreviewComponent.cs" />
         <Compile Include="Debug\Menu\DebugPursuitToggleComponent.cs" />
-        <Compile Include="Debug\Menu\DebugZoneInfoComponent.cs" />
         <Compile Include="Debug\Menu\DebugPreviewSpikeStripComponent.cs" />
         <Compile Include="Instances\AbstractInstance.cs" />
         <Compile Include="Instances\AbstractInstancePlacementManager.cs" />
