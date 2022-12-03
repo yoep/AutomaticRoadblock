@@ -7,6 +7,7 @@ using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
+using Rage;
 
 namespace AutomaticRoadblocks.Api
 {
@@ -63,8 +64,16 @@ namespace AutomaticRoadblocks.Api
         public static bool DispatchNow(bool userRequested = false)
         {
             var logger = IoC.Instance.GetInstance<ILogger>();
-            logger.Debug($"Dispatching roadblock from functions API with {nameof(userRequested)}: {userRequested}");
+            logger.Info($"Dispatching roadblock from functions API with {nameof(userRequested)}: {userRequested}");
             return PursuitManager.DispatchNow(userRequested);
+        }
+
+        /// <summary>
+        /// Close the current road at the player location.
+        /// </summary>
+        public static void CloseRoad()
+        {
+            CloseRoadDispatcher.CloseNearbyRoad(Game.LocalPlayer.Character.Position);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -111,13 +112,20 @@ namespace AutomaticRoadblocks.CloseRoad
         /// <inheritdoc />
         public void Dispose()
         {
-            _mainNode.DeletePreview();
-            _nodes.ForEach(x => x.DeletePreview());
-            _nodes.Clear();
-            _roadblocks.ForEach(x => x.Dispose());
-            _roadblocks.Clear();
-            _closeNodes.ForEach(x => x.Dispose());
-            _closeNodes.Clear();
+            try
+            {
+                _mainNode.DeletePreview();
+                _nodes.ForEach(x => x.DeletePreview());
+                _nodes.Clear();
+                _roadblocks.ForEach(SafeDisposeRoadblock);
+                _roadblocks.Clear();
+                _closeNodes.ForEach(x => x.Dispose());
+                _closeNodes.Clear();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to dispose close road instance, {ex.Message}", ex);
+            }
         }
 
         #endregion
@@ -206,6 +214,18 @@ namespace AutomaticRoadblocks.CloseRoad
                 .Where(x => x.Type == EStreetType.Road)
                 .Select(x => (Road)x)
                 .Last();
+        }
+
+        private void SafeDisposeRoadblock(ManualRoadblock roadblock)
+        {
+            try
+            {
+                roadblock.Dispose();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to dispose roadblock, {ex.Message}", ex);
+            }
         }
 
         #endregion

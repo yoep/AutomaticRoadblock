@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Utils;
+using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
 namespace AutomaticRoadblocks.Instances
@@ -19,6 +20,7 @@ namespace AutomaticRoadblocks.Instances
             GameInstance.IsRecordingCollisions = recordCollisions;
             GameInstance.IsEngineOn = true;
             GameInstance.IsSirenOn = true;
+            TurnHeadlightsOnIfNeeded();
         }
 
         #region Properties
@@ -90,6 +92,12 @@ namespace AutomaticRoadblocks.Instances
                    $"{nameof(GameInstance.IsRecordingCollisions)}: {GameInstance.IsRecordingCollisions}, " +
                    $"{nameof(GameInstance.IsEngineOn)}: {GameInstance.IsEngineOn}, " +
                    $"{nameof(GameInstance.IsSirenOn)}: {GameInstance.IsSirenOn}";
+        }
+
+        private void TurnHeadlightsOnIfNeeded()
+        {
+            if (GameUtils.TimePeriod is ETimePeriod.Evening or ETimePeriod.Night)
+                EntityUtils.VehicleLights(GameInstance, EVehicleLightState.AlwaysOn);
         }
     }
 }

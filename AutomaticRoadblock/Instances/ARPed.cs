@@ -245,6 +245,9 @@ namespace AutomaticRoadblocks.Instances
 
         public override string ToString()
         {
+            if (IsInvalid)
+                return "ARPed Game instance is invalid";
+
             return $"{nameof(GameInstance.Heading)}: {GameInstance.Heading}, " +
                    $"{nameof(GameInstance.IsPersistent)}: {GameInstance.IsPersistent}, " +
                    $"{nameof(GameInstance.RelationshipGroup)}: {GameInstance.RelationshipGroup}, " +
