@@ -62,8 +62,8 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public override void Dispose()
         {
-            DeletePreview();
             base.Dispose();
+            DeletePreview();
         }
 
         #endregion

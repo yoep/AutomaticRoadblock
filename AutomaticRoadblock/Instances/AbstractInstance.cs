@@ -100,7 +100,7 @@ namespace AutomaticRoadblocks.Instances
                         break;
                     }
 
-                    if (!GameInstance.IsPersistent)
+                    if (!_isReleased && !GameInstance.IsPersistent)
                     {
                         StateChanged(nameof(GameInstance.IsPersistent), GameInstance.IsPersistent);
                         GameInstance.MakePersistent();

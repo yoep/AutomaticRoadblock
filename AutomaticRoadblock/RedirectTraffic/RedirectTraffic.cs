@@ -188,6 +188,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void Release(bool releaseAll = false)
         {
+            var vehicle = Vehicle;
             var instancesToRelease = _instances
                 .Where(x => x.Type is EEntityType.CopPed or EEntityType.CopVehicle)
                 .ToList();
@@ -198,7 +199,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             RoadblockHelpers.ReleaseInstancesToLspdfr(instancesToRelease
                 .Where(x => x.Type == EEntityType.CopPed)
                 .Select(x => (ARPed)x)
-                .ToList(), (ARVehicle)instancesToRelease.First(x => x.Type == EEntityType.CopVehicle));
+                .ToList(), vehicle);
         }
 
         #endregion
@@ -293,13 +294,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private void InitializeCloseNodes()
         {
-            var placementSide = IsLeftSideOfLanes ? -90 : 90;
             var positionInFrontOfVehicle = OffsetPosition
                                            + MathHelper.ConvertHeadingToDirection(Lane.Heading) * (GetVehicleLength() + ConeDistance)
-                                           + MathHelper.ConvertHeadingToDirection(Lane.Heading - placementSide) * (GetVehicleWidth() / 2);
+                                           + MathHelper.ConvertHeadingToDirection(Lane.Heading - 90) * GetVehicleWidth() * 1.5f;
             var positionBehindVehicle = OffsetPosition
                                         + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * (GetVehicleLength() * 1.5f)
-                                        + MathHelper.ConvertHeadingToDirection(Lane.Heading + placementSide) * (GetVehicleWidth() / 2);
+                                        + MathHelper.ConvertHeadingToDirection(Lane.Heading + 90) * GetVehicleWidth() * 1.5f;
 
             _closeNodes = new ARCloseNodes(positionInFrontOfVehicle, positionBehindVehicle);
         }
