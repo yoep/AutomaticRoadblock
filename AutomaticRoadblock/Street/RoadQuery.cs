@@ -61,12 +61,13 @@ namespace AutomaticRoadblocks.Street
         /// <param name="distance">The distance to traverse.</param>
         /// <param name="roadType">The road types to follow.</param>
         /// <param name="blacklistedFlags">The flags of a node which should be ignored if present.</param>
+        /// <param name="stopAtIntersection">Stop at the first intersection found while travelling along the road.</param>
         /// <returns>Returns the roads found while traversing the distance.</returns>
         /// <remarks>The last element in the collection will always be of type <see cref="EStreetType.Road"/>.</remarks>
         public static ICollection<IVehicleNode> FindRoadsTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType,
-            ENodeFlag blacklistedFlags)
+            ENodeFlag blacklistedFlags, bool stopAtIntersection)
         {
-            var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags);
+            var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags, stopAtIntersection);
             var startedAt = DateTime.Now.Ticks;
             var roads = nodeInfos
                 .Select(ToVehicleNode)
@@ -193,7 +194,7 @@ namespace AutomaticRoadblocks.Street
         }
 
         private static List<VehicleNodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float expectedDistance, EVehicleNodeType nodeType,
-            ENodeFlag blacklistedFlags)
+            ENodeFlag blacklistedFlags, bool stopAtIntersection)
         {
             var startedAt = DateTime.Now.Ticks;
             var nextNodeCalculationStartedAt = DateTime.Now.Ticks;
@@ -239,6 +240,13 @@ namespace AutomaticRoadblocks.Street
                     Logger.Trace(
                         $"Traversed an additional {additionalDistanceTraversed} distance in {nextNodeCalculationDuration} millis, new total traversed distance = {distanceTraversed}");
                     nextNodeCalculationStartedAt = DateTime.Now.Ticks;
+                    
+                    // verify if we need to stop at the first intersection or not
+                    if (stopAtIntersection && nodeTowardsHeading.IsJunctionNode)
+                    {
+                        Logger.Trace($"Junction has been reached for {position} heading {heading}");
+                        break;
+                    }
                 }
             }
 

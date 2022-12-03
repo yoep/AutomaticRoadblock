@@ -357,7 +357,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
             _logger.Trace(
                 $"Determining roadblock location for Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(distanceToUse)}: {distanceToUse}, {nameof(roadType)}: {roadType}");
-            return RoadQuery.FindRoadsTraversing(vehicle.Position, vehicle.Heading, distanceToUse, roadType, DetermineBlacklistedFlagsForType(roadType))
+            return RoadQuery.FindRoadsTraversing(vehicle.Position, vehicle.Heading, distanceToUse, roadType, DetermineBlacklistedFlagsForType(roadType), false)
                 .ToList();
         }
 

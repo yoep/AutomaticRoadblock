@@ -74,18 +74,31 @@ namespace AutomaticRoadblocks.ManualPlacement
         #region Funtions
 
         /// <inheritdoc />
-        protected override IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
+        protected override IReadOnlyList<Road.Lane> LanesToBlock()
         {
+            IReadOnlyList<Road.Lane> lanes = new List<Road.Lane>(Road.Lanes);
+
             // check which lane(s) we need to block
             if (PlacementType == PlacementType.ClosestToPlayer)
             {
-                lanesToBlock = new List<Road.Lane> { Road.LaneClosestTo(Game.PlayerPosition) };
+                lanes = new List<Road.Lane> { Road.LaneClosestTo(Game.PlayerPosition) };
             }
-            else if (PlacementType == PlacementType.SameDirectionAsPlayer)
+            else if (PlacementType == PlacementType.SameDirectionAsRoad)
             {
-                lanesToBlock = Road.LanesHeadingTo(Heading).ToList();
+                lanes = Road.LanesSameDirection;
+            }
+            else if (PlacementType == PlacementType.OppositeDirectionOfRoad)
+            {
+                lanes = Road.LanesOppositeDirection;
             }
 
+            Logger.Trace($"Blocking a total of {lanes.Count} lanes for manual roadblock at {Position} with heading {Heading}");
+            return lanes;
+        }
+
+        /// <inheritdoc />
+        protected override IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
+        {
             return lanesToBlock
                 .Select(lane => new ManualRoadblockSlot(lane, MainBarrier, SecondaryBarrier, BackupType, LightSources, TargetHeading,
                     Flags.HasFlag(ERoadblockFlags.EnableLights), CopsEnabled, Offset))

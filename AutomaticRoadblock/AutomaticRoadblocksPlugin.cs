@@ -41,6 +41,8 @@ namespace AutomaticRoadblocks
         public const string ReloadSettingsDescription = "Reload the settings from the ini file";
         public const string RemoveEntities = "Remove entities" + DebugIndicatorText;
         public const string RemoveEntitiesDescription = "Cleanup all world entities";
+        public const string CloseNearbyRoad = "Close road" + DebugIndicatorText;
+        public const string OpenNearbyRoad = "Open road" + DebugIndicatorText;
 
         private const string DebugIndicatorText = " [DEBUG]";
     }

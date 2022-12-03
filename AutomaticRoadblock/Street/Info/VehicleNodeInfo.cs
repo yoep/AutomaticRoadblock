@@ -45,6 +45,11 @@ namespace AutomaticRoadblocks.Street.Info
         /// </summary>
         public ENodeFlag Flags { get; internal set; }
 
+        /// <summary>
+        /// Verify if this node is a junction node.
+        /// </summary>
+        public bool IsJunctionNode => Flags.HasFlag(ENodeFlag.IsJunction);
+
         #endregion
 
         #region Methods

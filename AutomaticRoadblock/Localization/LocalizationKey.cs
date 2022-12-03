@@ -12,6 +12,7 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey MenuPursuit = new(nameof(MenuPursuit), "Pursuit");
         public static readonly LocalizationKey MenuManualPlacement = new(nameof(MenuManualPlacement), "Manual placement");
         public static readonly LocalizationKey MenuRedirectTraffic = new(nameof(MenuRedirectTraffic), "Redirect traffic");
+        public static readonly LocalizationKey MenuCloseRoad = new(nameof(MenuCloseRoad), "Close road");
 
         #endregion
 
@@ -115,17 +116,27 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey InstancesCleaned = new(nameof(InstancesCleaned), "Instances have been cleaned");
         
         #endregion
+        
+        #region Close road
+        
+        public static readonly LocalizationKey CloseNearbyRoad = new(nameof(CloseNearbyRoad), "Close nearby road");
+        public static readonly LocalizationKey CloseNearbyRoadDescription = new(nameof(CloseNearbyRoadDescription), "Closes the road around the player");
+        public static readonly LocalizationKey OpenClosedRoad = new(nameof(OpenClosedRoad), "Open nearby road");
+        public static readonly LocalizationKey OpenClosedRoadDescription = new(nameof(OpenClosedRoadDescription), "Open the closed road again for traffic");
+
+        #endregion
 
         public static readonly IEnumerable<LocalizationKey> Values = new[]
         {
-            MainBarrier,
-            MainBarrierDescription,
-            SecondaryBarrier,
-            SecondaryBarrierDescription,
             BlockLanes,
             BlockLanesDescription,
             CleanRoadblockPlacement,
             CleanRoadblockPlacementDescription,
+            CloseNearbyRoad,
+            Direction,
+            DirectionAwayFromPlayer,
+            DirectionDescription,
+            DirectionTowardsPlayer,
             DispatchNow,
             DispatchNowDescription,
             EnableAutoPursuitLevelIncrease,
@@ -137,6 +148,8 @@ namespace AutomaticRoadblocks.Localization
             EnableSpikeStrip,
             LightSource,
             LightSourceDescription,
+            MainBarrier,
+            MainBarrierDescription,
             MenuManualPlacement,
             MenuMode,
             MenuPursuit,
@@ -163,14 +176,12 @@ namespace AutomaticRoadblocks.Localization
             RoadblockHasBeenHit,
             RoadblockInstanceCreationFailed,
             RoadblockNoPursuitActive,
+            SecondaryBarrier,
+            SecondaryBarrierDescription,
             SpeedLimit,
             SpeedLimitDescription,
             Vehicle,
             VehicleDescription,
-            Direction,
-            DirectionDescription,
-            DirectionTowardsPlayer,
-            DirectionAwayFromPlayer
         };
 
         public LocalizationKey(string identifier, string defaultText)

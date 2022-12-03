@@ -76,6 +76,14 @@
         <Compile Include="Barriers\Barriers.cs" />
         <Compile Include="Barriers\EBarrierFlags.cs" />
         <Compile Include="Barriers\IBarrierData.cs" />
+        <Compile Include="CloseRoad\CloseRoadDispatcher.cs" />
+        <Compile Include="CloseRoad\CloseRoadInstance.cs" />
+        <Compile Include="CloseRoad\ICloseRoadDispatcher.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadLightSourceComponentItem.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadMenuSwitchItem.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadNearbyComponentItem.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadNearbyPreviewComponentItem.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadUnitTypeComponentItem.cs" />
         <Compile Include="Data\AbstractDataFileLoader.cs" />
         <Compile Include="Data\ChanceException.cs" />
         <Compile Include="Data\ChanceProvider.cs" />
@@ -222,6 +230,7 @@
         <Compile Include="Roadblock\Slot\AbstractRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IRoadblockSlot.cs" />
+        <Compile Include="Settings\CloseRoadSettings.cs" />
         <Compile Include="ShortKeys\CleanAll.cs" />
         <Compile Include="ShortKeys\ICleanAll.cs" />
         <Compile Include="Street\Calculation\IRoadStrategy.cs" />

@@ -6,6 +6,8 @@ using System.Reflection;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.AbstractionLayer.Implementation;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.CloseRoad;
+using AutomaticRoadblocks.CloseRoad.Menu;
 using AutomaticRoadblocks.Debug.Menu;
 using AutomaticRoadblocks.Integrations;
 using AutomaticRoadblocks.Integrations.PoliceSmartRadio;
@@ -110,7 +112,8 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<IManualPlacement>(typeof(ManualPlacement.ManualPlacement))
                 .RegisterSingleton<IRedirectTrafficDispatcher>(typeof(RedirectTrafficDispatcher))
                 .RegisterSingleton<ISpikeStripDispatcher>(typeof(SpikeStripDispatcher))
-                .RegisterSingleton<ICleanAll>(typeof(CleanAll));
+                .RegisterSingleton<ICleanAll>(typeof(CleanAll))
+                .RegisterSingleton<ICloseRoadDispatcher>(typeof(CloseRoadDispatcher));
         }
 
         private static void InitializeDutyListener()
@@ -149,6 +152,7 @@ namespace AutomaticRoadblocks
                 .Register<IMenuSwitchItem>(typeof(RoadblockMenuSwitchItem))
                 .Register<IMenuSwitchItem>(typeof(ManualPlacementMenuSwitchItem))
                 .Register<IMenuSwitchItem>(typeof(RedirectTrafficMenuSwitchItem))
+                .Register<IMenuSwitchItem>(typeof(CloseRoadMenuSwitchItem))
                 // pursuit components
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchNowComponent))
@@ -174,7 +178,11 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficOffsetComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeTypeComponentItem))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficVehicleTypeComponentType))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableRedirectArrowComponentItem));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableRedirectArrowComponentItem))
+                // close road components
+                .Register<IMenuComponent<UIMenuItem>>(typeof(CloseRoadNearbyComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(CloseRoadUnitTypeComponentItem))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(CloseRoadLightSourceComponentItem));
         }
 
         private static void InitializeIntegrations()
@@ -272,7 +280,8 @@ namespace AutomaticRoadblocks
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchPreviewComponent))
                 .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugCleanEntitiesComponent));
+                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugCleanEntitiesComponent))
+                .Register<IMenuComponent<UIMenuItem>>(typeof(CloseRoadNearbyPreviewComponentItem));
         }
     }
 }
