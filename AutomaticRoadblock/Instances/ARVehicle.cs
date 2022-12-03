@@ -62,10 +62,8 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public override void Dispose()
         {
-            base.Dispose();
             DeletePreview();
-            GameInstance.Dismiss();
-            EntityUtils.Remove(GameInstance);
+            base.Dispose();
         }
 
         #endregion

@@ -1,9 +1,13 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Street.Info;
 using Rage;
 
 namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
 {
+    [SuppressMessage("ReSharper", "UnusedType.Global")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
     public interface ISpikeStripDispatcher : IDisposable
     {
         /// <summary>

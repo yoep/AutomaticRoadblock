@@ -62,7 +62,6 @@ namespace AutomaticRoadblocks.Instances
             base.Dispose();
             DeletePreview();
             DeleteAttachments();
-            EntityUtils.Remove(GameInstance);
         }
 
         #endregion

@@ -26,6 +26,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private readonly List<IARInstance<Entity>> _instances = new();
 
         private Blip _blip;
+        private ARCloseNodes _closeNodes;
 
         public RedirectTraffic(Request request)
         {
@@ -141,6 +142,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             _instances.ForEach(x => x.CreatePreview());
             Road.CreatePreview();
             CreateBlip();
+            _closeNodes.CreatePreview();
         }
 
         /// <inheritdoc />
@@ -152,6 +154,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             _instances.ForEach(x => x.DeletePreview());
             Road.DeletePreview();
             DeleteBlip();
+            _closeNodes.DeletePreview();
         }
 
         #endregion
@@ -165,6 +168,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             {
                 DeletePreview();
                 CreateBlip();
+                _closeNodes.Spawn();
 
                 if (BackupType != EBackupUnit.None)
                     Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
@@ -188,6 +192,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 .Where(x => x.Type is EEntityType.CopPed or EEntityType.CopVehicle)
                 .ToList();
             Cop.DeleteAttachments();
+            _closeNodes.Dispose();
             _instances.RemoveAll(x => instancesToRelease.Contains(x));
 
             RoadblockHelpers.ReleaseInstancesToLspdfr(instancesToRelease
@@ -225,6 +230,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             DeletePreview();
             _instances.ForEach(x => x.Dispose());
             DeleteBlip();
+            _closeNodes.Dispose();
         }
 
         #endregion
@@ -239,6 +245,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             InitializeVehicle(vehicle);
             InitializeCop(cops);
             InitializeScenery();
+            InitializeCloseNodes();
         }
 
         private void InitializeVehicle(ARVehicle vehicle)
@@ -282,6 +289,19 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 PlaceRedirectionArrow();
             if (EnableLights)
                 InitializeVehicleStoppedLight();
+        }
+
+        private void InitializeCloseNodes()
+        {
+            var placementSide = IsLeftSideOfLanes ? -90 : 90;
+            var positionInFrontOfVehicle = OffsetPosition
+                                           + MathHelper.ConvertHeadingToDirection(Lane.Heading) * (GetVehicleLength() + ConeDistance)
+                                           + MathHelper.ConvertHeadingToDirection(Lane.Heading - placementSide) * (GetVehicleWidth() / 2);
+            var positionBehindVehicle = OffsetPosition
+                                        + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * (GetVehicleLength() * 1.5f)
+                                        + MathHelper.ConvertHeadingToDirection(Lane.Heading + placementSide) * (GetVehicleWidth() / 2);
+
+            _closeNodes = new ARCloseNodes(positionInFrontOfVehicle, positionBehindVehicle);
         }
 
         private void PlaceConesAlongTheRoad()

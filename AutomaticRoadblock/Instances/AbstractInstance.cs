@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Instances
@@ -68,10 +69,7 @@ namespace AutomaticRoadblocks.Instances
             _isReleased = true;
 
             if (!IsInvalid)
-            {
-                GameInstance.IsPersistent = false;
-                GameInstance.Delete();
-            }
+                EntityUtils.Remove(GameInstance);
         }
 
         /// <inheritdoc />
