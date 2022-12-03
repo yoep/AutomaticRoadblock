@@ -11,7 +11,7 @@ namespace AutomaticRoadblocks.CloseRoad
         void Spawn();
 
         /// <summary>
-        /// Release the close road instances.
+        /// Release the close road instances back to LSPDFR.
         /// </summary>
         void Release();
     }

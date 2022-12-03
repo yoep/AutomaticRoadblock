@@ -120,28 +120,21 @@ namespace AutomaticRoadblocks.ManualPlacement
 
             lock (Instances)
             {
-                roadblockToSpawn = Instances.FirstOrDefault(x => x.IsPreviewActive);
-
-                if (roadblockToSpawn == null)
-                {
-                    roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance(position)));
-                    Instances.Add(roadblockToSpawn);
-                }
+                roadblockToSpawn = Instances.FirstOrDefault(x => x.IsPreviewActive) 
+                                   ?? CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance(position)));
             }
 
-            Logger.Trace($"Spawning manual roadblock {roadblockToSpawn}");
-            var success = roadblockToSpawn.Spawn();
+            return TrackInstanceAndSpawn(roadblockToSpawn);
+        }
 
-            if (success)
-            {
-                Logger.Info($"Manual roadblock has been spawned with success, {roadblockToSpawn}");
-            }
-            else
-            {
-                Logger.Warn($"Manual roadblock was unable to be spawned correctly, {roadblockToSpawn}");
-            }
+        public IRoadblock PlaceRoadblock(Vector3 position, float targetHeading, EBackupUnit backupType, BarrierModel mainBarrier, BarrierModel secondaryBarrier,
+            LightModel lightSource, PlacementType placementType, bool copsEnabled, float offset)
+        {
+            var node = RoadQuery.ToVehicleNode(CalculateNewLocationForInstance(position));
+            var roadblockToSpawn = DoInternalInstanceCreation(node, targetHeading, mainBarrier, secondaryBarrier, backupType, placementType, lightSource,
+                copsEnabled, offset);
 
-            return roadblockToSpawn;
+            return TrackInstanceAndSpawn(roadblockToSpawn);
         }
 
         /// <inheritdoc />
@@ -161,24 +154,53 @@ namespace AutomaticRoadblocks.ManualPlacement
                 return null;
 
             var targetHeading = Direction == PlacementDirection.Towards ? Game.PlayerHeading : Game.PlayerHeading - 180;
+            return DoInternalInstanceCreation(node, targetHeading, _mainBarrier, _secondaryBarrier, _backupType, _placementType, LightSourceType, _copsEnabled,
+                _offset);
+        }
+
+        private ManualRoadblock DoInternalInstanceCreation(IVehicleNode node, float targetHeading, BarrierModel mainBarrier, BarrierModel secondaryBarrier,
+            EBackupUnit backupType, PlacementType placementType, LightModel lightSource, bool copsEnabled, float offset)
+        {
             var request = new ManualRoadblock.Request
             {
                 Road = (Road)node,
-                MainBarrier = _mainBarrier,
-                SecondaryBarrier = _secondaryBarrier,
-                BackupType = _backupType,
-                PlacementType = _placementType,
+                MainBarrier = mainBarrier,
+                SecondaryBarrier = secondaryBarrier,
+                BackupType = backupType,
+                PlacementType = placementType,
                 TargetHeading = targetHeading,
-                AddLights = LightSourceType != LightModel.None,
-                LightSources = new List<LightModel> { LightSourceType },
-                CopsEnabled = CopsEnabled,
-                Offset = Offset,
+                AddLights = lightSource != LightModel.None,
+                LightSources = new List<LightModel> { lightSource },
+                CopsEnabled = copsEnabled,
+                Offset = offset
             };
 
             Logger.Trace($"Creating new manual roadblock for request {request}");
             var roadblock = new ManualRoadblock(request);
             Logger.Debug($"Created manual roadblock {roadblock}");
             return roadblock;
+        }
+
+        private IRoadblock TrackInstanceAndSpawn(ManualRoadblock roadblockToSpawn)
+        {
+            lock (Instances)
+            {
+                Instances.Add(roadblockToSpawn);
+            }
+
+            Logger.Trace($"Spawning manual roadblock {roadblockToSpawn}");
+            var success = roadblockToSpawn.Spawn();
+
+            if (success)
+            {
+                Logger.Info($"Manual roadblock has been spawned with success, {roadblockToSpawn}");
+            }
+            else
+            {
+                Logger.Warn($"Manual roadblock was unable to be spawned correctly, {roadblockToSpawn}");
+            }
+
+            return roadblockToSpawn;
         }
 
         private void UpdateMainBarrier(BarrierModel newType)
