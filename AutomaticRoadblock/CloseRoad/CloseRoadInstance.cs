@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -7,7 +6,6 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.ManualPlacement;
-using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
@@ -15,7 +13,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.CloseRoad
 {
-    public class CloseRoadInstance : IDisposable, IPreviewSupport
+    public class CloseRoadInstance : ICloseRoad
     {
         private const float IntersectionRoadblockOffset = 10f;
         private readonly IVehicleNode _mainNode;
@@ -94,7 +92,21 @@ namespace AutomaticRoadblocks.CloseRoad
 
         #endregion
 
-        #region IDisposable
+        #region Methods
+
+        /// <inheritdoc />
+        public void Spawn()
+        {
+            _roadblocks.ForEach(x => x.Spawn());
+            _closeNodes.ForEach(x => x.Spawn());
+            _logger.Info($"Close road spawned a total of {_roadblocks.Count} roadblocks and {_closeNodes.Count} node closures");
+        }
+
+        /// <inheritdoc />
+        public void Release()
+        {
+            _roadblocks.ForEach(x => x.Release(true));
+        }
 
         /// <inheritdoc />
         public void Dispose()
@@ -106,22 +118,6 @@ namespace AutomaticRoadblocks.CloseRoad
             _roadblocks.Clear();
             _closeNodes.ForEach(x => x.Dispose());
             _closeNodes.Clear();
-        }
-
-        #endregion
-
-        #region Methods
-
-        public void Spawn()
-        {
-            _roadblocks.ForEach(x => x.Spawn());
-            _closeNodes.ForEach(x => x.Spawn());
-            _logger.Info($"Close road spawned a total of {_roadblocks.Count} roadblocks and {_closeNodes.Count} node closures");
-        }
-
-        public void Release()
-        {
-            _roadblocks.ForEach(x => x.Release(true));
         }
 
         #endregion

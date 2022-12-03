@@ -14,16 +14,14 @@ namespace AutomaticRoadblocks.CloseRoad
 {
     public class CloseRoadDispatcher : ICloseRoadDispatcher
     {
-        private readonly IGame _game;
         private readonly ILogger _logger;
         private readonly ISettingsManager _settingsManager;
         private readonly IModelProvider _modelProvider;
 
         private readonly List<CloseRoadInstance> _instances = new();
 
-        public CloseRoadDispatcher(IGame game, ILogger logger, ISettingsManager settingsManager, IModelProvider modelProvider)
+        public CloseRoadDispatcher(ILogger logger, ISettingsManager settingsManager, IModelProvider modelProvider)
         {
-            _game = game;
             _logger = logger;
             _settingsManager = settingsManager;
             _modelProvider = modelProvider;
@@ -44,29 +42,35 @@ namespace AutomaticRoadblocks.CloseRoad
         #region ICloseRoadDispatcher
 
         /// <inheritdoc />
-        public void CloseNearbyRoad(Vector3 position, bool preview = false)
+        public ICloseRoad CloseNearbyRoad(Vector3 position, bool preview = false)
         {
-            _game.NewSafeFiber(() =>
+            return CloseNearbyRoad(position, BackupUnit, BarrierModelFromSettings(_settingsManager.CloseRoadSettings.Barrier), LightSource, MaxDistance,
+                preview);
+        }
+
+        /// <inheritdoc />
+        public ICloseRoad CloseNearbyRoad(Vector3 position, EBackupUnit backupUnit, BarrierModel barrier, LightModel lightSource, float maxDistance,
+            bool preview = false)
+        {
+            var closestNode = RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
+            _logger.Trace($"Closing the road for node {closestNode}");
+
+            var instance = new CloseRoadInstance(closestNode, backupUnit, barrier, lightSource, MaxDistance);
+            lock (_instances)
             {
-                var closestNode = RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
-                _logger.Trace($"Closing the road for node {closestNode}");
+                _instances.Add(instance);
+            }
 
-                var instance = new CloseRoadInstance(closestNode, BackupUnit, BarrierModelFromSettings(_settingsManager.CloseRoadSettings.Barrier), LightSource,
-                    MaxDistance);
-                lock (_instances)
-                {
-                    _instances.Add(instance);
-                }
+            if (preview)
+            {
+                instance.CreatePreview();
+            }
+            else
+            {
+                instance.Spawn();
+            }
 
-                if (preview)
-                {
-                    instance.CreatePreview();
-                }
-                else
-                {
-                    instance.Spawn();
-                }
-            }, $"{GetType()}.CloseNearbyRoad");
+            return instance;
         }
 
         /// <inheritdoc />
