@@ -1,4 +1,5 @@
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.CloseRoad;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.ManualPlacement;
@@ -18,11 +19,12 @@ namespace AutomaticRoadblocks.ShortKeys
         private readonly IRoadblockDispatcher _roadblockDispatcher;
         private readonly IManualPlacement _manualPlacement;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
+        private readonly ICloseRoadDispatcher _closeRoadDispatcher;
 
         private bool _active;
 
         public CleanAll(IGame game, ILogger logger, ISettingsManager settingsManager, ILocalizer localizer, IRoadblockDispatcher roadblockDispatcher,
-            IManualPlacement manualPlacement, IRedirectTrafficDispatcher redirectTrafficDispatcher)
+            IManualPlacement manualPlacement, IRedirectTrafficDispatcher redirectTrafficDispatcher, ICloseRoadDispatcher closeRoadDispatcher)
         {
             _game = game;
             _logger = logger;
@@ -31,6 +33,7 @@ namespace AutomaticRoadblocks.ShortKeys
             _roadblockDispatcher = roadblockDispatcher;
             _manualPlacement = manualPlacement;
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
+            _closeRoadDispatcher = closeRoadDispatcher;
         }
 
         /// <inheritdoc />
@@ -52,6 +55,7 @@ namespace AutomaticRoadblocks.ShortKeys
                         _roadblockDispatcher.DismissActiveRoadblocks();
                         _manualPlacement.RemoveRoadblocks(RemoveType.All);
                         _redirectTrafficDispatcher.RemoveTrafficRedirects(RemoveType.All);
+                        _closeRoadDispatcher.OpenRoads();
                         _logger.Info("Plugin instances have been cleaned");
                         _game.DisplayNotification(_localizer[LocalizationKey.InstancesCleaned]);
                     }

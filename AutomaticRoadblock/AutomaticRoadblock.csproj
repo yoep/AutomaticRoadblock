@@ -78,6 +78,7 @@
         <Compile Include="Barriers\IBarrierData.cs" />
         <Compile Include="CloseRoad\CloseRoadDispatcher.cs" />
         <Compile Include="CloseRoad\CloseRoadInstance.cs" />
+        <Compile Include="CloseRoad\ICloseRoad.cs" />
         <Compile Include="CloseRoad\ICloseRoadDispatcher.cs" />
         <Compile Include="CloseRoad\Menu\CloseRoadLightSourceComponentItem.cs" />
         <Compile Include="CloseRoad\Menu\CloseRoadMenuSwitchItem.cs" />
@@ -192,6 +193,7 @@
         <Compile Include="Pursuit\IPursuitManager.cs" />
         <Compile Include="Pursuit\PursuitLevel.cs" />
         <Compile Include="Pursuit\PursuitManager.cs" />
+        <Compile Include="RedirectTraffic\IRedirectTraffic.cs" />
         <Compile Include="RedirectTraffic\IRedirectTrafficDispatcher.cs" />
         <Compile Include="RedirectTraffic\Menu\EnableRedirectArrowComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficConeDistanceComponentItem.cs" />

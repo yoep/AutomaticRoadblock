@@ -14,10 +14,10 @@ using Rage;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
-    public class RedirectTraffic : IPlaceableInstance
+    public class RedirectTraffic : IRedirectTraffic
     {
-        private const float DefaultVehicleWidth = 2f;
-        private const float DefaultVehicleLength = 4f;
+        private const float DefaultVehicleWidth = 1f;
+        private const float DefaultVehicleLength = 3f;
         private const string RedirectTrafficAnimation = "amb@world_human_car_park_attendant@male@base";
         private const string ConeWithLightName = "cone_with_light";
 
@@ -26,6 +26,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private readonly List<IARInstance<Entity>> _instances = new();
 
         private Blip _blip;
+        private ARCloseNodes _closeNodes;
 
         public RedirectTraffic(Request request)
         {
@@ -141,6 +142,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             _instances.ForEach(x => x.CreatePreview());
             Road.CreatePreview();
             CreateBlip();
+            _closeNodes.CreatePreview();
         }
 
         /// <inheritdoc />
@@ -152,6 +154,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             _instances.ForEach(x => x.DeletePreview());
             Road.DeletePreview();
             DeleteBlip();
+            _closeNodes.DeletePreview();
         }
 
         #endregion
@@ -165,6 +168,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             {
                 DeletePreview();
                 CreateBlip();
+                _closeNodes.Spawn();
 
                 if (BackupType != EBackupUnit.None)
                     Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
@@ -181,18 +185,21 @@ namespace AutomaticRoadblocks.RedirectTraffic
             }
         }
 
+        /// <inheritdoc />
         public void Release(bool releaseAll = false)
         {
+            var vehicle = Vehicle;
             var instancesToRelease = _instances
                 .Where(x => x.Type is EEntityType.CopPed or EEntityType.CopVehicle)
                 .ToList();
             Cop.DeleteAttachments();
+            _closeNodes.Dispose();
             _instances.RemoveAll(x => instancesToRelease.Contains(x));
 
             RoadblockHelpers.ReleaseInstancesToLspdfr(instancesToRelease
                 .Where(x => x.Type == EEntityType.CopPed)
                 .Select(x => (ARPed)x)
-                .ToList(), (ARVehicle)instancesToRelease.First(x => x.Type == EEntityType.CopVehicle));
+                .ToList(), vehicle);
         }
 
         #endregion
@@ -224,6 +231,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             DeletePreview();
             _instances.ForEach(x => x.Dispose());
             DeleteBlip();
+            _closeNodes.Dispose();
         }
 
         #endregion
@@ -232,12 +240,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private void Init()
         {
-            var rotation = IsLeftSideOfLanes ? -35 : 35;
-            LspdfrHelper.CreateBackupUnit(OffsetPosition, Lane.Heading + rotation, BackupType, 1, out var vehicle, out var cops);
+            LspdfrHelper.CreateBackupUnit(OffsetPosition, Lane.Heading, BackupType, 1, out var vehicle, out var cops);
 
             InitializeVehicle(vehicle);
             InitializeCop(cops);
             InitializeScenery();
+            InitializeCloseNodes();
         }
 
         private void InitializeVehicle(ARVehicle vehicle)
@@ -248,6 +256,10 @@ namespace AutomaticRoadblocks.RedirectTraffic
             }
             else
             {
+                var rotation = IsLeftSideOfLanes ? -35 : 35;
+
+                vehicle.Position = OffsetPosition;
+                vehicle.Heading = Lane.Heading + rotation;
                 EntityUtils.PlaceVehicleOnTheGround(vehicle.GameInstance);
                 _instances.Add(vehicle);
             }
@@ -255,12 +267,10 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private void InitializeCop(IEnumerable<ARPed> cops)
         {
-            var distanceBehindVehicle = GetVehicleLength() - 1f;
             var copPedHeading = Lane.Heading - 180;
-            var positionBehindVehicle = OffsetPosition + MathHelper.ConvertHeadingToDirection(copPedHeading) * distanceBehindVehicle;
             var cop = cops.First();
 
-            cop.PlaceOnGroundAt(positionBehindVehicle);
+            cop.PlaceOnGroundAt(BehindVehicle());
             cop.Heading = copPedHeading;
 
             _instances.Add(cop);
@@ -283,10 +293,22 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 InitializeVehicleStoppedLight();
         }
 
+        private void InitializeCloseNodes()
+        {
+            var positionInFrontOfVehicle = OffsetPosition
+                                           + MathHelper.ConvertHeadingToDirection(Lane.Heading) * (GetVehicleLength() + ConeDistance)
+                                           + MathHelper.ConvertHeadingToDirection(Lane.Heading - 90) * GetVehicleWidth() * 1.5f;
+            var positionBehindVehicle = OffsetPosition
+                                        + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * (GetVehicleLength() * 1.5f)
+                                        + MathHelper.ConvertHeadingToDirection(Lane.Heading + 90) * GetVehicleWidth() * 1.5f;
+
+            _closeNodes = new ARCloseNodes(positionInFrontOfVehicle, positionBehindVehicle);
+        }
+
         private void PlaceConesAlongTheRoad()
         {
             var placementDirection = MathHelper.ConvertHeadingToDirection(Lane.Heading);
-            var startPosition = OffsetPosition + ConeStartDirection();
+            var startPosition = BehindVehicle() + ConeStartDirection();
             var actualConeLength = ConeType.Width + ConeType.Spacing;
             var coneDistance = ConeDistance + GetVehicleLength();
             var totalCones = coneDistance / actualConeLength;
@@ -303,17 +325,17 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private void PlaceConesBehindTheVehicle()
         {
             var coneDistance = ConeType.Width + ConeType.Spacing;
-            var totalCones = (int)Math.Floor(Lane.Width / coneDistance);
+            var totalCones = (int)Math.Floor(Lane.Width - 0.5f / coneDistance);
             var placementDirectionSide = IsLeftSideOfLanes ? 90 : -90;
             var placementDirection = MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * coneDistance +
                                      MathHelper.ConvertHeadingToDirection(Lane.Heading + placementDirectionSide) * coneDistance;
-            var startPosition = OffsetPosition + ConeStartDirection(0.5f);
+            var startPosition = BehindVehicle() + ConeStartDirection();
 
             Logger.Trace($"Creating a total of {totalCones} cones behind the vehicle for a lane width of {Lane.Width}");
             for (var i = 0; i < totalCones; i++)
             {
-                _instances.Add(BarrierFactory.Create(ConeType, startPosition, ConeHeading()));
                 startPosition += placementDirection * coneDistance;
+                _instances.Add(BarrierFactory.Create(ConeType, startPosition, ConeHeading()));
             }
         }
 
@@ -406,29 +428,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
             return closestLane;
         }
 
-        private int SignSideDirection()
+        private Vector3 ConeStartDirection()
         {
-            return IsLeftSideOfLanes ? 90 : -90;
-        }
-
-        private Vector3 ConeStartDirection(float additionalDistanceBehindVehicle = 0f)
-        {
-            var vehicleWidth = GetVehicleWidth() + 0.5f;
-            var vehicleLength = GetVehicleLength() - 1f;
+            var vehicleWidth = GetVehicleWidth() * 1.35f;
             var placementSide = IsLeftSideOfLanes ? -90 : 90;
 
-            if (BackupType != EBackupUnit.None)
-            {
-                vehicleWidth = Vehicle.Model.Dimensions.X;
-                vehicleLength = Vehicle.Model.Dimensions.Y;
-            }
-            else
-            {
-                Logger.Debug("No vehicle selected, using default vehicle values for calculating cone direction");
-            }
-
-            return MathHelper.ConvertHeadingToDirection(Lane.Heading + placementSide) * vehicleWidth +
-                   MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * (vehicleLength + additionalDistanceBehindVehicle);
+            return MathHelper.ConvertHeadingToDirection(Lane.Heading + placementSide) * vehicleWidth;
         }
 
         private float ConeHeading()
@@ -447,6 +452,17 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private float GetVehicleLength()
         {
             return BackupType == EBackupUnit.None ? DefaultVehicleLength : Vehicle.Model.Dimensions.Y;
+        }
+
+        private Vector3 BehindVehicle()
+        {
+            if (BackupType == EBackupUnit.None)
+                return OffsetPosition + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * DefaultVehicleLength;
+
+            var shoulderRotation = IsLeftSideOfLanes ? 90 : -90;
+            return Vehicle.GameInstance.RearPosition
+                   + MathHelper.ConvertHeadingToDirection(Lane.Heading - shoulderRotation) * 1f
+                   + MathHelper.ConvertHeadingToDirection(Lane.Heading - 180) * 0.75f;
         }
 
         private Vector3 PositionBasedOnType()

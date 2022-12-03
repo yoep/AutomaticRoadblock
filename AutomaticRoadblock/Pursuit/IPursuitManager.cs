@@ -3,6 +3,9 @@ using Rage;
 
 namespace AutomaticRoadblocks.Pursuit
 {
+    /// <summary>
+    /// Manages the roadblocks which are deployed during a pursuit.
+    /// </summary>
     public interface IPursuitManager : IOnDutyListener
     {
         /// <summary>

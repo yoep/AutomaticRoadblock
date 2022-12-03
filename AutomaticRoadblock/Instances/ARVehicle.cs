@@ -64,8 +64,6 @@ namespace AutomaticRoadblocks.Instances
         {
             base.Dispose();
             DeletePreview();
-            GameInstance.Dismiss();
-            EntityUtils.Remove(GameInstance);
         }
 
         #endregion

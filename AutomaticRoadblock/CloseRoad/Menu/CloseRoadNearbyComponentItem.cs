@@ -21,7 +21,7 @@ namespace AutomaticRoadblocks.CloseRoad.Menu
 
             MenuItem = new UIMenuItem(localizer[LocalizationKey.CloseNearbyRoad], localizer[LocalizationKey.CloseNearbyRoadDescription]);
         }
-        
+
         /// <inheritdoc />
         public UIMenuItem MenuItem { get; }
 
@@ -47,9 +47,9 @@ namespace AutomaticRoadblocks.CloseRoad.Menu
         private void CloseNearbyRoad()
         {
             _isClosed = true;
-            _closeRoadDispatcher.CloseNearbyRoad(_game.PlayerPosition);
             MenuItem.Text = _localizer[LocalizationKey.OpenClosedRoad];
             MenuItem.Description = _localizer[LocalizationKey.OpenClosedRoadDescription];
+            _game.NewSafeFiber(() => _closeRoadDispatcher.CloseNearbyRoad(_game.PlayerPosition), $"{GetType()}.CloseNearbyRoad");
         }
 
         private void OpenNearbyRoad()

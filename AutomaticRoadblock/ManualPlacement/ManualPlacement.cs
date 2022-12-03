@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -7,16 +6,17 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Models;
+using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
+using Rage;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
     internal class ManualPlacement : AbstractInstancePlacementManager<ManualRoadblock>, IManualPlacement
     {
         private readonly ISettingsManager _settingsManager;
-        private readonly IModelProvider _modelProvider;
 
         private BarrierModel _mainBarrier;
         private BarrierModel _secondaryBarrier;
@@ -31,9 +31,8 @@ namespace AutomaticRoadblocks.ManualPlacement
             : base(game, logger)
         {
             _settingsManager = settingsManager;
-            _modelProvider = modelProvider;
-            _mainBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
-            _secondaryBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultSecondaryBarrier);
+            _mainBarrier = modelProvider.TryFindModelByScriptName<BarrierModel>(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
+            _secondaryBarrier = modelProvider.TryFindModelByScriptName<BarrierModel>(settingsManager.ManualPlacementSettings.DefaultSecondaryBarrier);
             _copsEnabled = settingsManager.ManualPlacementSettings.EnableCops;
         }
 
@@ -108,36 +107,50 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         public void PlaceRoadblock()
         {
+            PlaceRoadblock(Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer);
+        }
+
+        /// <inheritdoc />
+        public IRoadblock PlaceRoadblock(Vector3 position)
+        {
             ManualRoadblock roadblockToSpawn;
 
             lock (Instances)
             {
-                roadblockToSpawn = Instances.FirstOrDefault(x => x.IsPreviewActive);
-
-                if (roadblockToSpawn == null)
-                {
-                    roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
-                    Instances.Add(roadblockToSpawn);
-                }
+                roadblockToSpawn = Instances.FirstOrDefault(x => x.IsPreviewActive)
+                                   ?? CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance(position)));
             }
 
-            Logger.Trace($"Spawning manual roadblock {roadblockToSpawn}");
-            var success = roadblockToSpawn.Spawn();
+            return TrackInstanceAndSpawn(roadblockToSpawn);
+        }
 
-            if (success)
-            {
-                Logger.Info($"Manual roadblock has been spawned with success, {roadblockToSpawn}");
-            }
-            else
-            {
-                Logger.Warn($"Manual roadblock was unable to be spawned correctly, {roadblockToSpawn}");
-            }
+        public IRoadblock PlaceRoadblock(Vector3 position, float targetHeading, EBackupUnit backupType, BarrierModel mainBarrier, BarrierModel secondaryBarrier,
+            LightModel lightSource, PlacementType placementType, bool copsEnabled, float offset)
+        {
+            var node = RoadQuery.ToVehicleNode(CalculateNewLocationForInstance(position));
+            var roadblockToSpawn = DoInternalInstanceCreation(node, targetHeading, mainBarrier, secondaryBarrier, backupType, placementType, lightSource,
+                copsEnabled, offset);
+
+            return TrackInstanceAndSpawn(roadblockToSpawn);
         }
 
         /// <inheritdoc />
         public void RemoveRoadblocks(RemoveType removeType)
         {
             DoInternalInstanceRemoval(removeType);
+        }
+
+        /// <inheritdoc />
+        public void Remove(IRoadblock roadblock)
+        {
+            if (roadblock.GetType() == typeof(ManualRoadblock))
+            {
+                DisposeInstance((ManualRoadblock)roadblock);
+            }
+            else
+            {
+                Logger.Warn($"Unable to remove manual placed roadblock, invalid instance type {roadblock.GetType()}");
+            }
         }
 
         #endregion
@@ -151,24 +164,53 @@ namespace AutomaticRoadblocks.ManualPlacement
                 return null;
 
             var targetHeading = Direction == PlacementDirection.Towards ? Game.PlayerHeading : Game.PlayerHeading - 180;
+            return DoInternalInstanceCreation(node, targetHeading, _mainBarrier, _secondaryBarrier, _backupType, _placementType, LightSourceType, _copsEnabled,
+                _offset);
+        }
+
+        private ManualRoadblock DoInternalInstanceCreation(IVehicleNode node, float targetHeading, BarrierModel mainBarrier, BarrierModel secondaryBarrier,
+            EBackupUnit backupType, PlacementType placementType, LightModel lightSource, bool copsEnabled, float offset)
+        {
             var request = new ManualRoadblock.Request
             {
                 Road = (Road)node,
-                MainBarrier = _mainBarrier,
-                SecondaryBarrier = _secondaryBarrier,
-                BackupType = _backupType,
-                PlacementType = _placementType,
+                MainBarrier = mainBarrier,
+                SecondaryBarrier = secondaryBarrier,
+                BackupType = backupType,
+                PlacementType = placementType,
                 TargetHeading = targetHeading,
-                AddLights = LightSourceType != LightModel.None,
-                LightSources = new List<LightModel> { LightSourceType },
-                CopsEnabled = CopsEnabled,
-                Offset = Offset,
+                AddLights = lightSource != LightModel.None,
+                LightSources = new List<LightModel> { lightSource },
+                CopsEnabled = copsEnabled,
+                Offset = offset
             };
 
             Logger.Trace($"Creating new manual roadblock for request {request}");
             var roadblock = new ManualRoadblock(request);
             Logger.Debug($"Created manual roadblock {roadblock}");
             return roadblock;
+        }
+
+        private IRoadblock TrackInstanceAndSpawn(ManualRoadblock roadblockToSpawn)
+        {
+            lock (Instances)
+            {
+                Instances.Add(roadblockToSpawn);
+            }
+
+            Logger.Trace($"Spawning manual roadblock {roadblockToSpawn}");
+            var success = roadblockToSpawn.Spawn();
+
+            if (success)
+            {
+                Logger.Info($"Manual roadblock has been spawned with success, {roadblockToSpawn}");
+            }
+            else
+            {
+                Logger.Warn($"Manual roadblock was unable to be spawned correctly, {roadblockToSpawn}");
+            }
+
+            return roadblockToSpawn;
         }
 
         private void UpdateMainBarrier(BarrierModel newType)
@@ -217,15 +259,6 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             _direction = value;
             DoInternalPreviewCreation(true);
-        }
-
-        private BarrierModel BarrierModelFromSettings(string defaultBarrier)
-        {
-            Logger.Debug($"Using barrier {defaultBarrier} for manual placement if found");
-            return _modelProvider.BarrierModels
-                .Where(x => string.Equals(x.ScriptName, defaultBarrier, StringComparison.OrdinalIgnoreCase))
-                .DefaultIfEmpty(BarrierModel.None)
-                .First();
         }
 
         #endregion
