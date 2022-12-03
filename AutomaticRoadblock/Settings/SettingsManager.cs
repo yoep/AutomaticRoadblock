@@ -12,6 +12,7 @@ namespace AutomaticRoadblocks.Settings
         private const string AutomaticRoadblocksSection = "Automatic Roadblocks";
         private const string ManualPlacementSection = "Manual Placement";
         private const string RedirectTrafficSection = "Redirect Traffic";
+        private const string CloseRoadSection = "Close Road";
 
         private readonly ILogger _logger;
 
@@ -31,6 +32,9 @@ namespace AutomaticRoadblocks.Settings
 
         /// <inheritdoc />
         public RedirectTrafficSettings RedirectTrafficSettings { get; private set; }
+
+        /// <inheritdoc />
+        public CloseRoadSettings CloseRoadSettings { get; private set; }
 
         /// <inheritdoc />
         public void Load()
@@ -53,6 +57,7 @@ namespace AutomaticRoadblocks.Settings
                 ReadAutomaticRoadblocksSettings(settingsFile);
                 ReadManualPlacementSettings(settingsFile);
                 ReadRedirectTrafficSettings(settingsFile);
+                ReadCloseRoadSettings(settingsFile);
 
                 // update the log level of the plugin
                 _logger.LogLevel = GeneralSettings.LogLevel;
@@ -116,6 +121,15 @@ namespace AutomaticRoadblocks.Settings
                 DistanceFromPlayer = (float)file.ReadDouble(RedirectTrafficSection, "DistanceFromPlayer", 10.0),
                 EnableLights = file.ReadBoolean(RedirectTrafficSection, "EnableLights", true),
                 DefaultCone = file.ReadString(RedirectTrafficSection, "DefaultCone", "big_cone_stripes"),
+            };
+        }
+
+        private void ReadCloseRoadSettings(InitializationFile file)
+        {
+            CloseRoadSettings = new CloseRoadSettings
+            {
+                MaxDistanceFromPlayer = (float)file.ReadDouble(CloseRoadSection, "MaxDistanceFromPlayer", 75.0),
+                Barrier = file.ReadString(CloseRoadSection, "Barrier", "police_do_not_cross"),
             };
         }
 

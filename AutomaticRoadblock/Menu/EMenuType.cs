@@ -5,6 +5,7 @@ namespace AutomaticRoadblocks.Menu
         Pursuit,
         ManualPlacement,
         RedirectTraffic,
+        CloseRoad,
         Debug
     }
 }

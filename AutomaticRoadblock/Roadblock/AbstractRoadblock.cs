@@ -57,6 +57,7 @@ namespace AutomaticRoadblocks.Roadblock
             LightSources = lightSources;
             Flags = flags;
             Offset = offset;
+            OffsetPosition = Position + MathHelper.ConvertHeadingToDirection(Heading) * Offset;
         }
 
         #region Properties
@@ -89,7 +90,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <summary>
         /// The offset position for the roadblock.
         /// </summary>
-        public Vector3 OffsetPosition => Road.Position + MathHelper.ConvertHeadingToDirection(Road.Node.Heading) * Offset;
+        public Vector3 OffsetPosition { get; }
 
         /// <inheritdoc />
         public float Heading { get; private set; }
@@ -347,7 +348,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             if (Flags.HasFlag(ERoadblockFlags.EnableLights))
                 InitializeLights();
-            
+
             SpeedZone = new ARSpeedZone(OffsetPosition, Road.Width, SpeedZoneLimit);
         }
 

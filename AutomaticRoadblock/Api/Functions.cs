@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.CloseRoad;
 using AutomaticRoadblocks.ManualPlacement;
+using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
@@ -14,21 +16,25 @@ namespace AutomaticRoadblocks.Api
     {
         /// <summary>
         /// Get the roadblock dispatcher.
+        /// This dispatcher allows deploying of automatic pursuit roadblocks.
         /// </summary>
         public static IRoadblockDispatcher RoadblockDispatcher => IoC.Instance.GetInstance<IRoadblockDispatcher>();
 
         /// <summary>
-        /// Get the automatic roadblock pursuit manager. 
+        /// Get the automatic roadblock pursuit manager.
+        /// This manager manages the settings of the roadblocks during a pursuit.
         /// </summary>
         public static IPursuitManager PursuitManager => IoC.Instance.GetInstance<IPursuitManager>();
 
         /// <summary>
         /// Get the manual placement instance.
+        /// This instance allows placing manual roadblocks.
         /// </summary>
         public static IManualPlacement ManualPlacement => IoC.Instance.GetInstance<IManualPlacement>();
 
         /// <summary>
         /// Get the traffic redirection dispatcher.
+        /// This dispatcher allows deploying traffic redirections.
         /// </summary>
         public static IRedirectTrafficDispatcher RedirectTrafficDispatcher => IoC.Instance.GetInstance<IRedirectTrafficDispatcher>();
 
@@ -36,6 +42,17 @@ namespace AutomaticRoadblocks.Api
         /// Get the spike strip dispatcher instance.
         /// </summary>
         public static ISpikeStripDispatcher SpikeStripDispatcher => IoC.Instance.GetInstance<ISpikeStripDispatcher>();
+
+        /// <summary>
+        /// Get the close road dispatcher instance.
+        /// </summary>
+        public static ICloseRoadDispatcher CloseRoadDispatcher => IoC.Instance.GetInstance<ICloseRoadDispatcher>();
+        
+        /// <summary>
+        /// The model provider for barriers and light sources.
+        /// This provider uses the automatic roadblock data files to determine the available models.
+        /// </summary>
+        public static IModelProvider ModelProvider => IoC.Instance.GetInstance<IModelProvider>();
 
         /// <summary>
         /// Dispatch a roadblock for the current pursuit.

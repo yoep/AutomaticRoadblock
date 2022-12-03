@@ -5,13 +5,15 @@ namespace AutomaticRoadblocks.ManualPlacement
     public class PlacementType
     {
         public static readonly PlacementType ClosestToPlayer = new("Closest");
-        public static readonly PlacementType SameDirectionAsPlayer = new("Same direction");
+        public static readonly PlacementType SameDirectionAsRoad = new("Same direction");
+        public static readonly PlacementType OppositeDirectionOfRoad = new("Opposite direction");
         public static readonly PlacementType All = new("All");
 
         public static readonly IEnumerable<PlacementType> Values = new[]
         {
             ClosestToPlayer,
-            SameDirectionAsPlayer,
+            SameDirectionAsRoad,
+            OppositeDirectionOfRoad,
             All
         };
 

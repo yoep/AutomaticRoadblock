@@ -66,6 +66,12 @@ namespace AutomaticRoadblocks.Instances
         public virtual void Dispose()
         {
             _isReleased = true;
+
+            if (!IsInvalid)
+            {
+                GameInstance.IsPersistent = false;
+                GameInstance.Delete();
+            }
         }
 
         /// <inheritdoc />
@@ -74,7 +80,10 @@ namespace AutomaticRoadblocks.Instances
             _isReleased = true;
 
             if (!IsInvalid)
+            {
+                GameInstance.IsPersistent = false;
                 GameInstance.Dismiss();
+            }
         }
 
         #endregion

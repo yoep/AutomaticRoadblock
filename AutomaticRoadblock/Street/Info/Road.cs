@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.Street.Info
 {
     public class Road : IVehicleNode
     {
-        private const float LaneHeadingTolerance = 15f;
+        private const float LaneHeadingTolerance = 20f;
 
         internal Road()
         {
@@ -46,14 +46,24 @@ namespace AutomaticRoadblocks.Street.Info
         public IReadOnlyList<Lane> Lanes { get; internal set; }
 
         /// <summary>
-        /// Get the total number of lanes.
+        /// The lanes going in the same direction as the road.
         /// </summary>
-        public int NumberOfLanesSameDirection => Lanes.Count(x => !x.IsOppositeHeadingOfRoadNodeHeading);
+        public IReadOnlyList<Lane> LanesSameDirection => Lanes.Where(x => !x.IsOppositeHeadingOfRoadNodeHeading).ToList();
+
+        /// <summary>
+        /// The lanes going in the opposite direction of the road.
+        /// </summary>
+        public IReadOnlyList<Lane> LanesOppositeDirection => Lanes.Where(x => x.IsOppositeHeadingOfRoadNodeHeading).ToList();
 
         /// <summary>
         /// Get the total number of lanes.
         /// </summary>
-        public int NumberOfLanesOppositeDirection => Lanes.Count(x => x.IsOppositeHeadingOfRoadNodeHeading);
+        public int NumberOfLanesSameDirection => LanesSameDirection.Count;
+
+        /// <summary>
+        /// Get the total number of lanes.
+        /// </summary>
+        public int NumberOfLanesOppositeDirection => LanesOppositeDirection.Count;
 
         /// <summary>
         /// Get or set the width of the road.
@@ -140,8 +150,9 @@ namespace AutomaticRoadblocks.Street.Info
         /// <returns>Returns the lanes towards the same heading if any match, else an empty <see cref="IEnumerable{T}"/>.</returns>
         public IEnumerable<Lane> LanesHeadingTo(float heading)
         {
+            var normalizedHeading = MathHelper.NormalizeHeading(heading);
             return Lanes
-                .Where(x => Math.Abs(x.Heading - heading) < LaneHeadingTolerance)
+                .Where(x => MathHelper.NormalizeHeading(x.Heading - normalizedHeading) <= LaneHeadingTolerance)
                 .ToList();
         }
 
