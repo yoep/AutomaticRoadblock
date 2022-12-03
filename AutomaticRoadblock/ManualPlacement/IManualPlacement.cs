@@ -1,13 +1,17 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Preview;
+using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Street.Info;
+using Rage;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
+    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
     public interface IManualPlacement : IPreviewSupport, IDisposable
     {
         /// <summary>
@@ -53,7 +57,15 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <summary>
         /// Place a roadblock based on the <see cref="DetermineLocation"/> <see cref="Road"/>.
         /// </summary>
+        [Obsolete("Use PlaceRoadblock(Vector3) instead")]
         void PlaceRoadblock();
+
+        /// <summary>
+        /// Place a roadblock at the given position.
+        /// </summary>
+        /// <param name="position">The position to use for placing a roadblock.</param>
+        /// <returns>Returns the created roadblock.</returns>
+        IRoadblock PlaceRoadblock(Vector3 position);
 
         /// <summary>
         /// Remove one or more placed roadblocks.

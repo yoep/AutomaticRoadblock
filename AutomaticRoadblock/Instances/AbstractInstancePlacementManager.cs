@@ -105,7 +105,7 @@ namespace AutomaticRoadblocks.Instances
         /// <param name="force">Force a redraw of the preview.</param>
         protected void DoInternalPreviewCreation(bool force)
         {
-            var road = CalculateNewLocationForInstance();
+            var road = CalculateNewLocationForInstance(Game.PlayerPosition);
 
             // ignore intersections and wait for the player to move
             if (road.GetType() == typeof(Intersection))
@@ -163,10 +163,8 @@ namespace AutomaticRoadblocks.Instances
             toBoRemoved.ForEach(x => DisposeInstance(x, false));
         }
 
-        protected VehicleNodeInfo CalculateNewLocationForInstance()
+        protected VehicleNodeInfo CalculateNewLocationForInstance(Vector3 position)
         {
-            var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
-
             return RoadQuery.FindClosestNode(position, EVehicleNodeType.AllRoadNoJunctions);
         }
 
@@ -228,7 +226,7 @@ namespace AutomaticRoadblocks.Instances
                 Logger.Debug($"Releasing manual roadblock placement to LSPDFR for {instance}");
                 instance.Release(true);
             }
-            
+
             instance.Dispose();
         }
 

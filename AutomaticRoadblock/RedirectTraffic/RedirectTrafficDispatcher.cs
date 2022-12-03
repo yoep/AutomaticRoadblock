@@ -9,6 +9,7 @@ using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
+using Rage;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
@@ -97,7 +98,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
                 if (redirectTraffic == null)
                 {
-                    redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
+                    redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance(Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer)));
                     Instances.Add(redirectTraffic);
                 }
             }

@@ -3,7 +3,9 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.RedirectTraffic;
+using AutomaticRoadblocks.Settings;
 using PoliceSmartRadio.API;
+using Rage;
 
 namespace AutomaticRoadblocks.Integrations.PoliceSmartRadio
 {
@@ -22,15 +24,17 @@ namespace AutomaticRoadblocks.Integrations.PoliceSmartRadio
         private readonly IPursuitManager _pursuitManager;
         private readonly IManualPlacement _manualPlacement;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
+        private readonly ISettingsManager _settingsManager;
 
         public PoliceSmartRadioIntegration(IGame game, ILogger logger, IPursuitManager pursuitManager, IManualPlacement manualPlacement,
-            IRedirectTrafficDispatcher redirectTrafficDispatcher)
+            IRedirectTrafficDispatcher redirectTrafficDispatcher, ISettingsManager settingsManager)
         {
             _game = game;
             _logger = logger;
             _pursuitManager = pursuitManager;
             _manualPlacement = manualPlacement;
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
+            _settingsManager = settingsManager;
         }
 
         /// <inheritdoc />
@@ -50,7 +54,7 @@ namespace AutomaticRoadblocks.Integrations.PoliceSmartRadio
 
         private void DoManualPlacement()
         {
-            _game.NewSafeFiber(() => _manualPlacement.PlaceRoadblock(), "PoliceSmartRadioIntegration.DoManualPlacement");
+            _game.NewSafeFiber(() => _manualPlacement.PlaceRoadblock(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * _settingsManager.ManualPlacementSettings.DistanceFromPlayer), "PoliceSmartRadioIntegration.DoManualPlacement");
         }
 
         private void DoRedirectTraffic()

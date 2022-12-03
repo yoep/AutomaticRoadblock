@@ -7,9 +7,11 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Models;
+using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
+using Rage;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -108,6 +110,12 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         public void PlaceRoadblock()
         {
+            PlaceRoadblock(Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer);
+        }
+
+        /// <inheritdoc />
+        public IRoadblock PlaceRoadblock(Vector3 position)
+        {
             ManualRoadblock roadblockToSpawn;
 
             lock (Instances)
@@ -116,7 +124,7 @@ namespace AutomaticRoadblocks.ManualPlacement
 
                 if (roadblockToSpawn == null)
                 {
-                    roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
+                    roadblockToSpawn = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance(position)));
                     Instances.Add(roadblockToSpawn);
                 }
             }
@@ -132,6 +140,8 @@ namespace AutomaticRoadblocks.ManualPlacement
             {
                 Logger.Warn($"Manual roadblock was unable to be spawned correctly, {roadblockToSpawn}");
             }
+
+            return roadblockToSpawn;
         }
 
         /// <inheritdoc />
