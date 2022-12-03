@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 {
     internal class RoadblockDispatcher : IRoadblockDispatcher
     {
-        private const float MinimumVehicleSpeed = 20f;
+        private const float MinimumVehicleSpeed = 15f;
         private const float MinimumRoadblockPlacementDistance = 175f;
         private const int AutoCleanRoadblockAfterSeconds = 45;
         private const float RoadblockCleanupDistanceFromPlayer = 100f;

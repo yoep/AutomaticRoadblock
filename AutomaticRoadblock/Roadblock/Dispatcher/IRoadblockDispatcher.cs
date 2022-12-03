@@ -4,7 +4,7 @@ using Rage;
 namespace AutomaticRoadblocks.Roadblock.Dispatcher
 {
     /// <summary>
-    /// The roadblock dispatcher is responsible for determining and dispatching roadblocks.
+    /// The roadblock dispatcher is responsible for determining and dispatching roadblocks for a pursuit.
     /// </summary>
     public interface IRoadblockDispatcher : IDisposable
     {
