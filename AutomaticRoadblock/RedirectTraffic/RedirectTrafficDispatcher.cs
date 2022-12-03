@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
@@ -16,7 +15,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
     internal class RedirectTrafficDispatcher : AbstractInstancePlacementManager<RedirectTraffic>, IRedirectTrafficDispatcher
     {
         private readonly ISettingsManager _settingsManager;
-        private readonly IModelProvider _modelProvider;
 
         private float _coneDistance = 2f;
         private EBackupUnit _backupType = EBackupUnit.LocalPatrol;
@@ -29,8 +27,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             : base(game, logger)
         {
             _settingsManager = settingsManager;
-            _modelProvider = modelProvider;
-            _coneType = ConeTypeFromSettings(settingsManager.RedirectTrafficSettings.DefaultCone);
+            _coneType = modelProvider.TryFindModelByScriptName<BarrierModel>(settingsManager.RedirectTrafficSettings.DefaultCone);
         }
 
         #region Properties
@@ -197,15 +194,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             _offset = offset;
             DoInternalPreviewCreation(true);
-        }
-
-        private BarrierModel ConeTypeFromSettings(string defaultCone)
-        {
-            Logger.Debug($"Using cone {defaultCone} for traffic redirection if found");
-            return _modelProvider.BarrierModels
-                .Where(x => string.Equals(x.ScriptName, defaultCone, StringComparison.OrdinalIgnoreCase))
-                .DefaultIfEmpty(BarrierModel.None)
-                .First();
         }
 
         #endregion

@@ -125,7 +125,7 @@ namespace AutomaticRoadblocks.Roadblock
 
             foreach (var position in conePositions)
             {
-                Instances.Add(BarrierFactory.Create(ModelProvider.RetrieveModelByScriptName<BarrierModel>(Barrier.BigConeStripesScriptName),
+                Instances.Add(BarrierFactory.Create(ModelProvider.FindModelByScriptName<BarrierModel>(Barrier.BigConeStripesScriptName),
                     position + direction * 3.5f));
             }
         }
@@ -406,27 +406,27 @@ namespace AutomaticRoadblocks.Roadblock
 
         private static BarrierModel GetMainBarrier(RoadblockData roadblockData)
         {
-            return ModelProvider.RetrieveModelByScriptName<BarrierModel>(roadblockData.MainBarrier);
+            return ModelProvider.FindModelByScriptName<BarrierModel>(roadblockData.MainBarrier);
         }
 
         private static BarrierModel GetSecondaryBarrier(RoadblockData roadblockData)
         {
             return !string.IsNullOrWhiteSpace(roadblockData.SecondaryBarrier)
-                ? ModelProvider.RetrieveModelByScriptName<BarrierModel>(roadblockData.SecondaryBarrier)
+                ? ModelProvider.FindModelByScriptName<BarrierModel>(roadblockData.SecondaryBarrier)
                 : BarrierModel.None;
         }
 
         private static BarrierModel GetChaseVehicleBarrier(RoadblockData roadblockData)
         {
             return !string.IsNullOrWhiteSpace(roadblockData.ChaseVehicleBarrier)
-                ? ModelProvider.RetrieveModelByScriptName<BarrierModel>(roadblockData.ChaseVehicleBarrier)
+                ? ModelProvider.FindModelByScriptName<BarrierModel>(roadblockData.ChaseVehicleBarrier)
                 : BarrierModel.None;
         }
 
         private static List<LightModel> GetLightSources(RoadblockData roadblockData)
         {
             return roadblockData.Lights
-                .Select(x => ModelProvider.RetrieveModelByScriptName<LightModel>(x))
+                .Select(x => ModelProvider.FindModelByScriptName<LightModel>(x))
                 .ToList();
         }
 

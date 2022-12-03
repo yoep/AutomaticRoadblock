@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -44,8 +43,8 @@ namespace AutomaticRoadblocks.CloseRoad
         /// <inheritdoc />
         public ICloseRoad CloseNearbyRoad(Vector3 position, bool preview = false)
         {
-            return CloseNearbyRoad(position, BackupUnit, BarrierModelFromSettings(_settingsManager.CloseRoadSettings.Barrier), LightSource, MaxDistance,
-                preview);
+            return CloseNearbyRoad(position, BackupUnit, _modelProvider.TryFindModelByScriptName<BarrierModel>(_settingsManager.CloseRoadSettings.Barrier),
+                LightSource, MaxDistance, preview);
         }
 
         /// <inheritdoc />
@@ -100,19 +99,6 @@ namespace AutomaticRoadblocks.CloseRoad
         {
             _instances.ForEach(x => x.Dispose());
             _instances.Clear();
-        }
-
-        #endregion
-
-        #region Functions
-
-        private BarrierModel BarrierModelFromSettings(string barrier)
-        {
-            _logger.Debug($"Using barrier {barrier} for close road if found");
-            return _modelProvider.BarrierModels
-                .Where(x => string.Equals(x.ScriptName, barrier, StringComparison.OrdinalIgnoreCase))
-                .DefaultIfEmpty(BarrierModel.None)
-                .First();
         }
 
         #endregion

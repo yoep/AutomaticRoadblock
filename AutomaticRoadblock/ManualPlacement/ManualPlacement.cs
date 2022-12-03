@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -18,7 +17,6 @@ namespace AutomaticRoadblocks.ManualPlacement
     internal class ManualPlacement : AbstractInstancePlacementManager<ManualRoadblock>, IManualPlacement
     {
         private readonly ISettingsManager _settingsManager;
-        private readonly IModelProvider _modelProvider;
 
         private BarrierModel _mainBarrier;
         private BarrierModel _secondaryBarrier;
@@ -33,9 +31,8 @@ namespace AutomaticRoadblocks.ManualPlacement
             : base(game, logger)
         {
             _settingsManager = settingsManager;
-            _modelProvider = modelProvider;
-            _mainBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
-            _secondaryBarrier = BarrierModelFromSettings(settingsManager.ManualPlacementSettings.DefaultSecondaryBarrier);
+            _mainBarrier = modelProvider.TryFindModelByScriptName<BarrierModel>(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
+            _secondaryBarrier = modelProvider.TryFindModelByScriptName<BarrierModel>(settingsManager.ManualPlacementSettings.DefaultSecondaryBarrier);
             _copsEnabled = settingsManager.ManualPlacementSettings.EnableCops;
         }
 
@@ -262,15 +259,6 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             _direction = value;
             DoInternalPreviewCreation(true);
-        }
-
-        private BarrierModel BarrierModelFromSettings(string defaultBarrier)
-        {
-            Logger.Debug($"Using barrier {defaultBarrier} for manual placement if found");
-            return _modelProvider.BarrierModels
-                .Where(x => string.Equals(x.ScriptName, defaultBarrier, StringComparison.OrdinalIgnoreCase))
-                .DefaultIfEmpty(BarrierModel.None)
-                .First();
         }
 
         #endregion
