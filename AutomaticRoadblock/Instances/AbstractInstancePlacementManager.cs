@@ -67,7 +67,7 @@ namespace AutomaticRoadblocks.Instances
 
                 foreach (var instance in instancesToRemove)
                 {
-                    DisposeInstance(instance, true);
+                    DisposeInstance(instance);
                     Instances.Remove(instance);
                 }
             }
@@ -82,7 +82,7 @@ namespace AutomaticRoadblocks.Instances
         {
             lock (Instances)
             {
-                Instances.ForEach(x => DisposeInstance(x, false));
+                Instances.ForEach(x => DisposeInstance(x));
                 Instances.Clear();
             }
         }
@@ -160,7 +160,7 @@ namespace AutomaticRoadblocks.Instances
                 Instances.RemoveAll(x => toBoRemoved.Contains(x));
             }
 
-            toBoRemoved.ForEach(x => DisposeInstance(x, false));
+            toBoRemoved.ForEach(x => DisposeInstance(x));
         }
 
         protected VehicleNodeInfo CalculateNewLocationForInstance(Vector3 position)
@@ -218,15 +218,15 @@ namespace AutomaticRoadblocks.Instances
         /// Dispose the given instance.
         /// </summary>
         /// <param name="instance">The instance to dispose.</param>
-        /// <param name="preview">Indicates if a preview is being disposed.</param>
-        private void DisposeInstance(T instance, bool preview)
+        private void DisposeInstance(T instance)
         {
-            if (!preview)
+            if (!instance.IsPreviewActive)
             {
-                Logger.Debug($"Releasing manual roadblock placement to LSPDFR for {instance}");
+                Logger.Debug($"Releasing instance placement to LSPDFR for {instance}");
                 instance.Release(true);
             }
 
+            Logger.Debug($"Disposing instance placement for {instance}");
             instance.Dispose();
         }
 
