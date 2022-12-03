@@ -17,6 +17,7 @@ namespace AutomaticRoadblocks.CloseRoad
 {
     public class CloseRoadInstance : IDisposable, IPreviewSupport
     {
+        private const float IntersectionRoadblockOffset = 10f;
         private readonly IVehicleNode _mainNode;
 
         private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
@@ -145,7 +146,10 @@ namespace AutomaticRoadblocks.CloseRoad
             _logger.Debug($"Closing a total of {node.Roads.Count} roads for intersection");
             foreach (var road in node.Roads)
             {
-                _roadblocks.Add(new ManualRoadblock(CreateRequest(road, road.Heading - 180, PlacementType.OppositeDirectionOfRoad, -10f)));
+                var roadblockTopPosition = road.RightSide + MathHelper.ConvertHeadingToDirection(road.Heading) * IntersectionRoadblockOffset;
+                _roadblocks.Add(
+                    new ManualRoadblock(CreateRequest(road, road.Heading - 180, PlacementType.OppositeDirectionOfRoad, -IntersectionRoadblockOffset)));
+                _closeNodes.Add(new ARCloseNodes(roadblockTopPosition, node.Position));
             }
         }
 
