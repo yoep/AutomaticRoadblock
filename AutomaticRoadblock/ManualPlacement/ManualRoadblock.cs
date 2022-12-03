@@ -54,7 +54,10 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         public override void Release(bool releaseAll = false)
         {
-            base.Release(true);
+            if (CopsEnabled)
+            {
+                base.Release(true);
+            }
         }
 
         #endregion
