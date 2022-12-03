@@ -54,12 +54,16 @@ namespace AutomaticRoadblocks.Integrations.PoliceSmartRadio
 
         private void DoManualPlacement()
         {
-            _game.NewSafeFiber(() => _manualPlacement.PlaceRoadblock(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * _settingsManager.ManualPlacementSettings.DistanceFromPlayer), "PoliceSmartRadioIntegration.DoManualPlacement");
+            _game.NewSafeFiber(
+                () => _manualPlacement.PlaceRoadblock(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) *
+                    _settingsManager.ManualPlacementSettings.DistanceFromPlayer), "PoliceSmartRadioIntegration.DoManualPlacement");
         }
 
         private void DoRedirectTraffic()
         {
-            _game.NewSafeFiber(() => _redirectTrafficDispatcher.DispatchRedirection(), "PoliceSmartRadioIntegration.DoRedirectTraffic");
+            _game.NewSafeFiber(
+                () => _redirectTrafficDispatcher.DispatchRedirection(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) *
+                    _settingsManager.RedirectTrafficSettings.DistanceFromPlayer), "PoliceSmartRadioIntegration.DoRedirectTraffic");
         }
 
         private void DoRemoveAll()

@@ -90,6 +90,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void DispatchRedirection()
         {
+            DispatchRedirection(Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer);
+        }
+
+        /// <inheritdoc />
+        public IRedirectTraffic DispatchRedirection(Vector3 position)
+        {
             RedirectTraffic redirectTraffic;
 
             lock (Instances)
@@ -98,7 +104,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
                 if (redirectTraffic == null)
                 {
-                    redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance(Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer)));
+                    redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance(position)));
                     Instances.Add(redirectTraffic);
                 }
             }
@@ -114,6 +120,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
             {
                 Logger.Warn($"Traffic redirection was unable to be spawned correctly, {redirectTraffic}");
             }
+
+            return redirectTraffic;
         }
 
         /// <inheritdoc />

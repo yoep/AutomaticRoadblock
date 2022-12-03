@@ -14,7 +14,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
-    public class RedirectTraffic : IPlaceableInstance
+    public class RedirectTraffic : IRedirectTraffic
     {
         private const float DefaultVehicleWidth = 2f;
         private const float DefaultVehicleLength = 4f;
@@ -181,6 +181,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
             }
         }
 
+        /// <inheritdoc />
         public void Release(bool releaseAll = false)
         {
             var instancesToRelease = _instances

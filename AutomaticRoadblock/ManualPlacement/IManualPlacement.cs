@@ -11,6 +11,8 @@ using Rage;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
+    [SuppressMessage("ReSharper", "UnusedType.Global")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
     public interface IManualPlacement : IPreviewSupport, IDisposable
     {
