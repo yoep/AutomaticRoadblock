@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Street.Info;
 using Rage;
@@ -41,6 +43,18 @@ namespace AutomaticRoadblocks.Roadblock
         /// The number of slots within the roadblock.
         /// </summary>
         int NumberOfSlots { get; }
+        
+        /// <summary>
+        /// The cop instances within the roadblock.
+        /// Cops released to LSPDFR won't be included anymore.
+        /// </summary>
+        IEnumerable<ARPed> Cops { get; }
+        
+        /// <summary>
+        /// The vehicle instances within the roadblock.
+        /// Vehicles released to LSPDFR won't be included anymore.
+        /// </summary>
+        IEnumerable<ARVehicle> Vehicles { get; }
 
         /// <summary>
         /// Invoked when the roadblock state changes.

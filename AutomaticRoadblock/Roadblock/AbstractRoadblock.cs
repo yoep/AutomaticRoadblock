@@ -80,6 +80,18 @@ namespace AutomaticRoadblocks.Roadblock
         public int NumberOfSlots => Slots?.Count ?? 0;
 
         /// <inheritdoc />
+        public IEnumerable<ARPed> Cops => Instances
+            .Where(x => x.Type == EEntityType.CopPed)
+            .Select(x => (ARPed)x)
+            .Concat(Slots.SelectMany(x => x.Cops));
+
+        /// <inheritdoc />
+        public IEnumerable<ARVehicle> Vehicles => Instances
+            .Where(x => x.Type == EEntityType.CopVehicle)
+            .Select(x => (ARVehicle)x)
+            .Concat(Slots.Select(x => x.Vehicle));
+
+        /// <inheritdoc />
         public Vector3 Position => Road.Position;
 
         /// <summary>
