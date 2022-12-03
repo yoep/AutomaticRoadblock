@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Dispatcher
@@ -6,6 +7,10 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
     /// <summary>
     /// The roadblock dispatcher is responsible for determining and dispatching roadblocks for a pursuit.
     /// </summary>
+    [SuppressMessage("ReSharper", "UnusedType.Global")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
+    [SuppressMessage("ReSharper", "UnusedMemberInSuper.Global")]
     public interface IRoadblockDispatcher : IDisposable
     {
         /// <summary>
@@ -48,5 +53,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// This is most of the time used when a pursuit has ended or has changed to an on-foot chase.
         /// </summary>
         void DismissActiveRoadblocks();
+
+        /// <summary>
+        /// Dismiss/remove the given roadblock.
+        /// </summary>
+        /// <param name="roadblock">The roadblock to remove.</param>
+        void Dismiss(IRoadblock roadblock);
     }
 }

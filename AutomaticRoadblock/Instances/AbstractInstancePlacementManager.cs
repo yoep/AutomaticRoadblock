@@ -82,7 +82,7 @@ namespace AutomaticRoadblocks.Instances
         {
             lock (Instances)
             {
-                Instances.ForEach(x => DisposeInstance(x));
+                Instances.ForEach(DisposeInstance);
                 Instances.Clear();
             }
         }
@@ -160,7 +160,26 @@ namespace AutomaticRoadblocks.Instances
                 Instances.RemoveAll(x => toBoRemoved.Contains(x));
             }
 
-            toBoRemoved.ForEach(x => DisposeInstance(x));
+            toBoRemoved.ForEach(DisposeInstance);
+        }
+
+        /// <summary>
+        /// Dispose the given instance.
+        /// </summary>
+        /// <param name="instance">The instance to dispose.</param>
+        protected void DisposeInstance(T instance)
+        {
+            if (instance == null)
+                return;
+
+            if (!instance.IsPreviewActive)
+            {
+                Logger.Debug($"Releasing instance placement to LSPDFR for {instance}");
+                instance.Release(true);
+            }
+
+            Logger.Debug($"Disposing instance placement for {instance}");
+            instance.Dispose();
         }
 
         protected VehicleNodeInfo CalculateNewLocationForInstance(Vector3 position)
@@ -212,22 +231,6 @@ namespace AutomaticRoadblocks.Instances
             }
 
             return closestInstance;
-        }
-
-        /// <summary>
-        /// Dispose the given instance.
-        /// </summary>
-        /// <param name="instance">The instance to dispose.</param>
-        private void DisposeInstance(T instance)
-        {
-            if (!instance.IsPreviewActive)
-            {
-                Logger.Debug($"Releasing instance placement to LSPDFR for {instance}");
-                instance.Release(true);
-            }
-
-            Logger.Debug($"Disposing instance placement for {instance}");
-            instance.Dispose();
         }
 
         private static void CreatePreviewMarker(VehicleNodeInfo street)

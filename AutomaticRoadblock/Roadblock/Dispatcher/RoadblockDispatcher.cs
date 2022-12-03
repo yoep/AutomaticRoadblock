@@ -133,8 +133,18 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // only release the roadblock and don't remove it yet
             // this will change the state of the roadblock to released state allowing
             // it to be picked up by the cleanup thread which will dispose the roadblock correctly
-            roadblocksToRelease.ForEach(x => x.Release(true));
+            roadblocksToRelease.ForEach(Dismiss);
             _logger.Info($"Released a total of {roadblocksToRelease.Count} roadblocks which were still active");
+        }
+
+        /// <inheritdoc />
+        public void Dismiss(IRoadblock roadblock)
+        {
+            if (roadblock == null)
+                return;
+
+            _logger.Debug($"Dismissing roadblock {roadblock}");
+            roadblock.Release(true);
         }
 
         #endregion

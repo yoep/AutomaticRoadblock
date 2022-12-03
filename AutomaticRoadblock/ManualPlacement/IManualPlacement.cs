@@ -95,5 +95,11 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// </summary>
         /// <param name="removeType">The remove criteria for the roadblocks.</param>
         void RemoveRoadblocks(RemoveType removeType);
+
+        /// <summary>
+        /// Remove the given roadblock instance.
+        /// </summary>
+        /// <param name="roadblock">The roadblock to remove.</param>
+        void Remove(IRoadblock roadblock);
     }
 }

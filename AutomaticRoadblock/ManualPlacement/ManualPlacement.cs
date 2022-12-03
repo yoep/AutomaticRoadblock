@@ -120,7 +120,7 @@ namespace AutomaticRoadblocks.ManualPlacement
 
             lock (Instances)
             {
-                roadblockToSpawn = Instances.FirstOrDefault(x => x.IsPreviewActive) 
+                roadblockToSpawn = Instances.FirstOrDefault(x => x.IsPreviewActive)
                                    ?? CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance(position)));
             }
 
@@ -141,6 +141,19 @@ namespace AutomaticRoadblocks.ManualPlacement
         public void RemoveRoadblocks(RemoveType removeType)
         {
             DoInternalInstanceRemoval(removeType);
+        }
+
+        /// <inheritdoc />
+        public void Remove(IRoadblock roadblock)
+        {
+            if (roadblock.GetType() == typeof(ManualRoadblock))
+            {
+                DisposeInstance((ManualRoadblock)roadblock);
+            }
+            else
+            {
+                Logger.Warn($"Unable to remove manual placed roadblock, invalid instance type {roadblock.GetType()}");
+            }
         }
 
         #endregion
