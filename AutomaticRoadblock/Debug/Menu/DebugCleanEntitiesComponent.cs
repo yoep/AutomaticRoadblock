@@ -31,14 +31,31 @@ namespace AutomaticRoadblocks.Debug.Menu
             try
             {
                 var localPlayer = Game.LocalPlayer;
+                
+                _logger.Info("Cleaning all entities...");
                 World.GetEntities(GetEntitiesFlags.ConsiderAllObjects | GetEntitiesFlags.ConsiderAllPeds | GetEntitiesFlags.ConsiderAllVehicles)
                     .Where(x => x != localPlayer.Character && x != localPlayer.LastVehicle)
                     .ToList()
-                    .ForEach(x => x.Dismiss());
+                    .ForEach(ForceDelete);
+                
+                _logger.Info("Cleaning all blips...");
+                foreach (var blip in World.GetAllBlips())
+                {
+                    blip.Delete();
+                }
             }
             catch (Exception ex)
             {
                 _logger.Error($"Failed to clean world entities, {ex.Message}", ex);
+            }
+        }
+
+        private static void ForceDelete(Entity entity)
+        {
+            if (entity != null && entity.IsValid())
+            {
+                entity.Dismiss();
+                entity.Delete();
             }
         }
     }
