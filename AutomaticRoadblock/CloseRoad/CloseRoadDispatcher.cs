@@ -46,43 +46,6 @@ namespace AutomaticRoadblocks.CloseRoad
         /// <inheritdoc />
         public void CloseNearbyRoad(Vector3 position, bool preview = false)
         {
-            DoInternalCloseRoad(position, preview);
-        }
-
-        /// <inheritdoc />
-        public void OpenRoads(bool previewsOnly = false)
-        {
-            lock (_instances)
-            {
-                var instancesToRemove = _instances
-                    .Where(x => x.IsPreviewActive == previewsOnly)
-                    .ToList();
-
-                instancesToRemove.ForEach(x =>
-                {
-                    x.Dispose();
-                    _instances.Remove(x);
-                });
-            }
-        }
-
-        #endregion
-
-        #region IDisposable
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            _instances.ForEach(x => x.Dispose());
-            _instances.Clear();
-        }
-
-        #endregion
-
-        #region Functions
-
-        private void DoInternalCloseRoad(Vector3 position, bool preview = false)
-        {
             _game.NewSafeFiber(() =>
             {
                 var closestNode = RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
@@ -103,8 +66,41 @@ namespace AutomaticRoadblocks.CloseRoad
                 {
                     instance.Spawn();
                 }
-            }, $"{GetType()}.DoInternalCloseRoad");
+            }, $"{GetType()}.CloseNearbyRoad");
         }
+
+        /// <inheritdoc />
+        public void OpenRoads(bool previewsOnly = false)
+        {
+            lock (_instances)
+            {
+                var instancesToRemove = _instances
+                    .Where(x => x.IsPreviewActive == previewsOnly)
+                    .ToList();
+
+                instancesToRemove.ForEach(x =>
+                {
+                    x.Release();
+                    x.Dispose();
+                    _instances.Remove(x);
+                });
+            }
+        }
+
+        #endregion
+
+        #region IDisposable
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _instances.ForEach(x => x.Dispose());
+            _instances.Clear();
+        }
+
+        #endregion
+
+        #region Functions
 
         private BarrierModel BarrierModelFromSettings(string barrier)
         {

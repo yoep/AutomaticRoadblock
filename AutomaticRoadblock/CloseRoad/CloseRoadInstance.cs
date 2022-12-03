@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
+using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.ManualPlacement;
@@ -22,6 +22,7 @@ namespace AutomaticRoadblocks.CloseRoad
         private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
         private readonly List<IVehicleNode> _nodes = new();
         private readonly List<ManualRoadblock> _roadblocks = new();
+        private readonly List<ARCloseNodes> _closeNodes = new();
 
         public CloseRoadInstance(IVehicleNode mainNode, EBackupUnit backupUnit, BarrierModel barrier, LightModel lightSource, float maxDistance)
         {
@@ -74,6 +75,7 @@ namespace AutomaticRoadblocks.CloseRoad
             _mainNode.CreatePreview();
             _nodes.ForEach(x => x.CreatePreview());
             _roadblocks.ForEach(x => x.CreatePreview());
+            _closeNodes.ForEach(x => x.CreatePreview());
         }
 
         /// <inheritdoc />
@@ -85,6 +87,7 @@ namespace AutomaticRoadblocks.CloseRoad
             _mainNode.DeletePreview();
             _nodes.ForEach(x => x.DeletePreview());
             _roadblocks.ForEach(x => x.DeletePreview());
+            _closeNodes.ForEach(x => x.DeletePreview());
             IsPreviewActive = false;
         }
 
@@ -100,6 +103,8 @@ namespace AutomaticRoadblocks.CloseRoad
             _nodes.Clear();
             _roadblocks.ForEach(x => x.Dispose());
             _roadblocks.Clear();
+            _closeNodes.ForEach(x => x.Dispose());
+            _closeNodes.Clear();
         }
 
         #endregion
@@ -108,6 +113,14 @@ namespace AutomaticRoadblocks.CloseRoad
 
         public void Spawn()
         {
+            _roadblocks.ForEach(x => x.Spawn());
+            _closeNodes.ForEach(x => x.Spawn());
+            _logger.Info($"Close road spawned a total of {_roadblocks.Count} roadblocks and {_closeNodes.Count} node closures");
+        }
+
+        public void Release()
+        {
+            _roadblocks.ForEach(x => x.Release(true));
         }
 
         #endregion
@@ -143,19 +156,28 @@ namespace AutomaticRoadblocks.CloseRoad
             var blacklistedNodes = isGravelRoad
                 ? ENodeFlag.IsOnWater | ENodeFlag.IsAlley
                 : ENodeFlag.IsAlley | ENodeFlag.IsGravelRoad | ENodeFlag.IsBackroad | ENodeFlag.IsOnWater;
-            var headingClosestToPlayer = road.LaneClosestTo(Game.LocalPlayer.Character.Position).Heading;
+            var laneClosestToPlayer = road.LaneClosestTo(Game.LocalPlayer.Character.Position);
+            var laneHeadingSameDirectionAsRoad = MathHelper.NormalizeHeading(laneClosestToPlayer.Heading - road.Heading) < 10f;
 
-            var roadFollowing = FindPositionToCloseFor(road.Position, headingClosestToPlayer - 180, nodeType, blacklistedNodes);
-            var targetHeadingSameDirection = roadFollowing.LanesSameDirection.First().Heading;
-            _roadblocks.Add(new ManualRoadblock(CreateRequest(roadFollowing, targetHeadingSameDirection - 180, PlacementType.OppositeDirectionOfRoad, 0f)));
+            CloseRoadForHeading(road, laneClosestToPlayer.Heading, laneHeadingSameDirectionAsRoad, nodeType, blacklistedNodes);
 
             // verify if the other side also needs to be closed
             if (!road.IsSingleDirection)
             {
-                var roadOpposite = FindPositionToCloseFor(road.Position, headingClosestToPlayer, nodeType, blacklistedNodes);
-                var targetHeadingOppositeDirection = roadFollowing.LanesOppositeDirection.First().Heading;
-                _roadblocks.Add(new ManualRoadblock(CreateRequest(roadOpposite, targetHeadingOppositeDirection - 180, PlacementType.OppositeDirectionOfRoad, 0f)));
+                CloseRoadForHeading(road, MathHelper.NormalizeHeading(laneClosestToPlayer.Heading - 180), !laneHeadingSameDirectionAsRoad, nodeType,
+                    blacklistedNodes);
             }
+        }
+
+        private void CloseRoadForHeading(Road road, float heading, bool sameDirectionOfRoad, EVehicleNodeType nodeType, ENodeFlag blacklistedNodes)
+        {
+            _logger.Trace($"Searching node to close for {road.Position} heading {heading} with sameDirectionOfRoad: {sameDirectionOfRoad}");
+            var nodeToClose = FindPositionToCloseFor(road.Position, heading, nodeType, blacklistedNodes);
+            var targetHeading = MathHelper.NormalizeHeading(nodeToClose.LanesSameDirection.First().Heading - 180);
+
+            _logger.Debug($"Closing road for node {nodeToClose} with targetHeading {targetHeading}");
+            _roadblocks.Add(new ManualRoadblock(CreateRequest(nodeToClose, targetHeading, PlacementType.OppositeDirectionOfRoad, 0f)));
+            _closeNodes.Add(new ARCloseNodes(sameDirectionOfRoad ? road.RightSide : road.LeftSide, nodeToClose.LeftSide));
         }
 
         private ManualRoadblock.Request CreateRequest(Road node, float heading, PlacementType placementType, float offset)
@@ -184,21 +206,6 @@ namespace AutomaticRoadblocks.CloseRoad
                 .Where(x => x.Type == EStreetType.Road)
                 .Select(x => (Road)x)
                 .Last();
-        }
-
-        [Conditional("DEBUG")]
-        private void CreateNodePreview(params IVehicleNode[] nodes)
-        {
-            lock (_nodes)
-            {
-                for (var i = 0; i < nodes.Length; i++)
-                {
-                    var node = nodes[i];
-
-                    node.CreatePreview();
-                    _nodes.Add(node);
-                }
-            }
         }
 
         #endregion

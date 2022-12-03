@@ -13,7 +13,7 @@ namespace AutomaticRoadblocks.Street.Info
 {
     public class Road : IVehicleNode
     {
-        private const float LaneHeadingTolerance = 15f;
+        private const float LaneHeadingTolerance = 20f;
 
         internal Road()
         {
@@ -150,8 +150,9 @@ namespace AutomaticRoadblocks.Street.Info
         /// <returns>Returns the lanes towards the same heading if any match, else an empty <see cref="IEnumerable{T}"/>.</returns>
         public IEnumerable<Lane> LanesHeadingTo(float heading)
         {
+            var normalizedHeading = MathHelper.NormalizeHeading(heading);
             return Lanes
-                .Where(x => Math.Abs(x.Heading - heading) < LaneHeadingTolerance)
+                .Where(x => MathHelper.NormalizeHeading(x.Heading - normalizedHeading) <= LaneHeadingTolerance)
                 .ToList();
         }
 
