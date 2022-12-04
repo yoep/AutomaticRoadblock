@@ -12,6 +12,8 @@ namespace AutomaticRoadblocks.ShortKeys
 {
     public class CleanAll : ICleanAll
     {
+        private const string AudioInstancesCleaned = "ATTENTION_ALL_UNITS WE_ARE_CODE 4";
+        
         private readonly IGame _game;
         private readonly ILogger _logger;
         private readonly ISettingsManager _settingsManager;
@@ -57,7 +59,7 @@ namespace AutomaticRoadblocks.ShortKeys
                         _redirectTrafficDispatcher.RemoveTrafficRedirects(RemoveType.All);
                         _closeRoadDispatcher.OpenRoads();
                         _logger.Info("Plugin instances have been cleaned");
-                        _game.DisplayNotification(_localizer[LocalizationKey.InstancesCleaned]);
+                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioInstancesCleaned);
                     }
                 }
                 
