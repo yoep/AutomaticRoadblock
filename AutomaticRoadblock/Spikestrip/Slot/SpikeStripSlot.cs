@@ -32,7 +32,8 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road street, Road.Lane lane, Vehicle targetVehicle, float heading,
             bool shouldAddLights, float offset = 0)
-            : base(lane, BarrierModel.None, BarrierModel.None, EBackupUnit.LocalPatrol, heading, targetVehicle, new List<LightModel>(), shouldAddLights, offset)
+            : base(lane, BarrierModel.None, BarrierModel.None, EBackupUnit.LocalPatrol, heading, targetVehicle, new List<LightModel>(), shouldAddLights, offset,
+                false)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
@@ -157,9 +158,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                 case ESpikeStripState.Deployed:
                     OnSpikeStripDeployed();
                     break;
-                case ESpikeStripState.Undeployed:
-                    OnSpikeStripUndeployed();
-                    break;
             }
         }
 
@@ -177,12 +175,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             Logger.Trace("--- Spike strip slot performance stats ---\n" +
                          $"Deploy time: ~{deployTimeColor}~{timeTaken}ms\n" +
                          $"Distance: ~{distanceColor}~{distanceFromTarget}");
-        }
-
-        [Conditional("DEBUG")]
-        private void OnSpikeStripUndeployed()
-        {
-            Game.DisplayNotificationDebug("~p~Spike strip undeployed");
         }
 
         private void OnSpikeStripBypassed()

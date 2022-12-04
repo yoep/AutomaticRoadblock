@@ -14,7 +14,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         private bool _monitorActive;
 
         protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, EBackupUnit backupType, float heading,
-            Vehicle targetVehicle, List<LightModel> lightSources, bool shouldAddLights, float offset = 0f)
+            Vehicle targetVehicle, List<LightModel> lightSources, bool shouldAddLights, float offset = 0f, bool initialize = true)
             : base(lane, mainBarrier, secondaryBarrier, backupType, heading, shouldAddLights, true, offset)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
@@ -22,7 +22,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             TargetVehicle = targetVehicle;
             LightSources = lightSources;
 
-            Initialize();
+            if (initialize)
+                Initialize();
+
             StartHitDetection();
         }
 

@@ -334,16 +334,15 @@ namespace AutomaticRoadblocks.Roadblock
         private void OnRoadblockSlotHit(IRoadblockSlot slot, ERoadblockHitType type)
         {
             // verify if the hit should be ignored
-            if (!Flags.HasFlag(ERoadblockFlags.DetectHit))
+            if (State == ERoadblockState.Hit || !Flags.HasFlag(ERoadblockFlags.DetectHit))
                 return;
-
-            LspdfrUtils.PlayScannerAudioNonBlocking(type == ERoadblockHitType.SpikeStrip ? AudioSpikeStripHit : AudioRoadblockHit);
 
             Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenHit]);
             BlipFlashNewState(Color.Green);
             if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
                 Release();
             UpdateState(ERoadblockState.Hit);
+            LspdfrUtils.PlayScannerAudioNonBlocking(type == ERoadblockHitType.SpikeStrip ? AudioSpikeStripHit : AudioRoadblockHit);
             Logger.Info("Roadblock has been hit by the suspect");
         }
 

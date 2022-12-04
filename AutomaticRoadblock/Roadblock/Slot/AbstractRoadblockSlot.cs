@@ -288,6 +288,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             catch (Exception ex)
             {
                 Logger.Error($"Failed to initialize {GetType()}, {ex.Message}", ex);
+                State = ERoadblockSlotState.Error;
             }
         }
 
