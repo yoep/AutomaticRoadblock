@@ -74,9 +74,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public IList<ARPed> Cops => ValidCopInstances.ToList();
 
-        /// <inheritdoc />
-        public virtual IList<ARPed> CopsJoiningThePursuit => Cops;
-
         /// <summary>
         /// The main barrier that is used within this slot as first row.
         /// </summary>
@@ -219,19 +216,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public virtual void Release(bool releaseAll = false)
         {
-            Logger.Trace($"Releasing roadblock slot {this}");
-            var instances = releaseAll
-                ? Cops
-                : CopsJoiningThePursuit;
-
-            Instances
-                .Where(x => x.Type == EEntityType.CopVehicle)
-                .ToList()
-                .ForEach(x => Instances.Remove(x));
-            Instances.RemoveAll(x => instances.Any(instance => x == instance));
-            Logger.Trace($"Roadblock slot state after release {this}");
-
-            RoadblockHelpers.ReleaseInstancesToLspdfr(instances, Vehicle);
+            DoInternalRelease(Cops);
         }
 
         /// <inheritdoc />
@@ -328,18 +313,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         /// <summary>
-        /// Get the width of the vehicle model.
-        /// When no vehicle model is present, it will use a default value.
-        /// </summary>
-        /// <returns>Returns the vehicle model width.</returns>
-        protected float GetVehicleWidth()
-        {
-            return VehicleModel != null
-                ? VehicleModel.Value.Dimensions.X
-                : DefaultVehicleWidth;
-        }
-
-        /// <summary>
         /// Initialize the cop instances of this slot.
         /// </summary>
         protected virtual void InitializeCops(IEnumerable<ARPed> cops)
@@ -355,6 +328,35 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
+        }
+
+        /// <summary>
+        /// Release the given list of cops back to LSPDFR.
+        /// </summary>
+        /// <param name="cops">The list of cops to release.</param>
+        protected void DoInternalRelease(IList<ARPed> cops)
+        {
+            Logger.Trace($"Releasing {GetType()} {this}");
+            Instances
+                .Where(x => x.Type == EEntityType.CopVehicle)
+                .ToList()
+                .ForEach(x => Instances.Remove(x));
+            Instances.RemoveAll(x => cops.Any(instance => x == instance));
+            Logger.Trace($"{GetType()} state after release {this}");
+
+            RoadblockHelpers.ReleaseInstancesToLspdfr(cops, Vehicle);
+        }
+
+        /// <summary>
+        /// Get the width of the vehicle model.
+        /// When no vehicle model is present, it will use a default value.
+        /// </summary>
+        /// <returns>Returns the vehicle model width.</returns>
+        private float GetVehicleWidth()
+        {
+            return VehicleModel != null
+                ? VehicleModel.Value.Dimensions.X
+                : DefaultVehicleWidth;
         }
 
         private void InitializeVehicleSlot(ARVehicle vehicle)

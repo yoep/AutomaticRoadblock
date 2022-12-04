@@ -42,7 +42,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         }
 
         /// <inheritdoc />
-        protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
+        protected override IPursuitRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
             return new PursuitRoadblockSlotLevel5(lane, MainBarrier, SecondaryBarrier, RetrieveBackupUnitType(), heading, targetVehicle, SlotLightSources(),
                 shouldAddLights);

@@ -5,6 +5,7 @@ using System.Linq;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
@@ -18,7 +19,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
     /// A <see cref="IRoadblockSlot"/> which deploys a spike strip.
     /// This slot won't create any barriers and will always use the local vehicle type.
     /// </summary>
-    public class SpikeStripSlot : AbstractRoadblockSlot
+    public class SpikeStripSlot : AbstractPursuitRoadblockSlot
     {
         private const float DeploySpikeStripRange = 50f;
         private const float PlacementInFrontOfVehicle = 0.1f;
@@ -30,12 +31,11 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road street, Road.Lane lane, Vehicle targetVehicle, float heading,
             bool shouldAddLights, float offset = 0)
-            : base(lane, BarrierModel.None, BarrierModel.None, EBackupUnit.LocalPatrol, heading, shouldAddLights, false, offset)
+            : base(lane, BarrierModel.None, BarrierModel.None, EBackupUnit.LocalPatrol, heading, targetVehicle, new List<LightModel>(), shouldAddLights, offset)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             SpikeStripDispatcher = spikeStripDispatcher;
-            TargetVehicle = targetVehicle;
             Road = street;
             Location = DetermineLocation();
             NumberOfCops = 1;
@@ -52,11 +52,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// The road this spike strip slot is placed on.
         /// </summary>
         private Road Road { get; }
-
-        /// <summary>
-        /// The target vehicle of the spike strip.
-        /// </summary>
-        private Vehicle TargetVehicle { get; }
 
         /// <summary>
         /// The spike strip dispatcher to use for creating an instance.
@@ -171,7 +166,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         private void OnSpikeStripDeployed()
         {
             var timeTaken = (DateTime.Now.Ticks - _spikeStripDeployStartedAt) / TimeSpan.TicksPerMillisecond;
-           var distanceFromTarget = TargetVehicle.DistanceTo2D(SpikeStrip.Position);
+            var distanceFromTarget = TargetVehicle.DistanceTo2D(SpikeStrip.Position);
             var deployTimeColor = timeTaken < 1000 ? "g" : "r";
             var distanceColor = distanceFromTarget >= 15f ? "g" : "r";
 

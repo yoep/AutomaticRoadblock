@@ -1,12 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Preview;
+using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
 {
+    /// <summary>
+    /// A basic roadblock which has the ability to close a road with one or more slots.
+    /// </summary>
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public interface IRoadblock : IDisposable, IPreviewSupport
     {
         /// <summary>
@@ -55,21 +61,17 @@ namespace AutomaticRoadblocks.Roadblock
         /// Vehicles released to LSPDFR won't be included anymore.
         /// </summary>
         IEnumerable<ARVehicle> Vehicles { get; }
+        
+        /// <summary>
+        /// The slots within this roadblock.
+        /// Each slot blocks a lane within the road and has a specific functionality.
+        /// </summary>
+        IEnumerable<IRoadblockSlot> Slots { get; }
 
         /// <summary>
         /// Invoked when the roadblock state changes.
         /// </summary>
         event RoadblockEvents.RoadblockStateChanged RoadblockStateChanged;
-
-        /// <summary>
-        /// Invoked when a cop from the roadblock is killed.
-        /// </summary>
-        event RoadblockEvents.RoadblockCopKilled RoadblockCopKilled;
-        
-        /// <summary>
-        /// Invoked when cops from a roadblock are joining the pursuit.
-        /// </summary>
-        event RoadblockEvents.RoadblockCopsJoiningPursuit RoadblockCopsJoiningPursuit;
 
         /// <summary>
         /// Spawn the roadblock in the world.

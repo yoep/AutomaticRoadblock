@@ -12,9 +12,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
     public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot, IPursuitRoadblockSlot
     {
         protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, EBackupUnit backupType, float heading,
-            Vehicle targetVehicle,
-            List<LightModel> lightSources, bool shouldAddLights)
-            : base(lane, mainBarrier, secondaryBarrier, backupType, heading, shouldAddLights, true)
+            Vehicle targetVehicle, List<LightModel> lightSources, bool shouldAddLights, float offset = 0f)
+            : base(lane, mainBarrier, secondaryBarrier, backupType, heading, shouldAddLights, true, offset)
         {
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             Assert.NotNull(lightSources, "lightSources cannot be null");
@@ -25,6 +24,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         #region Properties
+
+        /// <inheritdoc />
+        public virtual IList<ARPed> CopsJoiningThePursuit => Cops;
+
+        /// <inheritdoc />
+        public event RoadblockEvents.RoadblockSlotHit RoadblockSlotHit;
 
         /// <summary>
         /// Get the target vehicle of the slot.
@@ -48,6 +53,16 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             .Where(x => x.IsDead)
             .Where(HasCopReceivedDamageFromVehicleOrSuspects)
             .Any(HasCopBeenKilledBySuspects);
+
+        #endregion
+
+        #region Methods
+
+        /// <inheritdoc />
+        public override void Release(bool releaseAll = false)
+        {
+            DoInternalRelease(releaseAll ? Cops : CopsJoiningThePursuit);
+        }
 
         #endregion
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
@@ -10,8 +9,6 @@ using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
-using AutomaticRoadblocks.Utils;
-using AutomaticRoadblocks.Utils.Type;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
@@ -21,7 +18,8 @@ namespace AutomaticRoadblocks.Roadblock
     /// This implementation does not verify any states, use <see cref="AbstractPursuitRoadblock"/> instead.
     /// <remarks>Make sure that the <see cref="Initialize"/> method is called within the constructor after all properties/fields are set for the roadblock.</remarks>
     /// </summary>
-    public abstract class AbstractRoadblock : IRoadblock
+    /// <typeparam name="T">The slot type used within this roadblock (must be of type <see cref="IRoadblockSlot"/>).</typeparam>
+    public abstract class AbstractRoadblock<T> : IRoadblock where T : IRoadblockSlot
     {
         protected const float LaneHeadingTolerance = 45f;
         protected const int BlipFlashDuration = 3500;
@@ -29,7 +27,8 @@ namespace AutomaticRoadblocks.Roadblock
 
         protected static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
-
+        
+        protected readonly List<T> InternalSlots = new();
         protected Blip Blip;
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace AutomaticRoadblocks.Roadblock
         public ERoadblockFlags Flags { get; }
 
         /// <inheritdoc />
-        public int NumberOfSlots => Slots?.Count ?? 0;
+        public int NumberOfSlots => Slots?.Count() ?? 0;
 
         /// <inheritdoc />
         public IEnumerable<ARPed> Cops => Instances
@@ -90,6 +89,9 @@ namespace AutomaticRoadblocks.Roadblock
             .Where(x => x.Type == EEntityType.CopVehicle)
             .Select(x => (ARVehicle)x)
             .Concat(Slots.Select(x => x.Vehicle));
+
+        /// <inheritdoc />
+        public IEnumerable<IRoadblockSlot> Slots => InternalSlots.Select(x => (IRoadblockSlot)x);
 
         /// <inheritdoc />
         public Vector3 Position => Road.Position;
@@ -131,11 +133,6 @@ namespace AutomaticRoadblocks.Roadblock
         protected List<LightModel> LightSources { get; }
 
         /// <summary>
-        /// Get the generated slots for this roadblock.
-        /// </summary>
-        protected IReadOnlyList<IRoadblockSlot> Slots { get; private set; }
-
-        /// <summary>
         /// Get the scenery slots for this roadblock.
         /// </summary>
         protected List<IARInstance<Entity>> Instances { get; } = new();
@@ -160,9 +157,6 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public event RoadblockEvents.RoadblockCopKilled RoadblockCopKilled;
 
-        /// <inheritdoc />
-        public event RoadblockEvents.RoadblockCopsJoiningPursuit RoadblockCopsJoiningPursuit;
-
         #endregion
 
         #region IPreviewSupport
@@ -172,14 +166,14 @@ namespace AutomaticRoadblocks.Roadblock
                                        Slots.Any(x => x.IsPreviewActive);
 
         /// <inheritdoc />
-        public void CreatePreview()
+        public virtual void CreatePreview()
         {
             if (IsPreviewActive)
                 return;
 
             Logger.Trace($"Creating roadblock preview for {this}");
             CreateBlip();
-            Logger.Debug($"Creating a total of {Slots.Count} slot previews for the roadblock preview");
+            Logger.Debug($"Creating a total of {InternalSlots.Count} slot previews for the roadblock preview");
             foreach (var roadblockSlot in Slots)
             {
                 roadblockSlot.CreatePreview();
@@ -188,7 +182,6 @@ namespace AutomaticRoadblocks.Roadblock
             Road.CreatePreview();
             SpeedZone.CreatePreview();
             Instances.ForEach(x => x.CreatePreview());
-            DoInternalDebugPreviewCreation();
         }
 
         /// <inheritdoc />
@@ -266,7 +259,6 @@ namespace AutomaticRoadblocks.Roadblock
             }
 
             Logger.Trace($"Releasing roadblock instance {this}");
-            InvokeCopsJoiningPursuit(releaseAll);
             ReleaseEntities(releaseAll);
         }
 
@@ -275,7 +267,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             return
                 $"{nameof(Level)}: {Level}, {nameof(State)}: {State}, {nameof(Flags)}: {Flags}, {nameof(LightSources)}: [{string.Join(", ", LightSources)}], " +
-                $"Number of {nameof(Slots)}: [{Slots.Count}]\n" +
+                $"Number of {nameof(Slots)}: [{InternalSlots.Count}]\n" +
                 $"--- {nameof(Slots)} ---\n" +
                 $"{string.Join("\n", Slots)}\n" +
                 $"--- {nameof(Road)} ---\n" +
@@ -346,7 +338,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// </summary>
         /// <param name="lanesToBlock">The lanes to block.</param>
         /// <returns>Returns a list of created slots.</returns>
-        protected abstract IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock);
+        protected abstract IReadOnlyList<T> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock);
 
         /// <summary>
         /// Initialize the roadblock data.
@@ -370,58 +362,6 @@ namespace AutomaticRoadblocks.Roadblock
         protected void InvokeRoadblockCopKilled()
         {
             RoadblockCopKilled?.Invoke(this);
-        }
-
-        /// <summary>
-        /// Indicate that the cops of this roadblock can join the pursuit.
-        /// </summary>
-        /// <param name="releaseAll"></param>
-        protected void InvokeCopsJoiningPursuit(bool releaseAll)
-        {
-            switch (State)
-            {
-                case ERoadblockState.Bypassed when !Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass):
-                case ERoadblockState.Hit when !Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit):
-                    return;
-                default:
-                    RoadblockCopsJoiningPursuit?.Invoke(this, RetrieveCopsJoiningThePursuit(releaseAll));
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Retrieve a list of cops who will join the pursuit.
-        /// </summary>
-        /// <param name="releaseAll"></param>
-        /// <returns>Returns the cops joining the pursuit.</returns>
-        protected virtual IList<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
-        {
-            var copsJoining = new List<Ped>();
-
-            if (IsAllowedToJoinPursuit() || releaseAll)
-            {
-                foreach (var slot in Slots)
-                {
-                    try
-                    {
-                        var slotCops = releaseAll ? slot.Cops : slot.CopsJoiningThePursuit;
-                        copsJoining.AddRange(slotCops.Select(x => x.GameInstance));
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error($"Failed to retrieve slot cops joining the pursuit for {slot}, {ex.Message}", ex);
-                        Game.DisplayNotificationDebug("~r~Cops are unable to join the pursuit");
-                    }
-                }
-
-                Logger.Debug($"A total of {copsJoining.Count} cops are joining the pursuit for {this}");
-            }
-            else
-            {
-                Logger.Debug($"Cops are not allowed to join pursuit for {this}");
-            }
-
-            return copsJoining;
         }
 
         /// <summary>
@@ -452,7 +392,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
 
             Logger.Trace($"Roadblock will block {lanesToBlock.Count} lanes");
-            Slots = CreateRoadblockSlots(lanesToBlock);
+            InternalSlots.AddRange(CreateRoadblockSlots(lanesToBlock));
             PreventSlotVehiclesClipping();
         }
 
@@ -498,10 +438,10 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void PreventSlotVehiclesClipping()
         {
-            for (var i = 0; i < Slots.Count - 1; i++)
+            for (var i = 0; i < InternalSlots.Count - 1; i++)
             {
-                var currentSlot = Slots[i];
-                var nextSlot = Slots[i + 1];
+                var currentSlot = InternalSlots[i];
+                var nextSlot = InternalSlots[i + 1];
 
                 // if the current slot doesn't contain any vehicle
                 // skip the clipping calculation and move to the next one
@@ -572,58 +512,6 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 slot.WarpInVehicle();
             }
-        }
-
-        [Conditional("DEBUG")]
-        private void DoInternalDebugPreviewCreation()
-        {
-            Game.NewSafeFiber(() =>
-            {
-                Logger.Trace($"Creating roadblock debug preview for {GetType()}");
-                var color = PursuitIndicatorColor();
-                var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
-
-                while (IsPreviewActive)
-                {
-                    var remainingCops = Slots
-                        .SelectMany(x => x.Cops)
-                        .Where(x => !copsJoiningThePursuit.Contains(x.GameInstance))
-                        .Select(x => x.GameInstance)
-                        .ToList();
-
-                    foreach (var ped in copsJoiningThePursuit)
-                    {
-                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, color, 1f, 1f, false);
-                    }
-
-                    foreach (var ped in remainingCops)
-                    {
-                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.DarkRed, 1f, 1f, false);
-                    }
-
-                    Game.FiberYield();
-                }
-            }, "Roadblock.Preview");
-        }
-
-        private Color PursuitIndicatorColor()
-        {
-            var color = Color.DarkRed;
-
-            if (Flags.HasFlag(ERoadblockFlags.JoinPursuit))
-            {
-                color = Color.Lime;
-            }
-            else if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass))
-            {
-                color = Color.Gold;
-            }
-            else if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
-            {
-                color = Color.Coral;
-            }
-
-            return color;
         }
 
         #endregion

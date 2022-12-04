@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AutomaticRoadblocks.Roadblock.Slot;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
@@ -24,5 +25,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// <param name="roadblock">The roadblock of which the cops are joining the pursuit.</param>
         /// <param name="cops">The cops which join the pursuit.</param>
         public delegate void RoadblockCopsJoiningPursuit(IRoadblock roadblock, IEnumerable<Ped> cops);
+
+        /// <summary>
+        /// Invoked when the roadblock slot has been hit.
+        /// </summary>
+        /// <param name="slot">The roadblock slot that has been hit.</param>
+        public delegate void RoadblockSlotHit(IRoadblockSlot slot);
     }
 }

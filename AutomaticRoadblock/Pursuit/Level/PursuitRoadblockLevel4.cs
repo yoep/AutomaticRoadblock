@@ -40,10 +40,10 @@ namespace AutomaticRoadblocks.Pursuit.Level
         #region Functions
 
         /// <inheritdoc />
-        protected override IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
+        protected override IReadOnlyList<IPursuitRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
         {
             var slots = base.CreateRoadblockSlots(lanesToBlock);
-            var additionalSlots = new List<IRoadblockSlot>();
+            var additionalSlots = new List<IPursuitRoadblockSlot>();
 
             // add additional slots in-between the lanes
             for (var i = 0; i < slots.Count - 1; i++)
@@ -70,7 +70,7 @@ namespace AutomaticRoadblocks.Pursuit.Level
         }
 
         /// <inheritdoc />
-        protected override IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
+        protected override IPursuitRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights)
         {
             return new PursuitRoadblockSlotLevel4(lane, MainBarrier, SecondaryBarrier, RetrieveBackupUnitType(), heading, targetVehicle, SlotLightSources(),
                 shouldAddLights);

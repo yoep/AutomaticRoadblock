@@ -48,14 +48,10 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The cop instances of this roadblock slot.
         /// </summary>
         IList<ARPed> Cops { get; }
-        
-        /// <summary>
-        /// The cop instances of the roadblock slot that will be joining the pursuit.
-        /// </summary>
-        IList<ARPed> CopsJoiningThePursuit { get; }
 
         /// <summary>
         /// The length of the vehicle model in the slot.
+        /// This is primarily used to determine collisions between slots and adjust accordingly.
         /// </summary>
         float VehicleLength { get; }
 

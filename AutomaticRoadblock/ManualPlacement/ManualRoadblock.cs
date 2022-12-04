@@ -10,7 +10,7 @@ using AutomaticRoadblocks.Street.Info;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
-    public class ManualRoadblock : AbstractRoadblock, IPlaceableInstance
+    public class ManualRoadblock : AbstractRoadblock<IRoadblockSlot>, IPlaceableInstance
     {
         internal ManualRoadblock(Request request)
             : base(request.Road, request.MainBarrier, request.SecondaryBarrier, request.TargetHeading, request.LightSources, RequestToFlags(request),
