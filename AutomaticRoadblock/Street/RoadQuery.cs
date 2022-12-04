@@ -215,7 +215,7 @@ namespace AutomaticRoadblocks.Street
                 }
 
                 // never start at an intersection as it causes wrong directions being taken
-                var nodeTypeForThisIteration = nodeInfos.Count == 0 && nodeType is EVehicleNodeType.AllNodes or EVehicleNodeType.MainRoadsWithJunctions
+                var nodeTypeForThisIteration = IsFirstNodeDetectionCycle(nodeType, nodeInfos, findNodeAttempt)
                     ? EVehicleNodeType.AllRoadNoJunctions
                     : nodeType;
                 var findNodeAt = lastFoundNodeInfo.Position + MathHelper.ConvertHeadingToDirection(lastFoundNodeInfo.Heading) * distanceToMove;
@@ -291,6 +291,12 @@ namespace AutomaticRoadblocks.Street
             }
 
             return nodes;
+        }
+
+        private static bool IsFirstNodeDetectionCycle(EVehicleNodeType nodeType, IReadOnlyCollection<VehicleNodeInfo> nodeInfos, int findNodeAttempt)
+        {
+            // if the first attempt failed to find a node, continue at an intersection
+            return nodeInfos.Count == 0 && findNodeAttempt == 0 && nodeType is EVehicleNodeType.AllNodes or EVehicleNodeType.MainRoadsWithJunctions;
         }
 
         private static int GetClosestNodeId(Vector3 position)
