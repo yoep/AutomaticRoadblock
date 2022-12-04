@@ -31,9 +31,9 @@ namespace AutomaticRoadblocks.CloseRoad
         /// </summary>
         /// <param name="position">The position to close the road around.</param>
         /// <param name="preview">Close the nearby road as a preview only.</param>
-        /// <returns>Returns the created close road.</returns>
+        /// <returns>Returns the road closure on success, else null when unable to close road at given location.</returns>
         [CanBeNull]
-        ICloseRoad CloseNearbyRoad(Vector3 position, bool preview = false);
+        IRoadClosure CloseNearbyRoad(Vector3 position, bool preview = false);
 
         /// <summary>
         /// Close the nearby road around the given location.
@@ -47,8 +47,8 @@ namespace AutomaticRoadblocks.CloseRoad
         /// <param name="lightSource">The light source to place along the closed road instances.</param>
         /// <param name="maxDistance">The maximum distance from the position the units can be placed.</param>
         /// <param name="preview">Close the nearby road as a preview only.</param>
-        /// <returns>Returns the created close road.</returns>
-        ICloseRoad CloseNearbyRoad(Vector3 position, EBackupUnit backupUnit, BarrierModel barrier, LightModel lightSource, float maxDistance, bool preview = false);
+        /// <returns>Returns the road closure on success, else null when unable to close road at given location.</returns>
+        IRoadClosure CloseNearbyRoad(Vector3 position, EBackupUnit backupUnit, BarrierModel barrier, LightModel lightSource, float maxDistance, bool preview = false);
 
         /// <summary>
         /// Opens all closed roads again.

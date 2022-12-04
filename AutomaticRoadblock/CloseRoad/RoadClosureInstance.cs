@@ -14,7 +14,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.CloseRoad
 {
-    public class CloseRoadInstance : ICloseRoad
+    public class RoadClosureInstance : IRoadClosure
     {
         private const float IntersectionRoadblockOffset = 10f;
         private readonly IVehicleNode _mainNode;
@@ -24,7 +24,7 @@ namespace AutomaticRoadblocks.CloseRoad
         private readonly List<ManualRoadblock> _roadblocks = new();
         private readonly List<ARCloseNodes> _closeNodes = new();
 
-        public CloseRoadInstance(IVehicleNode mainNode, EBackupUnit backupUnit, BarrierModel barrier, LightModel lightSource, float maxDistance)
+        public RoadClosureInstance(IVehicleNode mainNode, EBackupUnit backupUnit, BarrierModel barrier, LightModel lightSource, float maxDistance)
         {
             Assert.NotNull(mainNode, "mainNode cannot be null");
             _mainNode = mainNode;

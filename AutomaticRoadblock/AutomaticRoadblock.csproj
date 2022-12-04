@@ -77,8 +77,8 @@
         <Compile Include="Barriers\EBarrierFlags.cs" />
         <Compile Include="Barriers\IBarrierData.cs" />
         <Compile Include="CloseRoad\CloseRoadDispatcher.cs" />
-        <Compile Include="CloseRoad\CloseRoadInstance.cs" />
-        <Compile Include="CloseRoad\ICloseRoad.cs" />
+        <Compile Include="CloseRoad\RoadClosureInstance.cs" />
+        <Compile Include="CloseRoad\IRoadClosure.cs" />
         <Compile Include="CloseRoad\ICloseRoadDispatcher.cs" />
         <Compile Include="CloseRoad\Menu\CloseRoadLightSourceComponentItem.cs" />
         <Compile Include="CloseRoad\Menu\CloseRoadMenuSwitchItem.cs" />

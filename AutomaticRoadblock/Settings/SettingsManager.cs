@@ -86,7 +86,7 @@ namespace AutomaticRoadblocks.Settings
         {
             AutomaticRoadblocksSettings = new AutomaticRoadblocksSettings
             {
-                DispatchNowKey = ValueToKey(file.ReadString(AutomaticRoadblocksSection, "DispatchNowKey", "X")),
+                DispatchNowKey = ValueToKey(file.ReadString(AutomaticRoadblocksSection, "DispatchNowKey", "E")),
                 DispatchNowModifierKey = ValueToKey(file.ReadString(AutomaticRoadblocksSection, "DispatchNowModifierKey", "ShiftKey")),
                 EnableDuringPursuits = file.ReadBoolean(AutomaticRoadblocksSection, "EnableDuringPursuits", true),
                 EnableAutoLevelIncrements = file.ReadBoolean(AutomaticRoadblocksSection, "EnableAutoLevelIncrements", true),
@@ -128,6 +128,8 @@ namespace AutomaticRoadblocks.Settings
         {
             CloseRoadSettings = new CloseRoadSettings
             {
+                CloseRoadKey = ValueToKey(file.ReadString(CloseRoadSection, "CloseRoadKey", "E")),
+                CloseRoadModifierKey = ValueToKey(file.ReadString(CloseRoadSection, "CloseRoadModifierKey", "ControlKey")),
                 MaxDistanceFromPlayer = (float)file.ReadDouble(CloseRoadSection, "MaxDistanceFromPlayer", 75.0),
                 Barrier = file.ReadString(CloseRoadSection, "Barrier", "police_do_not_cross"),
             };

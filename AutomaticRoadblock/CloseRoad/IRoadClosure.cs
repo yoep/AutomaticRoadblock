@@ -3,7 +3,7 @@ using AutomaticRoadblocks.Preview;
 
 namespace AutomaticRoadblocks.CloseRoad
 {
-    public interface ICloseRoad : IDisposable, IPreviewSupport
+    public interface IRoadClosure : IDisposable, IPreviewSupport
     {
         /// <summary>
         /// Spawn the close road instances.
