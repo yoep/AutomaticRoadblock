@@ -18,6 +18,7 @@ namespace AutomaticRoadblocks.CloseRoad
     public class CloseRoadDispatcher : ICloseRoadDispatcher
     {
         private const string AudioAccepted = "ROADBLOCK_ACCEPTED";
+        private const string AudioNegative = "ROADBLOCK_NEGATIVE";
         private const string AudioCloseRoad = "ROADBLOCK_CLOSE_ROAD";
 
         private readonly ILogger _logger;
@@ -26,7 +27,7 @@ namespace AutomaticRoadblocks.CloseRoad
         private readonly IModelProvider _modelProvider;
         private readonly ILocalizer _localizer;
 
-        private readonly List<CloseRoadInstance> _instances = new();
+        private readonly List<IRoadClosure> _instances = new();
         private bool _active;
 
         public CloseRoadDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, IModelProvider modelProvider, ILocalizer localizer)
@@ -53,37 +54,47 @@ namespace AutomaticRoadblocks.CloseRoad
         #region ICloseRoadDispatcher
 
         /// <inheritdoc />
-        public ICloseRoad CloseNearbyRoad(Vector3 position, bool preview = false)
+        public IRoadClosure CloseNearbyRoad(Vector3 position, bool preview = false)
         {
             return CloseNearbyRoad(position, BackupUnit, _modelProvider.TryFindModelByScriptName<BarrierModel>(_settingsManager.CloseRoadSettings.Barrier),
                 LightSource, MaxDistance, preview);
         }
 
         /// <inheritdoc />
-        public ICloseRoad CloseNearbyRoad(Vector3 position, EBackupUnit backupUnit, BarrierModel barrier, LightModel lightSource, float maxDistance,
+        public IRoadClosure CloseNearbyRoad(Vector3 position, EBackupUnit backupUnit, BarrierModel barrier, LightModel lightSource, float maxDistance,
             bool preview = false)
         {
-            var closestNode = RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
-            _logger.Trace($"Closing the road for node {closestNode}");
-
-            var instance = new CloseRoadInstance(closestNode, backupUnit, barrier, lightSource, MaxDistance);
-            lock (_instances)
+            try
             {
-                _instances.Add(instance);
+                var closestNode = RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
+                _logger.Trace($"Closing the road for node {closestNode}");
+
+                var instance = new RoadClosureInstance(closestNode, backupUnit, barrier, lightSource, MaxDistance);
+                lock (_instances)
+                {
+                    _instances.Add(instance);
+                }
+
+                if (preview)
+                {
+                    instance.CreatePreview();
+                }
+                else
+                {
+                    instance.Spawn();
+                }
+
+                LspdfrUtils.PlayScannerAudioNonBlocking($"{AudioAccepted} {AudioCloseRoad}");
+                _game.DisplayNotificationDebug(_localizer[LocalizationKey.RoadClosed]);
+                return instance;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"An error occurred while closing the road, {ex.Message}", ex);
+                LspdfrUtils.PlayScannerAudioNonBlocking($"{AudioNegative}");
             }
 
-            if (preview)
-            {
-                instance.CreatePreview();
-            }
-            else
-            {
-                instance.Spawn();
-            }
-
-            LspdfrUtils.PlayScannerAudioNonBlocking($"{AudioAccepted} {AudioCloseRoad}");
-            _game.DisplayNotificationDebug(_localizer[LocalizationKey.RoadClosed]);
-            return instance;
+            return null;
         }
 
         /// <inheritdoc />
