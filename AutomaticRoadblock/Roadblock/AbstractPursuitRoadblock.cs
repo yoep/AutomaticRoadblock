@@ -209,9 +209,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
 
             return lanesToBlock
-                .Select(lane => lane == spikeStripLane
-                    ? CreateSpikeStripSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights))
-                    : CreateSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights)))
+                .Select(lane => DoInternalSlotCreation(lane, spikeStripLane))
                 .ToList();
         }
 
@@ -319,6 +317,26 @@ namespace AutomaticRoadblocks.Roadblock
                     break;
             }
         }
+        
+        private IPursuitRoadblockSlot DoInternalSlotCreation(Road.Lane lane, Road.Lane spikeStripLane)
+        {
+            var slot = lane == spikeStripLane
+                ? CreateSpikeStripSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights))
+                : CreateSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights));
+            
+            slot.RoadblockSlotHit += OnRoadblockSlotHit;
+            
+            return slot;
+        }
+
+        private void OnRoadblockSlotHit(IRoadblockSlot slot)
+        {
+            BlipFlashNewState(Color.Green);
+            if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
+                Release();
+            UpdateState(ERoadblockState.Hit);
+            Logger.Info("Roadblock has been hit by the suspect");
+        }
 
         private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
         {
@@ -350,9 +368,12 @@ namespace AutomaticRoadblocks.Roadblock
                     {
                         if (Flags.HasFlag(ERoadblockFlags.DetectBypass))
                             VerifyIfRoadblockIsBypassed();
-                        if (Flags.HasFlag(ERoadblockFlags.DetectHit))
-                            VerifyIfRoadblockIsHit();
                         VerifyRoadblockCopKilled();
+
+                        // verify if the target vehicle instance is still valid
+                        // if not, set the state to invalid for this roadblock
+                        if (IsVehicleInstanceInvalid)
+                            InvalidateTheRoadblock();
                     }
                     catch (Exception ex)
                     {
@@ -361,7 +382,7 @@ namespace AutomaticRoadblocks.Roadblock
 
                     Game.FiberYield();
                 }
-            }, "PursuitRoadblock.Monitor");
+            }, $"{GetType()}.Monitor");
         }
 
         private void VerifyIfRoadblockIsBypassed()
@@ -388,30 +409,6 @@ namespace AutomaticRoadblocks.Roadblock
             }
         }
 
-        private void VerifyIfRoadblockIsHit()
-        {
-            if (IsVehicleInstanceInvalid)
-            {
-                InvalidateTheRoadblock();
-                return;
-            }
-
-            if (!TargetVehicle.HasBeenDamagedByAnyVehicle)
-                return;
-
-            if (!Slots
-                    .Where(x => x.Vehicle is { IsInvalid: false })
-                    .Any(HasBeenDamagedBy))
-                return;
-
-            Logger.Debug("Determined that the collision must have been against a roadblock slot");
-            BlipFlashNewState(Color.Green);
-            if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
-                Release();
-            UpdateState(ERoadblockState.Hit);
-            Logger.Info("Roadblock has been hit by the suspect");
-        }
-
         private void VerifyRoadblockCopKilled()
         {
             var hasACopBeenKilled = Slots
@@ -420,15 +417,6 @@ namespace AutomaticRoadblocks.Roadblock
 
             if (hasACopBeenKilled)
                 InvokeRoadblockCopKilled();
-        }
-
-        private bool HasBeenDamagedBy(IRoadblockSlot slot)
-        {
-            if (slot.Vehicle is { IsInvalid: false })
-                return slot.Vehicle.GameInstance.HasBeenDamagedBy(TargetVehicle);
-
-            Logger.Warn($"Unable to verify the vehicle collision for slot {slot}, vehicle is null");
-            return false;
         }
 
         private void BlipFlashNewState(Color color)

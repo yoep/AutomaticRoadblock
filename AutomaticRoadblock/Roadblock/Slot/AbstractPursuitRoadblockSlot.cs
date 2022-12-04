@@ -11,6 +11,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 {
     public abstract class AbstractPursuitRoadblockSlot : AbstractRoadblockSlot, IPursuitRoadblockSlot
     {
+        private bool _monitorActive;
+
         protected AbstractPursuitRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, EBackupUnit backupType, float heading,
             Vehicle targetVehicle, List<LightModel> lightSources, bool shouldAddLights, float offset = 0f)
             : base(lane, mainBarrier, secondaryBarrier, backupType, heading, shouldAddLights, true, offset)
@@ -21,6 +23,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             LightSources = lightSources;
 
             Initialize();
+            StartHitDetection();
         }
 
         #region Properties
@@ -40,6 +43,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// The light sources of this slot.
         /// </summary>
         protected List<LightModel> LightSources { get; }
+
+        /// <summary>
+        /// Verify if the target or vehicle from this slot have been invalidated.
+        /// </summary>
+        private bool IsInvalidated => TargetVehicle == null || !TargetVehicle.IsValid() ||
+                                      Vehicle == null || Vehicle.IsInvalid;
 
         #endregion
 
@@ -61,7 +70,15 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public override void Release(bool releaseAll = false)
         {
+            _monitorActive = false;
             DoInternalRelease(releaseAll ? Cops : CopsJoiningThePursuit);
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            _monitorActive = false;
+            base.Dispose();
         }
 
         #endregion
@@ -81,6 +98,40 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 return false;
 
             return cop.HasBeenDamagedBy(TargetVehicle) || TargetVehicle.Occupants.Any(cop.HasBeenDamagedBy);
+        }
+
+        private void StartHitDetection()
+        {
+            _monitorActive = true;
+            Game.NewSafeFiber(() =>
+            {
+                while (_monitorActive)
+                {
+                    VerifyHitByTargetVehicle();
+                    GameFiber.Yield();
+                }
+            }, $"{GetType()}.HitDetection");
+        }
+
+        private void VerifyHitByTargetVehicle()
+        {
+            if (IsInvalidated)
+            {
+                _monitorActive = false;
+                return;
+            }
+
+            if (!TargetVehicle.HasBeenDamagedByAnyVehicle && Cops.All(x => !x.GameInstance.HasBeenDamagedByAnyVehicle))
+                return;
+
+            // verify if any vehicle or cop have been hit by the target vehicle
+            if (Vehicle.GameInstance.HasBeenDamagedBy(TargetVehicle) ||
+                Cops.Any(x => x.GameInstance.HasBeenDamagedBy(TargetVehicle)))
+            {
+                Logger.Debug($"Target vehicle has hit slot {this}");
+                RoadblockSlotHit?.Invoke(this);
+                _monitorActive = false;
+            }
         }
 
         private static bool HasCopReceivedDamageFromVehicleOrSuspects(Entity x)
