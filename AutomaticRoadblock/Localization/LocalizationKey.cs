@@ -123,6 +123,7 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey CloseNearbyRoadDescription = new(nameof(CloseNearbyRoadDescription), "Closes the road around the player");
         public static readonly LocalizationKey OpenClosedRoad = new(nameof(OpenClosedRoad), "Open nearby road");
         public static readonly LocalizationKey OpenClosedRoadDescription = new(nameof(OpenClosedRoadDescription), "Open the closed road again for traffic");
+        public static readonly LocalizationKey RoadClosed = new(nameof(RoadClosed), "Nearby road has been closed off");
 
         #endregion
 
@@ -182,6 +183,7 @@ namespace AutomaticRoadblocks.Localization
             SpeedLimitDescription,
             Vehicle,
             VehicleDescription,
+            RoadClosed
         };
 
         public LocalizationKey(string identifier, string defaultText)
