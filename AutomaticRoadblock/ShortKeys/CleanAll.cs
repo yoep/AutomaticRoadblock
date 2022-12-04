@@ -1,7 +1,6 @@
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.CloseRoad;
 using AutomaticRoadblocks.Instances;
-using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
@@ -12,10 +11,11 @@ namespace AutomaticRoadblocks.ShortKeys
 {
     public class CleanAll : ICleanAll
     {
+        private const string AudioInstancesCleaned = "ATTENTION_ALL_UNITS WE_ARE_CODE 4";
+
         private readonly IGame _game;
         private readonly ILogger _logger;
         private readonly ISettingsManager _settingsManager;
-        private readonly ILocalizer _localizer;
         private readonly IRoadblockDispatcher _roadblockDispatcher;
         private readonly IManualPlacement _manualPlacement;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
@@ -23,13 +23,12 @@ namespace AutomaticRoadblocks.ShortKeys
 
         private bool _active;
 
-        public CleanAll(IGame game, ILogger logger, ISettingsManager settingsManager, ILocalizer localizer, IRoadblockDispatcher roadblockDispatcher,
+        public CleanAll(IGame game, ILogger logger, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher,
             IManualPlacement manualPlacement, IRedirectTrafficDispatcher redirectTrafficDispatcher, ICloseRoadDispatcher closeRoadDispatcher)
         {
             _game = game;
             _logger = logger;
             _settingsManager = settingsManager;
-            _localizer = localizer;
             _roadblockDispatcher = roadblockDispatcher;
             _manualPlacement = manualPlacement;
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
@@ -48,7 +47,7 @@ namespace AutomaticRoadblocks.ShortKeys
                 while (_active)
                 {
                     _game.FiberYield();
-                    
+
                     if (GameUtils.IsKeyPressed(settings.CleanAllKey, settings.CleanAllModifierKey))
                     {
                         _logger.Debug("Cleaning all plugin instances");
@@ -57,10 +56,10 @@ namespace AutomaticRoadblocks.ShortKeys
                         _redirectTrafficDispatcher.RemoveTrafficRedirects(RemoveType.All);
                         _closeRoadDispatcher.OpenRoads();
                         _logger.Info("Plugin instances have been cleaned");
-                        _game.DisplayNotification(_localizer[LocalizationKey.InstancesCleaned]);
+                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioInstancesCleaned);
                     }
                 }
-                
+
                 _logger.Trace("Clean all fiber has been stopped");
             }, "CleanAll.Listener");
         }

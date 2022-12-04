@@ -13,14 +13,11 @@ namespace AutomaticRoadblocks.SpikeStrip
     public class PursuitSpikeStrip : SpikeStrip
     {
         private const float BypassTolerance = 20f;
-        private const string AudioSpikeStripBypassed = "ROADBLOCK_SPIKESTRIP_BYPASSED";
-        private const string AudioSpikeStripHit = "ROADBLOCK_SPIKESTRIP_HIT";
         private const string AudioSpikeStripDeployedLeft = "ROADBLOCK_SPIKESTRIP_DEPLOYED_LEFT";
         private const string AudioSpikeStripDeployedMiddle = "ROADBLOCK_SPIKESTRIP_DEPLOYED_MIDDLE";
         private const string AudioSpikeStripDeployedRight = "ROADBLOCK_SPIKESTRIP_DEPLOYED_RIGHT";
 
         private float _lastKnownDistanceToSpikeStrip = 9999f;
-        private bool _audioPlayed;
 
         public PursuitSpikeStrip(Road street, ESpikeStripLocation location, Vehicle targetVehicle, float offset)
             : base(street, location, offset)
@@ -91,27 +88,12 @@ namespace AutomaticRoadblocks.SpikeStrip
             }
         }
 
-        private void PlayPursuitAudio(string audioName)
-        {
-            if (_audioPlayed)
-                return;
-
-            _audioPlayed = true;
-            LspdfrUtils.PlayScannerAudio(audioName);
-        }
-
         private void SpikeStripStateChanged(ISpikeStrip spikeStrip, ESpikeStripState state)
         {
             switch (state)
             {
                 case ESpikeStripState.Deploying:
                     LspdfrUtils.PlayScannerAudio(GetAudioName(spikeStrip.Location));
-                    break;
-                case ESpikeStripState.Hit:
-                    PlayPursuitAudio(AudioSpikeStripHit);
-                    break;
-                case ESpikeStripState.Bypassed:
-                    PlayPursuitAudio(AudioSpikeStripBypassed);
                     break;
             }
         }

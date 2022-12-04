@@ -31,6 +31,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         private readonly bool _shouldAddLights;
+        private ERoadblockSlotState _state;
 
         protected AbstractRoadblockSlot(Road.Lane lane, BarrierModel mainBarrier, BarrierModel secondaryBarrier, EBackupUnit backupType, float heading,
             bool shouldAddLights, bool recordVehicleCollisions, float offset = 0f)
@@ -47,6 +48,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             RecordVehicleCollisions = recordVehicleCollisions;
             Offset = offset;
             _shouldAddLights = shouldAddLights;
+            State = ERoadblockSlotState.Preparing;
         }
 
         #region Properties
@@ -66,6 +68,16 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             : DefaultVehicleLength;
 
         /// <inheritdoc />
+        public event RoadblockEvents.RoadblockSlotStateChanged StateChanged;
+
+        /// <inheritdoc />
+        public ERoadblockSlotState State
+        {
+            get => _state;
+            set => DoInternalStateUpdate(value);
+        }
+
+        /// <inheritdoc />
         public ARVehicle Vehicle => VehicleInstance;
 
         /// <inheritdoc />
@@ -73,9 +85,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
         /// <inheritdoc />
         public IList<ARPed> Cops => ValidCopInstances.ToList();
-
-        /// <inheritdoc />
-        public virtual IList<ARPed> CopsJoiningThePursuit => Cops;
 
         /// <summary>
         /// The main barrier that is used within this slot as first row.
@@ -192,8 +201,9 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public override string ToString()
         {
             return
-                $"Number of {nameof(Instances)}: {Instances.Count}, {nameof(Position)}: {Position}, {nameof(OffsetPosition)}: {OffsetPosition}, {nameof(Heading)}: {Heading}, " +
-                $"{nameof(MainBarrier)}: {MainBarrier}, {nameof(SecondaryBarrier)}: {SecondaryBarrier}, {nameof(BackupType)}: {BackupType}";
+                $"Number of {nameof(Instances)}: {Instances.Count}, {nameof(State)}: {State}, {nameof(Position)}: {Position}, " +
+                $"{nameof(OffsetPosition)}: {OffsetPosition}, {nameof(Heading)}: {Heading}, {nameof(MainBarrier)}: {MainBarrier}, " +
+                $"{nameof(SecondaryBarrier)}: {SecondaryBarrier}, {nameof(BackupType)}: {BackupType}";
         }
 
         /// <inheritdoc />
@@ -201,6 +211,8 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             if (IsPreviewActive)
                 DeletePreview();
+
+            State = ERoadblockSlotState.Spawned;
         }
 
         /// <inheritdoc />
@@ -219,19 +231,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <inheritdoc />
         public virtual void Release(bool releaseAll = false)
         {
-            Logger.Trace($"Releasing roadblock slot {this}");
-            var instances = releaseAll
-                ? Cops
-                : CopsJoiningThePursuit;
-
-            Instances
-                .Where(x => x.Type == EEntityType.CopVehicle)
-                .ToList()
-                .ForEach(x => Instances.Remove(x));
-            Instances.RemoveAll(x => instances.Any(instance => x == instance));
-            Logger.Trace($"Roadblock slot state after release {this}");
-
-            RoadblockHelpers.ReleaseInstancesToLspdfr(instances, Vehicle);
+            DoInternalRelease(Cops);
         }
 
         /// <inheritdoc />
@@ -257,25 +257,39 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// </summary>
         protected void Initialize()
         {
-            if (!LspdfrHelper.CreateBackupUnit(CalculateVehiclePosition(), CalculateVehicleHeading(), BackupType, NumberOfCops, out var vehicle, out var cops,
-                    RecordVehicleCollisions))
-            {
-                Logger.Error("Unable to initialize roadblock slot, LSPDFR backup unit creation failed");
+            if (State != ERoadblockSlotState.Preparing)
                 return;
+
+            try
+            {
+                if (!LspdfrHelper.CreateBackupUnit(CalculateVehiclePosition(), CalculateVehicleHeading(), BackupType, NumberOfCops, out var vehicle,
+                        out var cops,
+                        RecordVehicleCollisions))
+                {
+                    Logger.Error("Unable to initialize roadblock slot, LSPDFR backup unit creation failed");
+                    return;
+                }
+
+                InitializeVehicleSlot(vehicle);
+                InitializeCops(cops);
+                InitializeScenery();
+
+                if (!MainBarrier.IsNone)
+                    InitializeBarriers(MainBarrier, 2f);
+
+                if (!SecondaryBarrier.IsNone)
+                    InitializeBarriers(SecondaryBarrier, -4f);
+
+                if (_shouldAddLights)
+                    InitializeLights();
+
+                State = ERoadblockSlotState.Initialized;
             }
-
-            InitializeVehicleSlot(vehicle);
-            InitializeCops(cops);
-            InitializeScenery();
-
-            if (!MainBarrier.IsNone)
-                InitializeBarriers(MainBarrier, 2f);
-
-            if (!SecondaryBarrier.IsNone)
-                InitializeBarriers(SecondaryBarrier, -4f);
-
-            if (_shouldAddLights)
-                InitializeLights();
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to initialize {GetType()}, {ex.Message}", ex);
+                State = ERoadblockSlotState.Error;
+            }
         }
 
         /// <summary>
@@ -328,18 +342,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         }
 
         /// <summary>
-        /// Get the width of the vehicle model.
-        /// When no vehicle model is present, it will use a default value.
-        /// </summary>
-        /// <returns>Returns the vehicle model width.</returns>
-        protected float GetVehicleWidth()
-        {
-            return VehicleModel != null
-                ? VehicleModel.Value.Dimensions.X
-                : DefaultVehicleWidth;
-        }
-
-        /// <summary>
         /// Initialize the cop instances of this slot.
         /// </summary>
         protected virtual void InitializeCops(IEnumerable<ARPed> cops)
@@ -355,6 +357,36 @@ namespace AutomaticRoadblocks.Roadblock.Slot
 
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
+        }
+
+        /// <summary>
+        /// Release the given list of cops back to LSPDFR.
+        /// </summary>
+        /// <param name="cops">The list of cops to release.</param>
+        protected void DoInternalRelease(IList<ARPed> cops)
+        {
+            Logger.Trace($"Releasing {GetType()} {this}");
+            Instances
+                .Where(x => x.Type == EEntityType.CopVehicle)
+                .ToList()
+                .ForEach(x => Instances.Remove(x));
+            Instances.RemoveAll(x => cops.Any(instance => x == instance));
+            Logger.Trace($"{GetType()} state after release {this}");
+
+            RoadblockHelpers.ReleaseInstancesToLspdfr(cops, Vehicle);
+            State = ERoadblockSlotState.Released;
+        }
+
+        /// <summary>
+        /// Get the width of the vehicle model.
+        /// When no vehicle model is present, it will use a default value.
+        /// </summary>
+        /// <returns>Returns the vehicle model width.</returns>
+        private float GetVehicleWidth()
+        {
+            return VehicleModel != null
+                ? VehicleModel.Value.Dimensions.X
+                : DefaultVehicleWidth;
         }
 
         private void InitializeVehicleSlot(ARVehicle vehicle)
@@ -400,6 +432,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 Logger.Error($"Failed to create barrier of type {barrierModel}, {ex.Message}", ex);
                 return null;
             }
+        }
+
+        private void DoInternalStateUpdate(ERoadblockSlotState newState)
+        {
+            _state = newState;
+            StateChanged?.Invoke(this, newState);
         }
 
         private void DoSafeOperation(Action action, string operation)

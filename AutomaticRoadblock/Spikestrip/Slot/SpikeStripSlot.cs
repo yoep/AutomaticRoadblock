@@ -5,7 +5,9 @@ using System.Linq;
 using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
+using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Street.Info;
@@ -18,7 +20,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
     /// A <see cref="IRoadblockSlot"/> which deploys a spike strip.
     /// This slot won't create any barriers and will always use the local vehicle type.
     /// </summary>
-    public class SpikeStripSlot : AbstractRoadblockSlot
+    public class SpikeStripSlot : AbstractPursuitRoadblockSlot
     {
         private const float DeploySpikeStripRange = 50f;
         private const float PlacementInFrontOfVehicle = 0.1f;
@@ -30,12 +32,12 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         public SpikeStripSlot(ISpikeStripDispatcher spikeStripDispatcher, Road street, Road.Lane lane, Vehicle targetVehicle, float heading,
             bool shouldAddLights, float offset = 0)
-            : base(lane, BarrierModel.None, BarrierModel.None, EBackupUnit.LocalPatrol, heading, shouldAddLights, false, offset)
+            : base(lane, BarrierModel.None, BarrierModel.None, EBackupUnit.LocalPatrol, heading, targetVehicle, new List<LightModel>(), shouldAddLights, offset,
+                false)
         {
             Assert.NotNull(spikeStripDispatcher, "spikeStripDispatcher cannot be null");
             Assert.NotNull(targetVehicle, "targetVehicle cannot be null");
             SpikeStripDispatcher = spikeStripDispatcher;
-            TargetVehicle = targetVehicle;
             Road = street;
             Location = DetermineLocation();
             NumberOfCops = 1;
@@ -52,11 +54,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// The road this spike strip slot is placed on.
         /// </summary>
         private Road Road { get; }
-
-        /// <summary>
-        /// The target vehicle of the spike strip.
-        /// </summary>
-        private Vehicle TargetVehicle { get; }
 
         /// <summary>
         /// The spike strip dispatcher to use for creating an instance.
@@ -161,9 +158,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                 case ESpikeStripState.Deployed:
                     OnSpikeStripDeployed();
                     break;
-                case ESpikeStripState.Undeployed:
-                    OnSpikeStripUndeployed();
-                    break;
             }
         }
 
@@ -171,7 +165,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         private void OnSpikeStripDeployed()
         {
             var timeTaken = (DateTime.Now.Ticks - _spikeStripDeployStartedAt) / TimeSpan.TicksPerMillisecond;
-           var distanceFromTarget = TargetVehicle.DistanceTo2D(SpikeStrip.Position);
+            var distanceFromTarget = TargetVehicle.DistanceTo2D(SpikeStrip.Position);
             var deployTimeColor = timeTaken < 1000 ? "g" : "r";
             var distanceColor = distanceFromTarget >= 15f ? "g" : "r";
 
@@ -181,12 +175,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             Logger.Trace("--- Spike strip slot performance stats ---\n" +
                          $"Deploy time: ~{deployTimeColor}~{timeTaken}ms\n" +
                          $"Distance: ~{distanceColor}~{distanceFromTarget}");
-        }
-
-        [Conditional("DEBUG")]
-        private void OnSpikeStripUndeployed()
-        {
-            Game.DisplayNotificationDebug("~p~Spike strip undeployed");
         }
 
         private void OnSpikeStripBypassed()
@@ -202,6 +190,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                 GameFiber.Wait(DelayUndeployment);
                 DoUndeploy();
             }, "SpikeStripStateChanged.Hit");
+            InvokedRoadblockHitEvent(ERoadblockHitType.SpikeStrip);
         }
 
         private void StartMonitor()

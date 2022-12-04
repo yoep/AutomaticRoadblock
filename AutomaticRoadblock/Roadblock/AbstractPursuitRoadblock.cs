@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.Barriers;
@@ -15,6 +16,7 @@ using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.SpikeStrip.Slot;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
+using AutomaticRoadblocks.Utils.Type;
 using JetBrains.Annotations;
 using LSPD_First_Response.Engine.Scripting.Entities;
 using Rage;
@@ -25,12 +27,14 @@ namespace AutomaticRoadblocks.Roadblock
     /// This abstract implementation of <see cref="IRoadblock"/> verifies certain states such
     /// as <see cref="ERoadblockState.Hit"/> or <see cref="ERoadblockState.Bypassed"/>.
     /// </summary>
-    internal abstract class AbstractPursuitRoadblock : AbstractRoadblock
+    internal abstract class AbstractPursuitRoadblock : AbstractRoadblock<IPursuitRoadblockSlot>, IPursuitRoadblock
     {
         private const float BypassTolerance = 20f;
         private const string AudioRoadblockDeployed = "ROADBLOCK_DEPLOYED";
         private const string AudioRoadblockBypassed = "ROADBLOCK_BYPASSED";
         private const string AudioRoadblockHit = "ROADBLOCK_HIT";
+        private const string AudioSpikeStripBypassed = "ROADBLOCK_SPIKESTRIP_BYPASSED";
+        private const string AudioSpikeStripHit = "ROADBLOCK_SPIKESTRIP_HIT";
 
         private static readonly Random Random = new();
         private static readonly ILocalizer Localizer = IoC.Instance.GetInstance<ILocalizer>();
@@ -53,16 +57,17 @@ namespace AutomaticRoadblocks.Roadblock
 
         #region Properties
 
+        /// <inheritdoc />
+        [CanBeNull]
+        public Vehicle TargetVehicle { get; }
+
+        /// <inheritdoc />
+        public event RoadblockEvents.RoadblockCopsJoiningPursuit RoadblockCopsJoiningPursuit;
+
         /// <summary>
         /// The roadblock config data which determines most of the setup.
         /// </summary>
         protected RoadblockData RoadblockData { get; }
-
-        /// <summary>
-        /// Get the target vehicle of this roadblock.
-        /// </summary>
-        [CanBeNull]
-        protected Vehicle TargetVehicle { get; }
 
         /// <summary>
         /// The barrier model for the chase vehicle.
@@ -85,12 +90,34 @@ namespace AutomaticRoadblocks.Roadblock
         #region Methods
 
         /// <inheritdoc />
+        public override void CreatePreview()
+        {
+            base.CreatePreview();
+            DoInternalDebugPreviewCreation();
+        }
+
+        /// <inheritdoc />
         public override bool Spawn()
         {
             var result = base.Spawn();
             Monitor();
 
             return result;
+        }
+
+        /// <inheritdoc />
+        public override void Release(bool releaseAll = false)
+        {
+            // verify if the roadblock is still active
+            // otherwise, we cannot release the entities
+            if (State != ERoadblockState.Active)
+            {
+                Logger.Trace($"Unable to release roadblock instance, instance is not active for {this}");
+                return;
+            }
+
+            InvokeCopsJoiningPursuit(releaseAll);
+            base.Release(releaseAll);
         }
 
         public override string ToString()
@@ -110,7 +137,42 @@ namespace AutomaticRoadblocks.Roadblock
         /// <param name="targetVehicle">The target vehicle.</param>
         /// <param name="shouldAddLights">Set if light scenery should be added.</param>
         /// <returns>Returns the created slot for the roadblock.</returns>
-        protected abstract IRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights);
+        protected abstract IPursuitRoadblockSlot CreateSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool shouldAddLights);
+
+        /// <summary>
+        /// Retrieve a list of cops who will join the pursuit.
+        /// </summary>
+        /// <param name="releaseAll"></param>
+        /// <returns>Returns the cops joining the pursuit.</returns>
+        protected virtual IList<Ped> RetrieveCopsJoiningThePursuit(bool releaseAll)
+        {
+            var copsJoining = new List<Ped>();
+
+            if (IsAllowedToJoinPursuit() || releaseAll)
+            {
+                foreach (var slot in InternalSlots)
+                {
+                    try
+                    {
+                        var slotCops = releaseAll ? slot.Cops : slot.CopsJoiningThePursuit;
+                        copsJoining.AddRange(slotCops.Select(x => x.GameInstance));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to retrieve slot cops joining the pursuit for {slot}, {ex.Message}", ex);
+                        Game.DisplayNotificationDebug("~r~Cops are unable to join the pursuit");
+                    }
+                }
+
+                Logger.Debug($"A total of {copsJoining.Count} cops are joining the pursuit for {this}");
+            }
+            else
+            {
+                Logger.Debug($"Cops are not allowed to join pursuit for {this}");
+            }
+
+            return copsJoining;
+        }
 
         /// <inheritdoc />
         protected override void InitializeScenery()
@@ -138,7 +200,7 @@ namespace AutomaticRoadblocks.Roadblock
         }
 
         /// <inheritdoc />
-        protected override IReadOnlyList<IRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
+        protected override IReadOnlyList<IPursuitRoadblockSlot> CreateRoadblockSlots(IReadOnlyList<Road.Lane> lanesToBlock)
         {
             Road.Lane spikeStripLane = null;
 
@@ -149,9 +211,7 @@ namespace AutomaticRoadblocks.Roadblock
             }
 
             return lanesToBlock
-                .Select(lane => lane == spikeStripLane
-                    ? CreateSpikeStripSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights))
-                    : CreateSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights)))
+                .Select(lane => DoInternalSlotCreation(lane, spikeStripLane))
                 .ToList();
         }
 
@@ -243,6 +303,49 @@ namespace AutomaticRoadblocks.Roadblock
                 .ToList();
         }
 
+        /// <summary>
+        /// Indicate that the cops of this roadblock can join the pursuit.
+        /// </summary>
+        /// <param name="releaseAll"></param>
+        protected void InvokeCopsJoiningPursuit(bool releaseAll)
+        {
+            switch (State)
+            {
+                case ERoadblockState.Bypassed when !Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass):
+                case ERoadblockState.Hit when !Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit):
+                    return;
+                default:
+                    RoadblockCopsJoiningPursuit?.Invoke(this, RetrieveCopsJoiningThePursuit(releaseAll));
+                    break;
+            }
+        }
+
+        private IPursuitRoadblockSlot DoInternalSlotCreation(Road.Lane lane, Road.Lane spikeStripLane)
+        {
+            var slot = lane == spikeStripLane
+                ? CreateSpikeStripSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights))
+                : CreateSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights));
+
+            slot.RoadblockSlotHit += OnRoadblockSlotHit;
+
+            return slot;
+        }
+
+        private void OnRoadblockSlotHit(IRoadblockSlot slot, ERoadblockHitType type)
+        {
+            // verify if the hit should be ignored
+            if (State == ERoadblockState.Hit || !Flags.HasFlag(ERoadblockFlags.DetectHit))
+                return;
+
+            Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenHit]);
+            BlipFlashNewState(Color.Green);
+            if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
+                Release();
+            UpdateState(ERoadblockState.Hit);
+            LspdfrUtils.PlayScannerAudioNonBlocking(type == ERoadblockHitType.SpikeStrip ? AudioSpikeStripHit : AudioRoadblockHit);
+            Logger.Info("Roadblock has been hit by the suspect");
+        }
+
         private void CreateChaseVehicleBufferBarrels(Vector3 chasePosition)
         {
             var rowPosition = chasePosition + MathHelper.ConvertHeadingToDirection(TargetHeading - 180) * 4f;
@@ -273,9 +376,12 @@ namespace AutomaticRoadblocks.Roadblock
                     {
                         if (Flags.HasFlag(ERoadblockFlags.DetectBypass))
                             VerifyIfRoadblockIsBypassed();
-                        if (Flags.HasFlag(ERoadblockFlags.DetectHit))
-                            VerifyIfRoadblockIsHit();
                         VerifyRoadblockCopKilled();
+
+                        // verify if the target vehicle instance is still valid
+                        // if not, set the state to invalid for this roadblock
+                        if (IsVehicleInstanceInvalid)
+                            InvalidateTheRoadblock();
                     }
                     catch (Exception ex)
                     {
@@ -284,7 +390,7 @@ namespace AutomaticRoadblocks.Roadblock
 
                     Game.FiberYield();
                 }
-            }, "PursuitRoadblock.Monitor");
+            }, $"{GetType()}.Monitor");
         }
 
         private void VerifyIfRoadblockIsBypassed()
@@ -311,30 +417,6 @@ namespace AutomaticRoadblocks.Roadblock
             }
         }
 
-        private void VerifyIfRoadblockIsHit()
-        {
-            if (IsVehicleInstanceInvalid)
-            {
-                InvalidateTheRoadblock();
-                return;
-            }
-
-            if (!TargetVehicle.HasBeenDamagedByAnyVehicle)
-                return;
-
-            if (!Slots
-                    .Where(x => x.Vehicle is { IsInvalid: false })
-                    .Any(HasBeenDamagedBy))
-                return;
-
-            Logger.Debug("Determined that the collision must have been against a roadblock slot");
-            BlipFlashNewState(Color.Green);
-            if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
-                Release();
-            UpdateState(ERoadblockState.Hit);
-            Logger.Info("Roadblock has been hit by the suspect");
-        }
-
         private void VerifyRoadblockCopKilled()
         {
             var hasACopBeenKilled = Slots
@@ -343,15 +425,6 @@ namespace AutomaticRoadblocks.Roadblock
 
             if (hasACopBeenKilled)
                 InvokeRoadblockCopKilled();
-        }
-
-        private bool HasBeenDamagedBy(IRoadblockSlot slot)
-        {
-            if (slot.Vehicle is { IsInvalid: false })
-                return slot.Vehicle.GameInstance.HasBeenDamagedBy(TargetVehicle);
-
-            Logger.Warn($"Unable to verify the vehicle collision for slot {slot}, vehicle is null");
-            return false;
         }
 
         private void BlipFlashNewState(Color color)
@@ -372,7 +445,7 @@ namespace AutomaticRoadblocks.Roadblock
             UpdateState(ERoadblockState.Invalid);
         }
 
-        private IRoadblockSlot CreateSpikeStripSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool addLights)
+        private IPursuitRoadblockSlot CreateSpikeStripSlot(Road.Lane lane, float heading, Vehicle targetVehicle, bool addLights)
         {
             return new SpikeStripSlot(SpikeStripDispatcher, Road, lane, targetVehicle, heading, addLights);
         }
@@ -392,16 +465,17 @@ namespace AutomaticRoadblocks.Roadblock
                         Game.DisplayNotification(Localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(Position)]);
                         LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockDeployed);
                         break;
-                    case ERoadblockState.Hit:
-                        Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenHit]);
-                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockHit);
-                        break;
                     case ERoadblockState.Bypassed:
                         Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenBypassed]);
-                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockBypassed);
+                        PlayBypassedAudio();
                         break;
                 }
             }, "PursuitRoadblock.OnStateChanged");
+        }
+
+        private void PlayBypassedAudio()
+        {
+            LspdfrUtils.PlayScannerAudioNonBlocking(Flags.HasFlag(ERoadblockFlags.EnableSpikeStrips) ? AudioSpikeStripBypassed : AudioRoadblockBypassed);
         }
 
         private static BarrierModel GetMainBarrier(RoadblockData roadblockData)
@@ -428,6 +502,58 @@ namespace AutomaticRoadblocks.Roadblock
             return roadblockData.Lights
                 .Select(x => ModelProvider.FindModelByScriptName<LightModel>(x))
                 .ToList();
+        }
+
+        [Conditional("DEBUG")]
+        private void DoInternalDebugPreviewCreation()
+        {
+            Game.NewSafeFiber(() =>
+            {
+                Logger.Trace($"Creating roadblock debug preview for {GetType()}");
+                var color = PursuitIndicatorColor();
+                var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
+
+                while (IsPreviewActive)
+                {
+                    var remainingCops = Slots
+                        .SelectMany(x => x.Cops)
+                        .Where(x => !copsJoiningThePursuit.Contains(x.GameInstance))
+                        .Select(x => x.GameInstance)
+                        .ToList();
+
+                    foreach (var ped in copsJoiningThePursuit)
+                    {
+                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, color, 1f, 1f, false);
+                    }
+
+                    foreach (var ped in remainingCops)
+                    {
+                        GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.DarkRed, 1f, 1f, false);
+                    }
+
+                    Game.FiberYield();
+                }
+            }, "Roadblock.Preview");
+        }
+
+        private Color PursuitIndicatorColor()
+        {
+            var color = Color.DarkRed;
+
+            if (Flags.HasFlag(ERoadblockFlags.JoinPursuit))
+            {
+                color = Color.Lime;
+            }
+            else if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnBypass))
+            {
+                color = Color.Gold;
+            }
+            else if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
+            {
+                color = Color.Coral;
+            }
+
+            return color;
         }
 
         #endregion

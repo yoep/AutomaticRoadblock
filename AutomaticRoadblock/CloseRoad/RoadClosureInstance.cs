@@ -166,13 +166,15 @@ namespace AutomaticRoadblocks.CloseRoad
                 : ENodeFlag.IsAlley | ENodeFlag.IsGravelRoad | ENodeFlag.IsBackroad | ENodeFlag.IsOnWater;
             var laneClosestToPlayer = road.LaneClosestTo(Game.LocalPlayer.Character.Position);
             var laneHeadingSameDirectionAsRoad = MathHelper.NormalizeHeading(laneClosestToPlayer.Heading - road.Heading) < 10f;
+            var directionClosure = road.IsSingleDirection ? "one" : "two";
 
-            CloseRoadForHeading(road, laneClosestToPlayer.Heading, laneHeadingSameDirectionAsRoad, nodeType, blacklistedNodes);
+            _logger.Info($"Road closure will close {directionClosure} way");
+            CloseRoadForHeading(road, laneClosestToPlayer.Heading - 180, laneHeadingSameDirectionAsRoad, nodeType, blacklistedNodes);
 
             // verify if the other side also needs to be closed
             if (!road.IsSingleDirection)
             {
-                CloseRoadForHeading(road, MathHelper.NormalizeHeading(laneClosestToPlayer.Heading - 180), !laneHeadingSameDirectionAsRoad, nodeType,
+                CloseRoadForHeading(road, MathHelper.NormalizeHeading(laneClosestToPlayer.Heading), !laneHeadingSameDirectionAsRoad, nodeType,
                     blacklistedNodes);
             }
         }
