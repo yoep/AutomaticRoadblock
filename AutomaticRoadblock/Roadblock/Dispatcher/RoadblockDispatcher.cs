@@ -85,13 +85,27 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             Assert.NotNull(level, "level cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
 
-            _logger.Trace(
-                $"Starting roadblock dispatching with {nameof(level)}: {level}, {nameof(options)}: {options}");
+            _logger.Trace($"Starting roadblock dispatching with {nameof(level)}: {level}, {nameof(options)}: {options}");
             if (options.Force || options.IsUserRequested || IsRoadblockDispatchingAllowed(vehicle))
                 return DoInternalDispatch(level, vehicle, options);
 
             _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(options)}: {options}, " +
                          $"{nameof(IsRoadblockDispatchingAllowed)}: {IsRoadblockDispatchingAllowed(vehicle)}");
+            return null;
+        }
+
+        /// <inheritdoc />
+        public IRoadblock Dispatch(Vector3 position, ERoadblockLevel level, Vehicle vehicle, DispatchOptions options)
+        {
+            Assert.NotNull(position, "position cannot be null");
+            Assert.NotNull(level, "level cannot be null");
+            Assert.NotNull(vehicle, "vehicle cannot be null");
+            var node = RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
+
+            _logger.Trace($"Starting roadblock dispatching with {nameof(position)}: {position}, {nameof(level)}: {level}, {nameof(options)}: {options}");
+            if (options.Force || options.IsUserRequested || IsRoadblockDispatchingAllowed(vehicle))
+                return DoInternalDispatch(new List<IVehicleNode> { node }, level, vehicle, options);
+
             return null;
         }
 
@@ -194,10 +208,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         [CanBeNull]
         private IRoadblock DoInternalDispatch(ERoadblockLevel level, Vehicle vehicle, DispatchOptions options)
         {
-            // start the cleaner if it's not yet running
-            if (!_cleanerRunning)
-                StartCleaner();
-
             // verify if a user requested roadblock is still being dispatched
             // because of the fact that a user requested roadblock plays blocking audio,
             // the roadblock might still not have been deployed when a new one is requested
@@ -215,8 +225,23 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             LspdfrUtils.WaitForAudioCompletion();
 
             // calculate the roadblock location
-            _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
             var discoveredVehicleNodes = DetermineRoadblockLocation(level, vehicle, options.RoadblockDistance);
+
+            return DoInternalDispatch(discoveredVehicleNodes, level, vehicle, options);
+        }
+
+        private IRoadblock DoInternalDispatch(IList<IVehicleNode> discoveredVehicleNodes, ERoadblockLevel level, Vehicle vehicle, DispatchOptions options)
+        {
+            // start the cleaner if it's not yet running
+            if (!_cleanerRunning)
+                StartCleaner();
+
+            // update the flag that a user requested roadblock is being calculated
+            if (options.IsUserRequested)
+                _userRequestedRoadblockDispatching = true;
+
+            // calculate the roadblock location
+            _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
             var primaryRoadblockNode = discoveredVehicleNodes.OfType<Road>().Last();
 
             if (primaryRoadblockNode.Width < 1f)
