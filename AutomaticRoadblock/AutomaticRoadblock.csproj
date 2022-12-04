@@ -232,6 +232,7 @@
         <Compile Include="Roadblock\ERoadblockState.cs" />
         <Compile Include="Roadblock\Slot\AbstractPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\AbstractRoadblockSlot.cs" />
+        <Compile Include="Roadblock\Slot\ERoadblockSlotState.cs" />
         <Compile Include="Roadblock\Slot\IPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IRoadblockSlot.cs" />
         <Compile Include="Settings\CloseRoadSettings.cs" />

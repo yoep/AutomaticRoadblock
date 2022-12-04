@@ -27,7 +27,7 @@ namespace AutomaticRoadblocks.Roadblock
 
         protected static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
-        
+
         protected readonly List<T> InternalSlots = new();
         protected Blip Blip;
 
@@ -234,6 +234,11 @@ namespace AutomaticRoadblocks.Roadblock
 
                 Slots.ToList().ForEach(SpawnSlot);
                 UpdateState(ERoadblockState.Active);
+
+                if (Slots.Any(x => x.State != ERoadblockSlotState.Spawned))
+                {
+                    Game.DisplayNotificationDebug($"~r~A total of {Slots.Count(x => x.State != ERoadblockSlotState.Spawned)} slots failed to spawn");
+                }
 
                 CreateBlip();
                 return true;

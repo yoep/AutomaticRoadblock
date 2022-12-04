@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Preview;
@@ -9,6 +10,7 @@ using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
 {
+    [SuppressMessage("ReSharper", "EventNeverSubscribedTo.Global")]
     public interface IRoadblockSlot : IPreviewSupport, IDisposable
     {
         /// <summary>
@@ -30,6 +32,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Get the backup unit type that will be used for this slot.
         /// </summary>
         EBackupUnit BackupType { get; }
+        
+        /// <summary>
+        /// The state of this roadblock slot.
+        /// </summary>
+        ERoadblockSlotState State { get; }
 
         /// <summary>
         /// Retrieve the vehicle instance (nullable) of this slot.
@@ -54,6 +61,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// This is primarily used to determine collisions between slots and adjust accordingly.
         /// </summary>
         float VehicleLength { get; }
+
+        /// <summary>
+        /// Invoked when the state is changed of this slot.
+        /// </summary>
+        event RoadblockEvents.RoadblockSlotStateChanged StateChanged;
 
         /// <summary>
         /// Spawn the slot entities into the world.
