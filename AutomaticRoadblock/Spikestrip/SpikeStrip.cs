@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,6 +10,7 @@ using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using Rage;
 using Rage.Native;
+using Object = Rage.Object;
 
 namespace AutomaticRoadblocks.SpikeStrip
 {
@@ -22,6 +24,10 @@ namespace AutomaticRoadblocks.SpikeStrip
         protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         private AnimationExecutor _animation;
+        private long _spawnTimeDuration;
+        private long _undeployAnimationDuration;
+        private long _waitForUndeployCompleted;
+        private long _deployAnimationDuration;
 
         internal SpikeStrip(Road street, ESpikeStripLocation location, float offset)
         {
@@ -199,7 +205,9 @@ namespace AutomaticRoadblocks.SpikeStrip
         protected void UpdateState(ESpikeStripState state)
         {
             State = state;
-            StateChanged?.Invoke(this, state);
+
+            // move the state invocation to another thread so it doesn't block the current one
+            Game.NewSafeFiber(() => { StateChanged?.Invoke(this, state); }, $"{GetType()}.UpdateState");
         }
 
         private void DoInternalSpawn()
@@ -208,30 +216,35 @@ namespace AutomaticRoadblocks.SpikeStrip
                 return;
 
             Logger.Trace($"Spawning spike strip {this}");
+            var startTime = DateTime.Now.Ticks;
             GameInstance = PropUtils.CreateSpikeStrip(Position, Heading);
             GameInstance.IsPersistent = true;
+            _spawnTimeDuration = DateTime.Now.Ticks - startTime;
             DoUndeployAnimation();
-            UpdateState(ESpikeStripState.Undeployed);
         }
 
         private void DoInternalDeploy()
         {
+            var startTime = DateTime.Now.Ticks;
             if (IsInvalid)
                 DoInternalSpawn();
-            
+
             Logger.Trace($"Starting deployment of spike strip {this}");
+            var waitForStart = DateTime.Now.Ticks;
             // wait for the spike strip to become available
             while (State != ESpikeStripState.Undeployed)
             {
                 Game.FiberYield();
             }
 
+            _waitForUndeployCompleted = DateTime.Now.Ticks;
             Logger.Debug($"Deploying spike strip {this}");
             UpdateState(ESpikeStripState.Deploying);
             StopCurrentAnimation();
             DoDeployAnimation();
             UpdateState(ESpikeStripState.Deployed);
             StartMonitor();
+            LogPerformance(waitForStart, startTime);
         }
 
         private void DoInternalUndeploy()
@@ -242,7 +255,6 @@ namespace AutomaticRoadblocks.SpikeStrip
             Logger.Trace($"Undeploying spike strip {this}");
             StopCurrentAnimation();
             DoUndeployAnimation();
-            UpdateState(ESpikeStripState.Undeployed);
         }
 
         private void DoInternalCleanup()
@@ -258,13 +270,16 @@ namespace AutomaticRoadblocks.SpikeStrip
         {
             Game.NewSafeFiber(() =>
             {
+                Logger.Debug("Starting spike strip monitor");
                 while (State is not (ESpikeStripState.Preparing or ESpikeStripState.Undeployed or ESpikeStripState.Disposed))
                 {
                     DoNearbyVehiclesCheck();
                     DoAdditionalVerifications();
                     Game.FiberYield();
                 }
-            }, "SpikeStrip.Monitor");
+
+                Logger.Debug("Spike strip monitor completed");
+            }, $"{GetType()}.Monitor");
         }
 
         private void DoNearbyVehiclesCheck()
@@ -293,6 +308,7 @@ namespace AutomaticRoadblocks.SpikeStrip
         }
 
         // Credits to PNWParksFan (see discord knowledge base)
+
         private bool IsTouchingTheInstance(Vector3 position)
         {
             if (IsInvalid)
@@ -324,11 +340,13 @@ namespace AutomaticRoadblocks.SpikeStrip
                 return;
 
             Logger.Trace($"Playing spike strip deploy animation for {this}");
+            var startTime = DateTime.Now.Ticks;
             SoundHelper.PlaySound(GameInstance, Sounds.StingerDrop, Sounds.StingerDropRef);
             _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripDeploy,
                 AnimationFlags.None);
             _animation.Speed = 2.5f;
             _animation.WaitForCompletion();
+            _deployAnimationDuration = DateTime.Now.Ticks - startTime;
         }
 
         private void DoUndeployAnimation()
@@ -336,10 +354,15 @@ namespace AutomaticRoadblocks.SpikeStrip
             if (IsInvalid)
                 return;
 
+            var startTime = DateTime.Now.Ticks;
             SoundHelper.PlaySound(GameInstance, Sounds.StingerDrop, Sounds.StingerDropRef);
             _animation = AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.StingerDictionary, Animations.SpikeStripIdleUndeployed,
                 AnimationFlags.StayInEndFrame);
+            _animation.Speed = 1.5f;
             PropUtils.PlaceCorrectlyOnGround(GameInstance);
+            _animation.WaitForCompletion();
+            UpdateState(ESpikeStripState.Undeployed);
+            _undeployAnimationDuration = DateTime.Now.Ticks - startTime;
         }
 
         private Vector3 CalculateSpikeStripPosition(float offset)
@@ -368,6 +391,21 @@ namespace AutomaticRoadblocks.SpikeStrip
             return Road.LaneClosestTo(positionToMatch);
         }
 
+        private void LogPerformance(long waitForStart, long startTime)
+        {
+            var spawnTime = _spawnTimeDuration / TimeSpan.TicksPerMillisecond;
+            var undeployTime = _undeployAnimationDuration / TimeSpan.TicksPerMillisecond;
+            var waitForUndeploy = (waitForStart - _waitForUndeployCompleted) / TimeSpan.TicksPerMillisecond;
+            var deployAnimation = _deployAnimationDuration / TimeSpan.TicksPerMillisecond;
+            var totalDuration = (DateTime.Now.Ticks - startTime) / TimeSpan.TicksPerMillisecond;
+            Logger.Trace("--- Spike strip performance stats ---\n" +
+                         $"Total time: {totalDuration}ms\n" +
+                         $"Spawn time: {spawnTime}ms\n" +
+                         $"Undeploy anim: {undeployTime}ms\n" +
+                         $"Wait for: {waitForUndeploy}ms\n" +
+                         $"Deploy anim: {deployAnimation}ms");
+        }
+
         private static bool IsVehicleTireBurst(Vehicle vehicle, EVehicleWheel wheel, bool onRim)
         {
             // VEHICLE::IS_VEHICLE_TYRE_BURST
@@ -385,6 +423,11 @@ namespace AutomaticRoadblocks.SpikeStrip
                 EVehicleWheel.LeftRear,
                 EVehicleWheel.RightRear,
             };
+        }
+
+        private static string TimeToColor(long timeTaken)
+        {
+            return timeTaken < 500 ? "g" : "r";
         }
 
         #endregion

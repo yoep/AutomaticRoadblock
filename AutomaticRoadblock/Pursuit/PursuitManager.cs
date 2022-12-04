@@ -575,7 +575,7 @@ namespace AutomaticRoadblocks.Pursuit
                     }
                 }
 
-                _logger.Debug("Pursuit manager key listener has been stopped");
+                _logger.Info("Pursuit manager key listener has been stopped");
             }, "PursuitManager.KeyListener");
         }
 
