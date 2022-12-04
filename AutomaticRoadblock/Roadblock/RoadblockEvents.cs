@@ -30,6 +30,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// Invoked when the roadblock slot has been hit.
         /// </summary>
         /// <param name="slot">The roadblock slot that has been hit.</param>
-        public delegate void RoadblockSlotHit(IRoadblockSlot slot);
+        /// <param name="type">The target roadblock hit type.</param>
+        public delegate void RoadblockSlotHit(IRoadblockSlot slot, ERoadblockHitType type);
     }
 }

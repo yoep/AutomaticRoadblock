@@ -92,6 +92,18 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 .SelectMany(x => LightSourceFactory.Create(x, this)));
         }
 
+        /// <summary>
+        /// Invoke the <see cref="RoadblockEvents.RoadblockSlotHit"/> event.
+        /// This will stop the internal monitor to detect for any further hit detections.
+        /// </summary>
+        /// <param name="type">The entity type that was hit</param>
+        protected void InvokedRoadblockHitEvent(ERoadblockHitType type)
+        {
+            Logger.Debug($"Target vehicle has hit on {type} slot {this}");
+            RoadblockSlotHit?.Invoke(this, type);
+            _monitorActive = false;
+        }
+
         private bool HasCopBeenKilledBySuspects(Entity cop)
         {
             if (TargetVehicle == null || !TargetVehicle.IsValid())
@@ -125,12 +137,13 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 return;
 
             // verify if any vehicle or cop have been hit by the target vehicle
-            if (Vehicle.GameInstance.HasBeenDamagedBy(TargetVehicle) ||
-                Cops.Any(x => x.GameInstance.HasBeenDamagedBy(TargetVehicle)))
+            if (Vehicle.GameInstance.HasBeenDamagedBy(TargetVehicle))
             {
-                Logger.Debug($"Target vehicle has hit slot {this}");
-                RoadblockSlotHit?.Invoke(this);
-                _monitorActive = false;
+                InvokedRoadblockHitEvent(ERoadblockHitType.Vehicle);
+            }
+            else if (Cops.Any(x => x.GameInstance.HasBeenDamagedBy(TargetVehicle)))
+            {
+                InvokedRoadblockHitEvent(ERoadblockHitType.Cop);
             }
         }
 

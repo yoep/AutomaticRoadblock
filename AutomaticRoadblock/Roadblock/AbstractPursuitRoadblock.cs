@@ -33,6 +33,8 @@ namespace AutomaticRoadblocks.Roadblock
         private const string AudioRoadblockDeployed = "ROADBLOCK_DEPLOYED";
         private const string AudioRoadblockBypassed = "ROADBLOCK_BYPASSED";
         private const string AudioRoadblockHit = "ROADBLOCK_HIT";
+        private const string AudioSpikeStripBypassed = "ROADBLOCK_SPIKESTRIP_BYPASSED";
+        private const string AudioSpikeStripHit = "ROADBLOCK_SPIKESTRIP_HIT";
 
         private static readonly Random Random = new();
         private static readonly ILocalizer Localizer = IoC.Instance.GetInstance<ILocalizer>();
@@ -317,20 +319,27 @@ namespace AutomaticRoadblocks.Roadblock
                     break;
             }
         }
-        
+
         private IPursuitRoadblockSlot DoInternalSlotCreation(Road.Lane lane, Road.Lane spikeStripLane)
         {
             var slot = lane == spikeStripLane
                 ? CreateSpikeStripSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights))
                 : CreateSlot(lane, Heading, TargetVehicle, Flags.HasFlag(ERoadblockFlags.EnableLights));
-            
+
             slot.RoadblockSlotHit += OnRoadblockSlotHit;
-            
+
             return slot;
         }
 
-        private void OnRoadblockSlotHit(IRoadblockSlot slot)
+        private void OnRoadblockSlotHit(IRoadblockSlot slot, ERoadblockHitType type)
         {
+            // verify if the hit should be ignored
+            if (!Flags.HasFlag(ERoadblockFlags.DetectHit))
+                return;
+
+            LspdfrUtils.PlayScannerAudioNonBlocking(type == ERoadblockHitType.SpikeStrip ? AudioSpikeStripHit : AudioRoadblockHit);
+
+            Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenHit]);
             BlipFlashNewState(Color.Green);
             if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
                 Release();
@@ -457,16 +466,17 @@ namespace AutomaticRoadblocks.Roadblock
                         Game.DisplayNotification(Localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(Position)]);
                         LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockDeployed);
                         break;
-                    case ERoadblockState.Hit:
-                        Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenHit]);
-                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockHit);
-                        break;
                     case ERoadblockState.Bypassed:
                         Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenBypassed]);
-                        LspdfrUtils.PlayScannerAudioNonBlocking(AudioRoadblockBypassed);
+                        PlayBypassedAudio();
                         break;
                 }
             }, "PursuitRoadblock.OnStateChanged");
+        }
+
+        private void PlayBypassedAudio()
+        {
+            LspdfrUtils.PlayScannerAudioNonBlocking(Flags.HasFlag(ERoadblockFlags.EnableSpikeStrips) ? AudioSpikeStripBypassed : AudioRoadblockBypassed);
         }
 
         private static BarrierModel GetMainBarrier(RoadblockData roadblockData)

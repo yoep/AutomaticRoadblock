@@ -7,6 +7,7 @@ using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
+using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Street.Info;
@@ -197,6 +198,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                 GameFiber.Wait(DelayUndeployment);
                 DoUndeploy();
             }, "SpikeStripStateChanged.Hit");
+            InvokedRoadblockHitEvent(ERoadblockHitType.SpikeStrip);
         }
 
         private void StartMonitor()
