@@ -154,6 +154,7 @@ namespace AutomaticRoadblocks.Instances
             if (IsInvalid)
                 return this;
 
+            Functions.SetCopAsBusy(GameInstance, true);
             GameInstance.Tasks.Pause(duration);
             return this;
         }

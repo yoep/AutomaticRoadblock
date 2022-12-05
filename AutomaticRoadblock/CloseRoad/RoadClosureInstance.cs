@@ -168,7 +168,7 @@ namespace AutomaticRoadblocks.CloseRoad
             var laneHeadingSameDirectionAsRoad = MathHelper.NormalizeHeading(laneClosestToPlayer.Heading - road.Heading) < 10f;
             var directionClosure = road.IsSingleDirection ? "one" : "two";
 
-            _logger.Info($"Road closure will close {directionClosure} way");
+            _logger.Info($"Road closure will close {directionClosure} way at {road.Position}");
             CloseRoadForHeading(road, laneClosestToPlayer.Heading - 180, laneHeadingSameDirectionAsRoad, nodeType, blacklistedNodes);
 
             // verify if the other side also needs to be closed
