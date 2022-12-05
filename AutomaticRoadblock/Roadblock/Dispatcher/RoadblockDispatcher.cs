@@ -388,7 +388,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private IList<IVehicleNode> DetermineRoadblockLocation(ERoadblockLevel level, Vehicle vehicle, ERoadblockDistance roadblockDistance)
         {
             var distanceToUse = CalculateRoadblockDistance(vehicle, roadblockDistance);
-            var roadType = DetermineAllowedRoadTypes(vehicle, level);
+            var roadType = DetermineAllowedRoadTypes(vehicle);
 
             _logger.Trace(
                 $"Determining roadblock location for Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(distanceToUse)}: {distanceToUse}, {nameof(roadType)}: {roadType}");
@@ -568,21 +568,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return distance;
         }
 
-        private EVehicleNodeType DetermineAllowedRoadTypes(Vehicle vehicle, ERoadblockLevel level)
+        private EVehicleNodeType DetermineAllowedRoadTypes(Vehicle vehicle)
         {
-            // verify the current road type
-            // if we're already at a dirt/offroad road, all road types for the trajectory calculation are allowed
-            if (RoadQuery.IsSlowRoad(vehicle.Position))
-            {
-                _logger.Debug("Following the current dirt/offroad road for the roadblock placement");
-                return EVehicleNodeType.AllNodes;
-            }
-
-            // otherwise, we're going to base the allowed road types for the trajectory based
-            // on the current roadblock level
-            var vehicleNodeType = level.Level <= ERoadblockLevel.Level2.Level ? EVehicleNodeType.AllNodes : EVehicleNodeType.MainRoadsWithJunctions;
-            _logger.Debug($"Roadblock road traversal will use vehicle node type {vehicleNodeType}");
-            return vehicleNodeType;
+            var nodeType = RoadQuery.IsSlowRoad(vehicle.Position) ? EVehicleNodeType.AllNodes : EVehicleNodeType.MainRoadsWithJunctions;
+            
+            _logger.Debug($"Roadblock road traversal will use vehicle node type {nodeType}");
+            return nodeType;
         }
 
         private ENodeFlag DetermineBlacklistedFlagsForType(EVehicleNodeType vehicleNodeType)

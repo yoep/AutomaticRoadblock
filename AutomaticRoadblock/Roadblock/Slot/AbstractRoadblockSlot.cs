@@ -244,7 +244,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             }
 
             CopInstances.ToList()
-                .ForEach(x => x.WarpIntoVehicle(Vehicle.GameInstance, Vehicle.GameInstance.Driver == null ? EVehicleSeat.Driver : EVehicleSeat.Any));
+                .ForEach(cop =>
+                {
+                    cop
+                        .WarpIntoVehicle(Vehicle.GameInstance, Vehicle.GameInstance.Driver == null ? EVehicleSeat.Driver : EVehicleSeat.Any)
+                        .Wait(90000);
+                });
         }
 
         #endregion
@@ -355,6 +360,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
                 cop.Heading = pedHeading;
                 Instances.Add(cop);
 
+                cop.Wait(90000);
                 pedSpawnPosition += MathHelper.ConvertHeadingToDirection(Heading + 90) * 1.5f;
             }
         }
