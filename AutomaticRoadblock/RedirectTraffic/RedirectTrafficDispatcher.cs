@@ -153,6 +153,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
             return redirectTraffic;
         }
 
+        /// <inheritdoc />
+        protected override Vector3 CalculatePreviewPosition()
+        {
+            return Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * _settingsManager.RedirectTrafficSettings.DistanceFromPlayer;
+        }
+
         private bool ShouldAddLights()
         {
             return _settingsManager.RedirectTrafficSettings.EnableLights &&

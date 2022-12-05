@@ -168,6 +168,12 @@ namespace AutomaticRoadblocks.ManualPlacement
                 _offset);
         }
 
+        /// <inheritdoc />
+        protected override Vector3 CalculatePreviewPosition()
+        {
+            return Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * _settingsManager.ManualPlacementSettings.DistanceFromPlayer;
+        }
+
         private ManualRoadblock DoInternalInstanceCreation(IVehicleNode node, float targetHeading, BarrierModel mainBarrier, BarrierModel secondaryBarrier,
             EBackupUnit backupType, PlacementType placementType, LightModel lightSource, bool copsEnabled, float offset)
         {
