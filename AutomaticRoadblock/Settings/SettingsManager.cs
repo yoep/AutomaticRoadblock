@@ -118,7 +118,7 @@ namespace AutomaticRoadblocks.Settings
             RedirectTrafficSettings = new RedirectTrafficSettings
             {
                 EnablePreview = file.ReadBoolean(RedirectTrafficSection, "EnablePreview", true),
-                DistanceFromPlayer = (float)file.ReadDouble(RedirectTrafficSection, "DistanceFromPlayer", 10.0),
+                DistanceFromPlayer = (float)file.ReadDouble(RedirectTrafficSection, "DistanceFromPlayer", 20.0),
                 EnableLights = file.ReadBoolean(RedirectTrafficSection, "EnableLights", true),
                 DefaultCone = file.ReadString(RedirectTrafficSection, "DefaultCone", "big_cone_stripes"),
             };
