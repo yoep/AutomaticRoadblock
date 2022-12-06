@@ -183,10 +183,11 @@ namespace AutomaticRoadblocks.CloseRoad
             _logger.Trace($"Searching node to close for {road.Position} heading {heading}");
             var nodeToClose = FindPositionToCloseFor(road.Position, heading, nodeType, blacklistedNodes);
             var targetHeading = MathHelper.NormalizeHeading(nodeToClose.LanesSameDirection.First().Heading - 180);
+            var nodeClosureVehicleNodesPosition = nodeToClose.LeftSide + MathHelper.ConvertHeadingToDirection(nodeToClose.Heading) * 3f;
 
             _logger.Debug($"Closing road for node {nodeToClose} with targetHeading {targetHeading}");
             _roadblocks.Add(new ManualRoadblock(CreateRequest(nodeToClose, targetHeading, PlacementType.OppositeDirectionOfRoad, 0f)));
-            _closeNodes.Add(new ARCloseNodes(road.Position, nodeToClose.LeftSide));
+            _closeNodes.Add(new ARCloseNodes(road.Position, nodeClosureVehicleNodesPosition));
         }
 
         private ManualRoadblock.Request CreateRequest(Road node, float heading, PlacementType placementType, float offset)
