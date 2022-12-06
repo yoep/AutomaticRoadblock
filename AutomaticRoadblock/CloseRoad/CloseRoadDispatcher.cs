@@ -69,7 +69,7 @@ namespace AutomaticRoadblocks.CloseRoad
                 var closestNode = RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
                 _logger.Trace($"Closing the road for node {closestNode}");
 
-                var instance = new RoadClosureInstance(closestNode, backupUnit, barrier, lightSource, MaxDistance);
+                var instance = new RoadClosureInstance(closestNode, backupUnit, barrier, lightSource, maxDistance);
                 lock (_instances)
                 {
                     _instances.Add(instance);

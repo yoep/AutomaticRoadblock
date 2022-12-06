@@ -29,14 +29,26 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         event RoadblockEvents.RoadblockCopsJoiningPursuit RoadblockCopsJoiningPursuit;
 
         /// <summary>
-        /// Dispatch a new roadblock for the current pursuit.
+        /// Dispatch a new roadblock for the current pursuit when all conditions match.
+        /// Use <see cref="DispatchOptions.Force"/> to skip all condition checks.
         /// </summary>
         /// <param name="level">The level of the roadblock. This determines the look/units/props of the roadblock.</param>
         /// <param name="vehicle">The vehicle for which a roadblock should be dispatched.</param>
         /// <param name="options">The dispatching options for the roadblock.</param>
-        /// <returns>Return the roadblock when dispatched, else null.</returns>
-        /// <remarks>Call this method on a separate fiber.</remarks>
+        /// <returns>Return the roadblock if dispatched, else null.</returns>
+        /// <remarks>Call this method on a separate <see cref="GameFiber"/>.</remarks>
         IRoadblock Dispatch(ERoadblockLevel level, Vehicle vehicle, DispatchOptions options);
+        
+        /// <summary>
+        /// Dispatch a new roadblock for the current pursuit.
+        /// </summary>
+        /// <param name="position">The position to create the pursuit roadblock.</param>
+        /// <param name="level">The level of the roadblock. This determines the look/units/props of the roadblock.</param>
+        /// <param name="vehicle">The vehicle for which a roadblock should be dispatched.</param>
+        /// <param name="options">The dispatching options for the roadblock.</param>
+        /// <returns>Return the roadblock if dispatched, else null.</returns>
+        /// <remarks>Call this method on a separate <see cref="GameFiber"/>.</remarks>
+        IRoadblock Dispatch(Vector3 position, ERoadblockLevel level, Vehicle vehicle, DispatchOptions options);
 
         /// <summary>
         /// Dispatch a new roadblock preview for the given vehicle.

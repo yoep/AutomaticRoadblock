@@ -165,29 +165,29 @@ namespace AutomaticRoadblocks.CloseRoad
                 ? ENodeFlag.IsOnWater | ENodeFlag.IsAlley
                 : ENodeFlag.IsAlley | ENodeFlag.IsGravelRoad | ENodeFlag.IsBackroad | ENodeFlag.IsOnWater;
             var laneClosestToPlayer = road.LaneClosestTo(Game.LocalPlayer.Character.Position);
-            var laneHeadingSameDirectionAsRoad = MathHelper.NormalizeHeading(laneClosestToPlayer.Heading - road.Heading) < 10f;
             var directionClosure = road.IsSingleDirection ? "one" : "two";
 
-            _logger.Info($"Road closure will close {directionClosure} way");
-            CloseRoadForHeading(road, laneClosestToPlayer.Heading - 180, laneHeadingSameDirectionAsRoad, nodeType, blacklistedNodes);
+            _logger.Info($"Road closure will close {directionClosure} way at {road.Position}");
+            CloseRoadForHeading(road, laneClosestToPlayer.Heading - 180, nodeType, blacklistedNodes);
 
             // verify if the other side also needs to be closed
             if (!road.IsSingleDirection)
             {
-                CloseRoadForHeading(road, MathHelper.NormalizeHeading(laneClosestToPlayer.Heading), !laneHeadingSameDirectionAsRoad, nodeType,
+                CloseRoadForHeading(road, MathHelper.NormalizeHeading(laneClosestToPlayer.Heading), nodeType,
                     blacklistedNodes);
             }
         }
 
-        private void CloseRoadForHeading(Road road, float heading, bool sameDirectionOfRoad, EVehicleNodeType nodeType, ENodeFlag blacklistedNodes)
+        private void CloseRoadForHeading(Road road, float heading, EVehicleNodeType nodeType, ENodeFlag blacklistedNodes)
         {
-            _logger.Trace($"Searching node to close for {road.Position} heading {heading} with sameDirectionOfRoad: {sameDirectionOfRoad}");
+            _logger.Trace($"Searching node to close for {road.Position} heading {heading}");
             var nodeToClose = FindPositionToCloseFor(road.Position, heading, nodeType, blacklistedNodes);
             var targetHeading = MathHelper.NormalizeHeading(nodeToClose.LanesSameDirection.First().Heading - 180);
+            var nodeClosureVehicleNodesPosition = nodeToClose.LeftSide + MathHelper.ConvertHeadingToDirection(nodeToClose.Heading) * 3f;
 
             _logger.Debug($"Closing road for node {nodeToClose} with targetHeading {targetHeading}");
             _roadblocks.Add(new ManualRoadblock(CreateRequest(nodeToClose, targetHeading, PlacementType.OppositeDirectionOfRoad, 0f)));
-            _closeNodes.Add(new ARCloseNodes(sameDirectionOfRoad ? road.RightSide : road.LeftSide, nodeToClose.LeftSide));
+            _closeNodes.Add(new ARCloseNodes(road.Position, nodeClosureVehicleNodesPosition));
         }
 
         private ManualRoadblock.Request CreateRequest(Road node, float heading, PlacementType placementType, float offset)

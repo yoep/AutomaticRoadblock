@@ -10,14 +10,16 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
 {
     public class RedirectTrafficMenuSwitchItem : IMenuSwitchItem, IDisposable
     {
+        private readonly ILogger _logger;
         private readonly IGame _game;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
         private readonly ILocalizer _localizer;
 
         private bool _running = true;
 
-        public RedirectTrafficMenuSwitchItem(IGame game, IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
+        public RedirectTrafficMenuSwitchItem(ILogger logger, IGame game, IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
+            _logger = logger;
             _game = game;
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
             _localizer = localizer;
@@ -56,16 +58,29 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
                 {
                     _game.FiberYield();
 
-                    if (Menu.Visible)
-                    {
-                        _redirectTrafficDispatcher.CreatePreview();
-                    }
-                    else
-                    {
-                        _redirectTrafficDispatcher.DeletePreview();
-                    }
+                    DoProcessTick();
                 }
             }, "RedirectTrafficMenuSwitchItem.Process");
+        }
+
+        private void DoProcessTick()
+        {
+            try
+            {
+                if (Menu.Visible)
+                {
+                    _redirectTrafficDispatcher.CreatePreview();
+                }
+                else
+                {
+                    _redirectTrafficDispatcher.DeletePreview();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Traffic redirection preview failed, {ex.Message}", ex);
+                _game.DisplayNotification($"~r~{_localizer[LocalizationKey.RedirectTrafficUnknownError]}");
+            }
         }
     }
 }

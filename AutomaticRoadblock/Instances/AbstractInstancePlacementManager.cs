@@ -100,12 +100,18 @@ namespace AutomaticRoadblocks.Instances
         protected abstract T CreateInstance(IVehicleNode street);
 
         /// <summary>
+        /// Calculate the preview position to place within the world.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Vector3 CalculatePreviewPosition();
+
+        /// <summary>
         /// Create a preview for the current properties.
         /// </summary>
         /// <param name="force">Force a redraw of the preview.</param>
         protected void DoInternalPreviewCreation(bool force)
         {
-            var road = CalculateNewLocationForInstance(Game.PlayerPosition);
+            var road = CalculateNewLocationForInstance(CalculatePreviewPosition());
 
             // ignore intersections and wait for the player to move
             if (road.GetType() == typeof(Intersection))

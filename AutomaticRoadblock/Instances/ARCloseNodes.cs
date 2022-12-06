@@ -8,6 +8,9 @@ using Rage.Native;
 
 namespace AutomaticRoadblocks.Instances
 {
+    /// <summary>
+    /// Closes one or more vehicle nodes within the given area.
+    /// </summary>
     public class ARCloseNodes : IPreviewSupport, IDisposable
     {
         private readonly IGame _game = IoC.Instance.GetInstance<IGame>();
@@ -92,6 +95,8 @@ namespace AutomaticRoadblocks.Instances
                 var mainColor = Color.DarkOrange;
                 var color = Color.FromArgb(75, mainColor.R, mainColor.G, mainColor.B);
                 var middlePosition = (TopLeftPosition + BottomRightPosition) * 0.5f;
+                var renderPosition1 = new Vector3(TopLeftPosition.X, TopLeftPosition.Y, TopLeftPosition.Z);
+                var renderPosition2 = new Vector3(BottomRightPosition.X, BottomRightPosition.Y, TopLeftPosition.Z);
                 var flatTopLeft = new Vector3(TopLeftPosition.X, TopLeftPosition.Y, 0f);
                 var flatBottomRight = new Vector3(BottomRightPosition.X, BottomRightPosition.Y, 0f);
                 var orientation = (flatTopLeft - flatBottomRight).ToQuaternion();
@@ -101,6 +106,8 @@ namespace AutomaticRoadblocks.Instances
                     GameFiber.Yield();
                     Rage.Debug.DrawWireBox(middlePosition, orientation, TopLeftPosition - BottomRightPosition, mainColor);
                     Rage.Debug.DrawSphere(middlePosition, 1f, color);
+                    Rage.Debug.DrawSphere(renderPosition1, 0.5f, color);
+                    Rage.Debug.DrawSphere(renderPosition2, 0.5f, color);
                 }
             }, $"{GetType()}.CreatePreview");
         }

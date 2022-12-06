@@ -36,7 +36,6 @@ namespace AutomaticRoadblocks.Debug.Menu
         };
 
         private readonly IGame _game;
-        private readonly Random _random = new();
 
         private LHandle _currentPursuit;
 
@@ -81,7 +80,7 @@ namespace AutomaticRoadblocks.Debug.Menu
                     EVehicleNodeType.AllNodes);
                 var driver = new Ped(vehicleNode.Position);
                 var passenger = new Ped(vehicleNode.Position);
-                var vehicle = new Vehicle(new Model(VehicleModels[Random.Next(VehicleModels.Count)]), vehicleNode.Position, vehicleNode.Heading);
+                var vehicle = new Vehicle(new Model(VehicleModels[Random.Next(VehicleModels.Count)]), vehicleNode.Position, _game.PlayerHeading);
 
                 driver.RelationshipGroup = RelationshipGroup.Gang1;
                 passenger.RelationshipGroup = RelationshipGroup.Gang1;
@@ -101,8 +100,8 @@ namespace AutomaticRoadblocks.Debug.Menu
 
                 if (type.Aggressive)
                 {
-                    Functions.GetPedPursuitAttributes(driver).AverageFightTime = 0;
-                    Functions.GetPedPursuitAttributes(passenger).AverageFightTime = 0;
+                    Functions.GetPedPursuitAttributes(driver).AverageFightTime = 5;
+                    Functions.GetPedPursuitAttributes(passenger).AverageFightTime = 5;
                 }
 
                 Functions.SetPursuitIsActiveForPlayer(_currentPursuit, true);

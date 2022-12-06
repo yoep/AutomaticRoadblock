@@ -227,6 +227,7 @@ namespace AutomaticRoadblocks.Roadblock
             try
             {
                 DeletePreview();
+                CreateBlip();
 
                 // check if a speed zone needs to be created
                 if (Flags.HasFlag(ERoadblockFlags.SlowTraffic))
@@ -234,14 +235,8 @@ namespace AutomaticRoadblocks.Roadblock
 
                 Slots.ToList().ForEach(SpawnSlot);
                 UpdateState(ERoadblockState.Active);
-
-                if (Slots.Any(x => x.State != ERoadblockSlotState.Spawned))
-                {
-                    Game.DisplayNotificationDebug($"~r~A total of {Slots.Count(x => x.State != ERoadblockSlotState.Spawned)} slots failed to spawn");
-                }
-
-                CreateBlip();
-                return true;
+                
+                return Slots.Any(x => x.State != ERoadblockSlotState.Spawned);
             }
             catch (Exception ex)
             {

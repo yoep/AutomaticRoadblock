@@ -88,6 +88,7 @@ namespace AutomaticRoadblocks.Localization
         public static readonly LocalizationKey RedirectTrafficType = new(nameof(RedirectTrafficType), "Redirect");
         public static readonly LocalizationKey RedirectTrafficTypeDescription = new(nameof(RedirectTrafficTypeDescription), "Place a traffic redirection on");
         public static readonly LocalizationKey RedirectTrafficEnableRedirectionArrow = new(nameof(RedirectTrafficEnableRedirectionArrow), "Redirect arrow");
+        public static readonly LocalizationKey RedirectTrafficUnknownError = new(nameof(RedirectTrafficUnknownError), "An unknown error occurred while processing the traffic redirection");
 
         #endregion
 
@@ -171,6 +172,8 @@ namespace AutomaticRoadblocks.Localization
             RedirectTrafficEnableRedirectionArrow,
             RedirectTrafficType,
             RedirectTrafficTypeDescription,
+            RedirectTrafficUnknownError,
+            RoadClosed,
             RoadblockDispatchedAt,
             RoadblockDispatchedAt,
             RoadblockHasBeenBypassed,
@@ -183,7 +186,6 @@ namespace AutomaticRoadblocks.Localization
             SpeedLimitDescription,
             Vehicle,
             VehicleDescription,
-            RoadClosed
         };
 
         public LocalizationKey(string identifier, string defaultText)

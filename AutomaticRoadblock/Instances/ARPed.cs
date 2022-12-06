@@ -146,6 +146,20 @@ namespace AutomaticRoadblocks.Instances
         }
 
         /// <summary>
+        /// Wait/pause the entity for the given amount of time.
+        /// </summary>
+        /// <param name="duration">The duration of the action.</param>
+        public ARPed Wait(int duration)
+        {
+            if (IsInvalid)
+                return this;
+
+            Functions.SetCopAsBusy(GameInstance, true);
+            GameInstance.Tasks.Pause(duration);
+            return this;
+        }
+
+        /// <summary>
         /// Attach the given entity to this ped.
         /// </summary>
         /// <param name="attachment">Set the entity to attach.</param>
@@ -225,13 +239,19 @@ namespace AutomaticRoadblocks.Instances
             }
         }
 
-        public void WarpIntoVehicle(Vehicle vehicle, EVehicleSeat seat)
+        /// <summary>
+        /// Warp this ped into the given vehicle seat.
+        /// </summary>
+        /// <param name="vehicle">The vehicle to warp the ped in.</param>
+        /// <param name="seat">The vehicle seat to place the ped in.</param>
+        public ARPed WarpIntoVehicle(Vehicle vehicle, EVehicleSeat seat)
         {
             Assert.NotNull(vehicle, "vehicle cannot be null");
             if (IsInvalid || !vehicle.IsValid())
-                return;
+                return this;
 
-            GameInstance?.WarpIntoVehicle(vehicle, (int)seat);
+            GameInstance?.WarpIntoVehicle(vehicle, (int)seat); 
+            return this;
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ namespace AutomaticRoadblocks.CloseRoad
     [SuppressMessage("ReSharper", "UnusedType.Global")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
+    [SuppressMessage("ReSharper", "UnusedMemberInSuper.Global")]
     public interface ICloseRoadDispatcher : IDisposable
     {
         /// <summary>
