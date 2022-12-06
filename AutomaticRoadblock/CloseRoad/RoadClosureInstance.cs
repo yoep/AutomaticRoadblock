@@ -168,13 +168,12 @@ namespace AutomaticRoadblocks.CloseRoad
             var directionClosure = road.IsSingleDirection ? "one" : "two";
 
             _logger.Info($"Road closure will close {directionClosure} way at {road.Position}");
-            CloseRoadForHeading(road, laneClosestToPlayer.Heading - 180, nodeType, blacklistedNodes);
+            CloseRoadForHeading(road, MathHelper.NormalizeHeading(laneClosestToPlayer.Heading - 180), nodeType, blacklistedNodes);
 
             // verify if the other side also needs to be closed
             if (!road.IsSingleDirection)
             {
-                CloseRoadForHeading(road, MathHelper.NormalizeHeading(laneClosestToPlayer.Heading), nodeType,
-                    blacklistedNodes);
+                CloseRoadForHeading(road, MathHelper.NormalizeHeading(laneClosestToPlayer.Heading), nodeType, blacklistedNodes);
             }
         }
 
