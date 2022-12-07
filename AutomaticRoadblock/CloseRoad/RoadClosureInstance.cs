@@ -210,11 +210,22 @@ namespace AutomaticRoadblocks.CloseRoad
         {
             var nodes = RoadQuery.FindRoadsTraversing(position, heading, MaxDistance, nodeType, blacklistedNodes, true);
             _nodes.AddRange(nodes);
+            _logger.Trace($"Found nodes as potential road closure, [{string.Join(", ", _nodes)}]");
 
-            return nodes
-                .Where(x => x.Type == EStreetType.Road)
-                .Select(x => (Road)x)
-                .Last();
+            try
+            {
+                _logger.Debug($"Filtering out road closure position out of {_nodes.Count}");
+                return nodes
+                    .Where(x => x.Type == EStreetType.Road)
+                    .Select(x => (Road)x)
+                    .Last();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to find position from road traversal, {ex.Message}", ex);
+            }
+
+            return FindRoadFromIntersectionFallback(nodes.Last(), heading);
         }
 
         private void SafeDisposeRoadblock(ManualRoadblock roadblock)
@@ -227,6 +238,27 @@ namespace AutomaticRoadblocks.CloseRoad
             {
                 _logger.Error($"Failed to dispose roadblock, {ex.Message}", ex);
             }
+        }
+
+        private Road FindRoadFromIntersectionFallback(IVehicleNode node, float wantedHeading)
+        {
+            _logger.Warn($"Using intersection road as fallback at {node.Position}");
+            var closestHeadingDiff = 9999f;
+            var bestMatchingNode = (Road)null;
+
+            foreach (var road in ((Intersection)node).Roads)
+            {
+                var headingDiff = MathHelper.NormalizeHeading(wantedHeading - road.Heading);
+
+                if (headingDiff > closestHeadingDiff)
+                    continue;
+
+                closestHeadingDiff = headingDiff;
+                bestMatchingNode = road;
+            }
+
+            _logger.Debug($"Using best matching road {bestMatchingNode}");
+            return bestMatchingNode;
         }
 
         #endregion
