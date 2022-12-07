@@ -12,6 +12,12 @@ namespace AutomaticRoadblocks.Animation
         public const string ObjectPlaceDown = "putdown_low";
         public const string ObjectPickup = "pickup_low";
         public const string ThrowShortLow = "low_l_throw_short";
+
+        public static readonly string[] CopIdles = {
+            "idle_a",
+            "idle_b",
+            "idle_c",
+        };
         
         public static class Dictionaries
         {
@@ -19,7 +25,8 @@ namespace AutomaticRoadblocks.Animation
             public static AnimationDictionary ObjectDictionary;
             public static AnimationDictionary GrenadeDictionary;
             public static AnimationDictionary CarParkDictionary;
-            public static AnimationDictionary GuardDictionary;
+            public static AnimationDictionary CopIdleMale;
+            public static AnimationDictionary CopIdleFemale;
 
             static Dictionaries()
             {
@@ -27,13 +34,15 @@ namespace AutomaticRoadblocks.Animation
                 ObjectDictionary = new AnimationDictionary("pickup_object");
                 GrenadeDictionary = new AnimationDictionary("cover@weapon@grenade");
                 CarParkDictionary = new AnimationDictionary("amb@world_human_car_park_attendant@male@base");
-                GuardDictionary = new AnimationDictionary("amb@world_human_guard_patrol@male@idle_a");
+                CopIdleMale = new AnimationDictionary("amb@world_human_cop_idles@male@idle_a");
+                CopIdleFemale = new AnimationDictionary("amb@world_human_cop_idles@female@idle_a");
                 
                 StingerDictionary.LoadAndWait();
                 ObjectDictionary.LoadAndWait();
                 GrenadeDictionary.LoadAndWait();
                 CarParkDictionary.LoadAndWait();
-                GuardDictionary.LoadAndWait();
+                CopIdleMale.LoadAndWait();
+                CopIdleFemale.LoadAndWait();
             }
         }
     }

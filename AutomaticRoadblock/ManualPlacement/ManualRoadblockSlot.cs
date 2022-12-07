@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
@@ -51,10 +50,11 @@ namespace AutomaticRoadblocks.ManualPlacement
         {
             base.Spawn();
             RedirectTrafficCop.RedirectTraffic();
-            CopInstances
-                .Where(x => x != RedirectTrafficCop)
-                .ToList()
-                .ForEach(x => AnimationHelper.PlayAnimation(x.GameInstance, Animations.Dictionaries.GuardDictionary, "idle_a", AnimationFlags.Loop));
+            
+            foreach (var cop in CopInstances.Where(x => x != RedirectTrafficCop))
+            {
+                cop.Guard();
+            }
         }
 
         /// <inheritdoc />

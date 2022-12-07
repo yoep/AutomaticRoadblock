@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace AutomaticRoadblocks.Instances
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class ARPed : AbstractInstance<Ped>
     {
+        private static readonly Random Random = new();
+
         private readonly List<Entity> _attachments = new();
 
         public ARPed(Ped instance, float heading = 0f)
@@ -167,6 +170,20 @@ namespace AutomaticRoadblocks.Instances
             AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.CarParkDictionary, "base", AnimationFlags.Loop);
             return this;
         }
+        
+        public ARPed Guard()
+        {
+            if (IsInvalid)
+                return this;
+
+            var animationDictionary = GameInstance.IsMale
+                ? Animations.Dictionaries.CopIdleMale
+                : Animations.Dictionaries.CopIdleFemale;
+
+            UnequipAllWeapons();
+            AnimationHelper.PlayAnimation(GameInstance, animationDictionary, Animations.CopIdles[Random.Next(Animations.CopIdles.Length)], AnimationFlags.Loop);
+            return this;
+        }
 
         /// <summary>
         /// Attach the given entity to this ped.
@@ -259,7 +276,7 @@ namespace AutomaticRoadblocks.Instances
             if (IsInvalid || !vehicle.IsValid())
                 return this;
 
-            GameInstance?.WarpIntoVehicle(vehicle, (int)seat); 
+            GameInstance?.WarpIntoVehicle(vehicle, (int)seat);
             return this;
         }
 
