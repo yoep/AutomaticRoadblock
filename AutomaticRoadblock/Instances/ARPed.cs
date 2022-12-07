@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
@@ -156,6 +157,14 @@ namespace AutomaticRoadblocks.Instances
 
             Functions.SetCopAsBusy(GameInstance, true);
             GameInstance.Tasks.Pause(duration);
+            return this;
+        }
+
+        public ARPed RedirectTraffic()
+        {
+            Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
+            UnequipAllWeapons();
+            AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.CarParkDictionary, "base", AnimationFlags.Loop);
             return this;
         }
 

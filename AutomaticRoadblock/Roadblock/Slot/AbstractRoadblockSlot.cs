@@ -301,10 +301,22 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Calculate the position for cops which is behind the vehicle.
         /// This calculation is based on the width of the vehicle model.
         /// </summary>
-        /// <returns>Returns the position behind the vehicle.</returns>
         protected virtual Vector3 CalculatePositionBehindVehicle()
         {
             return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading) * (GetVehicleWidth() + 0.5f);
+        }
+
+        /// <summary>
+        /// Calculate the position to place the cops between the vehicle and the main barrier.
+        /// </summary>
+        protected Vector3 CalculatePositionLeftOfVehicle()
+        {
+            if (BackupType == EBackupUnit.None)
+            {
+                return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading - 180) * GetVehicleWidth();
+            }
+            
+            return Vehicle.GameInstance.LeftPosition + MathHelper.ConvertHeadingToDirection(Heading - 180) * 0.25f;
         }
 
         /// <summary>

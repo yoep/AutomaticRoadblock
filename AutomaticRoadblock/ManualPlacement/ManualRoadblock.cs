@@ -57,6 +57,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             if (CopsEnabled)
             {
                 base.Release(true);
+                InternalSlots.ForEach(x => x.Release());
             }
         }
 
