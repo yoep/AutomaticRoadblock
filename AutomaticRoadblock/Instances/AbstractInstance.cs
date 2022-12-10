@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Utils;
 using Rage;
 

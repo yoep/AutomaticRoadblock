@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Menu;
 using Rage;
 using RAGENativeUI.Elements;

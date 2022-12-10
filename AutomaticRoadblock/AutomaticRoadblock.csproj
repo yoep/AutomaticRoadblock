@@ -58,9 +58,9 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="AbstractionLayer\ILogger.cs" />
-        <Compile Include="AbstractionLayer\ELogLevel.cs" />
-        <Compile Include="AbstractionLayer\RageLogger.cs" />
+        <Compile Include="Logging\ILogger.cs" />
+        <Compile Include="Logging\ELogLevel.cs" />
+        <Compile Include="Logging\RageLogger.cs" />
         <Compile Include="Animation\AnimationHelper.cs" />
         <Compile Include="Animation\Animations.cs" />
         <Compile Include="Animation\AnimationExecutor.cs" />

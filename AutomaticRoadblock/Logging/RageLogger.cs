@@ -1,7 +1,7 @@
 using System;
 using Rage;
 
-namespace AutomaticRoadblocks.AbstractionLayer
+namespace AutomaticRoadblocks.Logging
 {
     public class RageLogger : ILogger
     {

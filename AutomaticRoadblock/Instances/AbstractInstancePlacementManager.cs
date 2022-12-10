@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;

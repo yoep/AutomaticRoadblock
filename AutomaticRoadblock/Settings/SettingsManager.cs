@@ -1,6 +1,6 @@
 using System;
 using System.Windows.Forms;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using Rage;
 
 namespace AutomaticRoadblocks.Settings

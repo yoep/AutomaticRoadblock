@@ -1,5 +1,5 @@
 using System.Windows.Forms;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 
 namespace AutomaticRoadblocks.Settings
 {

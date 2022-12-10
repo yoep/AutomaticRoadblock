@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 using Rage.Native;
@@ -15,22 +15,13 @@ namespace AutomaticRoadblocks.Utils
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
         /// <summary>
-        /// Get the current hour of the game.
-        /// </summary>
-        /// <returns>Returns the hour of the game.</returns>
-        public static int GetCurrentHour()
-        {
-            return World.TimeOfDay.Hours;
-        }
-
-        /// <summary>
         /// Get the current time period of the game.
         /// </summary>
         public static ETimePeriod TimePeriod
         {
             get
             {
-                var hour = GetCurrentHour();
+                var hour = World.TimeOfDay.Hours;
 
                 return hour switch
                 {

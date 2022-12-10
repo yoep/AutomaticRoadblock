@@ -1,7 +1,7 @@
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Settings;

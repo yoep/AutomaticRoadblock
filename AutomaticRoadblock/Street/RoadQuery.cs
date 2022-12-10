@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Street.Factory;
 using AutomaticRoadblocks.Street.Info;
 using JetBrains.Annotations;

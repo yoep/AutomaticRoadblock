@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Logging;
 using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Models

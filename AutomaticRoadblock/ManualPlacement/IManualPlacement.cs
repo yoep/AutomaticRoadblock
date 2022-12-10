@@ -12,7 +12,7 @@ using Rage;
 namespace AutomaticRoadblocks.ManualPlacement
 {
     /// <summary>
-    /// Creates & manages manual roadblocks which are not part of a pursuit.
+    /// Creates and manages manual roadblocks which are not part of a pursuit.
     /// </summary>
     [SuppressMessage("ReSharper", "UnusedType.Global")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]

@@ -1,5 +1,5 @@
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 using Rage.Native;

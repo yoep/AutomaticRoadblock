@@ -1,7 +1,7 @@
 using System;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Roadblock.Data;
 using Xunit.Abstractions;
 

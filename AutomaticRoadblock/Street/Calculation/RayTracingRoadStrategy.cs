@@ -1,4 +1,4 @@
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Utils;
 using Rage;
 using Rage.Native;

@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils;
 using Rage;

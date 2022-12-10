@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;

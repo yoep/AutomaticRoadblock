@@ -1,6 +1,6 @@
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.CloseRoad;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.Roadblock.Dispatcher;

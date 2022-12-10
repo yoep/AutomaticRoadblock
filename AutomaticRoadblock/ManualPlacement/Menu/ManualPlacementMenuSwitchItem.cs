@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
 using AutomaticRoadblocks.Utils;
