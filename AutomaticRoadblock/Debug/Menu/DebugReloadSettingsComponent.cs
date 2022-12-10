@@ -1,18 +1,16 @@
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.Utils;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
     public class DebugReloadSettingsComponent : IMenuComponent<UIMenuItem>
     {
-        private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
 
-        public DebugReloadSettingsComponent(IGame game, ISettingsManager settingsManager)
+        public DebugReloadSettingsComponent(ISettingsManager settingsManager)
         {
-            _game = game;
             _settingsManager = settingsManager;
         }
 
@@ -28,10 +26,10 @@ namespace AutomaticRoadblocks.Debug.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 _settingsManager.Load();
-                _game.DisplayNotification("Settings have been reloaded");
+                GameUtils.DisplayNotification("Settings have been reloaded");
             }, "Debug.ReloadSettings");
         }
     }

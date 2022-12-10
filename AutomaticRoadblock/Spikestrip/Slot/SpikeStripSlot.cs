@@ -11,6 +11,7 @@ using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Street.Info;
+using AutomaticRoadblocks.Utils;
 using JetBrains.Annotations;
 using Rage;
 
@@ -169,9 +170,9 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
             var deployTimeColor = timeTaken < 1000 ? "g" : "r";
             var distanceColor = distanceFromTarget >= 15f ? "g" : "r";
 
-            Game.DisplayNotificationDebug("~b~Spike strip deployed~s~~n~" +
-                                          $"Deploy time: ~{deployTimeColor}~{timeTaken}ms~s~~n~" +
-                                          $"Distance: ~{distanceColor}~{distanceFromTarget}");
+            GameUtils.DisplayNotificationDebug("~b~Spike strip deployed~s~~n~" +
+                                               $"Deploy time: ~{deployTimeColor}~{timeTaken}ms~s~~n~" +
+                                               $"Distance: ~{distanceColor}~{distanceFromTarget}");
             Logger.Trace("--- Spike strip slot performance stats ---\n" +
                          $"Deploy time: ~{deployTimeColor}~{timeTaken}ms\n" +
                          $"Distance: ~{distanceColor}~{distanceFromTarget}");
@@ -185,7 +186,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         private void OnSpikeStripHit()
         {
             // delay the undeploy to pop additional tires
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 GameFiber.Wait(DelayUndeployment);
                 DoUndeploy();
@@ -199,7 +200,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                 return;
 
             Logger.Trace("Starting spike strip slot monitor");
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (!_hasBeenDeployed && TargetVehicle != null && TargetVehicle.IsValid())
                 {
@@ -208,7 +209,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
                         DoSpikeStripDeploy();
                     }
 
-                    Game.FiberYield();
+                    GameFiber.Yield();
                 }
 
                 Logger.Debug("Spike strip monitor stopped");
@@ -217,7 +218,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         private void DoUndeploy()
         {
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 GameFiber.Wait(DelayBetweenStateChangeAndUndeploy);
                 ExecuteWithCop(cop =>
@@ -230,7 +231,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         {
             if (_hasBeenDeployed)
             {
-                Game.DisplayNotificationDebug($"~r~Unable to deploy {GetType()}, has already been deployed");
+                GameUtils.DisplayNotificationDebug($"~r~Unable to deploy {GetType()}, has already been deployed");
                 return;
             }
 
@@ -284,7 +285,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
 
         private void ExecuteWithCop(Action<ARPed> action)
         {
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 var cop = Cops.FirstOrDefault();
                 if (cop != null)

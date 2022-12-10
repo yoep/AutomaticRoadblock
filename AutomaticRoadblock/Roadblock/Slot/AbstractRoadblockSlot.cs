@@ -28,7 +28,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected static readonly Random Random = new();
 
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        protected readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         private readonly bool _shouldAddLights;
         private ERoadblockSlotState _state;
@@ -474,15 +473,15 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         private void DrawRoadblockDebugInfo()
         {
             Logger.Trace("Drawing the roadblock slot debug information within the preview");
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 var direction = MathHelper.ConvertHeadingToDirection(Heading);
                 var position = OffsetPosition + Vector3.WorldUp * 0.25f;
 
                 while (IsPreviewActive)
                 {
-                    Game.DrawArrow(position, direction, Rotator.Zero, 2f, Color.Yellow);
-                    Game.FiberYield();
+                    GameUtils.DrawArrow(position, direction, Rotator.Zero, 2f, Color.Yellow);
+                    GameFiber.Yield();
                 }
             }, "IRoadblockSlot.CreatePreview");
         }

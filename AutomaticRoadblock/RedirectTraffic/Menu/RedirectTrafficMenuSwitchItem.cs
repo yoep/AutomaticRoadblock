@@ -4,6 +4,8 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
+using AutomaticRoadblocks.Utils;
+using Rage;
 using RAGENativeUI;
 
 namespace AutomaticRoadblocks.RedirectTraffic.Menu
@@ -11,16 +13,14 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
     public class RedirectTrafficMenuSwitchItem : IMenuSwitchItem, IDisposable
     {
         private readonly ILogger _logger;
-        private readonly IGame _game;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
         private readonly ILocalizer _localizer;
 
         private bool _running = true;
 
-        public RedirectTrafficMenuSwitchItem(ILogger logger, IGame game, IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
+        public RedirectTrafficMenuSwitchItem(ILogger logger,  IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
             _logger = logger;
-            _game = game;
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
             _localizer = localizer;
 
@@ -52,12 +52,11 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
 
         private void Process()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (_running)
                 {
-                    _game.FiberYield();
-
+                    GameFiber.Yield();
                     DoProcessTick();
                 }
             }, "RedirectTrafficMenuSwitchItem.Process");
@@ -79,7 +78,7 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
             catch (Exception ex)
             {
                 _logger.Error($"Traffic redirection preview failed, {ex.Message}", ex);
-                _game.DisplayNotification($"~r~{_localizer[LocalizationKey.RedirectTrafficUnknownError]}");
+                GameUtils.DisplayNotification($"~r~{_localizer[LocalizationKey.RedirectTrafficUnknownError]}");
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Utils;
 using LSPD_First_Response.Mod.API;
 using Rage;
 using RAGENativeUI.Elements;
@@ -12,14 +13,12 @@ namespace AutomaticRoadblocks.Debug.Menu
     public class DebugPursuitForceOnFootComponent : IMenuComponent<UIMenuItem>, IDisposable
     {
         private readonly ILogger _logger;
-        private readonly IGame _game;
 
         private bool _active = true;
 
-        public DebugPursuitForceOnFootComponent(ILogger logger, IGame game)
+        public DebugPursuitForceOnFootComponent(ILogger logger)
         {
             _logger = logger;
-            _game = game;
         }
 
         /// <inheritdoc />
@@ -58,12 +57,12 @@ namespace AutomaticRoadblocks.Debug.Menu
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private void Init()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (_active)
                 {
                     MenuItem.Enabled = Functions.GetActivePursuit() != null;
-                    _game.FiberYield();
+                   GameFiber.Yield();
                 }
             }, "PursuitForceOnFootComponent.PursuitListener");
         }

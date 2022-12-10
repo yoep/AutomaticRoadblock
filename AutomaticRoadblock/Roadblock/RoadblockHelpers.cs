@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
 using LSPD_First_Response.Mod.API;
@@ -13,7 +14,6 @@ namespace AutomaticRoadblocks.Roadblock
     internal static class RoadblockHelpers
     {
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         /// <summary>
         /// Release the given instances back to LSPDFR.
@@ -53,13 +53,13 @@ namespace AutomaticRoadblocks.Roadblock
             catch (Exception ex)
             {
                 Logger.Error($"Failed to release instances, {ex.Message}", ex);
-                Game.DisplayNotificationDebug("~r~Failed to release instances to LSPDFR");
+                GameUtils.DisplayNotificationDebug("~r~Failed to release instances to LSPDFR");
             }
         }
 
         private static void TryEnteringVehicle(ARPed ped, Vehicle vehicle, EVehicleSeat vehicleSeat)
         {
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 if (vehicle != null && vehicle.IsValid())
                 {

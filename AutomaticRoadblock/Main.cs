@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.AbstractionLayer.Implementation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.CloseRoad;
 using AutomaticRoadblocks.CloseRoad.Menu;
@@ -28,6 +27,7 @@ using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.ShortKeys;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
+using AutomaticRoadblocks.Utils;
 using LSPD_First_Response.Mod.API;
 using Rage;
 using RAGENativeUI.Elements;
@@ -72,7 +72,6 @@ namespace AutomaticRoadblocks
         public override void Finally()
         {
             var logger = IoC.Instance.GetInstance<ILogger>();
-            var game = IoC.Instance.GetInstance<IGame>();
             var disposables = IoC.Instance.GetInstances<IDisposable>();
 
             try
@@ -83,12 +82,12 @@ namespace AutomaticRoadblocks
                     instance.Dispose();
                 }
 
-                game.DisplayPluginNotification("~g~has been unloaded");
+                GameUtils.DisplayPluginNotification("~g~has been unloaded");
             }
             catch (Exception ex)
             {
                 logger.Error("An error occurred while unloading the plugin", ex);
-                game.DisplayPluginNotification("~r~failed to correctly unload the plugin, see logs for more info");
+                GameUtils.DisplayPluginNotification("~r~failed to correctly unload the plugin, see logs for more info");
             }
         }
 
@@ -97,7 +96,6 @@ namespace AutomaticRoadblocks
         private static void InitializeIoC()
         {
             IoC.Instance
-                .RegisterSingleton<IGame>(typeof(RageImpl))
                 .RegisterSingleton<ILogger>(typeof(RageLogger))
                 .RegisterSingleton<ILocalizer>(typeof(Localizer))
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
@@ -188,10 +186,9 @@ namespace AutomaticRoadblocks
         private static void InitializeIntegrations()
         {
             var ioc = IoC.Instance;
-            var game = ioc.GetInstance<IGame>();
             var logger = ioc.GetInstance<ILogger>();
 
-            game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 GameFiber.Sleep(WaitTimeForIntegrationsInitialization);
                 logger.Trace("Verifying available plugin integrations");
@@ -216,7 +213,6 @@ namespace AutomaticRoadblocks
         {
             var ioC = IoC.Instance;
             var logger = ioC.GetInstance<ILogger>();
-            var game = ioC.GetInstance<IGame>();
             var listeners = ioC.GetInstances<IOnDutyListener>();
             logger.Trace($"On duty state changed to {onDuty}");
 
@@ -225,12 +221,12 @@ namespace AutomaticRoadblocks
                 listeners.ToList().ForEach(x => x.OnDutyStarted());
                 ioC.GetInstance<IMenu>().Activate();
 
-                game.NewSafeFiber(() =>
+                GameUtils.NewSafeFiber(() =>
                 {
                     logger.Info($"Loaded version {Version}");
 
                     GameFiber.Wait(2 * 1000);
-                    game.DisplayPluginNotification($"{Version}, by ~b~yoep~s~, has been loaded");
+                    GameUtils.DisplayPluginNotification($"{Version}, by ~b~yoep~s~, has been loaded");
                 }, "Main.DisplayPluginNotification");
             }
             else

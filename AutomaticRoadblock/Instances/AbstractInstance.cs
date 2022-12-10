@@ -8,7 +8,6 @@ namespace AutomaticRoadblocks.Instances
     public abstract class AbstractInstance<T> : IARInstance<T> where T : Entity
     {
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        protected readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         private bool _isReleased;
 
@@ -90,7 +89,7 @@ namespace AutomaticRoadblocks.Instances
 
         private void MonitorState()
         {
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (!_isReleased)
                 {
@@ -115,7 +114,7 @@ namespace AutomaticRoadblocks.Instances
         private void StateChanged(string field, object newValue)
         {
             Logger.Warn($"{GetType()}#{field} state changed to {newValue}");
-            Game.DisplayNotificationDebug($"~o~State changed of ~s~{GetType()}~c~#~b~{field}");
+            GameUtils.DisplayNotificationDebug($"~o~State changed of ~s~{GetType()}~c~#~b~{field}");
         }
 
         #endregion

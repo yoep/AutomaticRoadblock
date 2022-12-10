@@ -1,19 +1,17 @@
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Utils;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.CloseRoad.Menu
 {
     public class CloseRoadNearbyPreviewComponentItem : IMenuComponent<UIMenuItem>
     {
-        private readonly IGame _game;
         private readonly ICloseRoadDispatcher _closeRoadDispatcher;
 
         private bool _isClosed;
 
-        public CloseRoadNearbyPreviewComponentItem(IGame game, ICloseRoadDispatcher closeRoadDispatcher)
+        public CloseRoadNearbyPreviewComponentItem(ICloseRoadDispatcher closeRoadDispatcher)
         {
-            _game = game;
             _closeRoadDispatcher = closeRoadDispatcher;
         }
 
@@ -42,7 +40,7 @@ namespace AutomaticRoadblocks.CloseRoad.Menu
         private void CloseNearbyRoad()
         {
             _isClosed = true;
-            _closeRoadDispatcher.CloseNearbyRoad(_game.PlayerPosition, true);
+            _closeRoadDispatcher.CloseNearbyRoad(GameUtils.PlayerPosition, true);
             MenuItem.Text = AutomaticRoadblocksPlugin.OpenNearbyRoad;
         }
 

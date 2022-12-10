@@ -1,4 +1,3 @@
-using AutomaticRoadblocks.AbstractionLayer;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -44,7 +43,7 @@ namespace AutomaticRoadblocks.Utils
         /// <param name="sound">The sound string to play.</param>
         public static void PlayScannerAudioNonBlocking(string sound)
         {
-            IoC.Instance.GetInstance<IGame>().NewSafeFiber(() => PlayScannerAudio(sound), "LspdfrUtils.Audio");
+            GameUtils.NewSafeFiber(() => PlayScannerAudio(sound), "LspdfrUtils.Audio");
         }
 
         /// <summary>

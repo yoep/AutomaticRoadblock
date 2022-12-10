@@ -1,5 +1,9 @@
+using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
+using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Utils.Type;
 using Rage;
 using Rage.Native;
@@ -8,6 +12,8 @@ namespace AutomaticRoadblocks.Utils
 {
     public static class GameUtils
     {
+        private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+
         /// <summary>
         /// Get the current hour of the game.
         /// </summary>
@@ -87,6 +93,101 @@ namespace AutomaticRoadblocks.Utils
             Assert.NotNull(modifierKey, "secondKey cannot be null");
 
             return Game.IsKeyDown(key) && (modifierKey == Keys.None || Game.IsKeyDownRightNow(modifierKey));
+        }
+
+        /// <summary>
+        /// The player's current position.
+        /// </summary>
+        public static Vector3 PlayerPosition => Game.LocalPlayer.Character.Position;
+
+        /// <summary>
+        /// The player's current heading.
+        /// </summary>
+        public static float PlayerHeading => Game.LocalPlayer.Character.Heading;
+
+        /// <summary>
+        /// The player's current or last entered vehicle.
+        /// </summary>
+        public static Vehicle PlayerVehicle => Game.LocalPlayer.LastVehicle;
+
+        /// <summary>
+        /// Create a new safe game fiber for the given action.
+        /// This fiber has access to entities and prevents the plugin from crashing in case of unexpected errors.
+        /// </summary>
+        /// <param name="action">The action to execute on the fiber.</param>
+        /// <param name="name">The new fiber name.</param>
+        public static void NewSafeFiber(Action action, string name)
+        {
+            GameFiber.StartNew(() =>
+            {
+                try
+                {
+                    action.Invoke();
+                }
+                catch (ThreadInterruptedException)
+                {
+                    //ignore as this is probably on plugin termination and thread is in waiting state
+                }
+                catch (ThreadAbortException)
+                {
+                    //ignore as this is probably on plugin termination and thread was executing a method and couldn't exit correctly
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("An unexpected error occurred in '" + name + "' thread, error: " + ex.Message, ex);
+                    DisplayPluginNotification("~r~" + name + " thread has stopped working, see logs for more info");
+                }
+            }, name);
+        }
+
+        /// <summary>
+        /// Display a notification with the plugin name.
+        /// </summary>
+        /// <param name="message">The message to display.</param>
+        public static void DisplayPluginNotification(string message)
+        {
+            Assert.HasText(message, "message cannot be empty");
+            Game.DisplayNotification("~b~" + AutomaticRoadblocksPlugin.Name + " ~s~" + message.Trim());
+        }
+
+        /// <summary>
+        /// Display a notification.
+        /// </summary>
+        /// <param name="message">The message to display.</param>
+        public static void DisplayNotification(string message)
+        {
+            Assert.HasText(message, "message cannot be empty");
+            Game.DisplayNotification(message.Trim());
+        }
+
+        [Conditional("DEBUG")]
+        public static void DisplayNotificationDebug(string message)
+        {
+            InternalDebugNotification(message);
+        }
+
+        [Conditional("DEBUG")]
+        public static void DrawLine(Vector3 start, Vector3 end, Color color)
+        {
+            Rage.Debug.DrawLineDebug(start, end, color);
+        }
+
+        [Conditional("DEBUG")]
+        public static void DrawArrow(Vector3 position, Vector3 direction, Rotator rotationOffset, float scale, Color color)
+        {
+            Rage.Debug.DrawArrowDebug(position, direction, rotationOffset, scale, color);
+        }
+
+        [Conditional("DEBUG")]
+        public static void DrawSphere(Vector3 position, float radius, Color color)
+        {
+            Rage.Debug.DrawSphereDebug(position, radius, color);
+        }
+
+        [Conditional("DEBUG")]
+        private static void InternalDebugNotification(string message)
+        {
+            Game.DisplayNotification(message.Trim());
         }
     }
 }

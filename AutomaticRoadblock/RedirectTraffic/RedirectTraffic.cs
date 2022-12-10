@@ -19,7 +19,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private const float DefaultVehicleLength = 3f;
         private const string ConeWithLightName = "cone_with_light";
 
-        private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         private readonly List<IARInstance<Entity>> _instances = new();
 
@@ -393,7 +392,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private Road.Lane GetLaneClosestToPlayer()
         {
-            var playerPosition = Game.PlayerPosition;
+            var playerPosition = GameUtils.PlayerPosition;
             var rightSide = Road.RightSide;
             var leftSide = Road.LeftSide;
             var closestLaneDistance = 9999f;

@@ -20,7 +20,6 @@ namespace AutomaticRoadblocks.Pursuit
         private const int TimeAfterLastDeploymentBeforeIncreasingLevel = 10 * 1000;
 
         private readonly ILogger _logger;
-        private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly IRoadblockDispatcher _roadblockDispatcher;
         private readonly ILocalizer _localizer;
@@ -36,10 +35,9 @@ namespace AutomaticRoadblocks.Pursuit
         private PursuitLevel _pursuitLevel = PursuitLevel.Level1;
         private bool _keyListenerActive;
 
-        public PursuitManager(ILogger logger, IGame game, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher, ILocalizer localizer)
+        public PursuitManager(ILogger logger, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher, ILocalizer localizer)
         {
             _logger = logger;
-            _game = game;
             _settingsManager = settingsManager;
             _roadblockDispatcher = roadblockDispatcher;
             _localizer = localizer;
@@ -78,7 +76,7 @@ namespace AutomaticRoadblocks.Pursuit
             set
             {
                 _pursuitLevel = value;
-                _timeLastLevelChanged = _game.GameTime;
+                _timeLastLevelChanged = Game.GameTime;
                 _logger.Debug($"Pursuit level has changed to {value}");
             }
         }
@@ -184,12 +182,12 @@ namespace AutomaticRoadblocks.Pursuit
         /// <inheritdoc />
         public void DispatchPreview(ERoadblockDistance roadblockDistance)
         {
-            var vehicle = GetSuspectVehicle() ?? _game.PlayerVehicle;
+            var vehicle = GetSuspectVehicle() ?? GameUtils.PlayerVehicle;
 
             if (vehicle == null)
             {
                 _logger.Warn("Unable to create pursuit roadblock preview, no active vehicle in pursuit or player not in vehicle");
-                _game.DisplayNotification(_localizer[LocalizationKey.RoadblockNoPursuitActive]);
+                GameUtils.DisplayNotification(_localizer[LocalizationKey.RoadblockNoPursuitActive]);
                 return;
             }
 
@@ -239,8 +237,8 @@ namespace AutomaticRoadblocks.Pursuit
             _logger.Trace("Pursuit has been started");
             _totalCopsKilled = 0;
             _totalRoadblocksDeployed = 0;
-            _timePursuitStarted = _game.GameTime;
-            _timeLastLevelChanged = _game.GameTime;
+            _timePursuitStarted = Game.GameTime;
+            _timeLastLevelChanged = Game.GameTime;
             _timeLastLevelChangedForShotsFired = 0;
             _roadblockDispatcher.RoadblockCopKilled += RoadblockCopKilled;
             _roadblockDispatcher.RoadblockStateChanged += RoadblockStateChanged;
@@ -273,7 +271,7 @@ namespace AutomaticRoadblocks.Pursuit
 
         private void StartPursuitMonitor()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (IsPursuitActive)
                 {
@@ -350,7 +348,7 @@ namespace AutomaticRoadblocks.Pursuit
             if (IsAnySuspectAimingOrShooting() && IsAutomaticLevelIncreaseForShotsFiredAllowed())
             {
                 _logger.Debug("Suspect is shooting/aiming, increasing level");
-                _timeLastLevelChangedForShotsFired = _game.GameTime;
+                _timeLastLevelChangedForShotsFired = Game.GameTime;
                 UpdatePursuitLevel(PursuitLevel.From(PursuitLevel.Level + 1));
             }
 
@@ -388,7 +386,7 @@ namespace AutomaticRoadblocks.Pursuit
 
         private bool IsAutomaticLevelIncreaseForShotsFiredAllowed()
         {
-            var allowedSinceLastLevelChange = _game.GameTime - _timeLastLevelChangedForShotsFired > TimeBetweenLevelIncreaseShotsFired;
+            var allowedSinceLastLevelChange = Game.GameTime - _timeLastLevelChangedForShotsFired > TimeBetweenLevelIncreaseShotsFired;
 
             return (PursuitLevel.Level < 2 && allowedSinceLastLevelChange) ||
                    (PursuitLevel.Level == 2 && _totalRoadblocksDeployed > 0 && allowedSinceLastLevelChange) ||
@@ -421,7 +419,7 @@ namespace AutomaticRoadblocks.Pursuit
                 return false;
             }
 
-            _timeLastDispatchedRoadblock = _game.GameTime;
+            _timeLastDispatchedRoadblock = Game.GameTime;
             _totalRoadblocksDeployed++;
             _logger.Info($"Pursuit roadblock has been dispatched at {roadblock.Position} with state {roadblock.State}");
             return true;
@@ -444,7 +442,7 @@ namespace AutomaticRoadblocks.Pursuit
             catch (Exception ex)
             {
                 _logger.Error($"Failed to dispatch pursuit roadblock, {ex.Message}", ex);
-                _game.DisplayNotificationDebug("~r~Pursuit roadblock dispatch failed");
+                GameUtils.DisplayNotificationDebug("~r~Pursuit roadblock dispatch failed");
                 GameFiber.Wait(5 * 1000);
             }
         }
@@ -452,7 +450,7 @@ namespace AutomaticRoadblocks.Pursuit
         private bool DispatchForNonActivePursuit(bool userRequest, bool force, ERoadblockDistance roadblockDistance)
         {
             if (!userRequest && force)
-                return DoDispatch(_game.PlayerVehicle, false, true, roadblockDistance);
+                return DoDispatch(GameUtils.PlayerVehicle, false, true, roadblockDistance);
 
             _logger.Warn("Unable to dispatch roadblock, no active pursuit ongoing");
             return false;
@@ -472,7 +470,7 @@ namespace AutomaticRoadblocks.Pursuit
                 return false;
 
             var roadblocksSettings = _settingsManager.AutomaticRoadblocksSettings;
-            var gameTime = _game.GameTime;
+            var gameTime = Game.GameTime;
 
             return gameTime - _timePursuitStarted >= roadblocksSettings.DispatchAllowedAfter * 1000 &&
                    gameTime - _timeLastDispatchedRoadblock >= roadblocksSettings.DispatchInterval * 1000 &&
@@ -484,7 +482,7 @@ namespace AutomaticRoadblocks.Pursuit
         private void RoadblockStateChanged(IRoadblock roadblock, ERoadblockState newState)
         {
             if (newState == ERoadblockState.Active)
-                _timeLastRoadblockActive = _game.GameTime;
+                _timeLastRoadblockActive = Game.GameTime;
         }
 
         private void RoadblockCopKilled(IRoadblock roadblock)
@@ -524,13 +522,13 @@ namespace AutomaticRoadblocks.Pursuit
 
         private bool HasEnoughTimePassedBetweenLastLevelIncrease()
         {
-            return _game.GameTime - _timeLastLevelChanged > _settingsManager.AutomaticRoadblocksSettings.TimeBetweenAutoLevelIncrements * 1000;
+            return Game.GameTime - _timeLastLevelChanged > _settingsManager.AutomaticRoadblocksSettings.TimeBetweenAutoLevelIncrements * 1000;
         }
 
         private bool HasEnoughTimePassedAfterLastDeployment()
         {
             // this check should prevent the level from being increased directly after a roadblock has been spawned
-            return _game.GameTime - _timeLastDispatchedRoadblock > TimeAfterLastDeploymentBeforeIncreasingLevel;
+            return Game.GameTime - _timeLastDispatchedRoadblock > TimeAfterLastDeploymentBeforeIncreasingLevel;
         }
 
         private void OnStateChanged()
@@ -554,12 +552,12 @@ namespace AutomaticRoadblocks.Pursuit
         private void StartKeyListener()
         {
             _keyListenerActive = true;
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 _logger.Debug("Pursuit manager key listener has been started");
                 while (_keyListenerActive)
                 {
-                    _game.FiberYield();
+                    GameFiber.Yield();
 
                     try
                     {
@@ -592,13 +590,13 @@ namespace AutomaticRoadblocks.Pursuit
         [Conditional("DEBUG")]
         private void NotifyPursuitLevelIncreased()
         {
-            _game.DisplayNotification($"Pursuit level has changed to ~g~{PursuitLevel.Level}");
+            GameUtils.DisplayNotification($"Pursuit level has changed to ~g~{PursuitLevel.Level}");
         }
 
         [Conditional("DEBUG")]
         private void NotifySuspectKilledCop()
         {
-            _game.DisplayNotification($"Suspect killed a total of ~r~{_totalCopsKilled}~s~ cops");
+            GameUtils.DisplayNotification($"Suspect killed a total of ~r~{_totalCopsKilled}~s~ cops");
         }
 
         private static ERoadblockLevel ToRoadblockLevel(PursuitLevel pursuitLevel)

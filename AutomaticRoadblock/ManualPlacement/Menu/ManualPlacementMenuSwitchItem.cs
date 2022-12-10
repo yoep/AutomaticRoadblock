@@ -4,22 +4,22 @@ using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
+using AutomaticRoadblocks.Utils;
+using Rage;
 using RAGENativeUI;
 
 namespace AutomaticRoadblocks.ManualPlacement.Menu
 {
     public class ManualPlacementMenuSwitchItem : IMenuSwitchItem, IDisposable
     {
-        private readonly IGame _game;
         private readonly ILogger _logger;
         private readonly IManualPlacement _manualPlacement;
         private readonly ILocalizer _localizer;
 
         private bool _running = true;
 
-        public ManualPlacementMenuSwitchItem(IGame game, ILogger logger, IManualPlacement manualPlacement, ILocalizer localizer)
+        public ManualPlacementMenuSwitchItem( ILogger logger, IManualPlacement manualPlacement, ILocalizer localizer)
         {
-            _game = game;
             _logger = logger;
             _manualPlacement = manualPlacement;
             _localizer = localizer;
@@ -52,11 +52,11 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
 
         private void Process()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (_running)
                 {
-                    _game.FiberYield();
+                    GameFiber.Yield();
                     DoPreviewTick();
                 }
             }, "ManualPlacementMenuSwitchItem.Process");
@@ -78,7 +78,7 @@ namespace AutomaticRoadblocks.ManualPlacement.Menu
             catch (Exception ex)
             {
                 _logger.Error($"Manual placement preview failed, {ex.Message}", ex);
-                _game.DisplayNotification("~r~An unexpected error occurred while handling the manual roadblock placement");
+                GameUtils.DisplayNotification("~r~An unexpected error occurred while handling the manual roadblock placement");
             }
         }
     }

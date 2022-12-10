@@ -21,7 +21,6 @@ namespace AutomaticRoadblocks.SpikeStrip
     public class SpikeStrip : ISpikeStrip
     {
         protected static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         private AnimationExecutor _animation;
         private long _spawnTimeDuration;
@@ -106,7 +105,7 @@ namespace AutomaticRoadblocks.SpikeStrip
             if (IsPreviewActive)
                 return;
 
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 Logger.Trace($"Creating spike strip preview for {this}");
                 Road.CreatePreview();
@@ -120,8 +119,8 @@ namespace AutomaticRoadblocks.SpikeStrip
 
                 while (IsPreviewActive)
                 {
-                    Game.DrawSphere(Position, 0.2f, Color.Red);
-                    Game.FiberYield();
+                    GameUtils.DrawSphere(Position, 0.2f, Color.Red);
+                    GameFiber.Yield();
                 }
             }, "SpikeStrip.Preview");
         }
@@ -143,19 +142,19 @@ namespace AutomaticRoadblocks.SpikeStrip
         /// <inheritdoc />
         public void Spawn()
         {
-            Game.NewSafeFiber(DoInternalSpawn, "SpikeStrip.Spawn");
+            GameUtils.NewSafeFiber(DoInternalSpawn, "SpikeStrip.Spawn");
         }
 
         /// <inheritdoc />
         public void Deploy()
         {
-            Game.NewSafeFiber(DoInternalDeploy, "SpikeStrip.Deploy");
+            GameUtils.NewSafeFiber(DoInternalDeploy, "SpikeStrip.Deploy");
         }
 
         /// <inheritdoc />
         public void Undeploy()
         {
-            Game.NewSafeFiber(DoInternalUndeploy, "SpikeStrip.Undeploy");
+            GameUtils.NewSafeFiber(DoInternalUndeploy, "SpikeStrip.Undeploy");
         }
 
         public override string ToString()
@@ -207,7 +206,7 @@ namespace AutomaticRoadblocks.SpikeStrip
             State = state;
 
             // move the state invocation to another thread so it doesn't block the current one
-            Game.NewSafeFiber(() => { StateChanged?.Invoke(this, state); }, $"{GetType()}.UpdateState");
+            GameUtils.NewSafeFiber(() => { StateChanged?.Invoke(this, state); }, $"{GetType()}.UpdateState");
         }
 
         private void DoInternalSpawn()
@@ -234,7 +233,7 @@ namespace AutomaticRoadblocks.SpikeStrip
             // wait for the spike strip to become available
             while (State != ESpikeStripState.Undeployed)
             {
-                Game.FiberYield();
+                GameFiber.Yield();
             }
 
             _waitForUndeployCompleted = DateTime.Now.Ticks;
@@ -268,14 +267,14 @@ namespace AutomaticRoadblocks.SpikeStrip
 
         private void StartMonitor()
         {
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 Logger.Debug("Starting spike strip monitor");
                 while (State is not (ESpikeStripState.Preparing or ESpikeStripState.Undeployed or ESpikeStripState.Disposed))
                 {
                     DoNearbyVehiclesCheck();
                     DoAdditionalVerifications();
-                    Game.FiberYield();
+                    GameFiber.Yield();
                 }
 
                 Logger.Debug("Spike strip monitor completed");

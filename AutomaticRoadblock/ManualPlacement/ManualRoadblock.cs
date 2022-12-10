@@ -7,6 +7,7 @@ using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
+using AutomaticRoadblocks.Utils;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -85,7 +86,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             // check which lane(s) we need to block
             if (PlacementType == PlacementType.ClosestToPlayer)
             {
-                lanes = new List<Road.Lane> { Road.LaneClosestTo(Game.PlayerPosition) };
+                lanes = new List<Road.Lane> { Road.LaneClosestTo(GameUtils.PlayerPosition) };
             }
             else if (PlacementType == PlacementType.SameDirectionAsRoad)
             {

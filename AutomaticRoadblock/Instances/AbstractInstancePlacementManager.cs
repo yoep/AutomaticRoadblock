@@ -15,14 +15,12 @@ namespace AutomaticRoadblocks.Instances
 {
     public abstract class AbstractInstancePlacementManager<T> : IPreviewSupport, IDisposable where T : IPlaceableInstance
     {
-        protected readonly IGame Game;
         protected readonly ILogger Logger;
 
         protected VehicleNodeInfo LastDeterminedStreet;
 
-        protected AbstractInstancePlacementManager(IGame game, ILogger logger)
+        protected AbstractInstancePlacementManager(ILogger logger)
         {
-            Game = game;
             Logger = logger;
         }
 
@@ -223,7 +221,7 @@ namespace AutomaticRoadblocks.Instances
         {
             T closestInstance = default;
             var closestInstanceDistance = 9999f;
-            var playerPosition = Game.PlayerPosition;
+            var playerPosition = GameUtils.PlayerPosition;
 
             foreach (var instance in Instances.Where(x => !x.IsPreviewActive))
             {

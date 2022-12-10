@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Roadblock;
+using AutomaticRoadblocks.Utils;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
@@ -10,12 +10,10 @@ namespace AutomaticRoadblocks.Pursuit.Menu
     public class PursuitDispatchPreviewComponent : IMenuComponent<UIMenuListScrollerItem<ERoadblockDistance>>
     {
         private readonly IPursuitManager _pursuitManager;
-        private readonly IGame _game;
 
-        public PursuitDispatchPreviewComponent(IPursuitManager pursuitManager, IGame game)
+        public PursuitDispatchPreviewComponent(IPursuitManager pursuitManager)
         {
             _pursuitManager = pursuitManager;
-            _game = game;
         }
 
         /// <inheritdoc />
@@ -39,7 +37,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _game.NewSafeFiber(() => _pursuitManager.DispatchPreview(MenuItem.SelectedItem), "PursuitDispatchPreviewComponent.OnMenuActivation");
+            GameUtils.NewSafeFiber(() => _pursuitManager.DispatchPreview(MenuItem.SelectedItem), "PursuitDispatchPreviewComponent.OnMenuActivation");
         }
 
         [IoC.PostConstruct]

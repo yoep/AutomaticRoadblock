@@ -22,7 +22,6 @@ namespace AutomaticRoadblocks.CloseRoad
         private const string AudioCloseRoad = "ROADBLOCK_CLOSE_ROAD";
 
         private readonly ILogger _logger;
-        private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly IModelProvider _modelProvider;
         private readonly ILocalizer _localizer;
@@ -30,10 +29,9 @@ namespace AutomaticRoadblocks.CloseRoad
         private readonly List<IRoadClosure> _instances = new();
         private bool _active;
 
-        public CloseRoadDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, IModelProvider modelProvider, ILocalizer localizer)
+        public CloseRoadDispatcher(ILogger logger,ISettingsManager settingsManager, IModelProvider modelProvider, ILocalizer localizer)
         {
             _logger = logger;
-            _game = game;
             _settingsManager = settingsManager;
             _modelProvider = modelProvider;
             _localizer = localizer;
@@ -85,7 +83,7 @@ namespace AutomaticRoadblocks.CloseRoad
                 }
 
                 LspdfrUtils.PlayScannerAudioNonBlocking($"{AudioAccepted} {AudioCloseRoad}");
-                _game.DisplayNotificationDebug(_localizer[LocalizationKey.RoadClosed]);
+                GameUtils.DisplayNotificationDebug(_localizer[LocalizationKey.RoadClosed]);
                 return instance;
             }
             catch (Exception ex)
@@ -141,19 +139,19 @@ namespace AutomaticRoadblocks.CloseRoad
         private void StartKeyListener()
         {
             _active = true;
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 _logger.Debug("Close road key listener has been started");
                 while (_active)
                 {
-                    _game.FiberYield();
+                    GameFiber.Yield();
 
                     try
                     {
                         var settings = _settingsManager.CloseRoadSettings;
                         if (GameUtils.IsKeyPressed(settings.CloseRoadKey, settings.CloseRoadModifierKey))
                         {
-                            CloseNearbyRoad(_game.PlayerPosition);
+                            CloseNearbyRoad(GameUtils.PlayerPosition);
                         }
                     }
                     catch (Exception ex)

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
 using Rage;
@@ -35,13 +35,10 @@ namespace AutomaticRoadblocks.Debug.Menu
             "pounder2"
         };
 
-        private readonly IGame _game;
-
         private LHandle _currentPursuit;
 
-        public DebugPursuitToggleComponent(IGame game)
+        public DebugPursuitToggleComponent()
         {
-            _game = game;
             Events.OnPursuitEnded += OnPursuitEnded;
         }
 
@@ -71,16 +68,16 @@ namespace AutomaticRoadblocks.Debug.Menu
         [Conditional("DEBUG")]
         private void StartPursuit()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 _currentPursuit = Functions.CreatePursuit();
 
                 var type = MenuItem.SelectedItem;
-                var vehicleNode = RoadQuery.FindClosestRoad(_game.PlayerPosition + MathHelper.ConvertHeadingToDirection(_game.PlayerHeading) * 25f,
+                var vehicleNode = RoadQuery.FindClosestRoad(GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) * 25f,
                     EVehicleNodeType.AllNodes);
                 var driver = new Ped(vehicleNode.Position);
                 var passenger = new Ped(vehicleNode.Position);
-                var vehicle = new Vehicle(new Model(VehicleModels[Random.Next(VehicleModels.Count)]), vehicleNode.Position, _game.PlayerHeading);
+                var vehicle = new Vehicle(new Model(VehicleModels[Random.Next(VehicleModels.Count)]), vehicleNode.Position, GameUtils.PlayerHeading);
 
                 driver.RelationshipGroup = RelationshipGroup.Gang1;
                 passenger.RelationshipGroup = RelationshipGroup.Gang1;
