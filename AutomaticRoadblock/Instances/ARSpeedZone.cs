@@ -11,7 +11,6 @@ namespace AutomaticRoadblocks.Instances
 {
     public class ARSpeedZone : IPreviewSupport, IDisposable
     {
-        private readonly IGame _game = IoC.Instance.GetInstance<IGame>();
         private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
 
         private uint? _speedZoneId;
@@ -109,7 +108,7 @@ namespace AutomaticRoadblocks.Instances
         [Conditional("DEBUG")]
         private void DrawDebugInfo()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 var mainColor = Color.Lavender;
                 var color = Color.FromArgb(50, mainColor.R, mainColor.G, mainColor.B);

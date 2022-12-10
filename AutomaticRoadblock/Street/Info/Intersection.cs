@@ -1,15 +1,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Street.Info
 {
     public class Intersection : IVehicleNode
     {
-        private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
-
         #region Properties
 
         /// <inheritdoc />
@@ -80,15 +78,15 @@ namespace AutomaticRoadblocks.Street.Info
 
             IsPreviewActive = true;
             Roads?.ForEach(x => x.CreatePreview());
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 var mainArrowPosition = Position + Vector3.WorldUp * 1.5f;
                 var mainArrowDirection = MathHelper.ConvertHeadingToDirection(Heading);
 
                 while (IsPreviewActive)
                 {
-                    Game.DrawSphere(Position, 0.5f, Color.DeepPink);
-                    Game.DrawArrow(mainArrowPosition, mainArrowDirection, Rotator.Zero, 0.5f, Color.DeepPink);
+                    GameUtils.DrawSphere(Position, 0.5f, Color.DeepPink);
+                    GameUtils.DrawArrow(mainArrowPosition, mainArrowDirection, Rotator.Zero, 0.5f, Color.DeepPink);
                     Directions?.ForEach(x => DrawDirection(x.Position, x.Heading));
                     GameFiber.Yield();
                 }
@@ -101,7 +99,7 @@ namespace AutomaticRoadblocks.Street.Info
             var drawPosition = position
                                + Vector3.WorldUp * 1.5f
                                + direction * 0.6f;
-            Game.DrawArrow(drawPosition, direction, Rotator.Zero, 0.5f, Color.White);
+            GameUtils.DrawArrow(drawPosition, direction, Rotator.Zero, 0.5f, Color.White);
         }
 
         #endregion

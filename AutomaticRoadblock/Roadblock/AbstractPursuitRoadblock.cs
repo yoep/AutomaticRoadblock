@@ -160,7 +160,7 @@ namespace AutomaticRoadblocks.Roadblock
                     catch (Exception ex)
                     {
                         Logger.Error($"Failed to retrieve slot cops joining the pursuit for {slot}, {ex.Message}", ex);
-                        Game.DisplayNotificationDebug("~r~Cops are unable to join the pursuit");
+                        GameUtils.DisplayNotificationDebug("~r~Cops are unable to join the pursuit");
                     }
                 }
 
@@ -368,7 +368,7 @@ namespace AutomaticRoadblocks.Roadblock
 
         private void Monitor()
         {
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (State == ERoadblockState.Active)
                 {
@@ -388,7 +388,7 @@ namespace AutomaticRoadblocks.Roadblock
                         Logger.Error($"An error occurred while monitoring the roadblock, {ex.Message}", ex);
                     }
 
-                    Game.FiberYield();
+                    GameFiber.Yield();
                 }
             }, $"{GetType()}.Monitor");
         }
@@ -457,7 +457,7 @@ namespace AutomaticRoadblocks.Roadblock
             if (!Flags.HasFlag(ERoadblockFlags.PlayAudio))
                 return;
 
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 switch (newState)
                 {
@@ -507,7 +507,7 @@ namespace AutomaticRoadblocks.Roadblock
         [Conditional("DEBUG")]
         private void DoInternalDebugPreviewCreation()
         {
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 Logger.Trace($"Creating roadblock debug preview for {GetType()}");
                 var color = PursuitIndicatorColor();
@@ -531,7 +531,7 @@ namespace AutomaticRoadblocks.Roadblock
                         GameUtils.CreateMarker(ped.Position, EMarkerType.MarkerTypeUpsideDownCone, Color.DarkRed, 1f, 1f, false);
                     }
 
-                    Game.FiberYield();
+                    GameFiber.Yield();
                 }
             }, "Roadblock.Preview");
         }

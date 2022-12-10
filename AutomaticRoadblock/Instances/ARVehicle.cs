@@ -87,6 +87,9 @@ namespace AutomaticRoadblocks.Instances
 
         public override string ToString()
         {
+            if (IsInvalid)
+                return $"{GetType()}.{nameof(GameInstance)} is invalid";
+            
             return $"{nameof(GameInstance.Heading)}: {GameInstance.Heading}, " +
                    $"{nameof(GameInstance.IsPersistent)}: {GameInstance.IsPersistent}, " +
                    $"{nameof(GameInstance.IsRecordingCollisions)}: {GameInstance.IsRecordingCollisions}, " +

@@ -23,8 +23,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private bool _enableRedirectionArrow = true;
         private float _offset;
 
-        public RedirectTrafficDispatcher(IGame game, ILogger logger, ISettingsManager settingsManager, IModelProvider modelProvider)
-            : base(game, logger)
+        public RedirectTrafficDispatcher( ILogger logger, ISettingsManager settingsManager, IModelProvider modelProvider)
+            : base( logger)
         {
             _settingsManager = settingsManager;
             _coneType = modelProvider.TryFindModelByScriptName<BarrierModel>(settingsManager.RedirectTrafficSettings.DefaultCone);
@@ -87,7 +87,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void DispatchRedirection()
         {
-            DispatchRedirection(Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer);
+            DispatchRedirection(GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) * DistanceInFrontOfPlayer);
         }
 
         /// <inheritdoc />
@@ -156,7 +156,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         protected override Vector3 CalculatePreviewPosition()
         {
-            return Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * _settingsManager.RedirectTrafficSettings.DistanceFromPlayer;
+            return GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) * _settingsManager.RedirectTrafficSettings.DistanceFromPlayer;
         }
 
         private bool ShouldAddLights()

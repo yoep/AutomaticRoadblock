@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Preview;
+using AutomaticRoadblocks.Utils;
 using Rage;
 using Rage.Native;
 
@@ -13,7 +14,6 @@ namespace AutomaticRoadblocks.Instances
     /// </summary>
     public class ARCloseNodes : IPreviewSupport, IDisposable
     {
-        private readonly IGame _game = IoC.Instance.GetInstance<IGame>();
         private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
 
         public ARCloseNodes(Vector3 topLeftPosition, Vector3 bottomRightPosition)
@@ -90,7 +90,7 @@ namespace AutomaticRoadblocks.Instances
         [Conditional("DEBUG")]
         private void DrawDebugInfo()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 var mainColor = Color.DarkOrange;
                 var color = Color.FromArgb(75, mainColor.R, mainColor.G, mainColor.B);

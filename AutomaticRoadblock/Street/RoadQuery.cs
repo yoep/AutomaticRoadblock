@@ -238,9 +238,9 @@ namespace AutomaticRoadblocks.Street
                     distanceTraversed += additionalDistanceTraversed;
                     lastFoundNodeInfo = nodeTowardsHeading;
                     Logger.Trace(
-                        $"Traversed an additional {additionalDistanceTraversed} distance in {nextNodeCalculationDuration} millis, new total traversed distance = {distanceTraversed}");
+                        $"Traversed an additional {additionalDistanceTraversed} distance in {nextNodeCalculationDuration} millis, new total traversed distance = {distanceTraversed}, total nodes = {nodeInfos.Count}");
                     nextNodeCalculationStartedAt = DateTime.Now.Ticks;
-                    
+
                     // verify if we need to stop at the first intersection or not
                     if (stopAtIntersection && nodeTowardsHeading.IsJunctionNode)
                     {

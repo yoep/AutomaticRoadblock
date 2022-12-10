@@ -13,7 +13,7 @@
         <string>spike strip support</string>
         <string>spikes</string>
     </Phrases>
-    <Target>AutomaticRoadblocks.Api.Functions.DispatchNow</Target>
+    <Target>AutomaticRoadblocks.API.Functions.DispatchPursuitRoadblockNow</Target>
 	<Parameters>
 	    <Parameter>
 		    <Type>System.Boolean</Type>

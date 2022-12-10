@@ -58,15 +58,13 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="AbstractionLayer\IGame.cs" />
         <Compile Include="AbstractionLayer\ILogger.cs" />
-        <Compile Include="AbstractionLayer\Implementation\RageImpl.cs" />
-        <Compile Include="AbstractionLayer\Implementation\RageLogger.cs" />
         <Compile Include="AbstractionLayer\ELogLevel.cs" />
+        <Compile Include="AbstractionLayer\RageLogger.cs" />
         <Compile Include="Animation\AnimationHelper.cs" />
         <Compile Include="Animation\Animations.cs" />
         <Compile Include="Animation\AnimationExecutor.cs" />
-        <Compile Include="Api\Functions.cs" />
+        <Compile Include="API\Functions.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
         <Compile Include="Barriers\Barrier.cs" />

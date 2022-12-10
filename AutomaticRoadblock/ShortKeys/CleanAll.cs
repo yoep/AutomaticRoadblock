@@ -6,6 +6,7 @@ using AutomaticRoadblocks.RedirectTraffic;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Utils;
+using Rage;
 
 namespace AutomaticRoadblocks.ShortKeys
 {
@@ -13,7 +14,6 @@ namespace AutomaticRoadblocks.ShortKeys
     {
         private const string AudioInstancesCleaned = "ATTENTION_ALL_UNITS WE_ARE_CODE 4";
 
-        private readonly IGame _game;
         private readonly ILogger _logger;
         private readonly ISettingsManager _settingsManager;
         private readonly IRoadblockDispatcher _roadblockDispatcher;
@@ -23,10 +23,9 @@ namespace AutomaticRoadblocks.ShortKeys
 
         private bool _active;
 
-        public CleanAll(IGame game, ILogger logger, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher,
+        public CleanAll(ILogger logger, ISettingsManager settingsManager, IRoadblockDispatcher roadblockDispatcher,
             IManualPlacement manualPlacement, IRedirectTrafficDispatcher redirectTrafficDispatcher, ICloseRoadDispatcher closeRoadDispatcher)
         {
-            _game = game;
             _logger = logger;
             _settingsManager = settingsManager;
             _roadblockDispatcher = roadblockDispatcher;
@@ -39,14 +38,14 @@ namespace AutomaticRoadblocks.ShortKeys
         public void OnDutyStarted()
         {
             _active = true;
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 var settings = _settingsManager.GeneralSettings;
                 _logger.Trace($"Starting clean all fiber with keys {settings.CleanAllKey} & {settings.CleanAllModifierKey}");
 
                 while (_active)
                 {
-                    _game.FiberYield();
+                    GameFiber.Yield();
 
                     if (GameUtils.IsKeyPressed(settings.CleanAllKey, settings.CleanAllModifierKey))
                     {

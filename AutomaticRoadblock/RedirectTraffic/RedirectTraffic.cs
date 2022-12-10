@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Lspdfr;
@@ -18,10 +17,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
     {
         private const float DefaultVehicleWidth = 1f;
         private const float DefaultVehicleLength = 3f;
-        private const string RedirectTrafficAnimation = "amb@world_human_car_park_attendant@male@base";
         private const string ConeWithLightName = "cone_with_light";
 
-        private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
         private readonly List<IARInstance<Entity>> _instances = new();
 
@@ -173,9 +170,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 if (BackupType != EBackupUnit.None)
                     Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
 
-                Cop.Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
-                Cop.UnequipAllWeapons();
-                AnimationHelper.PlayAnimation(Cop.GameInstance, RedirectTrafficAnimation, "base", AnimationFlags.Loop);
+                Cop.RedirectTraffic();
                 return true;
             }
             catch (Exception ex)
@@ -397,7 +392,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
         private Road.Lane GetLaneClosestToPlayer()
         {
-            var playerPosition = Game.PlayerPosition;
+            var playerPosition = GameUtils.PlayerPosition;
             var rightSide = Road.RightSide;
             var leftSide = Road.LeftSide;
             var closestLaneDistance = 9999f;

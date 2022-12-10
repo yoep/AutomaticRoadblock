@@ -9,6 +9,7 @@ using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
+using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
@@ -26,7 +27,6 @@ namespace AutomaticRoadblocks.Roadblock
         protected const float AdditionalClippingSpace = 0.5f;
 
         protected static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        protected static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         protected readonly List<T> InternalSlots = new();
         protected Blip Blip;
@@ -497,11 +497,11 @@ namespace AutomaticRoadblocks.Roadblock
                 Logger.Debug($"Slot cops won't be released to LSPDFR for {this}");
             }
 
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 GameFiber.Wait(BlipFlashDuration);
                 DeleteBlip();
-            }, "Roadblock.ReleaseEntitiesToLspdfr");
+            }, $"{GetType()}.ReleaseEntitiesToLspdfr");
         }
 
         private void SpawnSlot(IRoadblockSlot slot)

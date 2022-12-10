@@ -9,7 +9,7 @@ using AutomaticRoadblocks.Roadblock.Dispatcher;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using Rage;
 
-namespace AutomaticRoadblocks.Api
+namespace AutomaticRoadblocks.API
 {
     [SuppressMessage("ReSharper", "UnusedType.Global")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -61,7 +61,7 @@ namespace AutomaticRoadblocks.Api
         /// </summary>
         /// <param name="userRequested">Indicates if the roadblock was called by the user.</param>
         /// <returns>Returns true if a roadblock is dispatched, else false.</returns>
-        public static bool DispatchNow(bool userRequested = false)
+        public static bool DispatchPursuitRoadblockNow(bool userRequested = false)
         {
             var logger = IoC.Instance.GetInstance<ILogger>();
             logger.Info($"Dispatching roadblock from functions API with {nameof(userRequested)}: {userRequested}");
@@ -69,7 +69,7 @@ namespace AutomaticRoadblocks.Api
         }
 
         /// <summary>
-        /// Close the current road at the player location.
+        /// Close the current road at the current player location.
         /// </summary>
         public static void CloseRoad()
         {

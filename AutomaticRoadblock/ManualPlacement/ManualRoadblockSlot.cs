@@ -6,6 +6,7 @@ using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Street.Info;
+using Rage;
 
 namespace AutomaticRoadblocks.ManualPlacement
 {
@@ -35,6 +36,11 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// </summary>
         private bool CopsEnabled { get; }
 
+        /// <summary>
+        /// The cop which will play the redirect traffic animation.
+        /// </summary>
+        private ARPed RedirectTrafficCop { get; set; }
+
         #endregion
 
         #region Methods
@@ -43,9 +49,23 @@ namespace AutomaticRoadblocks.ManualPlacement
         public override void Spawn()
         {
             base.Spawn();
-            CopInstances
-                .ToList()
-                .ForEach(x => x.StandStill(180000));
+            RedirectTrafficCop.RedirectTraffic();
+            
+            foreach (var cop in CopInstances.Where(x => x != RedirectTrafficCop))
+            {
+                cop.Guard();
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Release(bool releaseAll = false)
+        {
+            Cops.ToList().ForEach(x =>
+            {
+                x.DeleteAttachments();
+                x.ClearAllTasks();
+            });
+            base.Release(releaseAll);
         }
 
         /// <inheritdoc />
@@ -76,20 +96,38 @@ namespace AutomaticRoadblocks.ManualPlacement
                 .ToList());
         }
 
-        protected override void InitializeCops(IEnumerable<ARPed> cops)
+        /// <inheritdoc />
+        protected override void InitializeCops(IEnumerable<ARPed> instances)
         {
             if (CopsEnabled)
             {
-                base.InitializeCops(cops);
+                var cops = instances.ToList();
+
+                InitializeRedirectTrafficCop(cops.First());
+                base.InitializeCops(cops.Skip(1));
             }
             else
             {
                 Logger.Trace("No cops wanted for the manual roadblock, disposing the cop instances");
-                foreach (var cop in cops)
+                foreach (var cop in instances)
                 {
                     cop.Dispose();
                 }
             }
+        }
+
+        /// <inheritdoc />
+        protected override float CalculateCopHeading()
+        {
+            return Heading;
+        }
+
+        private void InitializeRedirectTrafficCop(ARPed cop)
+        {
+            cop.PlaceOnGroundAt(CalculatePositionLeftOfVehicle());
+            cop.Heading = MathHelper.NormalizeHeading(CalculateCopHeading() + 180);
+            Instances.Add(cop);
+            RedirectTrafficCop = cop;
         }
 
         #endregion

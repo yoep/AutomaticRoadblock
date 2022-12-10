@@ -5,6 +5,7 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Street.Info;
+using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
@@ -117,7 +118,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         private void StartHitDetection()
         {
             _monitorActive = true;
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (_monitorActive)
                 {

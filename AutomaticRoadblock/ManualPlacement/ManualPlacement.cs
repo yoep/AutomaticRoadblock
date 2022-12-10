@@ -10,6 +10,7 @@ using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
+using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.ManualPlacement
@@ -27,8 +28,8 @@ namespace AutomaticRoadblocks.ManualPlacement
         private bool _copsEnabled;
         private float _offset;
 
-        public ManualPlacement(ILogger logger, IGame game, ISettingsManager settingsManager, IModelProvider modelProvider)
-            : base(game, logger)
+        public ManualPlacement(ILogger logger, ISettingsManager settingsManager, IModelProvider modelProvider)
+            : base(logger)
         {
             _settingsManager = settingsManager;
             _mainBarrier = modelProvider.TryFindModelByScriptName<BarrierModel>(settingsManager.ManualPlacementSettings.DefaultMainBarrier);
@@ -107,7 +108,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         public void PlaceRoadblock()
         {
-            PlaceRoadblock(Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer);
+            PlaceRoadblock(GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) * DistanceInFrontOfPlayer);
         }
 
         /// <inheritdoc />
@@ -163,7 +164,7 @@ namespace AutomaticRoadblocks.ManualPlacement
             if (node.GetType() == typeof(Intersection))
                 return null;
 
-            var targetHeading = Direction == PlacementDirection.Towards ? Game.PlayerHeading : Game.PlayerHeading - 180;
+            var targetHeading = Direction == PlacementDirection.Towards ? GameUtils.PlayerHeading : GameUtils.PlayerHeading - 180;
             return DoInternalInstanceCreation(node, targetHeading, _mainBarrier, _secondaryBarrier, _backupType, _placementType, LightSourceType, _copsEnabled,
                 _offset);
         }
@@ -171,7 +172,7 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         protected override Vector3 CalculatePreviewPosition()
         {
-            return Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * _settingsManager.ManualPlacementSettings.DistanceFromPlayer;
+            return GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) * _settingsManager.ManualPlacementSettings.DistanceFromPlayer;
         }
 
         private ManualRoadblock DoInternalInstanceCreation(IVehicleNode node, float targetHeading, BarrierModel mainBarrier, BarrierModel secondaryBarrier,

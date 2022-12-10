@@ -1,25 +1,24 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
+using AutomaticRoadblocks.Utils;
+using Rage;
 using RAGENativeUI;
 
 namespace AutomaticRoadblocks.Roadblock.Menu
 {
     public class RoadblockMenuSwitchItem : IMenuSwitchItem, IDisposable
     {
-        private readonly IGame _game;
         private readonly ILocalizer _localizer;
 
         private bool _running;
         private bool _visible;
 
-        public RoadblockMenuSwitchItem(IGame game, ILocalizer localizer)
+        public RoadblockMenuSwitchItem(ILocalizer localizer)
         {
-            _game = game;
             _localizer = localizer;
 
             Menu = new UIMenu(localizer[LocalizationKey.MenuTitle], 
@@ -51,7 +50,7 @@ namespace AutomaticRoadblocks.Roadblock.Menu
         private void Process()
         {
             _running = true;
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (_running)
                 {
@@ -67,7 +66,7 @@ namespace AutomaticRoadblocks.Roadblock.Menu
                         _visible = false;
                     }
 
-                    _game.FiberYield();
+                    GameFiber.Yield();
                 }
             }, "ManualPlacementMenuSwitchItem.Process");
         }

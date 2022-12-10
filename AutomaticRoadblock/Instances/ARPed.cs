@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
@@ -14,6 +16,8 @@ namespace AutomaticRoadblocks.Instances
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class ARPed : AbstractInstance<Ped>
     {
+        private static readonly Random Random = new();
+
         private readonly List<Entity> _attachments = new();
 
         public ARPed(Ped instance, float heading = 0f)
@@ -159,6 +163,28 @@ namespace AutomaticRoadblocks.Instances
             return this;
         }
 
+        public ARPed RedirectTraffic()
+        {
+            Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
+            UnequipAllWeapons();
+            AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.CarParkDictionary, "base", AnimationFlags.Loop);
+            return this;
+        }
+        
+        public ARPed Guard()
+        {
+            if (IsInvalid)
+                return this;
+
+            var animationDictionary = GameInstance.IsMale
+                ? Animations.Dictionaries.CopIdleMale
+                : Animations.Dictionaries.CopIdleFemale;
+
+            UnequipAllWeapons();
+            AnimationHelper.PlayAnimation(GameInstance, animationDictionary, Animations.CopIdles[Random.Next(Animations.CopIdles.Length)], AnimationFlags.Loop);
+            return this;
+        }
+
         /// <summary>
         /// Attach the given entity to this ped.
         /// </summary>
@@ -250,7 +276,7 @@ namespace AutomaticRoadblocks.Instances
             if (IsInvalid || !vehicle.IsValid())
                 return this;
 
-            GameInstance?.WarpIntoVehicle(vehicle, (int)seat); 
+            GameInstance?.WarpIntoVehicle(vehicle, (int)seat);
             return this;
         }
 
@@ -266,7 +292,7 @@ namespace AutomaticRoadblocks.Instances
         public override string ToString()
         {
             if (IsInvalid)
-                return "ARPed Game instance is invalid";
+                return $"{GetType()}.{nameof(GameInstance)} is invalid";
 
             return $"{nameof(GameInstance.Heading)}: {GameInstance.Heading}, " +
                    $"{nameof(GameInstance.IsPersistent)}: {GameInstance.IsPersistent}, " +

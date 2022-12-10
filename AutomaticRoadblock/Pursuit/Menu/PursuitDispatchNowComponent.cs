@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Utils;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Pursuit.Menu
@@ -11,13 +11,11 @@ namespace AutomaticRoadblocks.Pursuit.Menu
     /// </summary>
     public class PursuitDispatchNowComponent : IMenuComponent<UIMenuItem>
     {
-        private readonly IGame _game;
         private readonly IPursuitManager _pursuitManager;
 
-        public PursuitDispatchNowComponent(IPursuitManager pursuitManager, IGame game, ILocalizer localizer)
+        public PursuitDispatchNowComponent(IPursuitManager pursuitManager,  ILocalizer localizer)
         {
             _pursuitManager = pursuitManager;
-            _game = game;
 
             MenuItem = new UIMenuItem(localizer[LocalizationKey.DispatchNow],
                 localizer[LocalizationKey.DispatchNowDescription]);
@@ -35,7 +33,7 @@ namespace AutomaticRoadblocks.Pursuit.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _game.NewSafeFiber(() => _pursuitManager.DispatchNow(true), "DispatchNowComponent.OnMenuActivation");
+            GameUtils.NewSafeFiber(() => _pursuitManager.DispatchNow(true), "DispatchNowComponent.OnMenuActivation");
         }
 
         [IoC.PostConstruct]

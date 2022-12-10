@@ -1,21 +1,19 @@
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Utils;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.CloseRoad.Menu
 {
     public class CloseRoadNearbyComponentItem : IMenuComponent<UIMenuItem>
     {
-        private readonly IGame _game;
         private readonly ICloseRoadDispatcher _closeRoadDispatcher;
         private readonly ILocalizer _localizer;
 
         private bool _isClosed;
 
-        public CloseRoadNearbyComponentItem(IGame game, ICloseRoadDispatcher closeRoadDispatcher, ILocalizer localizer)
+        public CloseRoadNearbyComponentItem(ICloseRoadDispatcher closeRoadDispatcher, ILocalizer localizer)
         {
-            _game = game;
             _closeRoadDispatcher = closeRoadDispatcher;
             _localizer = localizer;
 
@@ -49,7 +47,7 @@ namespace AutomaticRoadblocks.CloseRoad.Menu
             _isClosed = true;
             MenuItem.Text = _localizer[LocalizationKey.OpenClosedRoad];
             MenuItem.Description = _localizer[LocalizationKey.OpenClosedRoadDescription];
-            _game.NewSafeFiber(() => _closeRoadDispatcher.CloseNearbyRoad(_game.PlayerPosition), $"{GetType()}.CloseNearbyRoad");
+            GameUtils.NewSafeFiber(() => _closeRoadDispatcher.CloseNearbyRoad(GameUtils.PlayerPosition), $"{GetType()}.CloseNearbyRoad");
         }
 
         private void OpenNearbyRoad()
