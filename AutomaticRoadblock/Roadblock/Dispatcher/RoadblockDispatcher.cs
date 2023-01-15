@@ -270,9 +270,18 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 return null;
             }
 
-            var primaryRoadblock = DoRoadblockCreations(discoveredVehicleNodes, vehicle, level, false, options);
-            _userRequestedRoadblockDispatching = false;
-            return primaryRoadblock;
+            try
+            {
+                var primaryRoadblock = DoRoadblockCreations(discoveredVehicleNodes, vehicle, level, false, options);
+                _userRequestedRoadblockDispatching = false;
+                return primaryRoadblock;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to dispatch roadblock, {ex.Message}", ex);
+                GameUtils.DisplayNotification("~r~Failed to dispatch roadblock, see logs for more info");
+                return null;
+            }
         }
 
         private IRoadblock DoRoadblockCreations(IList<IVehicleNode> streetNodes, Vehicle vehicle, ERoadblockLevel level, bool createAsPreview,
