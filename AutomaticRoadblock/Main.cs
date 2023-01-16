@@ -68,6 +68,7 @@ namespace AutomaticRoadblocks
             else
             {
                 IoC.Instance.GetInstance<ILogger>().Error("Failed to start plugin, required assemblies are missing");
+                GameUtils.DisplayPluginNotification("~r~Unable to load, missing assemblies detected");
             }
         }
 
