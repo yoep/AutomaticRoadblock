@@ -132,6 +132,7 @@
         <Compile Include="Lspdfr\EBackupUnit.cs" />
         <Compile Include="Lspdfr\LspdfrHelper.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="MenuInitializer.cs" />
         <Compile Include="ManualPlacement\Menu\AbstractBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementDirectionComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
