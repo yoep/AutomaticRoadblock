@@ -52,6 +52,8 @@ namespace AutomaticRoadblocks
 
         public override void Initialize()
         {
+            var logger = IoC.Instance.GetInstance<ILogger>();
+            logger.Trace($"Initializing {Version}");
             AppDomain.CurrentDomain.AssemblyResolve += LSPDFRResolveEventHandler;
             InitializeSettings();
 
@@ -67,7 +69,7 @@ namespace AutomaticRoadblocks
             }
             else
             {
-                IoC.Instance.GetInstance<ILogger>().Error("Failed to start plugin, required assemblies are missing");
+                logger.Error($"Failed to start plugin {Version}, required assemblies are missing");
                 GameUtils.DisplayPluginNotification("~r~Unable to load, missing assemblies detected");
             }
         }

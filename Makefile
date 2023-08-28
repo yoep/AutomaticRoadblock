@@ -8,10 +8,10 @@ bump-%: bump-dependencies # Bump the (major, minor, patch) version of the applic
 	@bumpversion $*
 
 copy-%: # Copy all compiled files to the Build directory
-	@xcopy "AutomaticRoadblock\\bin\\x64\\$*\\AutomaticRoadblocks.dll" "Build\\Grand Theft Auto V\\plugins\\LSPDFR\\" /f /y
-	@xcopy "AutomaticRoadblock\\bin\\x64\\$*\\AutomaticRoadblocks.ini" "Build\\Grand Theft Auto V\\plugins\\LSPDFR\\" /f /y
-	@xcopy "AutomaticRoadblock\\bin\\x64\\$*\\AutomaticRoadblocks.pdb" "Build\\Grand Theft Auto V\\plugins\\LSPDFR\\" /f /y
-	@xcopy "AutomaticRoadblock\\bin\\x64\\$*\\plugins\\LSPDFR\\Automatic Roadblocks\\data\\*.xml" "Build\\Grand Theft Auto V\\plugins\\LSPDFR\\Automatic Roadblocks\\data\\" /f /y
+	@cp -v "AutomaticRoadblock/bin/x64/$*/AutomaticRoadblocks.dll" "Build/Grand Theft Auto V/plugins/LSPDFR/"
+	@cp -v "AutomaticRoadblock/bin/x64/$*/AutomaticRoadblocks.ini" "Build/Grand Theft Auto V/plugins/LSPDFR/"
+	@cp -v "AutomaticRoadblock/bin/x64/$*/AutomaticRoadblocks.pdb" "Build/Grand Theft Auto V/plugins/LSPDFR/"
+	@cp -v "AutomaticRoadblock/bin/x64/$*/plugins/LSPDFR/Automatic Roadblocks/data/*.xml" "Build/Grand Theft Auto V/plugins/LSPDFR/Automatic Roadblocks/data/"
 
 restore: # Restore the nuget packages
 	@nuget restore AutomaticRoadblock.sln
@@ -20,13 +20,13 @@ clean: # Clean the bin directory of the application
 	@dotnet clean
 
 test: clean
-	@dotnet test --configuration Debug /p:Platform=x64 --no-restore
+	@dotnet test --configuration Debug --no-restore
 
 build-dotnet: clean # Build the debug version of the application
-	@dotnet build --configuration Debug /p:Platform=x64 --no-restore
+	@dotnet build --configuration "Debug" --no-restore
 
 build-dotnet-release: clean # Build the release version of the application
-	@dotnet build --configuration Release /p:Platform=x64 --no-restore
+	@dotnet build --configuration "Release" --no-restore
 
 build: build-dotnet copy-Debug # Prepare & Build the Debug version of the application
 
