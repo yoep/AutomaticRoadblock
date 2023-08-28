@@ -1,19 +1,17 @@
 using System.Collections.Generic;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Data;
 using AutomaticRoadblocks.Menu;
+using AutomaticRoadblocks.Utils;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
     public class DebugReloadDataFilesComponent : IMenuComponent<UIMenuItem>
     {
-        private readonly IGame _game;
         private readonly List<IDataFile> _dataFiles;
 
-        public DebugReloadDataFilesComponent(IGame game, List<IDataFile> dataFiles)
+        public DebugReloadDataFilesComponent( List<IDataFile> dataFiles)
         {
-            _game = game;
             _dataFiles = dataFiles;
         }
 
@@ -29,10 +27,10 @@ namespace AutomaticRoadblocks.Debug.Menu
         /// <inheritdoc />
         public void OnMenuActivation(IMenu sender)
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 _dataFiles.ForEach(x => x.Reload());
-                _game.DisplayNotification("Data files have been reloaded");
+                GameUtils.DisplayNotification("Data files have been reloaded");
             }, "Debug.ReloadDataFiles");
         }
     }

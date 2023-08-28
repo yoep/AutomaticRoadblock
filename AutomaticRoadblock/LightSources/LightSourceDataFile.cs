@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Data;
+using AutomaticRoadblocks.Logging;
 
 namespace AutomaticRoadblocks.LightSources
 {

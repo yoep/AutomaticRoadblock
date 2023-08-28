@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Logging;
+using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using JetBrains.Annotations;
+using LSPD_First_Response.Mod.API;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
@@ -12,7 +14,6 @@ namespace AutomaticRoadblocks.Roadblock
     internal static class RoadblockHelpers
     {
         private static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         /// <summary>
         /// Release the given instances back to LSPDFR.
@@ -25,46 +26,58 @@ namespace AutomaticRoadblocks.Roadblock
             Assert.NotNull(copInstances, "copInstances cannot be null");
             try
             {
-                // release the cops & cop vehicle instances
+                // release the cops instances
                 copInstances
                     .Where(x => x is { IsInvalid: false })
                     .ToList()
                     .ForEach(x => x.Release());
 
+                // release the vehicle instance
+                if (vehicle != null)
+                    vehicle.Release();
+
                 // make sure the cops are in a vehicle when releasing them
                 Logger.Trace($"Releasing a total of {copInstances.Count} cops to LSPDFR");
-                copInstances
-                    .Where(x => x is { IsInvalid: false })
-                    .Select(x => x.GameInstance)
-                    .ToList()
-                    .ForEach(x =>
+
+                if (vehicle != null)
+                {
+                    for (var i = 0; i < copInstances.Where(x => x is { IsInvalid: false }).ToList().Count; i++)
                     {
-                        // make sure the ped is the vehicle or at least entering it
-                        if (vehicle != null)
-                            TryEnteringVehicle(x, vehicle.GameInstance);
-                    });
+                        var cop = copInstances[i];
+                        TryEnteringVehicle(cop, vehicle.GameInstance, i == 0 ? EVehicleSeat.Driver : EVehicleSeat.Any);
+                    }
+                }
+
                 Logger.Info("Instances have been released to LSPDFR");
             }
             catch (Exception ex)
             {
                 Logger.Error($"Failed to release instances, {ex.Message}", ex);
-                Game.DisplayNotificationDebug("~r~Failed to release instances to LSPDFR");
+                GameUtils.DisplayNotificationDebug("~r~Failed to release instances to LSPDFR");
             }
         }
 
-        private static void TryEnteringVehicle(Ped ped, Vehicle vehicle)
+        private static void TryEnteringVehicle(ARPed ped, Vehicle vehicle, EVehicleSeat vehicleSeat)
         {
-            if (vehicle != null && vehicle.IsValid())
+            GameUtils.NewSafeFiber(() =>
             {
-                if (!ped.IsInVehicle(vehicle, true))
+                if (vehicle != null && vehicle.IsValid())
                 {
-                    ped.Tasks.EnterVehicle(vehicle, 3000, (int)EVehicleSeat.Any);
+                    var instance = ped.GameInstance;
+
+                    if (!instance.IsInVehicle(vehicle, true))
+                    {
+                        instance.Tasks.EnterVehicle(vehicle, 20000, (int)vehicleSeat).WaitForCompletion();
+                    }
+
+                    if (vehicleSeat == EVehicleSeat.Driver)
+                        Functions.SetCopAsBusy(instance, false);
                 }
-            }
-            else
-            {
-                Logger.Error("Unable to release cop instances correctly, cannot enter vehicle as it's null or invalid");
-            }
+                else
+                {
+                    Logger.Error("Unable to release cop instances correctly, cannot enter vehicle as it's null or invalid");
+                }
+            }, $"RoadblockHelpers.TryEnteringVehicle");
         }
     }
 }

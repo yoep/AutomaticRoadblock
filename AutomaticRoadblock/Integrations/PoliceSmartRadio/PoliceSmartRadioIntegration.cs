@@ -1,9 +1,12 @@
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.ManualPlacement;
 using AutomaticRoadblocks.Pursuit;
 using AutomaticRoadblocks.RedirectTraffic;
+using AutomaticRoadblocks.Settings;
+using AutomaticRoadblocks.Utils;
 using PoliceSmartRadio.API;
+using Rage;
 
 namespace AutomaticRoadblocks.Integrations.PoliceSmartRadio
 {
@@ -17,20 +20,20 @@ namespace AutomaticRoadblocks.Integrations.PoliceSmartRadio
         private const string RedirectTrafficButtonName = "redirecttraffic";
         private const string RemoveAllButtonName = "removeall";
 
-        private readonly IGame _game;
         private readonly ILogger _logger;
         private readonly IPursuitManager _pursuitManager;
         private readonly IManualPlacement _manualPlacement;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
+        private readonly ISettingsManager _settingsManager;
 
-        public PoliceSmartRadioIntegration(IGame game, ILogger logger, IPursuitManager pursuitManager, IManualPlacement manualPlacement,
-            IRedirectTrafficDispatcher redirectTrafficDispatcher)
+        public PoliceSmartRadioIntegration(ILogger logger, IPursuitManager pursuitManager, IManualPlacement manualPlacement,
+            IRedirectTrafficDispatcher redirectTrafficDispatcher, ISettingsManager settingsManager)
         {
-            _game = game;
             _logger = logger;
             _pursuitManager = pursuitManager;
             _manualPlacement = manualPlacement;
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
+            _settingsManager = settingsManager;
         }
 
         /// <inheritdoc />
@@ -45,26 +48,30 @@ namespace AutomaticRoadblocks.Integrations.PoliceSmartRadio
 
         private void DoRoadblockDeployment()
         {
-            _game.NewSafeFiber(() => _pursuitManager.DispatchNow(true), "PoliceSmartRadioIntegration.DoRoadblockDeployment");
+            GameUtils.NewSafeFiber(() => _pursuitManager.DispatchNow(true), "PoliceSmartRadioIntegration.DoRoadblockDeployment");
         }
 
         private void DoManualPlacement()
         {
-            _game.NewSafeFiber(() => _manualPlacement.PlaceRoadblock(), "PoliceSmartRadioIntegration.DoManualPlacement");
+            GameUtils.NewSafeFiber(
+                () => _manualPlacement.PlaceRoadblock(GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) *
+                    _settingsManager.ManualPlacementSettings.DistanceFromPlayer), "PoliceSmartRadioIntegration.DoManualPlacement");
         }
 
         private void DoRedirectTraffic()
         {
-            _game.NewSafeFiber(() => _redirectTrafficDispatcher.DispatchRedirection(), "PoliceSmartRadioIntegration.DoRedirectTraffic");
+            GameUtils.NewSafeFiber(
+                () => _redirectTrafficDispatcher.DispatchRedirection(GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) *
+                    _settingsManager.RedirectTrafficSettings.DistanceFromPlayer), "PoliceSmartRadioIntegration.DoRedirectTraffic");
         }
 
         private void DoRemoveAll()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 _manualPlacement.RemoveRoadblocks(RemoveType.All);
                 _redirectTrafficDispatcher.RemoveTrafficRedirects(RemoveType.All);
-            }, "PoliceSmartRadioIntegration.DoRemoveAll");
+            }, $"{GetType()}.DoRemoveAll");
         }
     }
 }

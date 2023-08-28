@@ -3,32 +3,26 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using AutomaticRoadblocks.AbstractionLayer;
-using AutomaticRoadblocks.AbstractionLayer.Implementation;
 using AutomaticRoadblocks.Barriers;
-using AutomaticRoadblocks.Debug.Menu;
+using AutomaticRoadblocks.CloseRoad;
 using AutomaticRoadblocks.Integrations;
 using AutomaticRoadblocks.Integrations.PoliceSmartRadio;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.ManualPlacement;
-using AutomaticRoadblocks.ManualPlacement.Menu;
 using AutomaticRoadblocks.Menu;
-using AutomaticRoadblocks.Menu.Switcher;
 using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Pursuit;
-using AutomaticRoadblocks.Pursuit.Menu;
 using AutomaticRoadblocks.RedirectTraffic;
-using AutomaticRoadblocks.RedirectTraffic.Menu;
 using AutomaticRoadblocks.Roadblock.Data;
 using AutomaticRoadblocks.Roadblock.Dispatcher;
-using AutomaticRoadblocks.Roadblock.Menu;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.ShortKeys;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
+using AutomaticRoadblocks.Utils;
 using LSPD_First_Response.Mod.API;
 using Rage;
-using RAGENativeUI.Elements;
 
 // Source code: https://github.com/yoep/AutomaticRoadblock
 namespace AutomaticRoadblocks
@@ -40,6 +34,8 @@ namespace AutomaticRoadblocks
         private const int WaitTimeForIntegrationsInitialization = 3 * 1000;
         private const string PoliceSmartRadioPluginName = "PoliceSmartRadio";
         private const string PoliceSmartRadioPluginVersion = "1.2.0.0";
+        private const string RageNativeUiName = "RAGENativeUI";
+        private const string RageNativeUiVersion = "1.9.0.0";
 
         public Main()
         {
@@ -58,19 +54,27 @@ namespace AutomaticRoadblocks
         {
             AppDomain.CurrentDomain.AssemblyResolve += LSPDFRResolveEventHandler;
             InitializeSettings();
-            InitializeDutyListener();
-            InitializeMenuComponents();
-            InitializeDebugComponents();
-            InitializeMenu();
-            InitializeIntegrations();
 
-            AttachDebugger();
+            if (IsRequiredAssembliesPresent())
+            {
+                InitializeDutyListener();
+                InitializeIntegrations();
+                MenuInitializer.InitializeMenuComponents();
+                MenuInitializer.InitializeDebugComponents();
+                MenuInitializer.InitializeMenu();
+
+                AttachDebugger();
+            }
+            else
+            {
+                IoC.Instance.GetInstance<ILogger>().Error("Failed to start plugin, required assemblies are missing");
+                GameUtils.DisplayPluginNotification("~r~Unable to load, missing assemblies detected");
+            }
         }
 
         public override void Finally()
         {
             var logger = IoC.Instance.GetInstance<ILogger>();
-            var game = IoC.Instance.GetInstance<IGame>();
             var disposables = IoC.Instance.GetInstances<IDisposable>();
 
             try
@@ -81,12 +85,12 @@ namespace AutomaticRoadblocks
                     instance.Dispose();
                 }
 
-                game.DisplayPluginNotification("~g~has been unloaded");
+                GameUtils.DisplayPluginNotification("~g~has been unloaded");
             }
             catch (Exception ex)
             {
                 logger.Error("An error occurred while unloading the plugin", ex);
-                game.DisplayPluginNotification("~r~failed to correctly unload the plugin, see logs for more info");
+                GameUtils.DisplayPluginNotification("~r~failed to correctly unload the plugin, see logs for more info");
             }
         }
 
@@ -95,7 +99,6 @@ namespace AutomaticRoadblocks
         private static void InitializeIoC()
         {
             IoC.Instance
-                .RegisterSingleton<IGame>(typeof(RageImpl))
                 .RegisterSingleton<ILogger>(typeof(RageLogger))
                 .RegisterSingleton<ILocalizer>(typeof(Localizer))
                 .RegisterSingleton<ISettingsManager>(typeof(SettingsManager))
@@ -110,7 +113,8 @@ namespace AutomaticRoadblocks
                 .RegisterSingleton<IManualPlacement>(typeof(ManualPlacement.ManualPlacement))
                 .RegisterSingleton<IRedirectTrafficDispatcher>(typeof(RedirectTrafficDispatcher))
                 .RegisterSingleton<ISpikeStripDispatcher>(typeof(SpikeStripDispatcher))
-                .RegisterSingleton<ICleanAll>(typeof(CleanAll));
+                .RegisterSingleton<ICleanAll>(typeof(CleanAll))
+                .RegisterSingleton<ICloseRoadDispatcher>(typeof(CloseRoadDispatcher));
         }
 
         private static void InitializeDutyListener()
@@ -127,63 +131,12 @@ namespace AutomaticRoadblocks
             IoC.Instance.GetInstance<ISettingsManager>().Load();
         }
 
-        private static void InitializeMenu()
-        {
-            var logger = IoC.Instance.GetInstance<ILogger>();
-            var menu = IoC.Instance.GetInstance<IMenu>();
-            var menuComponents = IoC.Instance.GetInstances<IMenuComponent<UIMenuItem>>();
-
-            logger.Trace("Initializing menu components");
-            foreach (var menuComponent in menuComponents)
-            {
-                menu.RegisterComponent(menuComponent);
-            }
-
-            logger.Debug($"Initialized a total of {menu.TotalItems} menu component(s)");
-        }
-
-        private static void InitializeMenuComponents()
-        {
-            IoC.Instance
-                // menu switchers
-                .Register<IMenuSwitchItem>(typeof(RoadblockMenuSwitchItem))
-                .Register<IMenuSwitchItem>(typeof(ManualPlacementMenuSwitchItem))
-                .Register<IMenuSwitchItem>(typeof(RedirectTrafficMenuSwitchItem))
-                // pursuit components
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitLevelComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchNowComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitEnableDuringPursuitComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitEnableAutomaticLevelIncreaseComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitEnableSpikeStripComponentItem))
-                // manual placement components
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualRoadblockPlaceComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementRemoveComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PlacementTypeComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableCopsComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementDirectionComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementMainBarrierComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementSecondaryBarrierComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementLightTypeComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementVehicleTypeComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(ManualPlacementOffsetComponentItem))
-                // redirect traffic components
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficPlaceComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficRemoveComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficLaneTypeComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeDistanceComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficOffsetComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficConeTypeComponentItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(RedirectTrafficVehicleTypeComponentType))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(EnableRedirectArrowComponentItem));
-        }
-
         private static void InitializeIntegrations()
         {
             var ioc = IoC.Instance;
-            var game = ioc.GetInstance<IGame>();
             var logger = ioc.GetInstance<ILogger>();
 
-            game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 GameFiber.Sleep(WaitTimeForIntegrationsInitialization);
                 logger.Trace("Verifying available plugin integrations");
@@ -208,7 +161,6 @@ namespace AutomaticRoadblocks
         {
             var ioC = IoC.Instance;
             var logger = ioC.GetInstance<ILogger>();
-            var game = ioC.GetInstance<IGame>();
             var listeners = ioC.GetInstances<IOnDutyListener>();
             logger.Trace($"On duty state changed to {onDuty}");
 
@@ -217,12 +169,12 @@ namespace AutomaticRoadblocks
                 listeners.ToList().ForEach(x => x.OnDutyStarted());
                 ioC.GetInstance<IMenu>().Activate();
 
-                game.NewSafeFiber(() =>
+                GameUtils.NewSafeFiber(() =>
                 {
                     logger.Info($"Loaded version {Version}");
 
                     GameFiber.Wait(2 * 1000);
-                    game.DisplayPluginNotification($"{Version}, by ~b~yoep~s~, has been loaded");
+                    GameUtils.DisplayPluginNotification($"{Version}, by ~b~yoep~s~, has been loaded");
                 }, "Main.DisplayPluginNotification");
             }
             else
@@ -247,32 +199,36 @@ namespace AutomaticRoadblocks
                 .Any(assemblyVersion => minVersion == null || assemblyVersion.CompareTo(minVersion) >= 0);
         }
 
+        private static bool IsRequiredAssembliesPresent()
+        {
+            var logger = IoC.Instance.GetInstance<ILogger>();
+            
+            if (!IsAssemblyPresent(RageNativeUiName, Version.Parse(RageNativeUiVersion)))
+            {
+                logger.Error($"Unable to load, missing assembly {RageNativeUiName} version {RageNativeUiVersion}+");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsAssemblyPresent(string assembly, Version minVersion)
+        {
+            var logger = IoC.Instance.GetInstance<ILogger>();
+            var currentDomain = AppDomain.CurrentDomain;
+
+            logger.Trace($"Checking assembly {assembly} for minimal version {minVersion}");
+            return currentDomain.GetAssemblies()
+                .Select(x => x.GetName())
+                .Where(x => string.Equals(x.Name, assembly, StringComparison.CurrentCultureIgnoreCase))
+                .Select(x => x.Version)
+                .Any(x => x.CompareTo(minVersion) >= 0);
+        }
+
         [Conditional("DEBUG")]
         private static void AttachDebugger()
         {
             Rage.Debug.AttachAndBreak();
-        }
-
-        [Conditional("DEBUG")]
-        private static void InitializeDebugComponents()
-        {
-            var logger = IoC.Instance.GetInstance<ILogger>();
-
-            logger.Debug("Registering debug menu components");
-            IoC.Instance
-                .Register<IMenuSwitchItem>(typeof(DebugMenuSwitchItem))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitToggleComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPursuitForceOnFootComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugRoadPreviewComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugDeploySpikeStripComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugPreviewSpikeStripComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugReloadSettingsComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugReloadDataFilesComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugZoneInfoComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchSpawnComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(PursuitDispatchPreviewComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(CleanRoadblocksComponent))
-                .Register<IMenuComponent<UIMenuItem>>(typeof(DebugCleanEntitiesComponent));
         }
     }
 }

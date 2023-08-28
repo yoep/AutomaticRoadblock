@@ -1,21 +1,20 @@
-using System;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Models;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
+using Rage;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
     internal class RedirectTrafficDispatcher : AbstractInstancePlacementManager<RedirectTraffic>, IRedirectTrafficDispatcher
     {
         private readonly ISettingsManager _settingsManager;
-        private readonly IModelProvider _modelProvider;
 
         private float _coneDistance = 2f;
         private EBackupUnit _backupType = EBackupUnit.LocalPatrol;
@@ -24,12 +23,11 @@ namespace AutomaticRoadblocks.RedirectTraffic
         private bool _enableRedirectionArrow = true;
         private float _offset;
 
-        public RedirectTrafficDispatcher(IGame game, ILogger logger, ISettingsManager settingsManager, IModelProvider modelProvider)
-            : base(game, logger)
+        public RedirectTrafficDispatcher( ILogger logger, ISettingsManager settingsManager, IModelProvider modelProvider)
+            : base( logger)
         {
             _settingsManager = settingsManager;
-            _modelProvider = modelProvider;
-            _coneType = ConeTypeFromSettings(settingsManager.RedirectTrafficSettings.DefaultCone);
+            _coneType = modelProvider.TryFindModelByScriptName<BarrierModel>(settingsManager.RedirectTrafficSettings.DefaultCone);
         }
 
         #region Properties
@@ -89,6 +87,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <inheritdoc />
         public void DispatchRedirection()
         {
+            DispatchRedirection(GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) * DistanceInFrontOfPlayer);
+        }
+
+        /// <inheritdoc />
+        public IRedirectTraffic DispatchRedirection(Vector3 position)
+        {
             RedirectTraffic redirectTraffic;
 
             lock (Instances)
@@ -97,7 +101,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
 
                 if (redirectTraffic == null)
                 {
-                    redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance()));
+                    redirectTraffic = CreateInstance(RoadQuery.ToVehicleNode(LastDeterminedStreet ?? CalculateNewLocationForInstance(position)));
                     Instances.Add(redirectTraffic);
                 }
             }
@@ -113,6 +117,8 @@ namespace AutomaticRoadblocks.RedirectTraffic
             {
                 Logger.Warn($"Traffic redirection was unable to be spawned correctly, {redirectTraffic}");
             }
+
+            return redirectTraffic;
         }
 
         /// <inheritdoc />
@@ -145,6 +151,12 @@ namespace AutomaticRoadblocks.RedirectTraffic
                 Offset = Offset
             });
             return redirectTraffic;
+        }
+
+        /// <inheritdoc />
+        protected override Vector3 CalculatePreviewPosition()
+        {
+            return GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) * _settingsManager.RedirectTrafficSettings.DistanceFromPlayer;
         }
 
         private bool ShouldAddLights()
@@ -188,15 +200,6 @@ namespace AutomaticRoadblocks.RedirectTraffic
         {
             _offset = offset;
             DoInternalPreviewCreation(true);
-        }
-
-        private BarrierModel ConeTypeFromSettings(string defaultCone)
-        {
-            Logger.Debug($"Using cone {defaultCone} for traffic redirection if found");
-            return _modelProvider.BarrierModels
-                .Where(x => string.Equals(x.ScriptName, defaultCone, StringComparison.OrdinalIgnoreCase))
-                .DefaultIfEmpty(BarrierModel.None)
-                .First();
         }
 
         #endregion

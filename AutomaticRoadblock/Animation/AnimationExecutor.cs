@@ -67,7 +67,6 @@ namespace AutomaticRoadblocks.Animation
         public AnimationExecutor Stop()
         {
             AnimationHelper.StopAnimation(Entity, Dictionary, Animation);
-
             return this;
         }
 

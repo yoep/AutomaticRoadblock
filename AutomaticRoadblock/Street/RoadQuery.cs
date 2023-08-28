@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Street.Factory;
 using AutomaticRoadblocks.Street.Info;
 using JetBrains.Annotations;
@@ -61,12 +61,13 @@ namespace AutomaticRoadblocks.Street
         /// <param name="distance">The distance to traverse.</param>
         /// <param name="roadType">The road types to follow.</param>
         /// <param name="blacklistedFlags">The flags of a node which should be ignored if present.</param>
+        /// <param name="stopAtIntersection">Stop at the first intersection found while travelling along the road.</param>
         /// <returns>Returns the roads found while traversing the distance.</returns>
         /// <remarks>The last element in the collection will always be of type <see cref="EStreetType.Road"/>.</remarks>
         public static ICollection<IVehicleNode> FindRoadsTraversing(Vector3 position, float heading, float distance, EVehicleNodeType roadType,
-            ENodeFlag blacklistedFlags)
+            ENodeFlag blacklistedFlags, bool stopAtIntersection)
         {
-            var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags);
+            var nodeInfos = FindVehicleNodesWhileTraversing(position, heading, distance, roadType, blacklistedFlags, stopAtIntersection);
             var startedAt = DateTime.Now.Ticks;
             var roads = nodeInfos
                 .Select(ToVehicleNode)
@@ -193,7 +194,7 @@ namespace AutomaticRoadblocks.Street
         }
 
         private static List<VehicleNodeInfo> FindVehicleNodesWhileTraversing(Vector3 position, float heading, float expectedDistance, EVehicleNodeType nodeType,
-            ENodeFlag blacklistedFlags)
+            ENodeFlag blacklistedFlags, bool stopAtIntersection)
         {
             var startedAt = DateTime.Now.Ticks;
             var nextNodeCalculationStartedAt = DateTime.Now.Ticks;
@@ -214,7 +215,7 @@ namespace AutomaticRoadblocks.Street
                 }
 
                 // never start at an intersection as it causes wrong directions being taken
-                var nodeTypeForThisIteration = nodeInfos.Count == 0 && nodeType is EVehicleNodeType.AllNodes or EVehicleNodeType.MainRoadsWithJunctions
+                var nodeTypeForThisIteration = IsFirstNodeDetectionCycle(nodeType, nodeInfos, findNodeAttempt)
                     ? EVehicleNodeType.AllRoadNoJunctions
                     : nodeType;
                 var findNodeAt = lastFoundNodeInfo.Position + MathHelper.ConvertHeadingToDirection(lastFoundNodeInfo.Heading) * distanceToMove;
@@ -237,8 +238,15 @@ namespace AutomaticRoadblocks.Street
                     distanceTraversed += additionalDistanceTraversed;
                     lastFoundNodeInfo = nodeTowardsHeading;
                     Logger.Trace(
-                        $"Traversed an additional {additionalDistanceTraversed} distance in {nextNodeCalculationDuration} millis, new total traversed distance = {distanceTraversed}");
+                        $"Traversed an additional {additionalDistanceTraversed} distance in {nextNodeCalculationDuration} millis, new total traversed distance = {distanceTraversed}, total nodes = {nodeInfos.Count}");
                     nextNodeCalculationStartedAt = DateTime.Now.Ticks;
+
+                    // verify if we need to stop at the first intersection or not
+                    if (stopAtIntersection && nodeTowardsHeading.IsJunctionNode)
+                    {
+                        Logger.Trace($"Junction has been reached for {position} heading {heading}");
+                        break;
+                    }
                 }
             }
 
@@ -283,6 +291,12 @@ namespace AutomaticRoadblocks.Street
             }
 
             return nodes;
+        }
+
+        private static bool IsFirstNodeDetectionCycle(EVehicleNodeType nodeType, IReadOnlyCollection<VehicleNodeInfo> nodeInfos, int findNodeAttempt)
+        {
+            // if the first attempt failed to find a node, continue at an intersection
+            return nodeInfos.Count == 0 && findNodeAttempt == 0 && nodeType is EVehicleNodeType.AllNodes or EVehicleNodeType.MainRoadsWithJunctions;
         }
 
         private static int GetClosestNodeId(Vector3 position)

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Pursuit.Factory;
 using AutomaticRoadblocks.Pursuit.Level;
 using AutomaticRoadblocks.Roadblock.Data;
@@ -17,7 +17,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 {
     internal class RoadblockDispatcher : IRoadblockDispatcher
     {
-        private const float MinimumVehicleSpeed = 20f;
+        private const float MinimumVehicleSpeed = 15f;
         private const float MinimumRoadblockPlacementDistance = 175f;
         private const int AutoCleanRoadblockAfterSeconds = 45;
         private const float RoadblockCleanupDistanceFromPlayer = 100f;
@@ -30,7 +30,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private static readonly Random Random = new();
 
         private readonly ILogger _logger;
-        private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly ILocalizer _localizer;
         private readonly IRoadblockData _roadblockData;
@@ -41,10 +40,9 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private bool _cleanerRunning;
         private bool _userRequestedRoadblockDispatching;
 
-        public RoadblockDispatcher(ILogger logger, IGame game, ISettingsManager settingsManager, ILocalizer localizer, IRoadblockData roadblockData)
+        public RoadblockDispatcher(ILogger logger, ISettingsManager settingsManager, ILocalizer localizer, IRoadblockData roadblockData)
         {
             _logger = logger;
-            _game = game;
             _settingsManager = settingsManager;
             _localizer = localizer;
             _roadblockData = roadblockData;
@@ -85,13 +83,27 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             Assert.NotNull(level, "level cannot be null");
             Assert.NotNull(vehicle, "vehicle cannot be null");
 
-            _logger.Trace(
-                $"Starting roadblock dispatching with {nameof(level)}: {level}, {nameof(options)}: {options}");
+            _logger.Trace($"Starting roadblock dispatching with {nameof(level)}: {level}, {nameof(options)}: {options}");
             if (options.Force || options.IsUserRequested || IsRoadblockDispatchingAllowed(vehicle))
                 return DoInternalDispatch(level, vehicle, options);
 
             _logger.Info($"Dispatching of a roadblock is not allowed with {nameof(level)}: {level}, {nameof(options)}: {options}, " +
                          $"{nameof(IsRoadblockDispatchingAllowed)}: {IsRoadblockDispatchingAllowed(vehicle)}");
+            return null;
+        }
+
+        /// <inheritdoc />
+        public IRoadblock Dispatch(Vector3 position, ERoadblockLevel level, Vehicle vehicle, DispatchOptions options)
+        {
+            Assert.NotNull(position, "position cannot be null");
+            Assert.NotNull(level, "level cannot be null");
+            Assert.NotNull(vehicle, "vehicle cannot be null");
+            var node = RoadQuery.FindClosestRoad(position, EVehicleNodeType.AllNodes);
+
+            _logger.Trace($"Starting roadblock dispatching with {nameof(position)}: {position}, {nameof(level)}: {level}, {nameof(options)}: {options}");
+            if (options.Force || options.IsUserRequested || IsRoadblockDispatchingAllowed(vehicle))
+                return DoInternalDispatch(new List<IVehicleNode> { node }, level, vehicle, options);
+
             return null;
         }
 
@@ -104,8 +116,8 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             var roads = DetermineRoadblockLocation(level, vehicle, options.RoadblockDistance);
             _logger.Trace($"Dispatching roadblock on {roads.Last()}");
 
-            _game.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(roads.Last().Position)]);
-            _game.NewSafeFiber(() =>
+            GameUtils.DisplayNotification(_localizer[LocalizationKey.RoadblockDispatchedAt, World.GetStreetName(roads.Last().Position)]);
+            GameUtils.NewSafeFiber(() =>
             {
                 lock (_foundRoads)
                 {
@@ -133,8 +145,18 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             // only release the roadblock and don't remove it yet
             // this will change the state of the roadblock to released state allowing
             // it to be picked up by the cleanup thread which will dispose the roadblock correctly
-            roadblocksToRelease.ForEach(x => x.Release(true));
+            roadblocksToRelease.ForEach(Dismiss);
             _logger.Info($"Released a total of {roadblocksToRelease.Count} roadblocks which were still active");
+        }
+
+        /// <inheritdoc />
+        public void Dismiss(IRoadblock roadblock)
+        {
+            if (roadblock == null)
+                return;
+
+            _logger.Debug($"Dismissing roadblock {roadblock}");
+            roadblock.Release(true);
         }
 
         #endregion
@@ -184,10 +206,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         [CanBeNull]
         private IRoadblock DoInternalDispatch(ERoadblockLevel level, Vehicle vehicle, DispatchOptions options)
         {
-            // start the cleaner if it's not yet running
-            if (!_cleanerRunning)
-                StartCleaner();
-
             // verify if a user requested roadblock is still being dispatched
             // because of the fact that a user requested roadblock plays blocking audio,
             // the roadblock might still not have been deployed when a new one is requested
@@ -205,8 +223,23 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             LspdfrUtils.WaitForAudioCompletion();
 
             // calculate the roadblock location
-            _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
             var discoveredVehicleNodes = DetermineRoadblockLocation(level, vehicle, options.RoadblockDistance);
+
+            return DoInternalDispatch(discoveredVehicleNodes, level, vehicle, options);
+        }
+
+        private IRoadblock DoInternalDispatch(IList<IVehicleNode> discoveredVehicleNodes, ERoadblockLevel level, Vehicle vehicle, DispatchOptions options)
+        {
+            // start the cleaner if it's not yet running
+            if (!_cleanerRunning)
+                StartCleaner();
+
+            // update the flag that a user requested roadblock is being calculated
+            if (options.IsUserRequested)
+                _userRequestedRoadblockDispatching = true;
+
+            // calculate the roadblock location
+            _logger.Debug($"Dispatching new roadblock with {nameof(options)}: {options}");
             var primaryRoadblockNode = discoveredVehicleNodes.OfType<Road>().Last();
 
             if (primaryRoadblockNode.Width < 1f)
@@ -237,9 +270,18 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 return null;
             }
 
-            var primaryRoadblock = DoRoadblockCreations(discoveredVehicleNodes, vehicle, level, false, options);
-            _userRequestedRoadblockDispatching = false;
-            return primaryRoadblock;
+            try
+            {
+                var primaryRoadblock = DoRoadblockCreations(discoveredVehicleNodes, vehicle, level, false, options);
+                _userRequestedRoadblockDispatching = false;
+                return primaryRoadblock;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to dispatch roadblock, {ex.Message}", ex);
+                GameUtils.DisplayNotification("~r~Failed to dispatch roadblock, see logs for more info");
+                return null;
+            }
         }
 
         private IRoadblock DoRoadblockCreations(IList<IVehicleNode> streetNodes, Vehicle vehicle, ERoadblockLevel level, bool createAsPreview,
@@ -321,12 +363,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     _logger.Warn($"Not all roadblock instances spawned with success for {roadblock}");
                 }
 
-                _game.DisplayNotificationDebug($"Roadblock spawned {ToColorText(result)}:~n~" +
-                                               $"Distance: {road.Position.DistanceTo(vehicle.Position)}~n~" +
-                                               $"Road width: {roadblock.Road.Width}~n~" +
-                                               $"Slots: {roadblock.NumberOfSlots}~n~" +
-                                               $"Spawn time: {timeTakenToSpawn} millis~n~" +
-                                               $"Flags: {roadblock.Flags}");
+                GameUtils.DisplayNotificationDebug($"Roadblock spawned {ToColorText(result)}:~n~" +
+                                                   $"Distance: {road.Position.DistanceTo(vehicle.Position)}~n~" +
+                                                   $"Road width: {roadblock.Road.Width}~n~" +
+                                                   $"Slots: {roadblock.NumberOfSlots}~n~" +
+                                                   $"Spawn time: {timeTakenToSpawn} millis~n~" +
+                                                   $"Flags: {roadblock.Flags}");
                 _logger.Trace($"Distance between vehicle and roadblock after spawn {road.Position.DistanceTo(vehicle.Position)}");
             }
 
@@ -353,11 +395,11 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         private IList<IVehicleNode> DetermineRoadblockLocation(ERoadblockLevel level, Vehicle vehicle, ERoadblockDistance roadblockDistance)
         {
             var distanceToUse = CalculateRoadblockDistance(vehicle, roadblockDistance);
-            var roadType = DetermineAllowedRoadTypes(vehicle, level);
+            var roadType = DetermineAllowedRoadTypes(vehicle);
 
             _logger.Trace(
                 $"Determining roadblock location for Position: {vehicle.Position}, Heading: {vehicle.Heading}, {nameof(distanceToUse)}: {distanceToUse}, {nameof(roadType)}: {roadType}");
-            return RoadQuery.FindRoadsTraversing(vehicle.Position, vehicle.Heading, distanceToUse, roadType, DetermineBlacklistedFlagsForType(roadType))
+            return RoadQuery.FindRoadsTraversing(vehicle.Position, vehicle.Heading, distanceToUse, roadType, DetermineBlacklistedFlagsForType(roadType), false)
                 .ToList();
         }
 
@@ -395,7 +437,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         {
             _logger.Debug($"Roadblock state changed to {newState}");
 
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 if (newState == ERoadblockState.Disposed)
                 {
@@ -421,7 +463,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         {
             _logger.Trace("Starting the roadblock dispatcher cleaner");
             _cleanerRunning = true;
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 _logger.Info("Roadblock dispatch cleaner started");
                 while (_cleanerRunning)
@@ -455,10 +497,10 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                     .ToList()
                     .ForEach(x =>
                     {
-                        _game.DisplayNotificationDebug("~c~Roadblock is being disposed~n~" +
-                                                       $"State: {x.State}~n~" +
-                                                       $"Last state change: {_game.GameTime - x.Roadblock.LastStateChange}millis~n~" +
-                                                       $"Distance from player: {x.Position.DistanceTo2D(_game.PlayerPosition)}");
+                        GameUtils.DisplayNotificationDebug("~c~Roadblock is being disposed~n~" +
+                                                           $"State: {x.State}~n~" +
+                                                           $"Last state change: {Game.GameTime - x.Roadblock.LastStateChange}millis~n~" +
+                                                           $"Distance from player: {x.Position.DistanceTo2D(GameUtils.PlayerPosition)}");
                         x.Roadblock.Dispose();
                         _logger.Debug($"Roadblock cleanup has disposed roadblock {x}");
                     });
@@ -467,7 +509,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         private bool IsPlayerFarAwayFromRoadblock(RoadblockInfo roadblockInfo)
         {
-            var playerPosition = _game.PlayerPosition;
+            var playerPosition = GameUtils.PlayerPosition;
             var currentDistanceToRoadblock = playerPosition.DistanceTo(roadblockInfo.Position);
 
             // if the player is moving towards the roadblock
@@ -483,7 +525,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
 
         private bool IsAutoRoadblockCleaningAllowed(IRoadblock roadblock)
         {
-            return _game.GameTime - roadblock.LastStateChange >= AutoCleanRoadblockAfterSeconds * 1000;
+            return Game.GameTime - roadblock.LastStateChange >= AutoCleanRoadblockAfterSeconds * 1000;
         }
 
         private void AllowUserRequestForRoadblock()
@@ -533,21 +575,12 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return distance;
         }
 
-        private EVehicleNodeType DetermineAllowedRoadTypes(Vehicle vehicle, ERoadblockLevel level)
+        private EVehicleNodeType DetermineAllowedRoadTypes(Vehicle vehicle)
         {
-            // verify the current road type
-            // if we're already at a dirt/offroad road, all road types for the trajectory calculation are allowed
-            if (RoadQuery.IsSlowRoad(vehicle.Position))
-            {
-                _logger.Debug("Following the current dirt/offroad road for the roadblock placement");
-                return EVehicleNodeType.AllNodes;
-            }
-
-            // otherwise, we're going to base the allowed road types for the trajectory based
-            // on the current roadblock level
-            var vehicleNodeType = level.Level <= ERoadblockLevel.Level2.Level ? EVehicleNodeType.AllNodes : EVehicleNodeType.MainRoadsWithJunctions;
-            _logger.Debug($"Roadblock road traversal will use vehicle node type {vehicleNodeType}");
-            return vehicleNodeType;
+            var nodeType = RoadQuery.IsSlowRoad(vehicle.Position) ? EVehicleNodeType.AllNodes : EVehicleNodeType.MainRoadsWithJunctions;
+            
+            _logger.Debug($"Roadblock road traversal will use vehicle node type {nodeType}");
+            return nodeType;
         }
 
         private ENodeFlag DetermineBlacklistedFlagsForType(EVehicleNodeType vehicleNodeType)

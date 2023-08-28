@@ -1,6 +1,6 @@
 using System;
 
-namespace AutomaticRoadblocks.AbstractionLayer
+namespace AutomaticRoadblocks.Logging
 {
     [Flags]
     public enum ELogLevel

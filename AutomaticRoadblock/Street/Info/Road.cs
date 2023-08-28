@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
@@ -13,7 +12,7 @@ namespace AutomaticRoadblocks.Street.Info
 {
     public class Road : IVehicleNode
     {
-        private const float LaneHeadingTolerance = 15f;
+        private const float LaneHeadingTolerance = 20f;
 
         internal Road()
         {
@@ -46,14 +45,24 @@ namespace AutomaticRoadblocks.Street.Info
         public IReadOnlyList<Lane> Lanes { get; internal set; }
 
         /// <summary>
-        /// Get the total number of lanes.
+        /// The lanes going in the same direction as the road.
         /// </summary>
-        public int NumberOfLanesSameDirection => Lanes.Count(x => !x.IsOppositeHeadingOfRoadNodeHeading);
+        public IReadOnlyList<Lane> LanesSameDirection => Lanes.Where(x => !x.IsOppositeHeadingOfRoadNodeHeading).ToList();
+
+        /// <summary>
+        /// The lanes going in the opposite direction of the road.
+        /// </summary>
+        public IReadOnlyList<Lane> LanesOppositeDirection => Lanes.Where(x => x.IsOppositeHeadingOfRoadNodeHeading).ToList();
 
         /// <summary>
         /// Get the total number of lanes.
         /// </summary>
-        public int NumberOfLanesOppositeDirection => Lanes.Count(x => x.IsOppositeHeadingOfRoadNodeHeading);
+        public int NumberOfLanesSameDirection => LanesSameDirection.Count;
+
+        /// <summary>
+        /// Get the total number of lanes.
+        /// </summary>
+        public int NumberOfLanesOppositeDirection => LanesOppositeDirection.Count;
 
         /// <summary>
         /// Get or set the width of the road.
@@ -140,8 +149,9 @@ namespace AutomaticRoadblocks.Street.Info
         /// <returns>Returns the lanes towards the same heading if any match, else an empty <see cref="IEnumerable{T}"/>.</returns>
         public IEnumerable<Lane> LanesHeadingTo(float heading)
         {
+            var normalizedHeading = MathHelper.NormalizeHeading(heading);
             return Lanes
-                .Where(x => Math.Abs(x.Heading - heading) < LaneHeadingTolerance)
+                .Where(x => MathHelper.NormalizeHeading(x.Heading - normalizedHeading) <= LaneHeadingTolerance)
                 .ToList();
         }
 
@@ -188,7 +198,6 @@ namespace AutomaticRoadblocks.Street.Info
             IsPreviewActive = true;
             GameFiber.StartNew(() =>
             {
-                var game = IoC.Instance.GetInstance<IGame>();
                 var color = Color.LightGray;
 
                 if ((Node.Flags & (ENodeFlag.IsGravelRoad | ENodeFlag.IsOffRoad)) != 0)
@@ -202,10 +211,10 @@ namespace AutomaticRoadblocks.Street.Info
 
                 while (IsPreviewActive)
                 {
-                    game.DrawSphere(Position, 0.5f, color);
+                    GameUtils.DrawSphere(Position, 0.5f, color);
                     GameUtils.CreateMarker(LeftSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Blue, 0.5f, 1.5f, false);
                     GameUtils.CreateMarker(RightSide, EMarkerType.MarkerTypeVerticalCylinder, Color.Green, 0.5f, 1.5f, false);
-                    game.FiberYield();
+                    GameFiber.Yield();
                 }
             });
             foreach (var lane in Lanes)
@@ -323,10 +332,8 @@ namespace AutomaticRoadblocks.Street.Info
             [Conditional("DEBUG")]
             private void DoInternalPreviewCreation()
             {
-                var game = IoC.Instance.GetInstance<IGame>();
-
                 IsPreviewActive = true;
-                game.NewSafeFiber(() =>
+                GameUtils.NewSafeFiber(() =>
                 {
                     var rightSideDirection = MathHelper.ConvertHeadingToDirection(Heading) * 1f;
                     var leftSideDirection = MathHelper.ConvertHeadingToDirection(Heading) * 1.25f;
@@ -334,10 +341,10 @@ namespace AutomaticRoadblocks.Street.Info
 
                     while (IsPreviewActive)
                     {
-                        game.DrawArrow(FloatAboveGround(Position), rightSideDirection, Rotator.Zero, Width - 1f, colorLaneArrow);
+                        GameUtils.DrawArrow(FloatAboveGround(Position), rightSideDirection, Rotator.Zero, Width - 1f, colorLaneArrow);
                         GameUtils.CreateMarker(RightSide + rightSideDirection, EMarkerType.MarkerTypeVerticalCylinder, Color.Yellow, 0.5f, 2f, false);
                         GameUtils.CreateMarker(LeftSide + leftSideDirection, EMarkerType.MarkerTypeVerticalCylinder, Color.DarkViolet, 0.5f, 2f, false);
-                        game.FiberYield();
+                        GameFiber.Yield();
                     }
                 }, "Road.Lane.CreatePreview");
             }

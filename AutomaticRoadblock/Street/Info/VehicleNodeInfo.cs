@@ -1,6 +1,6 @@
 using System.Drawing;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Preview;
+using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Street.Info
@@ -44,6 +44,11 @@ namespace AutomaticRoadblocks.Street.Info
         /// The flags of the node.
         /// </summary>
         public ENodeFlag Flags { get; internal set; }
+
+        /// <summary>
+        /// Verify if this node is a junction node.
+        /// </summary>
+        public bool IsJunctionNode => Flags.HasFlag(ENodeFlag.IsJunction);
 
         #endregion
 
@@ -89,16 +94,15 @@ namespace AutomaticRoadblocks.Street.Info
             if (IsPreviewActive)
                 return;
 
-            var game = IoC.Instance.GetInstance<IGame>();
             var direction = MathHelper.ConvertHeadingToDirection(Heading);
 
             IsPreviewActive = true;
-            game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (IsPreviewActive)
                 {
-                    game.DrawArrow(FloatAboveGround(Position), direction, Rotator.Zero, 3f, Color.Gold);
-                    game.FiberYield();
+                    GameUtils.DrawArrow(FloatAboveGround(Position), direction, Rotator.Zero, 3f, Color.Gold);
+                    GameFiber.Yield();
                 }
             }, "Road.VehicleNode.CreatePreview");
         }

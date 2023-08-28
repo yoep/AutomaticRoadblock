@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
+using AutomaticRoadblocks.Logging;
 using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Models
@@ -62,7 +62,7 @@ namespace AutomaticRoadblocks.Models
         #region Methods
 
         /// <inheritdoc />
-        public T RetrieveModelByScriptName<T>(string scriptName) where T : IModel
+        public T FindModelByScriptName<T>(string scriptName) where T : IModel
         {
             var model = this[scriptName, typeof(T)];
             if (model == null)
@@ -70,6 +70,13 @@ namespace AutomaticRoadblocks.Models
                 throw new ModelNotFoundException(scriptName);
             }
 
+            return (T)model;
+        }
+
+        /// <inheritdoc />
+        public T TryFindModelByScriptName<T>(string scriptName) where T : IModel
+        {
+            var model = this[scriptName, typeof(T)] ?? this[typeof(T)].First(x => x.IsNone);
             return (T)model;
         }
 
@@ -127,7 +134,7 @@ namespace AutomaticRoadblocks.Models
 
         private static bool IsModelScriptName(IModel model, string expectedScriptName)
         {
-            return model.ScriptName.Equals(expectedScriptName, StringComparison.CurrentCultureIgnoreCase);
+            return string.Equals(model.ScriptName, expectedScriptName, StringComparison.OrdinalIgnoreCase);
         }
 
         #endregion

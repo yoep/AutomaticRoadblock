@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Xml;
 
 namespace AutomaticRoadblocks.Data

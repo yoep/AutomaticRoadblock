@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 
 namespace AutomaticRoadblocks.Integrations
 {

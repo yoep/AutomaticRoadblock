@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Menu.Switcher;
 using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Utils;
+using Rage;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
 
@@ -15,7 +16,6 @@ namespace AutomaticRoadblocks.Menu
     public class MenuImpl : IMenu
     {
         private readonly ILogger _logger;
-        private readonly IGame _game;
         private readonly ISettingsManager _settingsManager;
         private readonly ICollection<IMenuSwitchItem> _menuSwitchItems;
         private readonly ILocalizer _localizer;
@@ -26,10 +26,9 @@ namespace AutomaticRoadblocks.Menu
         private UIMenuSwitchMenusItem _menuSwitcher;
         private bool _menuRunning;
 
-        public MenuImpl(ILogger logger, IGame game, ISettingsManager settingsManager, ICollection<IMenuSwitchItem> menuSwitchItems, ILocalizer localizer)
+        public MenuImpl(ILogger logger,  ISettingsManager settingsManager, ICollection<IMenuSwitchItem> menuSwitchItems, ILocalizer localizer)
         {
             _logger = logger;
-            _game = game;
             _settingsManager = settingsManager;
             _menuSwitchItems = menuSwitchItems;
             _localizer = localizer;
@@ -117,7 +116,7 @@ namespace AutomaticRoadblocks.Menu
             catch (Exception ex)
             {
                 _logger.Error($"An unexpected error occurred while initializing the menu with error {ex.Message}", ex);
-                _game.DisplayPluginNotification("an unexpected error occurred");
+                GameUtils.DisplayPluginNotification("an unexpected error occurred");
             }
         }
 
@@ -141,12 +140,12 @@ namespace AutomaticRoadblocks.Menu
             catch (MenuException ex)
             {
                 _logger.Error(ex.Message, ex);
-                _game.DisplayPluginNotification("could not invoke menu item, see log files for more info");
+                GameUtils.DisplayPluginNotification("could not invoke menu item, see log files for more info");
             }
             catch (Exception ex)
             {
                 _logger.Error($"An unexpected error occurred while activating the menu item {ex.Message}", ex);
-                _game.DisplayPluginNotification("an unexpected error occurred while invoking the menu action");
+                GameUtils.DisplayPluginNotification("an unexpected error occurred while invoking the menu action");
             }
         }
 
@@ -183,12 +182,12 @@ namespace AutomaticRoadblocks.Menu
         private void StartKeyListener()
         {
             _menuRunning = true;
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 _logger.Debug("Menu key listener has been started");
                 while (_menuRunning)
                 {
-                    _game.FiberYield();
+                    GameFiber.Yield();
                     MenuPool.ProcessMenus();
 
                     try
@@ -202,7 +201,7 @@ namespace AutomaticRoadblocks.Menu
                     catch (Exception ex)
                     {
                         _logger.Error($"An unexpected error occurred while processing the menu with error {ex.Message}", ex);
-                        _game.DisplayPluginNotification("an unexpected error occurred");
+                        GameUtils.DisplayPluginNotification("an unexpected error occurred");
                     }
                 }
 

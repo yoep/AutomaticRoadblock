@@ -1,15 +1,13 @@
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.SpikeStrip;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
+using AutomaticRoadblocks.Utils;
 using RAGENativeUI.Elements;
 
 namespace AutomaticRoadblocks.Debug.Menu
 {
     public class DebugDeploySpikeStripComponent : IMenuComponent<UIMenuListScrollerItem<ESpikeStripLocation>>
     {
-        private static readonly IGame Game = IoC.Instance.GetInstance<IGame>();
-
         private readonly ISpikeStripDispatcher _spikeStripDispatcher;
 
         private bool _deployed;
@@ -49,7 +47,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         private void DeploySpikeStrip()
         {
             _deployed = true;
-            _spikeStripDispatcher.Deploy(Game.PlayerPosition, MenuItem.SelectedItem);
+            _spikeStripDispatcher.Deploy(GameUtils.PlayerPosition, MenuItem.SelectedItem);
             MenuItem.Text = AutomaticRoadblocksPlugin.RemoveSpikeStrip;
         }
 

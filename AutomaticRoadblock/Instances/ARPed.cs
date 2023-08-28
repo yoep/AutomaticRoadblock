@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using AutomaticRoadblocks.Animation;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
 using LSPD_First_Response.Mod.API;
@@ -14,6 +16,8 @@ namespace AutomaticRoadblocks.Instances
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class ARPed : AbstractInstance<Ped>
     {
+        private static readonly Random Random = new();
+
         private readonly List<Entity> _attachments = new();
 
         public ARPed(Ped instance, float heading = 0f)
@@ -62,7 +66,6 @@ namespace AutomaticRoadblocks.Instances
             base.Dispose();
             DeletePreview();
             DeleteAttachments();
-            EntityUtils.Remove(GameInstance);
         }
 
         #endregion
@@ -147,6 +150,42 @@ namespace AutomaticRoadblocks.Instances
         }
 
         /// <summary>
+        /// Wait/pause the entity for the given amount of time.
+        /// </summary>
+        /// <param name="duration">The duration of the action.</param>
+        public ARPed Wait(int duration)
+        {
+            if (IsInvalid)
+                return this;
+
+            Functions.SetCopAsBusy(GameInstance, true);
+            GameInstance.Tasks.Pause(duration);
+            return this;
+        }
+
+        public ARPed RedirectTraffic()
+        {
+            Attach(PropUtils.CreateWand(), PedBoneId.RightPhHand);
+            UnequipAllWeapons();
+            AnimationHelper.PlayAnimation(GameInstance, Animations.Dictionaries.CarParkDictionary, "base", AnimationFlags.Loop);
+            return this;
+        }
+        
+        public ARPed Guard()
+        {
+            if (IsInvalid)
+                return this;
+
+            var animationDictionary = GameInstance.IsMale
+                ? Animations.Dictionaries.CopIdleMale
+                : Animations.Dictionaries.CopIdleFemale;
+
+            UnequipAllWeapons();
+            AnimationHelper.PlayAnimation(GameInstance, animationDictionary, Animations.CopIdles[Random.Next(Animations.CopIdles.Length)], AnimationFlags.Loop);
+            return this;
+        }
+
+        /// <summary>
         /// Attach the given entity to this ped.
         /// </summary>
         /// <param name="attachment">Set the entity to attach.</param>
@@ -226,13 +265,19 @@ namespace AutomaticRoadblocks.Instances
             }
         }
 
-        public void WarpIntoVehicle(Vehicle vehicle, EVehicleSeat seat)
+        /// <summary>
+        /// Warp this ped into the given vehicle seat.
+        /// </summary>
+        /// <param name="vehicle">The vehicle to warp the ped in.</param>
+        /// <param name="seat">The vehicle seat to place the ped in.</param>
+        public ARPed WarpIntoVehicle(Vehicle vehicle, EVehicleSeat seat)
         {
             Assert.NotNull(vehicle, "vehicle cannot be null");
             if (IsInvalid || !vehicle.IsValid())
-                return;
+                return this;
 
             GameInstance?.WarpIntoVehicle(vehicle, (int)seat);
+            return this;
         }
 
         /// <summary>
@@ -246,6 +291,9 @@ namespace AutomaticRoadblocks.Instances
 
         public override string ToString()
         {
+            if (IsInvalid)
+                return $"{GetType()}.{nameof(GameInstance)} is invalid";
+
             return $"{nameof(GameInstance.Heading)}: {GameInstance.Heading}, " +
                    $"{nameof(GameInstance.IsPersistent)}: {GameInstance.IsPersistent}, " +
                    $"{nameof(GameInstance.RelationshipGroup)}: {GameInstance.RelationshipGroup}, " +

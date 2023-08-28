@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Action>
+    <Name>close road</Name>
+    <Commands>
+        <string>dispatch</string>
+        <string>request</string>
+    </Commands>
+    <Phrases>
+        <string>road closure</string>
+        <string>block road</string>
+        <string>close off road</string>
+        <string>close road</string>
+        <string>close street</string>
+        <string>block street</string>
+    </Phrases>
+    <Target>AutomaticRoadblocks.Api.Functions.CloseRoad</Target>
+    <Parameters/>
+</Action>

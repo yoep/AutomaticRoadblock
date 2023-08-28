@@ -35,7 +35,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-          <HintPath>..\packages\JetBrains.Annotations.2022.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+          <HintPath>..\packages\JetBrains.Annotations.2022.3.1\lib\net20\JetBrains.Annotations.dll</HintPath>
         </Reference>
         <Reference Include="LSPD First Response">
           <HintPath>..\Libs\LSPD First Response.dll</HintPath>
@@ -44,11 +44,11 @@
         <Reference Include="PoliceSmartRadio">
           <HintPath>..\Libs\PoliceSmartRadio.dll</HintPath>
         </Reference>
-        <Reference Include="RAGENativeUI, Version=1.9.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\RAGENativeUI.1.9.0\lib\net472\RAGENativeUI.dll</HintPath>
+        <Reference Include="RAGENativeUI, Version=1.9.2.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\RAGENativeUI.1.9.2\lib\net472\RAGENativeUI.dll</HintPath>
         </Reference>
         <Reference Include="RagePluginHook, Version=0.0.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\RagePluginHook.1.86.1\lib\net472\RagePluginHook.dll</HintPath>
+          <HintPath>..\packages\RagePluginHook.1.98.0\lib\net472\RagePluginHook.dll</HintPath>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
@@ -58,15 +58,13 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="AbstractionLayer\IGame.cs" />
-        <Compile Include="AbstractionLayer\ILogger.cs" />
-        <Compile Include="AbstractionLayer\Implementation\RageImpl.cs" />
-        <Compile Include="AbstractionLayer\Implementation\RageLogger.cs" />
-        <Compile Include="AbstractionLayer\ELogLevel.cs" />
+        <Compile Include="Logging\ILogger.cs" />
+        <Compile Include="Logging\ELogLevel.cs" />
+        <Compile Include="Logging\RageLogger.cs" />
         <Compile Include="Animation\AnimationHelper.cs" />
         <Compile Include="Animation\Animations.cs" />
         <Compile Include="Animation\AnimationExecutor.cs" />
-        <Compile Include="Api\Functions.cs" />
+        <Compile Include="API\Functions.cs" />
         <Compile Include="Assert.cs" />
         <Compile Include="AutomaticRoadblocksPlugin.cs" />
         <Compile Include="Barriers\Barrier.cs" />
@@ -76,6 +74,15 @@
         <Compile Include="Barriers\Barriers.cs" />
         <Compile Include="Barriers\EBarrierFlags.cs" />
         <Compile Include="Barriers\IBarrierData.cs" />
+        <Compile Include="CloseRoad\CloseRoadDispatcher.cs" />
+        <Compile Include="CloseRoad\RoadClosureInstance.cs" />
+        <Compile Include="CloseRoad\IRoadClosure.cs" />
+        <Compile Include="CloseRoad\ICloseRoadDispatcher.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadLightSourceComponentItem.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadMenuSwitchItem.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadNearbyComponentItem.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadNearbyPreviewComponentItem.cs" />
+        <Compile Include="CloseRoad\Menu\CloseRoadUnitTypeComponentItem.cs" />
         <Compile Include="Data\AbstractDataFileLoader.cs" />
         <Compile Include="Data\ChanceException.cs" />
         <Compile Include="Data\ChanceProvider.cs" />
@@ -89,10 +96,10 @@
         <Compile Include="Debug\Menu\DebugReloadSettingsComponent.cs" />
         <Compile Include="Debug\Menu\DebugRoadPreviewComponent.cs" />
         <Compile Include="Debug\Menu\DebugPursuitToggleComponent.cs" />
-        <Compile Include="Debug\Menu\DebugZoneInfoComponent.cs" />
         <Compile Include="Debug\Menu\DebugPreviewSpikeStripComponent.cs" />
         <Compile Include="Instances\AbstractInstance.cs" />
         <Compile Include="Instances\AbstractInstancePlacementManager.cs" />
+        <Compile Include="Instances\ARCloseNodes.cs" />
         <Compile Include="Instances\ARSpeedZone.cs" />
         <Compile Include="Instances\ARSpikeStrip.cs" />
         <Compile Include="Instances\IARInstance.cs" />
@@ -125,6 +132,7 @@
         <Compile Include="Lspdfr\EBackupUnit.cs" />
         <Compile Include="Lspdfr\LspdfrHelper.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="MenuInitializer.cs" />
         <Compile Include="ManualPlacement\Menu\AbstractBarrierComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementDirectionComponentItem.cs" />
         <Compile Include="ManualPlacement\Menu\ManualPlacementOffsetComponentItem.cs" />
@@ -184,6 +192,7 @@
         <Compile Include="Pursuit\IPursuitManager.cs" />
         <Compile Include="Pursuit\PursuitLevel.cs" />
         <Compile Include="Pursuit\PursuitManager.cs" />
+        <Compile Include="RedirectTraffic\IRedirectTraffic.cs" />
         <Compile Include="RedirectTraffic\IRedirectTrafficDispatcher.cs" />
         <Compile Include="RedirectTraffic\Menu\EnableRedirectArrowComponentItem.cs" />
         <Compile Include="RedirectTraffic\Menu\RedirectTrafficConeDistanceComponentItem.cs" />
@@ -208,6 +217,8 @@
         <Compile Include="Roadblock\Dispatcher\RoadblockDispatcher.cs" />
         <Compile Include="Roadblock\Dispatcher\RoadblockInfo.cs" />
         <Compile Include="Roadblock\ERoadblockDistance.cs" />
+        <Compile Include="Roadblock\ERoadblockHitType.cs" />
+        <Compile Include="Roadblock\IPursuitRoadblock.cs" />
         <Compile Include="Roadblock\IRoadblock.cs" />
         <Compile Include="Roadblock\Menu\CleanRoadblocksComponent.cs" />
         <Compile Include="Roadblock\AbstractRoadblock.cs" />
@@ -220,8 +231,10 @@
         <Compile Include="Roadblock\ERoadblockState.cs" />
         <Compile Include="Roadblock\Slot\AbstractPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\AbstractRoadblockSlot.cs" />
+        <Compile Include="Roadblock\Slot\ERoadblockSlotState.cs" />
         <Compile Include="Roadblock\Slot\IPursuitRoadblockSlot.cs" />
         <Compile Include="Roadblock\Slot\IRoadblockSlot.cs" />
+        <Compile Include="Settings\CloseRoadSettings.cs" />
         <Compile Include="ShortKeys\CleanAll.cs" />
         <Compile Include="ShortKeys\ICleanAll.cs" />
         <Compile Include="Street\Calculation\IRoadStrategy.cs" />
@@ -305,6 +318,7 @@
       </Content>
     </ItemGroup>
     <ItemGroup>
+      <None Include="App.config" />
       <None Include="packages.config" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
@@ -15,14 +15,12 @@ namespace AutomaticRoadblocks.Instances
 {
     public abstract class AbstractInstancePlacementManager<T> : IPreviewSupport, IDisposable where T : IPlaceableInstance
     {
-        protected readonly IGame Game;
         protected readonly ILogger Logger;
 
         protected VehicleNodeInfo LastDeterminedStreet;
 
-        protected AbstractInstancePlacementManager(IGame game, ILogger logger)
+        protected AbstractInstancePlacementManager(ILogger logger)
         {
-            Game = game;
             Logger = logger;
         }
 
@@ -67,7 +65,7 @@ namespace AutomaticRoadblocks.Instances
 
                 foreach (var instance in instancesToRemove)
                 {
-                    DisposeInstance(instance, true);
+                    DisposeInstance(instance);
                     Instances.Remove(instance);
                 }
             }
@@ -82,7 +80,7 @@ namespace AutomaticRoadblocks.Instances
         {
             lock (Instances)
             {
-                Instances.ForEach(x => DisposeInstance(x, false));
+                Instances.ForEach(DisposeInstance);
                 Instances.Clear();
             }
         }
@@ -100,12 +98,18 @@ namespace AutomaticRoadblocks.Instances
         protected abstract T CreateInstance(IVehicleNode street);
 
         /// <summary>
+        /// Calculate the preview position to place within the world.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Vector3 CalculatePreviewPosition();
+
+        /// <summary>
         /// Create a preview for the current properties.
         /// </summary>
         /// <param name="force">Force a redraw of the preview.</param>
         protected void DoInternalPreviewCreation(bool force)
         {
-            var road = CalculateNewLocationForInstance();
+            var road = CalculateNewLocationForInstance(CalculatePreviewPosition());
 
             // ignore intersections and wait for the player to move
             if (road.GetType() == typeof(Intersection))
@@ -160,13 +164,30 @@ namespace AutomaticRoadblocks.Instances
                 Instances.RemoveAll(x => toBoRemoved.Contains(x));
             }
 
-            toBoRemoved.ForEach(x => DisposeInstance(x, false));
+            toBoRemoved.ForEach(DisposeInstance);
         }
 
-        protected VehicleNodeInfo CalculateNewLocationForInstance()
+        /// <summary>
+        /// Dispose the given instance.
+        /// </summary>
+        /// <param name="instance">The instance to dispose.</param>
+        protected void DisposeInstance(T instance)
         {
-            var position = Game.PlayerPosition + MathHelper.ConvertHeadingToDirection(Game.PlayerHeading) * DistanceInFrontOfPlayer;
+            if (instance == null)
+                return;
 
+            if (!instance.IsPreviewActive)
+            {
+                Logger.Debug($"Releasing instance placement to LSPDFR for {instance}");
+                instance.Release(true);
+            }
+
+            Logger.Debug($"Disposing instance placement for {instance}");
+            instance.Dispose();
+        }
+
+        protected VehicleNodeInfo CalculateNewLocationForInstance(Vector3 position)
+        {
             return RoadQuery.FindClosestNode(position, EVehicleNodeType.AllRoadNoJunctions);
         }
 
@@ -200,7 +221,7 @@ namespace AutomaticRoadblocks.Instances
         {
             T closestInstance = default;
             var closestInstanceDistance = 9999f;
-            var playerPosition = Game.PlayerPosition;
+            var playerPosition = GameUtils.PlayerPosition;
 
             foreach (var instance in Instances.Where(x => !x.IsPreviewActive))
             {
@@ -214,22 +235,6 @@ namespace AutomaticRoadblocks.Instances
             }
 
             return closestInstance;
-        }
-
-        /// <summary>
-        /// Dispose the given instance.
-        /// </summary>
-        /// <param name="instance">The instance to dispose.</param>
-        /// <param name="preview">Indicates if a preview is being disposed.</param>
-        private void DisposeInstance(T instance, bool preview)
-        {
-            if (!preview)
-            {
-                Logger.Debug($"Releasing manual roadblock placement to LSPDFR for {instance}");
-                instance.Release(true);
-            }
-            
-            instance.Dispose();
         }
 
         private static void CreatePreviewMarker(VehicleNodeInfo street)

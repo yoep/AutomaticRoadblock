@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Instances;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Roadblock;
 using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.Utils;
@@ -69,12 +69,12 @@ namespace AutomaticRoadblocks.LightSources
             return instances;
         }
 
-        private static ARScenery CreateSideInstance(LightModel lightModel, Vector3 sidePosition, Vector3 targetPoint, float travelHeading,
-            float placementHeading)
+        private static ARScenery CreateSideInstance(LightModel lightModel, Vector3 sidePosition, Vector3 targetPoint, 
+            float travelHeading, float placementHeading)
         {
             Logger.Trace($"Creating side instance at {sidePosition} for {lightModel}");
             var position = sidePosition + MathHelper.ConvertHeadingToDirection(travelHeading) * PlacementDistanceRoadSides;
-            var targetPosition = targetPoint + MathHelper.ConvertHeadingToDirection(placementHeading - 180) * PlacementDistanceRoadSides;
+            var targetPosition = targetPoint + MathHelper.ConvertHeadingToDirection(MathHelper.NormalizeHeading(placementHeading - 180)) * (PlacementDistanceRoadSides + 5f);
             var heading = MathHelper.ConvertDirectionToHeading(targetPosition - position) + lightModel.Rotation;
 
             return new ARScenery(CreateInstance(lightModel, position, heading));

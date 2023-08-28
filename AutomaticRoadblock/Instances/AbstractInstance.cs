@@ -1,5 +1,6 @@
 using System.Diagnostics;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
+using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Instances
@@ -7,7 +8,6 @@ namespace AutomaticRoadblocks.Instances
     public abstract class AbstractInstance<T> : IARInstance<T> where T : Entity
     {
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
-        protected readonly IGame Game = IoC.Instance.GetInstance<IGame>();
 
         private bool _isReleased;
 
@@ -66,6 +66,9 @@ namespace AutomaticRoadblocks.Instances
         public virtual void Dispose()
         {
             _isReleased = true;
+
+            if (!IsInvalid)
+                EntityUtils.Remove(GameInstance);
         }
 
         /// <inheritdoc />
@@ -74,7 +77,10 @@ namespace AutomaticRoadblocks.Instances
             _isReleased = true;
 
             if (!IsInvalid)
+            {
+                GameInstance.IsPersistent = false;
                 GameInstance.Dismiss();
+            }
         }
 
         #endregion
@@ -83,7 +89,7 @@ namespace AutomaticRoadblocks.Instances
 
         private void MonitorState()
         {
-            Game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (!_isReleased)
                 {
@@ -93,7 +99,7 @@ namespace AutomaticRoadblocks.Instances
                         break;
                     }
 
-                    if (!GameInstance.IsPersistent)
+                    if (!_isReleased && !GameInstance.IsPersistent)
                     {
                         StateChanged(nameof(GameInstance.IsPersistent), GameInstance.IsPersistent);
                         GameInstance.MakePersistent();
@@ -108,7 +114,7 @@ namespace AutomaticRoadblocks.Instances
         private void StateChanged(string field, object newValue)
         {
             Logger.Warn($"{GetType()}#{field} state changed to {newValue}");
-            Game.DisplayNotificationDebug($"~o~State changed of ~s~{GetType()}~c~#~b~{field}");
+            GameUtils.DisplayNotificationDebug($"~o~State changed of ~s~{GetType()}~c~#~b~{field}");
         }
 
         #endregion

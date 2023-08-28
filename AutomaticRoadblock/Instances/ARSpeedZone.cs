@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
@@ -11,11 +11,9 @@ namespace AutomaticRoadblocks.Instances
 {
     public class ARSpeedZone : IPreviewSupport, IDisposable
     {
-        private readonly IGame _game = IoC.Instance.GetInstance<IGame>();
         private readonly ILogger _logger = IoC.Instance.GetInstance<ILogger>();
 
         private uint? _speedZoneId;
-        private bool _previewActive;
 
         public ARSpeedZone(Vector3 position, float radius, float speedLimit)
         {
@@ -46,19 +44,22 @@ namespace AutomaticRoadblocks.Instances
         #region IPreviewSupport
 
         /// <inheritdoc />
-        public bool IsPreviewActive => _previewActive;
+        public bool IsPreviewActive { get; private set; }
 
         /// <inheritdoc />
         public void CreatePreview()
         {
-            _previewActive = true;
+            if (IsPreviewActive)
+                return;
+
+            IsPreviewActive = true;
             DrawDebugInfo();
         }
 
         /// <inheritdoc />
         public void DeletePreview()
         {
-            _previewActive = false;
+            IsPreviewActive = false;
         }
 
         #endregion
@@ -107,12 +108,12 @@ namespace AutomaticRoadblocks.Instances
         [Conditional("DEBUG")]
         private void DrawDebugInfo()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 var mainColor = Color.Lavender;
                 var color = Color.FromArgb(50, mainColor.R, mainColor.G, mainColor.B);
 
-                while (_previewActive)
+                while (IsPreviewActive)
                 {
                     GameFiber.Yield();
                     GameUtils.CreateMarker(Position, EMarkerType.MarkerTypeVerticalCylinder, color, Radius, 2f, false);

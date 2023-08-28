@@ -1,11 +1,16 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Preview;
+using Rage;
 
 namespace AutomaticRoadblocks.RedirectTraffic
 {
+    [SuppressMessage("ReSharper", "UnusedType.Global")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
     public interface IRedirectTrafficDispatcher : IPreviewSupport, IDisposable
     {
         /// <summary>
@@ -41,7 +46,15 @@ namespace AutomaticRoadblocks.RedirectTraffic
         /// <summary>
         /// Dispatch a new redirect traffic instance.
         /// </summary>
+        [Obsolete("Use DispatchRedirection(Vector3) instead")]
         void DispatchRedirection();
+        
+        /// <summary>
+        /// Dispatch a traffic redirection for the current position.
+        /// </summary>
+        /// <param name="position">The position to create a traffic redirection.</param>
+        /// <returns>Returns the created traffic redirection.</returns>
+        IRedirectTraffic DispatchRedirection(Vector3 position);
 
         /// <summary>
         /// Remove the traffic redirects.

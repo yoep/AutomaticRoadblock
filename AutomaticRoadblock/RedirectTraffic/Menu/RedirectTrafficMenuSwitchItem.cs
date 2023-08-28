@@ -1,24 +1,26 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using AutomaticRoadblocks.AbstractionLayer;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Menu.Switcher;
+using AutomaticRoadblocks.Utils;
+using Rage;
 using RAGENativeUI;
 
 namespace AutomaticRoadblocks.RedirectTraffic.Menu
 {
     public class RedirectTrafficMenuSwitchItem : IMenuSwitchItem, IDisposable
     {
-        private readonly IGame _game;
+        private readonly ILogger _logger;
         private readonly IRedirectTrafficDispatcher _redirectTrafficDispatcher;
         private readonly ILocalizer _localizer;
 
         private bool _running = true;
 
-        public RedirectTrafficMenuSwitchItem(IGame game, IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
+        public RedirectTrafficMenuSwitchItem(ILogger logger,  IRedirectTrafficDispatcher redirectTrafficDispatcher, ILocalizer localizer)
         {
-            _game = game;
+            _logger = logger;
             _redirectTrafficDispatcher = redirectTrafficDispatcher;
             _localizer = localizer;
 
@@ -50,22 +52,34 @@ namespace AutomaticRoadblocks.RedirectTraffic.Menu
 
         private void Process()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 while (_running)
                 {
-                    _game.FiberYield();
-
-                    if (Menu.Visible)
-                    {
-                        _redirectTrafficDispatcher.CreatePreview();
-                    }
-                    else
-                    {
-                        _redirectTrafficDispatcher.DeletePreview();
-                    }
+                    GameFiber.Yield();
+                    DoProcessTick();
                 }
             }, "RedirectTrafficMenuSwitchItem.Process");
+        }
+
+        private void DoProcessTick()
+        {
+            try
+            {
+                if (Menu.Visible)
+                {
+                    _redirectTrafficDispatcher.CreatePreview();
+                }
+                else
+                {
+                    _redirectTrafficDispatcher.DeletePreview();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Traffic redirection preview failed, {ex.Message}", ex);
+                GameUtils.DisplayNotification($"~r~{_localizer[LocalizationKey.RedirectTrafficUnknownError]}");
+            }
         }
     }
 }

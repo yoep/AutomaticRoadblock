@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Street;
+using AutomaticRoadblocks.Utils;
 using Rage;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
@@ -15,13 +16,11 @@ namespace AutomaticRoadblocks.Debug.Menu
         private const float SearchRadius = 15f;
 
         private readonly ILogger _logger;
-        private readonly IGame _game;
         private List<IVehicleNode> _roads;
 
-        public DebugRoadPreviewComponent(ILogger logger, IGame game)
+        public DebugRoadPreviewComponent(ILogger logger)
         {
             _logger = logger;
-            _game = game;
         }
 
         #region IMenuComponent
@@ -58,7 +57,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         [Conditional("DEBUG")]
         private void CreateRoadPreview()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreviewRemove;
                 var type = (ERoadPreviewType)MenuItem.SelectedValue;
@@ -91,7 +90,7 @@ namespace AutomaticRoadblocks.Debug.Menu
         [Conditional("DEBUG")]
         private void RemoveRoadPreview()
         {
-            _game.NewSafeFiber(() =>
+            GameUtils.NewSafeFiber(() =>
             {
                 MenuItem.Text = AutomaticRoadblocksPlugin.RoadPreview;
                 _roads.ForEach(x => x.DeletePreview());

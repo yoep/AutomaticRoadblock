@@ -1,6 +1,6 @@
 using System;
 using System.Windows.Forms;
-using AutomaticRoadblocks.AbstractionLayer;
+using AutomaticRoadblocks.Logging;
 using Rage;
 
 namespace AutomaticRoadblocks.Settings
@@ -12,6 +12,7 @@ namespace AutomaticRoadblocks.Settings
         private const string AutomaticRoadblocksSection = "Automatic Roadblocks";
         private const string ManualPlacementSection = "Manual Placement";
         private const string RedirectTrafficSection = "Redirect Traffic";
+        private const string CloseRoadSection = "Close Road";
 
         private readonly ILogger _logger;
 
@@ -31,6 +32,9 @@ namespace AutomaticRoadblocks.Settings
 
         /// <inheritdoc />
         public RedirectTrafficSettings RedirectTrafficSettings { get; private set; }
+
+        /// <inheritdoc />
+        public CloseRoadSettings CloseRoadSettings { get; private set; }
 
         /// <inheritdoc />
         public void Load()
@@ -53,6 +57,7 @@ namespace AutomaticRoadblocks.Settings
                 ReadAutomaticRoadblocksSettings(settingsFile);
                 ReadManualPlacementSettings(settingsFile);
                 ReadRedirectTrafficSettings(settingsFile);
+                ReadCloseRoadSettings(settingsFile);
 
                 // update the log level of the plugin
                 _logger.LogLevel = GeneralSettings.LogLevel;
@@ -81,7 +86,7 @@ namespace AutomaticRoadblocks.Settings
         {
             AutomaticRoadblocksSettings = new AutomaticRoadblocksSettings
             {
-                DispatchNowKey = ValueToKey(file.ReadString(AutomaticRoadblocksSection, "DispatchNowKey", "X")),
+                DispatchNowKey = ValueToKey(file.ReadString(AutomaticRoadblocksSection, "DispatchNowKey", "E")),
                 DispatchNowModifierKey = ValueToKey(file.ReadString(AutomaticRoadblocksSection, "DispatchNowModifierKey", "ShiftKey")),
                 EnableDuringPursuits = file.ReadBoolean(AutomaticRoadblocksSection, "EnableDuringPursuits", true),
                 EnableAutoLevelIncrements = file.ReadBoolean(AutomaticRoadblocksSection, "EnableAutoLevelIncrements", true),
@@ -102,7 +107,7 @@ namespace AutomaticRoadblocks.Settings
             {
                 EnablePreview = file.ReadBoolean(ManualPlacementSection, "EnablePreview", true),
                 DistanceFromPlayer = (float)file.ReadDouble(ManualPlacementSection, "DistanceFromPlayer", 8.0),
-                EnableCops = file.ReadBoolean(ManualPlacementSection, "EnableCops", false),
+                EnableCops = file.ReadBoolean(ManualPlacementSection, "EnableCops", true),
                 DefaultMainBarrier = file.ReadString(ManualPlacementSection, "DefaultMainBarrier"),
                 DefaultSecondaryBarrier = file.ReadString(ManualPlacementSection, "DefaultSecondaryBarrier"),
             };
@@ -113,9 +118,20 @@ namespace AutomaticRoadblocks.Settings
             RedirectTrafficSettings = new RedirectTrafficSettings
             {
                 EnablePreview = file.ReadBoolean(RedirectTrafficSection, "EnablePreview", true),
-                DistanceFromPlayer = (float)file.ReadDouble(RedirectTrafficSection, "DistanceFromPlayer", 10.0),
+                DistanceFromPlayer = (float)file.ReadDouble(RedirectTrafficSection, "DistanceFromPlayer", 20.0),
                 EnableLights = file.ReadBoolean(RedirectTrafficSection, "EnableLights", true),
                 DefaultCone = file.ReadString(RedirectTrafficSection, "DefaultCone", "big_cone_stripes"),
+            };
+        }
+
+        private void ReadCloseRoadSettings(InitializationFile file)
+        {
+            CloseRoadSettings = new CloseRoadSettings
+            {
+                CloseRoadKey = ValueToKey(file.ReadString(CloseRoadSection, "CloseRoadKey", "E")),
+                CloseRoadModifierKey = ValueToKey(file.ReadString(CloseRoadSection, "CloseRoadModifierKey", "ControlKey")),
+                MaxDistanceFromPlayer = (float)file.ReadDouble(CloseRoadSection, "MaxDistanceFromPlayer", 60.0),
+                Barrier = file.ReadString(CloseRoadSection, "Barrier", "police_do_not_cross"),
             };
         }
 

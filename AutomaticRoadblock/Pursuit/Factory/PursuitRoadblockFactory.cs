@@ -7,7 +7,7 @@ namespace AutomaticRoadblocks.Pursuit.Factory
 {
     internal static class PursuitRoadblockFactory
     {
-        private static readonly Dictionary<ERoadblockLevel, Func<PursuitRoadblockRequest, IRoadblock>> Roadblocks = new()
+        private static readonly Dictionary<ERoadblockLevel, Func<PursuitRoadblockRequest, IPursuitRoadblock>> Roadblocks = new()
         {
             {
                 ERoadblockLevel.Level1, request => new PursuitRoadblockLevel1(request)
@@ -26,7 +26,7 @@ namespace AutomaticRoadblocks.Pursuit.Factory
             }
         };
 
-        internal static IRoadblock Create(PursuitRoadblockRequest request)
+        internal static IPursuitRoadblock Create(PursuitRoadblockRequest request)
         {
             Assert.NotNull(request, "request cannot be null");
             Assert.NotNull(request.RoadblockData, $"request is invalid, {nameof(request.RoadblockData)} cannot be null");
