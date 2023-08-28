@@ -137,7 +137,7 @@ namespace AutomaticRoadblocks.Localization
             }
             catch (Exception ex)
             {
-                _logger.Error($"Failed to format localized message, {ex.Message}", ex);
+                _logger.Error($"Failed to format localized message of {key}, {ex.Message}", ex);
                 return key.DefaultText;
             }
         }
