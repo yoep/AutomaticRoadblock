@@ -18,7 +18,7 @@ jobs:
         with:
           nuget-api-key: ${{ secrets.NuGetAPIKey }}
           nuget-version: latest
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         id: cache
         with:
           path: ~/.nuget/packages
