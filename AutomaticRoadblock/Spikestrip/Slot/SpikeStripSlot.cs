@@ -12,7 +12,6 @@ using AutomaticRoadblocks.Roadblock.Slot;
 using AutomaticRoadblocks.SpikeStrip.Dispatcher;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.SpikeStrip.Slot
@@ -64,7 +63,6 @@ namespace AutomaticRoadblocks.SpikeStrip.Slot
         /// <summary>
         /// Retrieve the spike strip instance of this slot.
         /// </summary>
-        [CanBeNull]
         private ISpikeStrip SpikeStrip => Instances
             .Where(x => x.Type == EEntityType.SpikeStrip)
             .Select(x => (ARSpikeStrip)x)

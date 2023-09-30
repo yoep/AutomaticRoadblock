@@ -10,7 +10,6 @@ using AutomaticRoadblocks.Settings;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
-using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Dispatcher
@@ -203,7 +202,6 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             return enableSpikeStrips && roadblockData.SpikeStripsEnabled && spawnChance >= threshold;
         }
 
-        [CanBeNull]
         private IRoadblock DoInternalDispatch(ERoadblockLevel level, Vehicle vehicle, DispatchOptions options)
         {
             // verify if a user requested roadblock is still being dispatched
@@ -625,7 +623,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
         /// <summary>
         /// Filter out any roads of the intersection which travel in the same heading as the target.
         /// </summary>
-        private IEnumerable<Road> FilterRoadsTravellingAlongTheRoute([CanBeNull] IVehicleNode previousNode, Intersection intersection)
+        private IEnumerable<Road> FilterRoadsTravellingAlongTheRoute(IVehicleNode previousNode, Intersection intersection)
         {
             _logger.Debug($"Filtering applicable intersection roads for intersection {intersection}");
             var headingToVerify = previousNode?.Heading ?? intersection.Heading;

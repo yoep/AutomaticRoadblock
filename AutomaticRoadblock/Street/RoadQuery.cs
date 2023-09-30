@@ -4,7 +4,6 @@ using System.Linq;
 using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Street.Factory;
 using AutomaticRoadblocks.Street.Info;
-using JetBrains.Annotations;
 using Rage;
 using Rage.Native;
 
@@ -132,7 +131,6 @@ namespace AutomaticRoadblocks.Street
 
         #region Functions
 
-        [CanBeNull]
         private static VehicleNodeInfo FindVehicleNodeWithHeading(Vector3 position, float heading, EVehicleNodeType nodeType,
             ENodeFlag blacklistedFlags = ENodeFlag.None)
         {

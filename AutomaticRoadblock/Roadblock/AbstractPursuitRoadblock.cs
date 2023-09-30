@@ -17,7 +17,6 @@ using AutomaticRoadblocks.SpikeStrip.Slot;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
-using JetBrains.Annotations;
 using LSPD_First_Response.Engine.Scripting.Entities;
 using Rage;
 
@@ -58,7 +57,6 @@ namespace AutomaticRoadblocks.Roadblock
         #region Properties
 
         /// <inheritdoc />
-        [CanBeNull]
         public Vehicle TargetVehicle { get; }
 
         /// <inheritdoc />

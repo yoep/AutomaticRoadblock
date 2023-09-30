@@ -8,7 +8,6 @@ using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Utils.Type;
-using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Instances
@@ -94,7 +93,6 @@ namespace AutomaticRoadblocks.Instances
         /// </summary>
         /// <param name="street">The road to create the instance for.</param>
         /// <returns>Returns the created instance on success, else null.</returns>
-        [CanBeNull]
         protected abstract T CreateInstance(IVehicleNode street);
 
         /// <summary>

@@ -1,5 +1,4 @@
 using System.Xml.XPath;
-using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Xml.Context
 {
@@ -27,27 +26,23 @@ namespace AutomaticRoadblocks.Xml.Context
         /// <summary>
         /// The XML document that is being parsed.
         /// </summary>
-        [NotNull]
         public XPathDocument Document { get; }
 
-        [NotNull] public XPathNavigator CurrentNode { get; }
+        public XPathNavigator CurrentNode { get; }
 
         /// <summary>
         /// The current xpath navigation of the context.
         /// </summary>
-        [NotNull]
         public string XPath => _xPath + LookupName;
 
         /// <summary>
         /// The current lookup name for the content in the <see cref="CurrentNode"/>.
         /// </summary>
-        [CanBeNull]
         public string LookupName { get; }
 
         /// <summary>
         /// The current value of the node context.
         /// </summary>
-        [CanBeNull]
         public string Value { get; }
 
         private static string ToXPath(XPathNavigator currentNode)

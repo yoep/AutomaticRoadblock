@@ -5,7 +5,6 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Preview;
 using AutomaticRoadblocks.Street.Info;
-using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
@@ -42,13 +41,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// Retrieve the vehicle instance (nullable) of this slot.
         /// It returns null when <see cref="Spawn"/> has not been called yet.
         /// </summary>
-        [CanBeNull]
         ARVehicle Vehicle { get; }
 
         /// <summary>
         /// The lane this slot blocks of a certain road.
         /// </summary>
-        [NotNull]
         Road.Lane Lane { get; }
 
         /// <summary>

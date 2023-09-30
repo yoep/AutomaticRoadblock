@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Lspdfr;
-using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.CloseRoad
@@ -33,7 +32,6 @@ namespace AutomaticRoadblocks.CloseRoad
         /// <param name="position">The position to close the road around.</param>
         /// <param name="preview">Close the nearby road as a preview only.</param>
         /// <returns>Returns the road closure on success, else null when unable to close road at given location.</returns>
-        [CanBeNull]
         IRoadClosure CloseNearbyRoad(Vector3 position, bool preview = false);
 
         /// <summary>

@@ -4,7 +4,6 @@ using System.Linq;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Logging;
-using JetBrains.Annotations;
 
 namespace AutomaticRoadblocks.Models
 {
@@ -97,7 +96,6 @@ namespace AutomaticRoadblocks.Models
 
         #region Functions
 
-        [CanBeNull]
         private IEnumerable<T> TrySafeModelLoading<T>(string property, Func<List<T>> action, Action<IEnumerable<T>> invokeEvent, List<T> defaults = null)
         {
             // initialize the defaults list if none is given

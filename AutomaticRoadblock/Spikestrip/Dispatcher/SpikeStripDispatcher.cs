@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Street.Info;
-using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
@@ -84,8 +83,8 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
 
         #region Functions
 
-        private ISpikeStrip DoInternalSpikeStripCreation(Road street, [CanBeNull] Road.Lane lane, ESpikeStripLocation stripLocation, DeploymentType type,
-            [CanBeNull] Vehicle targetVehicle, float offset)
+        private ISpikeStrip DoInternalSpikeStripCreation(Road street, Road.Lane lane, ESpikeStripLocation stripLocation, DeploymentType type,
+            Vehicle targetVehicle, float offset)
         {
             ISpikeStrip spikeStrip;
 
@@ -127,7 +126,7 @@ namespace AutomaticRoadblocks.SpikeStrip.Dispatcher
             return new SpikeStrip(street, stripLocation, offset);
         }
 
-        private static PursuitSpikeStrip DoPursuitSpikeStripCreation(Road street, [CanBeNull] Road.Lane lane, ESpikeStripLocation stripLocation,
+        private static PursuitSpikeStrip DoPursuitSpikeStripCreation(Road street, Road.Lane lane, ESpikeStripLocation stripLocation,
             Vehicle targetVehicle, float offset)
         {
             return lane == null
