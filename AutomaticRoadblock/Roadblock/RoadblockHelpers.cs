@@ -5,7 +5,6 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
-using JetBrains.Annotations;
 using LSPD_First_Response.Mod.API;
 using Rage;
 
@@ -21,7 +20,7 @@ namespace AutomaticRoadblocks.Roadblock
         /// <param name="copInstances">The instances which are allowed to be released.</param>
         /// <param name="vehicle">The vehicle instance which will be released, can be null.</param>
         /// <returns>Returns the instances which have been released.</returns>
-        internal static void ReleaseInstancesToLspdfr(IList<ARPed> copInstances, [CanBeNull] ARVehicle vehicle)
+        internal static void ReleaseInstancesToLspdfr(IList<ARPed> copInstances, ARVehicle vehicle)
         {
             Assert.NotNull(copInstances, "copInstances cannot be null");
             try

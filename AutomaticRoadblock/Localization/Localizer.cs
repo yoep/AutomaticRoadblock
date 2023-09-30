@@ -131,7 +131,15 @@ namespace AutomaticRoadblocks.Localization
                 }
             }
 
-            return string.Format(textValue, args);
+            try
+            {
+                return string.Format(textValue, args);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to format localized message of {key}, {ex.Message}", ex);
+                return key.DefaultText;
+            }
         }
 
         private bool AddLocalizationKeyToCacheIfFound(LocalizationKey key)

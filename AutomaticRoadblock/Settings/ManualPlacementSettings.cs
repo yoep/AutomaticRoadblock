@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-
 namespace AutomaticRoadblocks.Settings
 {
     public class ManualPlacementSettings
@@ -25,14 +23,12 @@ namespace AutomaticRoadblocks.Settings
         /// The default main barrier to use when placing manual roadblocks
         /// This barrier will be selected when opening the menu section for the first time
         /// </summary>
-        [CanBeNull]
         public string DefaultMainBarrier { get; internal set; }
         
         /// <summary>
         /// The default secondary barrier to use when placing manual roadblocks
         /// This barrier will be selected when opening the menu section for the first time
         /// </summary>
-        [CanBeNull]
         public string DefaultSecondaryBarrier { get; internal set; }
     }
 }

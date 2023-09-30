@@ -10,7 +10,6 @@ using AutomaticRoadblocks.Lspdfr;
 using AutomaticRoadblocks.Street.Info;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
-using JetBrains.Annotations;
 using Rage;
 
 namespace AutomaticRoadblocks.Roadblock.Slot
@@ -105,7 +104,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         /// <summary>
         /// The vehicle model of this slot.
         /// </summary>
-        [CanBeNull]
         protected Model? VehicleModel { get; }
 
         /// <summary>
