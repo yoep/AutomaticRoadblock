@@ -31,7 +31,7 @@ build-dotnet-release: clean # Build the release version of the application
 build: build-dotnet copy-Debug # Prepare & Build the Debug version of the application
 
 build-release: build-dotnet-release copy-Release # Prepare & Build the Release version of the application
-	@cp "AutomaticRoadblock\\Api\\Functions.cs" "Build\\API Documentation\\" /f /y
+	@cp "AutomaticRoadblock\\Api\\Functions.cs" "Build\\API Documentation\\"
 
 release: bump-minor build-release # Build the release version of the application
 
