@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Utils;
 using Rage;
@@ -9,14 +8,11 @@ namespace AutomaticRoadblocks.Instances
     {
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
 
-        private bool _isReleased;
-
         protected AbstractInstance(T instance)
         {
             Assert.NotNull(instance, "instance cannot be null");
             GameInstance = instance;
             GameInstance.MakePersistent();
-            MonitorState();
         }
 
         #region Properties
@@ -65,8 +61,6 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public virtual void Dispose()
         {
-            _isReleased = true;
-
             if (!IsInvalid)
                 EntityUtils.Remove(GameInstance);
         }
@@ -74,47 +68,11 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public virtual void Release()
         {
-            _isReleased = true;
-
             if (!IsInvalid)
             {
                 GameInstance.IsPersistent = false;
                 GameInstance.Dismiss();
             }
-        }
-
-        #endregion
-
-        #region Functions
-
-        private void MonitorState()
-        {
-            GameUtils.NewSafeFiber(() =>
-            {
-                while (!_isReleased)
-                {
-                    if (IsInvalid)
-                    {
-                        StateChanged(nameof(GameInstance.IsValid), GameInstance.IsValid());
-                        break;
-                    }
-
-                    if (!_isReleased && !GameInstance.IsPersistent)
-                    {
-                        StateChanged(nameof(GameInstance.IsPersistent), GameInstance.IsPersistent);
-                        GameInstance.MakePersistent();
-                    }
-
-                    GameFiber.Wait(1000);
-                }
-            }, $"{GetType()}.MonitorState");
-        }
-
-        [Conditional("DEBUG")]
-        private void StateChanged(string field, object newValue)
-        {
-            Logger.Warn($"{GetType()}#{field} state changed to {newValue}");
-            GameUtils.DisplayNotificationDebug($"~o~State changed of ~s~{GetType()}~c~#~b~{field}");
         }
 
         #endregion
