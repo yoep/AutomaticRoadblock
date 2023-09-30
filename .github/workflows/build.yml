@@ -23,11 +23,6 @@ jobs:
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config') }}
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: |
-            4.8.x
       - name: Install dependencies
         run: make restore
       - name: Test
