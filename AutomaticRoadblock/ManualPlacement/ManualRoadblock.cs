@@ -52,13 +52,19 @@ namespace AutomaticRoadblocks.ManualPlacement
         /// <inheritdoc />
         public override ERoadblockLevel Level => ERoadblockLevel.None;
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="AbstractRoadblock{T}.Release" />
         public override void Release(bool releaseAll = false)
         {
             if (CopsEnabled)
             {
+                Logger.Debug("Releasing manual roadblock, cops are enabled");
                 base.Release(true);
                 InternalSlots.ForEach(x => x.Release());
+            }
+            else
+            {
+                Logger.Debug("Disposing manual roadblock, cops are disabled");
+                Dispose();
             }
         }
 

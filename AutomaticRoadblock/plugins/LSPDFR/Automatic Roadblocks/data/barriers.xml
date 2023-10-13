@@ -3,7 +3,7 @@
         <Name>Small cone</Name> <!-- The (display) name of the barrier -->
         <ScriptName>small_cone</ScriptName> <!-- The name to use as reference in other data files to this barrier, this value is also used by the localization -->
         <Model>prop_mp_cone_03</Model> <!-- The game model name -->
-        <Spacing>0.4</Spacing> <!-- The spacing between each barrier of this type -->
+        <Spacing>0.5</Spacing> <!-- The spacing between each barrier of this type -->
         <Flags>
             <Flag>ManualPlacement</Flag> <!-- Make it usable within the manual placement -->
             <Flag>RedirectTraffic</Flag>  <!-- Make it usable within the traffic redirection -->
@@ -13,7 +13,7 @@
         <Name>Small cone with stripes</Name>
         <ScriptName>small_cone_stripes</ScriptName>
         <Model>prop_mp_cone_02</Model>
-        <Spacing>0.4</Spacing>
+        <Spacing>0.5</Spacing>
         <Flags>
             <Flag>ManualPlacement</Flag>
             <Flag>RedirectTraffic</Flag>
@@ -23,7 +23,7 @@
         <Name>Big cone</Name>
         <ScriptName>big_cone</ScriptName>
         <Model>prop_roadcone01c</Model>
-        <Spacing>0.5</Spacing>
+        <Spacing>0.6</Spacing>
         <Flags>
             <Flag>ManualPlacement</Flag>
             <Flag>RedirectTraffic</Flag>
@@ -33,7 +33,7 @@
         <Name>Big cone with stripes</Name>
         <ScriptName>big_cone_stripes</ScriptName>
         <Model>prop_mp_cone_01</Model>
-        <Spacing>0.5</Spacing>
+        <Spacing>0.6</Spacing>
         <Flags>
             <Flag>ManualPlacement</Flag>
             <Flag>RedirectTraffic</Flag>
@@ -43,7 +43,7 @@
         <Name>Long pole</Name>
         <ScriptName>roadpole</ScriptName>
         <Model>prop_roadpole_01a</Model>
-        <Spacing>0.5</Spacing>
+        <Spacing>0.6</Spacing>
         <Flags>
             <Flag>ManualPlacement</Flag>
         </Flags>
@@ -52,7 +52,7 @@
         <Name>Long pole with light</Name>
         <ScriptName>roadpole_light</ScriptName>
         <Model>prop_roadpole_01b</Model>
-        <Spacing>0.5</Spacing>
+        <Spacing>0.6</Spacing>
         <Flags>
             <Flag>ManualPlacement</Flag>
         </Flags>
