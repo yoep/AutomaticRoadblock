@@ -1,5 +1,7 @@
+using System;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Models;
+using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.Barriers
@@ -57,7 +59,7 @@ namespace AutomaticRoadblocks.Barriers
             var model = new Model(barrier.Model);
 
             // load the asset into memory
-            model.LoadAndWait();
+            LoadModel(barrier, model);
 
             return new BarrierModel
             {
@@ -96,6 +98,18 @@ namespace AutomaticRoadblocks.Barriers
                 hashCode = (hashCode * 397) ^ Width.GetHashCode();
                 return hashCode;
             }
+        }
+
+        private static void LoadModel(Barrier barrier, Model model)
+        {
+            GameUtils.NewSafeFiber(() =>
+            {
+                Logger.Trace($"Loading BarrierModel of {barrier}");
+                var loadingStartedAt = DateTime.Now.Ticks;
+                model.LoadAndWait();
+                var timeTaken = (DateTime.Now.Ticks - loadingStartedAt) / TimeSpan.TicksPerMillisecond;
+                Logger.Debug($"BarrierModel {barrier} has been loaded in {timeTaken}ms");
+            }, "BarrierModel.LoadModel");
         }
     }
 }

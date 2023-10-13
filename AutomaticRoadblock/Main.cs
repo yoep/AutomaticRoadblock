@@ -168,7 +168,12 @@ namespace AutomaticRoadblocks
 
             if (onDuty)
             {
-                listeners.ToList().ForEach(x => x.OnDutyStarted());
+                listeners.ToList().ForEach(x =>
+                {
+                    logger.Debug($"Invoking OnDutyStarted listener of {x.GetType().Name}");
+                    x.OnDutyStarted();
+                });
+                logger.Debug("Activating menu component");
                 ioC.GetInstance<IMenu>().Activate();
 
                 GameUtils.NewSafeFiber(() =>
@@ -181,7 +186,11 @@ namespace AutomaticRoadblocks
             }
             else
             {
-                listeners.ToList().ForEach(x => x.OnDutyEnded());
+                listeners.ToList().ForEach(x =>
+                {
+                    logger.Debug($"Invoking OnDutyEnded listener of {x.GetType().Name}");
+                    x.OnDutyEnded();
+                });
             }
         }
 

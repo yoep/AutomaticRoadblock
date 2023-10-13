@@ -18,8 +18,6 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public Object GameInstance => SpikeStrip?.GameInstance;
 
-       
-
         /// <inheritdoc />
         public Vector3 Position
         {
@@ -37,10 +35,14 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public bool IsInvalid => SpikeStrip.State is ESpikeStripState.Preparing or ESpikeStripState.Disposed;
 
+        /// <inheritdoc />
+        public InstanceState State => InstanceState.Idle;
+        
         /// <summary>
         /// The spike strip instance.
         /// </summary>
         public ISpikeStrip SpikeStrip { get; }
+
 
         #endregion
 

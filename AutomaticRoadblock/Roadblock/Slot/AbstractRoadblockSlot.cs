@@ -187,7 +187,11 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public virtual void Dispose()
         {
             DeletePreview();
-            Instances.ForEach(x => DoSafeOperation(x.Dispose, $"dispose instance slot {x}"));
+            Instances
+                .Where(x => !x.IsInvalid)
+                .Where(x => x.State != InstanceState.Released)
+                .ToList()
+                .ForEach(x => DoSafeOperation(x.Dispose, $"dispose instance slot {x}"));
         }
 
         #endregion
@@ -381,11 +385,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected void DoInternalRelease(IList<ARPed> cops)
         {
             Logger.Trace($"Releasing {GetType()} {this}");
+            // release all scenery instances
             Instances
-                .Where(x => x.Type == EEntityType.CopVehicle)
+                .Where(x => x.Type == EEntityType.Scenery)
+                .Where(x => !x.IsInvalid)
                 .ToList()
-                .ForEach(x => Instances.Remove(x));
-            Instances.RemoveAll(x => cops.Any(instance => x == instance));
+                .ForEach(x => x.Release());
             Logger.Trace($"{GetType()} state after release {this}");
 
             RoadblockHelpers.ReleaseInstancesToLspdfr(cops, Vehicle);

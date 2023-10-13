@@ -40,6 +40,11 @@ namespace AutomaticRoadblocks.Instances
         bool IsInvalid { get; }
 
         /// <summary>
+        /// Retrieve the current state of this instance.
+        /// </summary>
+        InstanceState State { get; }
+
+        /// <summary>
         /// Release the <see cref="Entity"/> back to the game world.
         /// This method removes persistence and other attributes on the <see cref="Entity"/> which might be memory intensive.
         /// </summary>

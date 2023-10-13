@@ -1,5 +1,7 @@
+using System;
 using AutomaticRoadblocks.Localization;
 using AutomaticRoadblocks.Models;
+using AutomaticRoadblocks.Utils;
 using Rage;
 
 namespace AutomaticRoadblocks.LightSources
@@ -73,7 +75,7 @@ namespace AutomaticRoadblocks.LightSources
             var model = new WeaponAsset(light.Model);
 
             // load the asset into memory
-            model.LoadAndWait();
+            LoadAssetIntoMemory(light, model);
 
             return new LightModel
             {
@@ -90,7 +92,7 @@ namespace AutomaticRoadblocks.LightSources
             var model = new Model(light.Model);
 
             // load the asset into memory
-            model.LoadAndWait();
+            LoadAssetIntoMemory(light, model);
 
             return new LightModel
             {
@@ -100,6 +102,18 @@ namespace AutomaticRoadblocks.LightSources
                 WeaponAsset = null,
                 Width = DimensionOf(model)
             };
+        }
+        
+        private static void LoadAssetIntoMemory(Light light, IAsset asset)
+        {
+            GameUtils.NewSafeFiber(() =>
+            {
+                Logger.Trace($"Loading light asset for {light}");
+                var loadingStartedAt = DateTime.Now.Ticks;
+                asset.LoadAndWait();
+                var timeTaken = (DateTime.Now.Ticks - loadingStartedAt) / TimeSpan.TicksPerMillisecond;
+                Logger.Debug($"Light asset {light} has been loaded in {timeTaken}ms");
+            }, "LightModel.LoadAssetIntoMemory");
         }
     }
 }

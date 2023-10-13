@@ -55,6 +55,7 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Instances\InstanceState.cs" />
         <Compile Include="Logging\ILogger.cs" />
         <Compile Include="Logging\ELogLevel.cs" />
         <Compile Include="Logging\RageLogger.cs" />

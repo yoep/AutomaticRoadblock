@@ -59,19 +59,5 @@ namespace AutomaticRoadblocks.Instances
         }
 
         #endregion
-
-        #region IARInstance
-
-        /// <inheritdoc />
-        public override void Release()
-        {
-            base.Release();
-            if (GameInstance == null || !GameInstance.IsValid())
-                return;
-
-            GameInstance.IsPersistent = false;
-        }
-
-        #endregion
     }
 }

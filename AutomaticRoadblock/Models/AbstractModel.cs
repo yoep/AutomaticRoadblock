@@ -1,12 +1,15 @@
 using System;
 using System.Linq;
 using AutomaticRoadblocks.Localization;
+using AutomaticRoadblocks.Logging;
 using Rage;
 
 namespace AutomaticRoadblocks.Models
 {
     public abstract class AbstractModel : IModel
     {
+        protected static readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+        
         #region Properties
 
         /// <inheritdoc />

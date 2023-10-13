@@ -49,8 +49,8 @@ namespace AutomaticRoadblocks.ManualPlacement
         public override void Spawn()
         {
             base.Spawn();
-            RedirectTrafficCop.RedirectTraffic();
-            
+            RedirectTrafficCop?.RedirectTraffic();
+
             foreach (var cop in CopInstances.Where(x => x != RedirectTrafficCop))
             {
                 cop.Guard();

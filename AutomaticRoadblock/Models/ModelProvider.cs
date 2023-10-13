@@ -20,6 +20,7 @@ namespace AutomaticRoadblocks.Models
             _lightSourceData = lightSourceData;
 
             // do an initial load as some components might depend on them
+            logger.Debug("Initial data is being loaded for ModelProvider");
             Reload();
         }
 
@@ -122,11 +123,13 @@ namespace AutomaticRoadblocks.Models
 
         private void InvokeBarrierModelsChanged(IEnumerable<BarrierModel> models)
         {
+            _logger.Trace($"Barrier models has changed, invoking listeners");
             BarrierModelsChanged?.Invoke(models);
         }
 
         private void InvokeLightModelsChanged(IEnumerable<LightModel> models)
         {
+            _logger.Trace("Light models has changed, invoking listeners");
             LightModelsChanged?.Invoke(models);
         }
 
