@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Drawing;
 using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Utils;
 using Rage;
@@ -7,12 +9,14 @@ namespace AutomaticRoadblocks.Instances
     public abstract class AbstractInstance<T> : IARInstance<T> where T : Entity
     {
         protected readonly ILogger Logger = IoC.Instance.GetInstance<ILogger>();
+        private InstanceState _state = InstanceState.Idle;
 
         protected AbstractInstance(T instance)
         {
             Assert.NotNull(instance, "instance cannot be null");
             GameInstance = instance;
             GameInstance.MakePersistent();
+            DrawDebugInfo();
         }
 
         #region Properties
@@ -41,6 +45,13 @@ namespace AutomaticRoadblocks.Instances
         public bool IsInvalid => GameInstance == null ||
                                  !GameInstance.IsValid();
 
+        /// <inheritdoc />
+        public InstanceState State
+        {
+            get => _state;
+            protected set => UpdateState(value);
+        }
+
         #endregion
 
         #region IPreviewSupport
@@ -61,6 +72,8 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public virtual void Dispose()
         {
+            State = InstanceState.Disposed;
+
             if (!IsInvalid)
                 EntityUtils.Remove(GameInstance);
         }
@@ -68,11 +81,61 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public virtual void Release()
         {
-            if (!IsInvalid)
+            State = InstanceState.Released;
+
+            if (IsInvalid)
             {
-                GameInstance.IsPersistent = false;
-                GameInstance.Dismiss();
+                Logger.Warn($"Unable to release instance {this}, game instance is invalid");
+                return;
             }
+
+            GameInstance.IsPersistent = false;
+            GameInstance.Dismiss();
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{nameof(Type)}: {Type}, " +
+                   $"{nameof(IsInvalid)}: {IsInvalid}, " +
+                   $"{nameof(State)}: {State}, " +
+                   $"{nameof(IsPreviewActive)}: {IsPreviewActive}";
+        }
+
+        #endregion
+
+        #region Functions
+
+        private void UpdateState(InstanceState newState)
+        {
+            if (_state == InstanceState.Disposed)
+            {
+                Logger.Warn($"Unable to update instance state to {newState}, current state is {_state}");
+                return;
+            }
+
+            _state = newState;
+        }
+
+        [Conditional("DEBUG")]
+        private void DrawDebugInfo()
+        {
+            GameUtils.NewSafeFiber(() =>
+            {
+                while (State != InstanceState.Disposed && !IsInvalid)
+                {
+                    var position = Position + Vector3.WorldUp * 5f;
+                    var color = State switch
+                    {
+                        InstanceState.Disposed => Color.Black,
+                        InstanceState.Idle => GameInstance.IsPersistent ? Color.Orange : Color.Gray,
+                        InstanceState.Released => Color.Green,
+                    };
+
+                    GameUtils.DrawArrow(position, Vector3.WorldDown, Rotator.Zero, 1.5f, color);
+                    GameFiber.Yield();
+                }
+            }, "AbstractInstance.DrawDebugInfo");
         }
 
         #endregion
