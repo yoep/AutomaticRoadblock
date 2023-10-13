@@ -189,6 +189,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             DeletePreview();
             Instances
                 .Where(x => !x.IsInvalid)
+                .Where(x => x.State != InstanceState.Released)
                 .ToList()
                 .ForEach(x => DoSafeOperation(x.Dispose, $"dispose instance slot {x}"));
         }
@@ -384,13 +385,6 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected void DoInternalRelease(IList<ARPed> cops)
         {
             Logger.Trace($"Releasing {GetType()} {this}");
-            // release all vehicles
-            Instances
-                .Where(x => x.Type == EEntityType.CopVehicle)
-                .ToList()
-                .ForEach(x => Instances.Remove(x));
-            // release all cop instances
-            Instances.RemoveAll(x => cops.Any(instance => x == instance));
             // release all scenery instances
             Instances
                 .Where(x => x.Type == EEntityType.Scenery)
