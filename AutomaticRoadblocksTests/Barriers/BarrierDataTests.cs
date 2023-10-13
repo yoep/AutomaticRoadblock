@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.Barriers
         [Fact]
         public void TestBarriersDeserialization()
         {
-            var expectedResult = new Barrier("Small cone", "small_cone", "prop_mp_cone_03", 0.4, EBarrierFlags.ManualPlacement | EBarrierFlags.RedirectTraffic);
+            var expectedResult = new Barrier("Small cone", "small_cone", "prop_mp_cone_03", 0.5, EBarrierFlags.ManualPlacement | EBarrierFlags.RedirectTraffic);
             var modelData = IoC.Instance.GetInstance<IBarrierData>();
 
             var result = modelData.Barriers;
