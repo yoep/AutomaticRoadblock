@@ -60,7 +60,7 @@ namespace AutomaticRoadblocks.Roadblock
         {
             GameUtils.NewSafeFiber(() =>
             {
-                if (vehicle != null && vehicle.IsValid())
+                if (vehicle != null && vehicle.IsValid() && !ped.IsInvalid)
                 {
                     var instance = ped.GameInstance;
 
@@ -76,7 +76,7 @@ namespace AutomaticRoadblocks.Roadblock
                 {
                     Logger.Error("Unable to release cop instances correctly, cannot enter vehicle as it's null or invalid");
                 }
-            }, $"RoadblockHelpers.TryEnteringVehicle");
+            }, "RoadblockHelpers.TryEnteringVehicle");
         }
     }
 }
