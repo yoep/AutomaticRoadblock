@@ -385,12 +385,12 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         protected void DoInternalRelease(IList<ARPed> cops)
         {
             Logger.Trace($"Releasing {GetType()} {this}");
-            // release all scenery instances
+            // release all scenery and barrier instances
             Instances
-                .Where(x => x.Type == EEntityType.Scenery)
                 .Where(x => !x.IsInvalid)
+                .Where(x => x.Type is EEntityType.Scenery or EEntityType.Barrier)
                 .ToList()
-                .ForEach(x => x.Release());
+                .ForEach(DelayedRelease);
             Logger.Trace($"{GetType()} state after release {this}");
 
             RoadblockHelpers.ReleaseInstancesToLspdfr(cops, Vehicle);
@@ -470,6 +470,15 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             {
                 Logger.Error($"Failed to {operation}, {ex.Message}", ex);
             }
+        }
+
+        private static void DelayedRelease(IARInstance<Entity> instance)
+        {
+            GameUtils.NewSafeFiber(() =>
+            {
+                GameFiber.Wait(3000);
+                instance.Release();
+            }, "AbstractRoadblockSlot.DelayedRelease");
         }
 
         [Conditional("DEBUG")]

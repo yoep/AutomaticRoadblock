@@ -61,7 +61,17 @@ namespace AutomaticRoadblocks.LightSources
         public static LightModel From(Light light)
         {
             Assert.NotNull(light, "light cannot be null");
-            return light.Model.StartsWith(WeaponAssetPrefix) ? FromWeapon(light) : FromModel(light);
+            Logger.Trace($"Creating LightModel for {light}");
+            var lightModel = new LightModel
+            {
+                Light = light,
+                LocalizationKey = new LocalizationKey(LocalizationKeyPrefix + ToCamelCase(light.ScriptName), light.Name),
+            };
+
+            // load the asset into memory
+            LoadAssetIntoMemory(lightModel);
+
+            return lightModel;
         }
 
         public override string ToString()
@@ -70,52 +80,42 @@ namespace AutomaticRoadblocks.LightSources
                    $"{nameof(Spacing)}: {Spacing}, {nameof(IsNone)}: {IsNone}";
         }
 
-        private static LightModel FromWeapon(Light light)
-        {
-            var model = new WeaponAsset(light.Model);
-
-            // load the asset into memory
-            LoadAssetIntoMemory(light, model);
-
-            return new LightModel
-            {
-                Light = light,
-                LocalizationKey = new LocalizationKey(LocalizationKeyPrefix + ToCamelCase(light.ScriptName), light.Name),
-                Model = null,
-                WeaponAsset = model,
-                Width = 0.05f
-            };
-        }
-
-        private static LightModel FromModel(Light light)
-        {
-            Assert.NotNull(light, "light cannot be null");
-            Logger.Trace($"Creating BarrierModel for {light}");
-            var model = new Model(light.Model);
-
-            // load the asset into memory
-            LoadAssetIntoMemory(light, model);
-
-            return new LightModel
-            {
-                Light = light,
-                LocalizationKey = new LocalizationKey(LocalizationKeyPrefix + ToCamelCase(light.ScriptName), light.Name),
-                Model = model,
-                WeaponAsset = null,
-                Width = DimensionOf(model)
-            };
-        }
-        
-        private static void LoadAssetIntoMemory(Light light, IAsset asset)
+        private static void LoadAssetIntoMemory(LightModel lightModel)
         {
             GameUtils.NewSafeFiber(() =>
             {
-                Logger.Trace($"Loading light asset for {light}");
+                Logger.Trace($"Creating barrier model {lightModel.Light.Model}");
+                var asset = CreateAsset(lightModel);
+                Logger.Trace($"Loading light asset for {lightModel}");
                 var loadingStartedAt = DateTime.Now.Ticks;
                 asset.LoadAndWait();
                 var timeTaken = (DateTime.Now.Ticks - loadingStartedAt) / TimeSpan.TicksPerMillisecond;
-                Logger.Debug($"Light asset {light} has been loaded in {timeTaken}ms");
+                Logger.Debug($"Light asset {lightModel} has been loaded in {timeTaken}ms");
+
+                if (IsWeaponModel(lightModel.Light))
+                {
+                    lightModel.WeaponAsset = (WeaponAsset) asset;
+                    lightModel.Width = 0.05f;
+                }
+                else
+                {
+                    var model = (Model) asset;
+                    lightModel.Model = model;
+                    lightModel.Width = DimensionOf(model);
+                }
+                Logger.Trace($"Updated light model info for {lightModel}");
             }, "LightModel.LoadAssetIntoMemory");
+        }
+
+        private static IHashedAsset CreateAsset(LightModel lightModel)
+        {
+            var modelName = lightModel.Light.Model;
+            return IsWeaponModel(lightModel.Light) ? new WeaponAsset(modelName) : new Model(modelName);
+        }
+
+        private static bool IsWeaponModel(Light light)
+        {
+            return light.Model.StartsWith(WeaponAssetPrefix);
         }
     }
 }

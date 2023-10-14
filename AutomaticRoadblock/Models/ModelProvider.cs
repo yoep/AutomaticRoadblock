@@ -142,7 +142,7 @@ namespace AutomaticRoadblocks.Models
 
             try
             {
-                _logger.Trace($"Loading models for {property} on {Thread.CurrentThread}");
+                _logger.Trace($"Loading models for {property} on {Thread.CurrentThread.Name}");
                 var loadedModels = action.Invoke();
                 _logger.Debug($"Loaded a total of {loadedModels.Count} {property}");
 

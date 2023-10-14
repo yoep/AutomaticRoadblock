@@ -496,6 +496,12 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 Logger.Debug($"Slot cops won't be released to LSPDFR for {this}");
             }
+            
+            Instances
+                .Where(x => !x.IsInvalid)
+                .Where(x => x.Type is EEntityType.Scenery or EEntityType.Barrier)
+                .ToList()
+                .ForEach(DelayedRelease);
 
             GameUtils.NewSafeFiber(() =>
             {
@@ -512,6 +518,15 @@ namespace AutomaticRoadblocks.Roadblock
             {
                 slot.WarpInVehicle();
             }
+        }
+        
+        private static void DelayedRelease(IARInstance<Entity> instance)
+        {
+            GameUtils.NewSafeFiber(() =>
+            {
+                GameFiber.Wait(3000);
+                instance.Release();
+            }, "AbstractRoadblock.DelayedRelease");
         }
 
         #endregion

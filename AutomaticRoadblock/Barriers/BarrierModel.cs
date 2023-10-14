@@ -57,18 +57,16 @@ namespace AutomaticRoadblocks.Barriers
         {
             Assert.NotNull(barrier, "barrier cannot be null");
             Logger.Trace($"Creating BarrierModel for {barrier}");
-            var model = new Model(barrier.Model);
-
-            // load the asset into memory
-            LoadModel(barrier, model);
-
-            return new BarrierModel
+            var barrierModel = new BarrierModel
             {
                 Barrier = barrier,
                 LocalizationKey = new LocalizationKey(LocalizationKeyPrefix + ToCamelCase(barrier.ScriptName), barrier.Name),
-                Model = model,
-                Width = DimensionOf(model)
             };
+
+            // load the asset into memory
+            LoadModel(barrierModel);
+
+            return barrierModel;
         }
 
         /// <inheritdoc />
@@ -101,15 +99,21 @@ namespace AutomaticRoadblocks.Barriers
             }
         }
 
-        private static void LoadModel(Barrier barrier, Model model)
+        private static void LoadModel(BarrierModel barrierModel)
         {
             GameUtils.NewSafeFiber(() =>
             {
-                Logger.Trace($"Loading BarrierModel of {barrier}");
+                Logger.Trace($"Creating barrier model {barrierModel.Model}");
+                var model = new Model(barrierModel.Barrier.Model);
+                Logger.Trace($"Loading model data of {barrierModel}");
                 var loadingStartedAt = DateTime.Now.Ticks;
                 model.LoadAndWait();
                 var timeTaken = (DateTime.Now.Ticks - loadingStartedAt) / TimeSpan.TicksPerMillisecond;
-                Logger.Debug($"BarrierModel {barrier} has been loaded in {timeTaken}ms");
+                Logger.Debug($"BarrierModel {barrierModel} has been loaded in {timeTaken}ms");
+
+                barrierModel.Model = model;
+                barrierModel.Width = DimensionOf(model);
+                Logger.Trace($"Updated barrier model info for {barrierModel}");
             }, "BarrierModel.LoadModel");
         }
     }
