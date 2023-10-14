@@ -28,6 +28,12 @@ namespace AutomaticRoadblocks.LightSources
             Lights = TryToLoadDatafile(LightsFilename, Lights.Defaults);
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{nameof(Lights)}: {Lights}";
+        }
+
         #endregion
         
         #region Functions

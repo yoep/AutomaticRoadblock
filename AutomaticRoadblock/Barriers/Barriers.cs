@@ -72,5 +72,11 @@ namespace AutomaticRoadblocks.Barriers
         }
 
         [XmlUnwrapContents] public List<Barrier> Items { get; internal set; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{nameof(Items)}: [{string.Join(", ", Items)}]";
+        }
     }
 }

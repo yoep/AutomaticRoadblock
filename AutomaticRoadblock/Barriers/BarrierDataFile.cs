@@ -28,6 +28,12 @@ namespace AutomaticRoadblocks.Barriers
             Barriers = TryToLoadDatafile(BarriersFilename, Barriers.Defaults);
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{nameof(Barriers)}: {Barriers}";
+        }
+
         #endregion
 
         #region Functions

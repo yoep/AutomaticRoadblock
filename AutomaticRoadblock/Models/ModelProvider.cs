@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using AutomaticRoadblocks.Barriers;
 using AutomaticRoadblocks.LightSources;
 using AutomaticRoadblocks.Logging;
@@ -83,19 +84,56 @@ namespace AutomaticRoadblocks.Models
         /// <inheritdoc />
         public void Reload()
         {
-            _logger.Trace("Loading available data models");
-            BarrierModels = TrySafeModelLoading(nameof(BarrierModels), () => _barrierModelData.Barriers.Items
-                .Select(BarrierModel.From)
-                .ToList(), InvokeBarrierModelsChanged, new List<BarrierModel> { BarrierModel.None });
-            LightModels = TrySafeModelLoading(nameof(LightModels), () => _lightSourceData.Lights.Items
-                .Select(LightModel.From)
-                .ToList(), InvokeLightModelsChanged, new List<LightModel> { LightModel.None });
-            _logger.Info("Data models have been loaded into the model provider");
+            _logger.Debug("Loading all available data models");
+            BarrierModels = TrySafeModelLoading(nameof(BarrierModels), LoadBarrierModels, InvokeBarrierModelsChanged,
+                new List<BarrierModel> { BarrierModel.None });
+            LightModels = TrySafeModelLoading(nameof(LightModels), LoadLightModels, InvokeLightModelsChanged, new List<LightModel> { LightModel.None });
+            _logger.Info($"A total of {BarrierModels.Count() + LightModels.Count()} models have been loaded into the model provider");
         }
 
         #endregion
 
         #region Functions
+
+        private List<BarrierModel> LoadBarrierModels()
+        {
+            if (_barrierModelData == null)
+            {
+                _logger.Error("Unable to load barrier models, _barrierModelData is null");
+                return new List<BarrierModel>();
+            }
+
+            if (_barrierModelData.Barriers == null)
+            {
+                _logger.Error("Unable to load barrier models, _barrierModelData.Barriers is null");
+                return new List<BarrierModel>();
+            }
+
+            _logger.Debug($"Loading a total of {_barrierModelData.Barriers.Items.Count} barrier models for {_barrierModelData}");
+            return _barrierModelData.Barriers.Items
+                .Select(BarrierModel.From)
+                .ToList();
+        }
+
+        private List<LightModel> LoadLightModels()
+        {
+            if (_lightSourceData == null)
+            {
+                _logger.Error("Unable to load light models, _lightSourceData is null");
+                return new List<LightModel>();
+            }
+
+            if (_lightSourceData.Lights == null)
+            {
+                _logger.Error("Unable to load light models, _lightSourceData.Lights is null");
+                return new List<LightModel>();
+            }
+
+            _logger.Debug($"Loading a total of {_lightSourceData.Lights.Items.Count} light models for {_lightSourceData}");
+            return _lightSourceData.Lights.Items
+                .Select(LightModel.From)
+                .ToList();
+        }
 
         private IEnumerable<T> TrySafeModelLoading<T>(string property, Func<List<T>> action, Action<IEnumerable<T>> invokeEvent, List<T> defaults = null)
         {
@@ -104,7 +142,7 @@ namespace AutomaticRoadblocks.Models
 
             try
             {
-                _logger.Trace($"Loading models for {property}");
+                _logger.Trace($"Loading models for {property} on {Thread.CurrentThread}");
                 var loadedModels = action.Invoke();
                 _logger.Debug($"Loaded a total of {loadedModels.Count} {property}");
 

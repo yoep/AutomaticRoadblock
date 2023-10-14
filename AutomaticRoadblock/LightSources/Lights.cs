@@ -38,5 +38,11 @@ namespace AutomaticRoadblocks.LightSources
         };
 
         [XmlUnwrapContents] public List<Light> Items { get; internal set; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{nameof(Items)}: [{string.Join(", ", Items)}]";
+        }
     }
 }

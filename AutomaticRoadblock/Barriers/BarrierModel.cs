@@ -56,6 +56,7 @@ namespace AutomaticRoadblocks.Barriers
         public static BarrierModel From(Barrier barrier)
         {
             Assert.NotNull(barrier, "barrier cannot be null");
+            Logger.Trace($"Creating BarrierModel for {barrier}");
             var model = new Model(barrier.Model);
 
             // load the asset into memory

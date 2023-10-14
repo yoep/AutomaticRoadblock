@@ -89,6 +89,8 @@ namespace AutomaticRoadblocks.LightSources
 
         private static LightModel FromModel(Light light)
         {
+            Assert.NotNull(light, "light cannot be null");
+            Logger.Trace($"Creating BarrierModel for {light}");
             var model = new Model(light.Model);
 
             // load the asset into memory
