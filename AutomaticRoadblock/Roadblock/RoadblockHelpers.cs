@@ -5,8 +5,6 @@ using AutomaticRoadblocks.Instances;
 using AutomaticRoadblocks.Logging;
 using AutomaticRoadblocks.Utils;
 using AutomaticRoadblocks.Vehicles;
-using LSPD_First_Response.Mod.API;
-using Rage;
 
 namespace AutomaticRoadblocks.Roadblock
 {
@@ -25,26 +23,31 @@ namespace AutomaticRoadblocks.Roadblock
             Assert.NotNull(copInstances, "copInstances cannot be null");
             try
             {
-                // release the cops instances
-                copInstances
-                    .Where(x => x is { IsInvalid: false })
-                    .ToList()
-                    .ForEach(x => x.Release());
+                // always cancel all tasks of the cops
+                Logger.Trace($"Clearing all tasks for a total of {copInstances.Count} cops");
+                foreach (var ped in copInstances)
+                {
+                    ped.ClearAllTasks(true);
+                }
 
-                // release the vehicle instance
-                if (vehicle != null)
-                    vehicle.Release();
-
-                // make sure the cops are in a vehicle when releasing them
-                Logger.Trace($"Releasing a total of {copInstances.Count} cops to LSPDFR");
-
-                if (vehicle != null)
+                // command the cops to start entering their vehicle if possible
+                // if not, due to no valid vehicle, release all cops back to the world
+                if (vehicle is { IsInvalid: false })
                 {
                     for (var i = 0; i < copInstances.Where(x => x is { IsInvalid: false }).ToList().Count; i++)
                     {
                         var cop = copInstances[i];
-                        TryEnteringVehicle(cop, vehicle.GameInstance, i == 0 ? EVehicleSeat.Driver : EVehicleSeat.Any);
+                        TryEnteringVehicle(cop, vehicle, i == 0 ? EVehicleSeat.Driver : EVehicleSeat.Any);
                     }
+                }
+                else
+                {
+                    // release the cop instances
+                    Logger.Trace($"Releasing a total of {copInstances.Count} cops to LSPDFR");
+                    copInstances
+                        .Where(x => x is { IsInvalid: false })
+                        .ToList()
+                        .ForEach(x => x.Release());
                 }
 
                 Logger.Info("Instances have been released to LSPDFR");
@@ -56,21 +59,27 @@ namespace AutomaticRoadblocks.Roadblock
             }
         }
 
-        private static void TryEnteringVehicle(ARPed ped, Vehicle vehicle, EVehicleSeat vehicleSeat)
+        private static void TryEnteringVehicle(ARPed ped, ARVehicle vehicle, EVehicleSeat vehicleSeat)
         {
             GameUtils.NewSafeFiber(() =>
             {
-                if (vehicle != null && vehicle.IsValid() && !ped.IsInvalid)
+                if (vehicle is { IsInvalid: false } && !ped.IsInvalid)
                 {
                     var instance = ped.GameInstance;
+                    var vehicleInstance = vehicle.GameInstance;
 
-                    if (!instance.IsInVehicle(vehicle, true))
-                    {
-                        instance.Tasks.EnterVehicle(vehicle, 20000, (int)vehicleSeat).WaitForCompletion();
-                    }
+                    // make the cop enter the vehicle if it isn't already
+                    // before doing this, all running tasks should have been cancelled upfront
+                    if (!instance.IsInVehicle(vehicleInstance, true))
+                        instance.Tasks.EnterVehicle(vehicleInstance, 15000, (int)vehicleSeat).WaitForCompletion();
 
+                    // release the vehicle from this plugin once the driver has entered
+                    // this should prevent the vehicle from despawning too fast before the cops were able to enter it
                     if (vehicleSeat == EVehicleSeat.Driver)
-                        Functions.SetCopAsBusy(instance, false);
+                        vehicle.Release();
+
+                    // release the ped from this plugin
+                    ped.Release();
                 }
                 else
                 {

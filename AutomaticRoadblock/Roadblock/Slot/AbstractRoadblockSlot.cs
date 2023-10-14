@@ -472,7 +472,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             }
         }
 
-        private void DelayedRelease(IARInstance<Entity> instance)
+        private static void DelayedRelease(IARInstance<Entity> instance)
         {
             GameUtils.NewSafeFiber(() =>
             {
