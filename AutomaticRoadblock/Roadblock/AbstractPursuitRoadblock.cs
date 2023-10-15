@@ -545,7 +545,7 @@ namespace AutomaticRoadblocks.Roadblock
 
                 while (State is not ERoadblockState.Disposing and not ERoadblockState.Disposed)
                 {
-                    foreach (var ped in copsJoiningThePursuit)
+                    foreach (var ped in copsJoiningThePursuit.Where(x => x.IsValid()))
                     {
                         var position = ped.Position + Vector3.WorldUp * 6.5f;
                         GameUtils.DrawArrow(position, Vector3.WorldDown, Rotator.Zero, 1.5f, color);
