@@ -235,6 +235,7 @@ namespace AutomaticRoadblocks.Roadblock
 
                 Slots.ToList().ForEach(SpawnSlot);
                 UpdateState(ERoadblockState.Active);
+                Instances.ForEach(x => x.MakePersistent());
                 
                 return Slots.Any(x => x.State != ERoadblockSlotState.Spawned);
             }

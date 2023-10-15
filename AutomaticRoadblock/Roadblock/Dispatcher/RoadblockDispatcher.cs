@@ -137,7 +137,7 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
             {
                 roadblocksToRelease = _roadblocks
                     .Select(x => x.Roadblock)
-                    .Where(x => x.State == ERoadblockState.Active)
+                    .Where(x => x.State is ERoadblockState.Active or ERoadblockState.Bypassed or ERoadblockState.Hit)
                     .ToList();
             }
 
@@ -466,13 +466,17 @@ namespace AutomaticRoadblocks.Roadblock.Dispatcher
                 _logger.Info("Roadblock dispatch cleaner started");
                 while (_cleanerRunning)
                 {
+                    int totalRoadblocks;
+                    
                     // verify if we need to do a cleanup
                     // if there are no roadblocks, skip the cleanup
                     lock (_roadblocks)
                     {
-                        if (_roadblocks.Count > 0)
-                            DoCleanupTick();
+                        totalRoadblocks = _roadblocks.Count;
                     }
+                    
+                    if (totalRoadblocks > 0)
+                        DoCleanupTick();
 
                     GameFiber.Wait(10 * 1000);
                 }

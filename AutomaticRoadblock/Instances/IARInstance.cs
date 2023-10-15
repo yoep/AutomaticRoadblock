@@ -49,5 +49,17 @@ namespace AutomaticRoadblocks.Instances
         /// This method removes persistence and other attributes on the <see cref="Entity"/> which might be memory intensive.
         /// </summary>
         void Release();
+
+        /// <summary>
+        /// Dismiss the <see cref="Entity"/> which will allow it to be garbage collected by the game engine.
+        /// The difference with <see cref="Release"/> is that the <see cref="Entity"/> won't be released back to other plugins, such as LSPDFR. 
+        /// </summary>
+        void Dismiss();
+
+        /// <summary>
+        /// Makes sure that the game instance is persistent and won't be despawned by the game engine.
+        /// This might modify the current from <see cref="InstanceState.Released"/> if applicable.
+        /// </summary>
+        void MakePersistent();
     }
 }

@@ -52,6 +52,7 @@ namespace AutomaticRoadblocks.Roadblock
             RoadblockStateChanged += OnStateChanged;
 
             Initialize();
+            DrawDebugInfo();
         }
 
         #region Properties
@@ -367,28 +368,28 @@ namespace AutomaticRoadblocks.Roadblock
         private void Monitor()
         {
             GameUtils.NewSafeFiber(() =>
-            {
-                while (State == ERoadblockState.Active)
                 {
-                    try
+                    while (State == ERoadblockState.Active)
                     {
-                        if (Flags.HasFlag(ERoadblockFlags.DetectBypass))
-                            VerifyIfRoadblockIsBypassed();
-                        VerifyRoadblockCopKilled();
+                        try
+                        {
+                            if (Flags.HasFlag(ERoadblockFlags.DetectBypass))
+                                VerifyIfRoadblockIsBypassed();
+                            VerifyRoadblockCopKilled();
 
-                        // verify if the target vehicle instance is still valid
-                        // if not, set the state to invalid for this roadblock
-                        if (IsVehicleInstanceInvalid)
-                            InvalidateTheRoadblock();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error($"An error occurred while monitoring the roadblock, {ex.Message}", ex);
-                    }
+                            // verify if the target vehicle instance is still valid
+                            // if not, set the state to invalid for this roadblock
+                            if (IsVehicleInstanceInvalid)
+                                InvalidateTheRoadblock();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error($"An error occurred while monitoring the roadblock, {ex.Message}", ex);
+                        }
 
-                    GameFiber.Yield();
-                }
-            }, $"{GetType()}.Monitor");
+                        GameFiber.Yield();
+                    }
+                }, $"{GetType()}.Monitor");
         }
 
         private void VerifyIfRoadblockIsBypassed()
@@ -532,6 +533,36 @@ namespace AutomaticRoadblocks.Roadblock
                     GameFiber.Yield();
                 }
             }, "Roadblock.Preview");
+        }
+
+        [Conditional("DEBUG")]
+        private void DrawDebugInfo()
+        {
+            GameUtils.NewSafeFiber(() =>
+            {
+                var color = PursuitIndicatorColor();
+                var copsJoiningThePursuit = RetrieveCopsJoiningThePursuit(false);
+
+                while (State is not ERoadblockState.Disposing and not ERoadblockState.Disposed)
+                {
+                    foreach (var ped in copsJoiningThePursuit)
+                    {
+                        var position = ped.Position + Vector3.WorldUp * 6.5f;
+                        GameUtils.DrawArrow(position, Vector3.WorldDown, Rotator.Zero, 1.5f, color);
+                    }
+
+                    foreach (var ped in Slots
+                                 .SelectMany(x => x.Cops)
+                                 .Where(x => !x.IsInvalid && !copsJoiningThePursuit.Contains(x.GameInstance))
+                                 .Select(x => x.GameInstance))
+                    {
+                        var position = ped.Position + Vector3.WorldUp * 5.5f;
+                        GameUtils.DrawArrow(position, Vector3.WorldDown, Rotator.Zero, 1.5f, Color.DarkRed);
+                    }
+
+                    GameFiber.Yield();
+                }
+            }, "AbstractPursuitRoadblock.DrawDebugInfo");
         }
 
         private Color PursuitIndicatorColor()

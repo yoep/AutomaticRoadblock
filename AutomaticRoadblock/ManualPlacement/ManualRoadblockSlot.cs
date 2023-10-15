@@ -55,6 +55,8 @@ namespace AutomaticRoadblocks.ManualPlacement
             {
                 cop.Guard();
             }
+            
+            Instances.ForEach(x => x.MakePersistent());
         }
 
         /// <inheritdoc />

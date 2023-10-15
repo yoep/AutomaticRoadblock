@@ -171,6 +171,7 @@ namespace AutomaticRoadblocks.RedirectTraffic
                     Vehicle.GameInstance.IndicatorLightsStatus = VehicleIndicatorLightsStatus.Both;
 
                 Cop.RedirectTraffic();
+                _instances.ForEach(x => x.MakePersistent());
                 return true;
             }
             catch (Exception ex)

@@ -36,21 +36,33 @@ namespace AutomaticRoadblocks.Instances
         public bool IsInvalid => SpikeStrip.State is ESpikeStripState.Preparing or ESpikeStripState.Disposed;
 
         /// <inheritdoc />
-        public InstanceState State => InstanceState.Idle;
-        
+        public InstanceState State { get; private set; }
+
         /// <summary>
         /// The spike strip instance.
         /// </summary>
         public ISpikeStrip SpikeStrip { get; }
-
 
         #endregion
 
         /// <inheritdoc />
         public void Release()
         {
+            Dismiss();
+        }
+
+        /// <inheritdoc />
+        public void Dismiss()
+        {
             // retract the spike strip
             SpikeStrip.Undeploy();
+            State = InstanceState.Released;
+        }
+
+        /// <inheritdoc />
+        public void MakePersistent()
+        {
+            // no-op
         }
 
         #region IPreviewSupport
@@ -78,6 +90,7 @@ namespace AutomaticRoadblocks.Instances
         public void Dispose()
         {
             SpikeStrip.Dispose();
+            State = InstanceState.Disposed;
         }
 
         #endregion

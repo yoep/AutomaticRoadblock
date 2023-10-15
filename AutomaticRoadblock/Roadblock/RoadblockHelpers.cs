@@ -23,12 +23,12 @@ namespace AutomaticRoadblocks.Roadblock
             Assert.NotNull(copInstances, "copInstances cannot be null");
             try
             {
-                // always cancel all tasks of the cops
+                // always cancel all tasks of the cops which are not within a vehicle
                 Logger.Trace($"Clearing all tasks for a total of {copInstances.Count} cops");
-                foreach (var ped in copInstances)
-                {
-                    ped.ClearAllTasks(true);
-                }
+                copInstances
+                    .Where(x => !x.IsInvalid && x.GameInstance.CurrentVehicle == null)
+                    .ToList()
+                    .ForEach(x => x.ClearAllTasks(true));
 
                 // command the cops to start entering their vehicle if possible
                 // if not, due to no valid vehicle, release all cops back to the world

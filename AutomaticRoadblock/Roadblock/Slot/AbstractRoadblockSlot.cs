@@ -316,7 +316,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             {
                 return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading - 180) * GetVehicleWidth();
             }
-            
+
             return Vehicle.GameInstance.LeftPosition + MathHelper.ConvertHeadingToDirection(Heading - 180) * 0.25f;
         }
 
@@ -386,12 +386,19 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Logger.Trace($"Releasing {GetType()} {this}");
             // release all scenery and barrier instances
-            Instances
-                .Where(x => !x.IsInvalid)
-                .Where(x => x.Type is EEntityType.Scenery or EEntityType.Barrier)
-                .ToList()
-                .ForEach(DelayedRelease);
+            foreach (var instance in Instances.Where(x => !x.IsInvalid && x.Type is EEntityType.Scenery or EEntityType.Barrier))
+            {
+                DelayedRelease(instance);
+            }
+
             Logger.Trace($"{GetType()} state after release {this}");
+
+            // dismiss all cops which won't join the pursuit
+            // this allows the instances to be garbage collected by the game engine
+            foreach (var instance in Instances.Where(x => !x.IsInvalid && x.Type == EEntityType.CopPed && !cops.Contains(x)))
+            {
+                instance.Dismiss();
+            }
 
             RoadblockHelpers.ReleaseInstancesToLspdfr(cops, Vehicle);
             State = ERoadblockSlotState.Released;
