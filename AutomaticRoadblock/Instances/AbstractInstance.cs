@@ -15,7 +15,7 @@ namespace AutomaticRoadblocks.Instances
         {
             Assert.NotNull(instance, "instance cannot be null");
             GameInstance = instance;
-            GameInstance.MakePersistent();
+            MakePersistent();
             DrawDebugInfo();
         }
 
@@ -81,16 +81,40 @@ namespace AutomaticRoadblocks.Instances
         /// <inheritdoc />
         public virtual void Release()
         {
-            State = InstanceState.Released;
+            // The default action of Release is the same as Dismiss
+            // This however might be overridden to have separate behaviors for different instance implementations.
+            Dismiss();
+        }
 
+        /// <inheritdoc />
+        public void Dismiss()
+        {
+            State = InstanceState.Released;
+            
             if (IsInvalid)
             {
-                Logger.Warn($"Unable to release instance {this}, game instance is invalid");
+                Logger.Warn($"Unable to dismiss instance {this}, game instance is invalid");
                 return;
             }
-
+            
             GameInstance.IsPersistent = false;
             GameInstance.Dismiss();
+        }
+
+        /// <inheritdoc />
+        public void MakePersistent()
+        {
+            if (IsInvalid)
+                return;
+
+            if (State == InstanceState.Disposed)
+            {
+                Logger.Warn($"Unable to make instance persistent, invalid state {State} for {this}");
+                return;
+            }
+            
+            GameInstance.IsPersistent = true;
+            State = InstanceState.Idle;
         }
 
         /// <inheritdoc />

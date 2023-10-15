@@ -23,6 +23,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
     {
         private const float DefaultVehicleWidth = 2.5f;
         private const float DefaultVehicleLength = 4f;
+        private const float ReleaseAfterDistance = 50f;
         protected const int VehicleHeadingMaxOffset = 25;
         protected static readonly Random Random = new();
 
@@ -187,11 +188,21 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         public virtual void Dispose()
         {
             DeletePreview();
-            Instances
-                .Where(x => !x.IsInvalid)
-                .Where(x => x.State != InstanceState.Released)
-                .ToList()
-                .ForEach(x => DoSafeOperation(x.Dispose, $"dispose instance slot {x}"));
+
+            // Release all additional units which might have joined the pursuit
+            // This should prevent cops from despawning in the pursuit near the target
+            foreach (var instance in Instances
+                         .Where(x => !x.IsInvalid && x.Type is EEntityType.CopPed or EEntityType.CopVehicle)
+                         .Where(x => x.State is not InstanceState.Released and not InstanceState.Disposed && x.Position.DistanceTo(Position) >= ReleaseAfterDistance))
+            {
+                instance.Release();
+            }
+
+            // Dispose all remaining instances
+            foreach (var instance in Instances.Where(x => !x.IsInvalid && x.State != InstanceState.Released))
+            {
+                DoSafeOperation(instance.Dispose, $"dispose instance slot {instance}");
+            }
         }
 
         #endregion
@@ -316,7 +327,7 @@ namespace AutomaticRoadblocks.Roadblock.Slot
             {
                 return OffsetPosition + MathHelper.ConvertHeadingToDirection(Heading - 180) * GetVehicleWidth();
             }
-            
+
             return Vehicle.GameInstance.LeftPosition + MathHelper.ConvertHeadingToDirection(Heading - 180) * 0.25f;
         }
 
@@ -386,12 +397,19 @@ namespace AutomaticRoadblocks.Roadblock.Slot
         {
             Logger.Trace($"Releasing {GetType()} {this}");
             // release all scenery and barrier instances
-            Instances
-                .Where(x => !x.IsInvalid)
-                .Where(x => x.Type is EEntityType.Scenery or EEntityType.Barrier)
-                .ToList()
-                .ForEach(DelayedRelease);
+            foreach (var instance in Instances.Where(x => !x.IsInvalid && x.Type is EEntityType.Scenery or EEntityType.Barrier))
+            {
+                DelayedRelease(instance);
+            }
+
             Logger.Trace($"{GetType()} state after release {this}");
+
+            // dismiss all cops which won't join the pursuit
+            // this allows the instances to be garbage collected by the game engine
+            foreach (var instance in Instances.Where(x => !x.IsInvalid && x.Type == EEntityType.CopPed && !cops.Contains(x)))
+            {
+                instance.Dismiss();
+            }
 
             RoadblockHelpers.ReleaseInstancesToLspdfr(cops, Vehicle);
             State = ERoadblockSlotState.Released;
