@@ -1,6 +1,6 @@
 # Automatic Roadblocks
 
-![Build](https://github.com/yoep/AutomaticRoadblock/workflows/Build/badge.svg)
+![Build](https://github.com/yoep/AutomaticRoadblock/actions/workflows/build.yml/badge.svg?branch=master)
 ![Version](https://img.shields.io/github/v/tag/yoep/AutomaticRoadblock?label=version)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
