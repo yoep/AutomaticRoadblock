@@ -29,6 +29,8 @@ namespace AutomaticRoadblocks.Roadblock
     internal abstract class AbstractPursuitRoadblock : AbstractRoadblock<IPursuitRoadblockSlot>, IPursuitRoadblock
     {
         private const float BypassTolerance = 20f;
+        private const float VehicleCrashedMaxDistance = 30f;
+        private const uint VehicleCrashedDetectionDuration = 2000;
         private const string AudioRoadblockDeployed = "ROADBLOCK_DEPLOYED";
         private const string AudioRoadblockBypassed = "ROADBLOCK_BYPASSED";
         private const string AudioRoadblockHit = "ROADBLOCK_HIT";
@@ -107,11 +109,11 @@ namespace AutomaticRoadblocks.Roadblock
         /// <inheritdoc />
         public override void Release(bool releaseAll = false)
         {
-            // verify if the roadblock is still active
-            // otherwise, we cannot release the entities
-            if (State != ERoadblockState.Active)
+            // verify if the roadblock is still active or been hit
+            // otherwise, we cannot release the entities of this roadblock
+            if (State is not ERoadblockState.Active and ERoadblockState.Hit)
             {
-                Logger.Trace($"Unable to release roadblock instance, instance is not active for {this}");
+                Logger.Trace($"Unable to release roadblock instances, roadblock has invalid state for {this}");
                 return;
             }
 
@@ -338,8 +340,16 @@ namespace AutomaticRoadblocks.Roadblock
 
             Game.DisplayNotification(Localizer[LocalizationKey.RoadblockHasBeenHit]);
             BlipFlashNewState(Color.Green);
+
+            // verify if this roadblock should join the pursuit or not
             if (Flags.HasFlag(ERoadblockFlags.JoinPursuitOnHit))
                 Release();
+
+            // verify if the vehicle has come to a stop after the hit
+            // if so, it's tires might have been popped or fatally crashed
+            // in this scenario, we release all cops to go in for an arrest
+            VehicleCrashedDetection();
+
             UpdateState(ERoadblockState.Hit);
             LspdfrUtils.PlayScannerAudioNonBlocking(type == ERoadblockHitType.SpikeStrip ? AudioSpikeStripHit : AudioRoadblockHit);
             Logger.Info("Roadblock has been hit by the suspect");
@@ -475,6 +485,41 @@ namespace AutomaticRoadblocks.Roadblock
         private void PlayBypassedAudio()
         {
             LspdfrUtils.PlayScannerAudioNonBlocking(Flags.HasFlag(ERoadblockFlags.EnableSpikeStrips) ? AudioSpikeStripBypassed : AudioRoadblockBypassed);
+        }
+
+        private void VehicleCrashedDetection()
+        {
+            GameUtils.NewSafeFiber(() =>
+            {
+                Logger.Trace("Starting a new vehicle crashed detection thread");
+                var averageSpeed = 0f;
+                var startTime = Game.GameTime;
+
+                while (startTime - Game.GameTime < VehicleCrashedDetectionDuration &&
+                       TargetVehicle.IsValid() &&
+                       TargetVehicle.Position.DistanceTo(Position) <= VehicleCrashedMaxDistance &&
+                       State is not ERoadblockState.Disposing and not ERoadblockState.Disposed)
+                {
+                    if (TargetVehicle.IsValid())
+                        averageSpeed += TargetVehicle.Speed;
+
+                    GameFiber.Wait(250);
+                }
+
+                // check if the target is still valid and this roadblock is not being disposed
+                // otherwise, we stop this detection
+                if (State is ERoadblockState.Disposing or ERoadblockState.Disposed || !TargetVehicle.IsValid())
+                    return;
+
+                averageSpeed /= VehicleCrashedDetectionDuration / 250;
+                if (TargetVehicle.IsValid() &&
+                    TargetVehicle.Position.DistanceTo(Position) <= VehicleCrashedMaxDistance && 
+                    averageSpeed < 3f)
+                {
+                    Logger.Info("Target vehicle has come to a stop, releasing all roadblock instances");
+                    Release(true);
+                }
+            }, "AbstractPursuitRoadblock.VehicleCrashedDetection");
         }
 
         private static BarrierModel GetMainBarrier(RoadblockData roadblockData)

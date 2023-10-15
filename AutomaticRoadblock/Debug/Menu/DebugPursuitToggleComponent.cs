@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using AutomaticRoadblocks.Menu;
 using AutomaticRoadblocks.Street;
 using AutomaticRoadblocks.Utils;
@@ -15,7 +16,14 @@ namespace AutomaticRoadblocks.Debug.Menu
     {
         private static readonly Random Random = new();
 
-        private static readonly IReadOnlyList<string> VehicleModels = new List<string>
+        private static readonly IReadOnlyList<string> LunaticsVehicleModels = new List<string>
+        {
+            "burrito3",
+            "gburrito2",
+            "baller5"
+        };
+
+        private static readonly IReadOnlyList<string> VehicleModels = LunaticsVehicleModels.Concat(new List<string>
         {
             "penumbra2",
             "coquette4",
@@ -33,7 +41,7 @@ namespace AutomaticRoadblocks.Debug.Menu
             "baller6",
             "oracle2",
             "pounder2"
-        };
+        }).ToList();
 
         private LHandle _currentPursuit;
 
@@ -73,33 +81,45 @@ namespace AutomaticRoadblocks.Debug.Menu
                 _currentPursuit = Functions.CreatePursuit();
 
                 var type = MenuItem.SelectedItem;
-                var vehicleNode = RoadQuery.FindClosestRoad(GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) * 25f,
+                var vehicleNode = RoadQuery.FindClosestRoad(GameUtils.PlayerPosition + MathHelper.ConvertHeadingToDirection(GameUtils.PlayerHeading) * 50f,
                     EVehicleNodeType.AllNodes);
-                var driver = new Ped(vehicleNode.Position);
-                var passenger = new Ped(vehicleNode.Position);
-                var vehicle = new Vehicle(new Model(VehicleModels[Random.Next(VehicleModels.Count)]), vehicleNode.Position, GameUtils.PlayerHeading);
+                var vehicleModels = type == PursuitType.Lunatics ? LunaticsVehicleModels : VehicleModels;
+                var vehicle = new Vehicle(new Model(vehicleModels[Random.Next(vehicleModels.Count)]), vehicleNode.Position, GameUtils.PlayerHeading)
+                {
+                    IsEngineOn = true
+                };
+                var peds = CreatePeds(type, vehicle);
 
-                driver.RelationshipGroup = RelationshipGroup.Gang1;
-                passenger.RelationshipGroup = RelationshipGroup.Gang1;
+                for (var i = 0; i < peds.Count; i++)
+                {
+                    var ped = peds[i];
 
-                AddWeaponsToPed(driver);
-                AddWeaponsToPed(passenger);
-                driver.WarpIntoVehicle(vehicle, (int)EVehicleSeat.Driver);
-                passenger.WarpIntoVehicle(vehicle, (int)EVehicleSeat.RightFront);
+                    ped.WarpIntoVehicle(vehicle, (int)(i == 0 ? EVehicleSeat.Driver : EVehicleSeat.Any));
+                    Functions.AddPedToPursuit(_currentPursuit, ped);
+
+                    if (i == 0)
+                    {
+                        Functions.GetPedPursuitAttributes(ped).MinDrivingSpeed = 10f;
+                        Functions.GetPedPursuitAttributes(ped).MaxDrivingSpeed = type.MaxDrivingSpeed;
+                    }
+
+                    if (type.Aggressive)
+                    {
+                        Functions.GetPedPursuitAttributes(ped).AverageFightTime = 20;
+                    }
+
+                    if (type == PursuitType.Lunatics)
+                    {
+                        ped.Armor = 100;
+                        Functions.GetPedPursuitAttributes(ped).AverageFightTime = 0;
+                        Functions.GetPedPursuitAttributes(ped).SurrenderChancePittedAndCrashed = 0.05f;
+                        Functions.GetPedPursuitAttributes(ped).SurrenderChanceTireBurstAndCrashed = 0.05f;
+                        Functions.GetPedPursuitAttributes(ped).SurrenderChancePitted = 0.05f;
+                    }
+                }
 
                 Game.SetRelationshipBetweenRelationshipGroups(RelationshipGroup.Gang1.Name, RelationshipGroup.Cop.Name, Relationship.Hate);
                 Game.SetRelationshipBetweenRelationshipGroups(RelationshipGroup.Cop.Name, RelationshipGroup.Gang1.Name, Relationship.Hate);
-
-                Functions.AddPedToPursuit(_currentPursuit, driver);
-                Functions.AddPedToPursuit(_currentPursuit, passenger);
-                Functions.GetPedPursuitAttributes(driver).MinDrivingSpeed = 10f;
-                Functions.GetPedPursuitAttributes(driver).MaxDrivingSpeed = type.MaxDrivingSpeed;
-
-                if (type.Aggressive)
-                {
-                    Functions.GetPedPursuitAttributes(driver).AverageFightTime = 5;
-                    Functions.GetPedPursuitAttributes(passenger).AverageFightTime = 5;
-                }
 
                 Functions.SetPursuitIsActiveForPlayer(_currentPursuit, true);
                 MenuItem.Text = AutomaticRoadblocksPlugin.EndPursuit;
@@ -110,6 +130,23 @@ namespace AutomaticRoadblocks.Debug.Menu
         {
             MenuItem.Text = AutomaticRoadblocksPlugin.StartPursuit;
             _currentPursuit = null;
+        }
+
+        private List<Ped> CreatePeds(PursuitType pursuitType, Vehicle vehicle)
+        {
+            var peds = new List<Ped>();
+            var maxVehicleOccupants = vehicle.FreeSeatsCount;
+            var totalOccupants = pursuitType.MaxOccupants > maxVehicleOccupants ? maxVehicleOccupants : pursuitType.MaxOccupants;
+
+            for (var i = 0; i < totalOccupants; i++)
+            {
+                var instance = new Ped(vehicle.Position);
+                AddWeaponsToPed(instance);
+                instance.RelationshipGroup = RelationshipGroup.Gang1;
+                peds.Add(instance);
+            }
+
+            return peds;
         }
 
         [Conditional("DEBUG")]
@@ -132,12 +169,13 @@ namespace AutomaticRoadblocks.Debug.Menu
 
         public class PursuitType
         {
-            public static readonly PursuitType Slow = new("Slow",15f, false);
-            public static readonly PursuitType SlowAggressive = new("Slow aggressive",15f, true);
-            public static readonly PursuitType Normal = new("Normal",45f, false);
-            public static readonly PursuitType NormalAggressive = new("Normal aggressive",45f, true);
-            public static readonly PursuitType Fast = new("Fast",80f, false);
-            public static readonly PursuitType FastAggressive = new("Fast aggressive",80f, true);
+            public static readonly PursuitType Slow = new("Slow", 15f, false, 1);
+            public static readonly PursuitType SlowAggressive = new("Slow aggressive", 15f, true, 2);
+            public static readonly PursuitType Normal = new("Normal", 45f, false, 2);
+            public static readonly PursuitType NormalAggressive = new("Normal aggressive", 45f, true, 2);
+            public static readonly PursuitType Fast = new("Fast", 80f, false, 2);
+            public static readonly PursuitType FastAggressive = new("Fast aggressive", 80f, true, 2);
+            public static readonly PursuitType Lunatics = new("Lunatics", 80f, true, 4);
 
             public static readonly IEnumerable<PursuitType> Values = new[]
             {
@@ -146,21 +184,25 @@ namespace AutomaticRoadblocks.Debug.Menu
                 Normal,
                 NormalAggressive,
                 Fast,
-                FastAggressive
+                FastAggressive,
+                Lunatics
             };
-            
-            private PursuitType(string displayText, float maxDrivingSpeed, bool aggressive)
+
+            private PursuitType(string displayText, float maxDrivingSpeed, bool aggressive, int maxOccupants)
             {
                 DisplayText = displayText;
                 MaxDrivingSpeed = maxDrivingSpeed;
                 Aggressive = aggressive;
+                MaxOccupants = maxOccupants;
             }
 
             public string DisplayText { get; }
-            
+
             public float MaxDrivingSpeed { get; }
 
             public bool Aggressive { get; }
+
+            public int MaxOccupants { get; }
 
             public override string ToString()
             {
