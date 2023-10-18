@@ -7,6 +7,8 @@ Redistribution of this plugin or uploading it elsewhere is not allowed.
 - Copy the contents of the "Grand Theft Auto V" to the installation directory of GTA V.
 - Modify the "AutomaticRoadblocks.ini" in the Plugins directory to your preferences.
 
+You can ignore the "API Documentation" directory as this is meant for developers who want to integrate this plugin into their plugin.
+
 Advanced configuration
 ----------------------
 
