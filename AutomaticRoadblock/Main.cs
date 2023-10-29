@@ -202,12 +202,27 @@ namespace AutomaticRoadblocks
 
         private static bool IsLSPDFRPluginRunning(string plugin, Version minVersion = null)
         {
-            return Functions
-                .GetAllUserPlugins()
-                .Select(assembly => assembly.GetName())
-                .Where(assemblyName => string.Equals(assemblyName.Name, plugin, StringComparison.CurrentCultureIgnoreCase))
-                .Select(assemblyName => assemblyName.Version)
-                .Any(assemblyVersion => minVersion == null || assemblyVersion.CompareTo(minVersion) >= 0);
+            var logger = IoC.Instance.GetInstance<ILogger>();
+            try
+            {
+                var assemblies = Functions.GetAllUserPlugins();
+                
+                return assemblies != null && assemblies
+                    .Select(assembly => assembly.GetName())
+                    .Where(assemblyName => string.Equals(assemblyName.Name, plugin, StringComparison.CurrentCultureIgnoreCase))
+                    .Select(assemblyName => assemblyName.Version)
+                    .Any(assemblyVersion => minVersion == null || IsVersionCompatible(minVersion, assemblyVersion));
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Failed to verify if LSPDFR plugin \"{plugin}\" is running, {ex.Message}", ex);
+                return false;
+            }
+        }
+
+        private static bool IsVersionCompatible(Version minVersion, Version assemblyVersion)
+        {
+            return assemblyVersion != null && assemblyVersion.CompareTo(minVersion) >= 0;
         }
 
         private static bool IsRequiredAssembliesPresent()
