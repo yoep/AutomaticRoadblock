@@ -3,7 +3,7 @@
         <Name>Flares</Name> <!-- The (display) name of the light -->
         <ScriptName>flares</ScriptName> <!-- The name to use as reference in other data files to this light, this value is also used by the localization -->
         <Model>weapon_flare</Model>  <!-- The game model name -->
-        <Spacing>1.0</Spacing> <!-- The spacing between each light -->
+        <Spacing>1.25</Spacing> <!-- The spacing between each light -->
         <Flags>
             <Flag>Lane</Flag> <!-- Place the lights across the lane -->
         </Flags>
@@ -41,7 +41,7 @@
         <Name>Warning</Name>
         <ScriptName>warning</ScriptName>
         <Model>prop_warninglight_01</Model>
-        <Spacing>1.0</Spacing>
+        <Spacing>1.25</Spacing>
         <Flags>
             <Flag>Lane</Flag>
         </Flags>
