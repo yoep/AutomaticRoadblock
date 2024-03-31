@@ -4,7 +4,7 @@
 ![Version](https://img.shields.io/github/v/tag/yoep/AutomaticRoadblock?label=version)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-Automatic Roadblocks allows the dispatching of roadblocks during a pursuit based on a selected pursuit level.
+Automatic Roadblocks allow the dispatching of roadblocks during a pursuit based on a selected pursuit level.
 When roadblocks are deployed, custom scanner audio is played as well as for the indication that the pursuit level is automatically increased.
 
 ## Features
@@ -21,7 +21,7 @@ When roadblocks are deployed, custom scanner audio is played as well as for the 
 
 ## API/plugin integration
 
-Plugins can use the [Functions](AutomaticRoadblock/API/Functions.cs) for available api's.
+Plugins can use the [Functions](AutomaticRoadblock/API/Functions.cs) for available APIs.
 
 ## Development
 
@@ -38,7 +38,7 @@ Plugins can use the [Functions](AutomaticRoadblock/API/Functions.cs) for availab
 
 To get started using this project, do the following steps.
 
-1. Download all nuget packages through the `restore` target
+1. Download all Nuget packages through the `restore` target
 
 ```bash
 make restore
